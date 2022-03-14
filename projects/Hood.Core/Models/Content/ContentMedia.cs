@@ -1,5 +1,5 @@
 ﻿using Hood.Interfaces;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Hood.Models
 {

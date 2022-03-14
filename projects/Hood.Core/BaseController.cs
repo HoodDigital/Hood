@@ -81,14 +81,14 @@ namespace Hood.Controllers
             }
         }
 
-        protected ViewResult View(ISaveableModel model)
+        protected virtual ViewResult View(ISaveableModel model)
         {
             model.MessageType = MessageType;
             model.SaveMessage = SaveMessage;
             SaveMessage = null;
             return base.View(model);
         }
-        protected ViewResult View(string viewName, ISaveableModel model)
+        protected virtual ViewResult View(string viewName, ISaveableModel model)
         {
             model.MessageType = MessageType;
             model.SaveMessage = SaveMessage;
@@ -96,27 +96,27 @@ namespace Hood.Controllers
             return base.View(viewName, model);
         }
 
-        protected async Task<Response> SuccessResponseAsync<TSource>(string successMessage, string title = null)
+        protected virtual async Task<Response> SuccessResponseAsync<TSource>(string successMessage, string title = null)
         {
             await _logService.AddLogAsync<TSource>(successMessage, type: LogType.Success);
             return new Response(true, successMessage, title);
         }
-        protected async Task<Response> SuccessResponseAsync<TSource>(string successMessage, object logObject, string title = null)
+        protected virtual async Task<Response> SuccessResponseAsync<TSource>(string successMessage, object logObject, string title = null)
         {
             await _logService.AddLogAsync<TSource>(successMessage, logObject, type: LogType.Success);
             return new Response(true, successMessage, title);
         }
-        protected async Task<Response> ErrorResponseAsync<TSource>(string errorMessage, Exception ex)
+        protected virtual async Task<Response> ErrorResponseAsync<TSource>(string errorMessage, Exception ex)
         {
             await _logService.AddExceptionAsync<TSource>(errorMessage, ex);
             return new Response(ex, errorMessage);
         }
-        protected async Task<Response> ErrorResponseAsync<TSource>(string errorMessage, Exception ex, object logObject)
+        protected virtual async Task<Response> ErrorResponseAsync<TSource>(string errorMessage, Exception ex, object logObject)
         {
             await _logService.AddExceptionAsync<TSource>(errorMessage, logObject, ex);
             return new Response(ex, errorMessage);
         }
-        protected async Task<ApplicationUser> GetCurrentUserOrThrow()
+        protected virtual async Task<ApplicationUser> GetCurrentUserOrThrow()
         {
             var user = await _account.GetUserByIdAsync(User.GetLocalUserId());
             if (user == null)

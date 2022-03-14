@@ -46,7 +46,7 @@ namespace Hood.Core
         protected IServiceProvider GetServiceProvider()
         {
             var accessor = ServiceProvider.GetService<IHttpContextAccessor>();
-            var context = accessor.HttpContext;
+            var context = accessor?.HttpContext;
             return context != null ? context.RequestServices : ServiceProvider;
         }
 

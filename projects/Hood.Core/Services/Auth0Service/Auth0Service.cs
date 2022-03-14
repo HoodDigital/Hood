@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Auth0.ManagementApi;
 using Auth0.ManagementApi.Models;
