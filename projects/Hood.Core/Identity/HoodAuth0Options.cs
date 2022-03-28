@@ -40,6 +40,11 @@ namespace Hood.Identity
         public string? ResponseType { get; set; }
         public HttpClient? Backchannel { get; set; }
         public TimeSpan? MaxAge { get; set; }
+        public bool ForwardToReturnUriOnSignup { get; set; } = false;
+        public string AccountControllerName { get; set; } = "Account";
+        public string SignupCompleteAction { get; set; } = "Index";
+        public string SignupCompleteController { get; set; } = "Manage";
+
 
 #nullable disable
 
@@ -70,7 +75,9 @@ namespace Hood.Identity
             var repo = Engine.Services.Resolve<IAccountRepository>();
             var principal = e.Principal;
             var userId = e.Principal.GetUserId();
-            var returnUrl = e.ReturnUri;
+            var returnUrl = e.ReturnUri;                
+            
+            var identity = (ClaimsIdentity)principal.Identity;
 
             // Check if user exists and is linked to this Auth0 account
             var user = await authService.GetUserByAuth0Id(userId);
@@ -80,7 +87,6 @@ namespace Hood.Identity
                 var emailVerifiedClaim = e.Principal.FindFirst("email_verified");
                 if (user.Active || (emailVerifiedClaim != null && emailVerifiedClaim.Value == "true"))
                 {
-                    var identity = (ClaimsIdentity)principal.Identity;
                     identity.AddClaim(new Claim(Identity.HoodClaimTypes.Active, "true"));
                     await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, e.Properties);
                 }
@@ -95,23 +101,21 @@ namespace Hood.Identity
             if (user != null)
             {
                 // user exists, but the current Auth0 signin method is not saved, force them into the connect account flow.
-                var identity = (ClaimsIdentity)principal.Identity;
+
 
                 if (user.ConnectedAuth0Accounts != null && user.ConnectedAuth0Accounts.Count() > 0)
                 {
                     identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountLinkRequired, "true"));
                 }
-                else
-                {
-                    // This is a legacy account just send to the local account connect flow - 
-                    // Email needs to be verified to attach to a local account.
-                }
+
+                // This is a legacy account just send to the local account connect flow - 
+                // Email needs to be verified to attach to a local account.
 
                 identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountNotConnected, "true"));
 
                 await SetDefaultClaims(e, user);
 
-                e.Response.Redirect(linkGenerator.GetPathByAction("ConnectAccount", "Account", new { e.ReturnUri }));
+                e.Response.Redirect(linkGenerator.GetPathByAction("ConnectAccount", this.AccountControllerName, new { returnUrl = e.ReturnUri }));
                 e.HandleResponse();
                 return;
             }
@@ -120,8 +124,8 @@ namespace Hood.Identity
             if (!Engine.Settings.Account.AllowRemoteSignups)
             {
                 // user has not been found, or created & signups are disabled on this end
-                returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", "Account", new { r = "signup-disabled" });
-                e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", "Account", new { returnUrl }));
+                returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = "signup-disabled" });
+                e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new { returnUrl }));
                 e.HandleResponse();
                 return;
             }
@@ -154,8 +158,8 @@ namespace Hood.Identity
             if (!result.Succeeded)
             {
                 // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
-                returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", "Account", new { r = "account-creation-failed" });
-                e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", "Account", new { returnUrl }));
+                returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = "account-creation-failed" });
+                e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new { returnUrl }));
                 e.HandleResponse();
                 return;
             }
@@ -164,8 +168,8 @@ namespace Hood.Identity
             if (user == null)
             {
                 // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
-                returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", "Account", new { r = "account-linking-failed" });
-                e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", "Account", new { returnUrl }));
+                returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = "account-linking-failed" });
+                e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new { returnUrl }));
                 e.HandleResponse();
                 return;
             }
@@ -176,17 +180,27 @@ namespace Hood.Identity
             if (user.Active)
             {
                 // Account is already active, so mark it as such, this allows access to secure areas.
-                var identity = (ClaimsIdentity)principal.Identity;
+
                 identity.AddClaim(new Claim(Identity.HoodClaimTypes.Active, "true"));
             }
 
             await authService.SyncLocalRoles(user, e.Principal.GetRoles());
             await SetDefaultClaims(e, user);
 
+            identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountCreated, "true"));
+
+            if (ForwardToReturnUriOnSignup)
+            {
+                e.Response.Redirect(e.ReturnUri);
+                e.HandleResponse();
+                return;
+            }
+
             // Account setup complete, send user to manage profile with new-account-connection flag.
-            returnUrl = linkGenerator.GetPathByAction("Index", "Manage", new { returnUrl = e.ReturnUri, created = true });
+            returnUrl = linkGenerator.GetPathByAction(this.SignupCompleteAction, this.SignupCompleteController, new { returnUrl = e.ReturnUri, created = true });
             e.Response.Redirect(returnUrl);
             e.HandleResponse();
+            return;
         }
         public virtual Task OnRemoteFailure(RemoteFailureContext e)
         {
@@ -209,8 +223,8 @@ namespace Hood.Identity
                 if (data.ContainsKey("error_description")) { description = data["error_description"]; }
             }
             var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
-            var returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", "Account", new { r = reason, d = description });
-            e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", "Account", new { returnUrl, d = description }));
+            var returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = reason, d = description });
+            e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new { returnUrl, d = description }));
             e.HandleResponse();
             return Task.CompletedTask;
         }
@@ -225,8 +239,8 @@ namespace Hood.Identity
         {
             // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
             var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
-            var returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", "Account", new { r = "auth-failed" });
-            e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", "Account", new
+            var returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = "auth-failed" });
+            e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new
             {
                 returnUrl
             }));

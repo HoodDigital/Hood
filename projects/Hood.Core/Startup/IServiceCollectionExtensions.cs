@@ -94,6 +94,9 @@ namespace Hood.Startup
 
             services.ConfigureEngine(config);
 
+            // TODO: #37 Redo logging service so it logs to app insights, repurpose db logs for internal messaging.             
+            services.AddSingleton<ILogService, LogService>();
+
             return services;
         }
 
@@ -120,7 +123,6 @@ namespace Hood.Startup
             services.AddSingleton<IMediaRefreshService, MediaRefreshService>();
             services.AddSingleton<IDirectoryManager, DirectoryManager>();
             services.AddSingleton<IMediaManager, MediaManager>();
-            services.AddSingleton<ILogService, LogService>();
             services.AddSingleton<ContentCategoryCache>();
             services.AddSingleton<ContentByTypeCache>();
 

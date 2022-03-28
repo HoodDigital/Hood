@@ -4,7 +4,8 @@ namespace Hood.Identity
     {
         public const string AccountNotConnected = "https://schemas.hooddigital.com/hoodcms/account-not-connected";
         public const string AccountLinkRequired = "https://schemas.hooddigital.com/hoodcms/account-link-required";
-        public const string Active = "https://schemas.hooddigital.com/hoodcms/account-active";
+        public const string Active = "https://schemas.hooddigital.com/hoodcms/account-active";        
+        public const string AccountCreated = "https://schemas.hooddigital.com/hoodcms/account-created";
         public const string Anonymous = "https://schemas.hooddigital.com/hoodcms/anonymous";
         public const string LocalUserId = "https://schemas.hooddigital.com/hoodcms/local-user-id";
         public const string IsImpersonating = "https://schemas.hooddigital.com/hoodcms/impersonation-active";
