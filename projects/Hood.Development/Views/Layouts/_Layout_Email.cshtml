@@ -7,13 +7,13 @@
 
 <head>
     <meta charset="utf-8"> <!-- utf-8 works for most cases -->
-    <meta name="viewport" content="width=device-width"> <!-- Forcing initial-scale shouldn't be necessary -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"> <!-- Use the latest (edge) version of IE rendering engine -->
-    <meta name="x-apple-disable-message-reformatting"> <!-- Disable auto-scale in iOS 10 Mail entirely -->
-    <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no"> <!-- Tell iOS not to automatically link certain text strings. -->
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+    <meta name="x-apple-disable-message-reformatting"> 
+    <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no"> 
     <meta name="color-scheme" content="light">
     <meta name="supported-color-schemes" content="light">
-    <title></title> <!-- The title tag shows in email notifications, like Android 4.4. -->
+    <title>@Model.Subject</title> 
 
     <!-- What it does: Makes background images in 72ppi Outlook render at correct size. -->
     <!--[if gte mso 9]>
@@ -24,29 +24,21 @@
         </o:OfficeDocumentSettings>
     </xml>
     <![endif]-->
-
-    <!-- Web Font / @@font-face : BEGIN -->
-    <!-- NOTE: If web fonts are not required, lines 23 - 41 can be safely removed. -->
-
-    <!-- Desktop Outlook chokes on web font references and defaults to Times New Roman, so we force a safe fallback font. -->
     <!--[if mso]>
         <style>
             * {
-                font-family: sans-serif !important;
+                font-family: @Model.FontFamily !important;
             }
         </style>
     <![endif]-->
 
-    <!-- All other clients get the webfont reference; some will render the font and others will silently fail to the fallbacks. More on that here: http://stylecampaign.com/blog/2015/02/webfont-support-in-email/ -->
     <!--[if !mso]><!-->
-    <link href='https://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&amp;display=swap" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&amp;display=swap" rel="stylesheet" type="text/css">
     <!--<![endif]-->
 
-    <!-- Web Font / @@font-face : END -->
-
-    <!-- CSS Reset : BEGIN -->
     <style>
-        /* What it does: Tells the email client that only light styles are provided but the client can transform them to dark. A duplicate of meta color-scheme meta tag above. */
         :root {
             color-scheme: light;
             supported-color-schemes: light;
@@ -60,6 +52,7 @@
             padding: 0 !important;
             height: 100% !important;
             width: 100% !important;
+            font-family: 'Cabin', sans-serif;
         }
 
         /* What it does: Stops email clients resizing small text. */
@@ -91,7 +84,6 @@
             border-spacing: 0 !important;
             border-collapse: collapse !important;
             table-layout: fixed !important;
-            margin: 0 auto !important;
         }
 
         /* What it does: Uses a better rendering method when resizing images in IE. */
@@ -161,57 +153,173 @@
     </style>
     <!-- CSS Reset : END -->
 
-    <!-- Progressive Enhancements : BEGIN -->
+    <!-- Bootstrap Clean : BEGIN -->
     <style>
-        /* What it does: Hover styles for buttons */
-        .button-td,
-        .button-a {
-            transition: all 100ms ease-in;
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
         }
 
-        .button-td-primary:hover,
-        .button-a-primary:hover {
-            background: #555555 !important;
-            border-color: #555555 !important;
-        }
-
-        /* Media Queries */
-        @@mediascreen and (max-width: 480px) {
-
-            /* What it does: Forces table cells into full-width rows. */
-            .stack-column,
-            .stack-column-center {
-                display: block !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                direction: ltr !important;
-            }
-
-            /* And center justify these ones. */
-            .stack-column-center {
-                text-align: center !important;
-            }
-
-            /* What it does: Generic utility class for centering. Useful for images, buttons, and nested tables. */
-            .center-on-narrow {
-                text-align: center !important;
-                display: block !important;
-                margin-left: auto !important;
-                margin-right: auto !important;
-                float: none !important;
-            }
-
-            table.center-on-narrow {
-                display: inline-block !important;
-            }
-
-            /* What it does: Adjust typography on small screens to improve readability */
-            .email-container p {
-                font-size: 17px !important;
+        @@media (prefers-reduced-motion: no-preference) {
+            :root {
+                scroll-behavior: smooth;
             }
         }
+
+        body {
+            margin: 0;
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+        h6,
+        .h6,
+        h5,
+        .h5,
+        h4,
+        .h4,
+        h3,
+        .h3,
+        h2,
+        .h2,
+        h1,
+        .h1 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;            
+            font-family: 'Cabin', sans-serif;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        h1,
+        .h1 {
+            font-size: 39px;
+        }
+        h2,
+        .h2 {
+            font-size: 32px;
+        }
+
+        h3,
+        .h3 {
+            font-size: 27px;
+        }
+
+        h4,
+        .h4 {
+            font-size: 25px;
+        }
+
+        h5,
+        .h5 {
+            font-size: 22px;
+        }
+
+        h6,
+        .h6 {
+            font-size: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        abbr[title],
+        abbr[data-bs-original-title] {
+            text-decoration: underline dotted;
+            cursor: help;
+            text-decoration-skip-ink: none;
+        }
+
+        address {
+            margin-bottom: 1rem;
+            font-style: normal;
+            line-height: inherit;
+        }
+
+        ol,
+        ul {
+            padding-left: 2rem;
+        }
+
+        ol,
+        ul,
+        dl {
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        ol ol,
+        ul ul,
+        ol ul,
+        ul ol {
+            margin-bottom: 0;
+        }
+
+        dt {
+            font-weight: 700;
+        }
+
+        dd {
+            margin-bottom: 0.5rem;
+            margin-left: 0;
+        }
+
+        blockquote {
+            margin: 0 0 1rem;
+        }
+
+        b,
+        strong {
+            font-weight: bolder;
+        }
+
+        small,
+        .small {
+            font-size: 0.875em;
+        }
+
+        mark,
+        .mark {
+            padding: 0.2em;
+            background-color: #fcf8e3;
+        }
+
+        sub,
+        sup {
+            position: relative;
+            font-size: 0.75em;
+            line-height: 0;
+            vertical-align: baseline;
+        }
+
+        sub {
+            bottom: -0.25em;
+        }
+
+        sup {
+            top: -0.5em;
+        }
+
+        a {
+            color: #6c757d;
+            text-decoration: underline;
+        }
+
+        a:hover {
+            color: #565e64;
+        }
+
+        a:not([href]):not([class]),
+        a:not([href]):not([class]):hover {
+            color: inherit;
+            text-decoration: none;
+        }
+
     </style>
-    <!-- Progressive Enhancements : END -->
 
 </head>
 <!--
@@ -223,7 +331,7 @@
 
 <body width="100%" style="margin: 0; padding: 0 !important; mso-line-height-rule: exactly; background-color: @Model.BackgroundColour;">
     <center role="article" aria-roledescription="email" lang="en" style="width: 100%; background-color: @Model.BackgroundColour;">
-        <!--[if mso | IE]>
+    <!--[if mso | IE]>
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: @Model.BackgroundColour;">
     <tr>
     <td>
@@ -245,7 +353,7 @@
 
         <!-- Create white space after the desired preview text so email clients don’t pull other distracting text into the inbox preview. Extend as necessary. -->
         <!-- Preview Text Spacing Hack : BEGIN -->
-        <div style="display: none; font-size: 1px; line-height: 1px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all; font-family: sans-serif;">
+        <div style="display: none; font-size: 1px; line-height: 1px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all;">
             &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
         </div>
         <!-- Preview Text Spacing Hack : END -->
@@ -265,46 +373,53 @@
 
             <!-- Email Body : BEGIN -->
 
-                <!-- Clear Spacer : BEGIN -->
-                <tr>
-                    <td aria-hidden="true" height="20" style="font-size: 0px; line-height: 0px;">
-                        &nbsp;
-                    </td>
-                </tr>
-                <!-- Clear Spacer : END -->
+            <!-- Clear Spacer : BEGIN -->
+            <tr>
+                <td aria-hidden="true" height="20" style="font-size: 0px; line-height: 0px;">
+                    &nbsp;
+                </td>
+            </tr>
+            <!-- Clear Spacer : END -->
+            <tr>
+                <td style="vertical-align: top;" valign="top">
+                    <table border="0" cellpadding="0" cellspacing="0" class="main" style="box-shadow:0 0 27px rgba(0,0,0,0.2);border-collapse:separate;mso-table-lspace: 0pt;mso-table-rspace: 0pt;width:100%;background: #fff;border-radius:6px;box-shadow:0 0 25px rgba(0,0,0,0.2)" width="100%">
+        
+                        <!-- Email Header : BEGIN -->
+                        @Html.Raw(Model.GetHeader())
+                        <!-- Email Header : END -->
 
-                <!-- Email Header : BEGIN -->
-                @Html.Raw(Model.GetHeader())   
-                <!-- Email Header : END -->
+                        <!-- Hero Image, Flush : BEGIN -->
+                        @Html.Raw(Model.GetHero())
+                        <!-- Hero Image, Flush : END -->
 
-                <!-- Hero Image, Flush : BEGIN -->
-                @Html.Raw(Model.GetHero())    
-                <!-- Hero Image, Flush : END -->
+                        @RenderBody()
 
-                @RenderBody()
+                        <!-- Clear Spacer : BEGIN -->
+                        <tr>
+                            <td aria-hidden="true" height="20" style="font-size: 0px; line-height: 0px;">
+                                &nbsp;
+                            </td>
+                        </tr>
+                        <!-- Clear Spacer : END -->
 
-                <!-- Clear Spacer : BEGIN -->
-                <tr>
-                    <td aria-hidden="true" height="20" style="font-size: 0px; line-height: 0px;">
-                        &nbsp;
-                    </td>
-                </tr>
-                <!-- Clear Spacer : END -->
+                        </table>
+                        <!-- Email Body : END -->
+                        @if (Model.EmailSmallPrint.IsSet())
+                        {
+                            <!-- Email Footer : BEGIN -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 680px;" align="center">
+                                <tr>
+                                    <td style="@(Model.GetFontStyles(.75, 1))color:#ccc;padding: 20px;text-align: center;" align="center">
+                                        @Html.Raw(Model.EmailSmallPrint)
+                                    </td>
+                                </tr>
+                            </table>
+                            <!-- Email Footer : END -->
+                        }
 
-            </table>
-            <!-- Email Body : END -->
-            @if (Model.EmailSmallPrint.IsSet())
-            {
-                <!-- Email Footer : BEGIN -->
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 680px;" align="center">
-                    <tr>
-                        <td style="padding: 20px; font-family: sans-serif; font-size: 12px; line-height: 15px; text-align: center;" align="center">
-                            @Html.Raw(Model.EmailSmallPrint)
-                        </td>
-                    </tr>
-                </table>
-                <!-- Email Footer : END -->
-            }
+                    </table>
+                </td>
+            </tr>  
 
             <!--[if mso]>
             </td>

@@ -1,6 +1,7 @@
 ﻿using Hood.Core;
 using Hood.Extensions;
 using SendGrid.Helpers.Mail;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -15,21 +16,25 @@ namespace Hood.Models
         public string Template { get; set; } = Models.MailSettings.PlainTemplate;
 
         public bool ShowSiteSocials { get; set; } = true;
-        public string EmailSmallPrint { get; set; } = "<a href='http://hooddigital.com/' style='color: #999999;text-decoration: none;'>Powered by HoodCMS by Hood Digital</a>.";
+        public string EmailSmallPrint { get; set; } = "";
         public string Logo { get; set; } = "";
-        public string Title { get; set; } = "";                
+        public string Title { get; set; } = "";
         public string HeroImage { get; set; } = "";
+        public string FontFamily { get; set; } = "Poppins,sans-serif";
+        public string LogoAlign { get; set; } = "left";
         public string BackgroundColour { get; set; }
+        public int BaseFontSize { get; set; } = 18;
+        public string MailPadding { get; set; } = "30px";
 
         public string GetBackgroundColor()
         {
             Models.MailSettings mailSettings = Engine.Settings.Mail;
-            
+
             if (!BackgroundColour.IsSet())
                 if (mailSettings.BackgroundColour.IsSet())
                     Logo = mailSettings.BackgroundColour;
 
-            return BackgroundColour;            
+            return BackgroundColour;
         }
 
         public string GetHeader()
@@ -48,23 +53,23 @@ namespace Hood.Models
                     Logo = basicSettings.Logo;
 
             if (Logo.IsSet())
-                return 
+                return
                 @$"<tr>
-                    <td style='padding: 20px 0; text-align: center'>
-                        <h1 class='align-center' style='color:#222222;font-family:sans-serif;font-weight:300;line-height:1.4;margin:0;margin-bottom:30px;font-size:25px;text-transform:capitalize;text-align:center;text-decoration:none;'>
+                    <td style='padding:{MailPadding};text-align:{LogoAlign}'>
+                        <h1 class='align-{LogoAlign}' style='color:#222222;margin:0;margin-bottom:0px;text-align:{LogoAlign};text-decoration:none;'>
                             <img src='{Logo}' alt='{Title}' align='center' style='border:none;-ms-interpolation-mode:bicubic;width:250px;height:auto;' width='300'>
                         </h1>
                     </td>
                 </tr>";
             else
-                return 
+                return
                 @$"<tr>
-                    <td style='padding: 20px 0; text-align: center'>
-                        <h1 class='align-center' style='color:#222222;font-family:sans-serif;font-weight:300;line-height:1.4;margin:0;margin-bottom:30px;font-size:25px;text-transform:capitalize;text-align:center;text-decoration:none;'>
+                    <td style='padding:{MailPadding};text-align:{LogoAlign}'>
+                        <h1 class='align-{LogoAlign}' style='color:#222222;{GetFontStyles(2.5)}margin-bottom:0px;text-align:{LogoAlign};text-decoration:none;'>
                             {Title}
                         </h1>
                     </td>
-                </tr>";            
+                </tr>";
         }
 
         public string GetHero()
@@ -76,22 +81,28 @@ namespace Hood.Models
                     HeroImage = mailSettings.HeroImage;
 
             if (HeroImage.IsSet())
-                return 
+                return
                 @$"<tr>
                     <td style='background-color: #ffffff;'>
                         <img src='{HeroImage}' width='680' height='' alt='alt_text' border='0'
-                            style='width: 100%; max-width: 680px; height: auto; background: #dddddd; font-family: sans-serif; font-size: 15px; line-height: 15px; color: #555555; margin: auto; display: block;' class='g-img'>
+                            style='width:100%;max-width:680px;height:auto;background:#dddddd;margin:auto;display:block;' class='g-img'>
                     </td>
                 </tr>";
             else
-                return $"";            
+                return $"";
+        }
+        public string GetFontStyles(double fontSizeMultiplier = 1, double lineHeightMultiplier = 1.25)
+        {
+            double size = BaseFontSize * fontSizeMultiplier;
+            double lineHeight = BaseFontSize * fontSizeMultiplier * lineHeightMultiplier;
+            return $"font-family:{FontFamily};font-size:{Math.Round(size)}px;line-height:{Math.Round(lineHeight)}px;margin-top:0;margin-bottom:{BaseFontSize}px;";
         }
 
         public MailObject()
         {
             BasicSettings basicSettings = Engine.Settings.Basic;
             Models.MailSettings mailSettings = Engine.Settings.Mail;
-                
+
             _textBody = new StringWriter();
             _body = new StringWriter();
 
@@ -152,7 +163,7 @@ namespace Hood.Models
             _textBody.WriteLine(content);
             _textBody.WriteLine();
             _textBody.WriteLine();
-            _body.WriteLine(string.Format(@"<h1 class='align-{2}' style='color: {1}; font-family:  sans-serif; font-weight: 300; line-height: 2.3em; margin-top: 0; margin-bottom: .75em;  font-size: 35px; text-transform: capitalize; text-align: {2};'>{0}</h1>", content, colour, align));
+            _body.WriteLine($"<h1 class='align-{align}' style='color:{colour};{GetFontStyles(2.5, 1)}text-align:{align};'>{content}</h1>");
         }
         public void AddH2(string content, string colour = "#222222", string align = "left")
         {
@@ -160,7 +171,7 @@ namespace Hood.Models
             _textBody.WriteLine(content);
             _textBody.WriteLine();
             _textBody.WriteLine();
-            _body.WriteLine(string.Format(@"<h2 class='align-{2}' style='color: {1}; font-family:  sans-serif; font-weight: 300; line-height: 2.0em; margin-top: 0; margin-bottom: .75em;  font-size: 30px; text-transform: capitalize; text-align: {2};'>{0}</h2>", content, colour, align));
+            _body.WriteLine($"<h2 class='align-{align}' style='color:{colour};{GetFontStyles(2, 1.1)}text-align:{align};'>{content}</h2>");
         }
         public void AddH3(string content, string colour = "#222222", string align = "left")
         {
@@ -168,27 +179,28 @@ namespace Hood.Models
             _textBody.WriteLine(content);
             _textBody.WriteLine();
             _textBody.WriteLine();
-            _body.WriteLine(string.Format(@"<h3 class='align-{2}' style='color: {1}; font-family:  sans-serif; font-weight: 300; line-height: 1.8em; margin-top: 0; margin-bottom: .75em; font-size: 25px; text-transform: capitalize; text-align: {2};'>{0}</h3>", content, colour, align));
+            _body.WriteLine($"<h3 class='align-{align}' style='color:{colour};{GetFontStyles(1.75)}text-align:{align};'>{content}</h3>");
         }
+
         public void AddH4(string content, string colour = "#222222", string align = "left")
         {
             _textBody.WriteLine();
             _textBody.WriteLine(content);
             _textBody.WriteLine();
-            _textBody.WriteLine();  
-            _body.WriteLine(string.Format(@"<h4 class='align-{2}' style='color: {1}; font-family:  sans-serif; font-weight: 300; line-height: 1.4em; margin-top: 0; margin-bottom: .75em; font-size: 20px; text-transform: capitalize; text-align: {2};'>{0}</h4>", content, colour, align));
+            _textBody.WriteLine();
+            _body.WriteLine($"<h4 class='align-{align}' style='color:{colour};{GetFontStyles(1.3)}text-align:{align};'>{content}</h4>");
         }
         public void AddParagraph(string content, string colour = "#222222", string align = "left")
         {
             _textBody.WriteLine(content);
             _textBody.WriteLine();
-            _body.WriteLine(string.Format(@"<p class='align-{2}' style='color: {1}; font-family:  sans-serif; font-size: 14px; font-weight: normal; margin-top: 0; margin-bottom: .75em;  text-align: {2};'>{0}</p>", content, colour, align));
+            _body.WriteLine($"<p class='align-{align}' style='color:{colour};{GetFontStyles(1, 1.5)}text-align:{align};'>{content}</p>");
         }
         public void AddDiv(string content, string colour = "#222222", string align = "left")
         {
             _textBody.WriteLine(content);
             _textBody.WriteLine();
-            _body.WriteLine(string.Format(@"<div class='align-{2}' style='color: {1}; font-family:  sans-serif; font-size: 14px; font-weight: normal; margin-top: .25em; margin-bottom: .25em;  text-align: {2};'>{0}</p>", content, colour, align));
+            _body.WriteLine($"<div class='align-{align}' style='color:{colour};{GetFontStyles(1)}text-align:{align};'>{content}</div>");
         }
         public void AddUnorderedList(List<string> items, string colour = "#222222")
         {
@@ -198,10 +210,10 @@ namespace Hood.Models
             }
             _textBody.WriteLine();
 
-            _body.WriteLine(string.Format(@"<ul style='color: {0}; font-family:  sans-serif; font-size: 14px; font-weight: normal; margin-top: 0; margin-bottom: 1em;'>", colour));
+            _body.WriteLine($"<ul style='color:{colour};{GetFontStyles(1)}margin-top:0;margin-bottom:1em;'>");
             foreach (string item in items)
             {
-                _body.WriteLine(string.Format(@"<li>{0}</li>", item, colour));
+                _body.WriteLine($"<li style='color:{colour};{GetFontStyles(1)}margin-top:0;margin-bottom:1em;'>{item}</li>");
             }
             _body.WriteLine("</ul>");
         }
@@ -213,31 +225,31 @@ namespace Hood.Models
             }
             _textBody.WriteLine();
 
-            _body.WriteLine(string.Format(@"<ol style='color: {0}; font-family:  sans-serif; font-size: 14px; font-weight: normal; margin-top: 0; margin-bottom: 1em;'>", colour));
+            _body.WriteLine($"<ol style='color:{colour};{GetFontStyles(1)}margin-top:0;margin-bottom:1em;'>");
             foreach (string item in items)
             {
-                _body.WriteLine(string.Format(@"<li>{0}</li>", item, colour));
+                _body.WriteLine($"<li style='color:{colour};{GetFontStyles(1)}margin-top:0;margin-bottom:1em;'>{item}</li>");
             }
             _body.WriteLine("</ol>");
         }
         public void AddImage(string url, string altText)
         {
             _textBody.WriteLine("Image: " + url + "(" + altText + ")");
-            _body.WriteLine(string.Format(@"<p style='font-family:  sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 1em;'><img src='{0}' alt='{1}' width='520' class='img-responsive img-block' style='border: none; -ms-interpolation-mode: bicubic; max-width: 100%; display: block;'></p>", url, altText));
+            _body.WriteLine($"<p style='{GetFontStyles(1)}margin: 0;margin-bottom: 1em;'><img src='{url}' alt='{altText}' width='520' class='img-responsive img-block' style='border:none;-ms-interpolation-mode:bicubic;max-width:100%;display:block;'></p>");
         }
         public void AddCallToAction(string content, string url, string colour = "#3498db", string align = "left")
         {
             _textBody.WriteLine(content + ": " + url);
-            _body.WriteLine(string.Format(@"<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box; min-width: 100% !important;' width='100%'>
+            _body.WriteLine($@"<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='margin-bottom:{BaseFontSize}px;border-collapse:separate;mso-table-lspace:0pt;mso-table-rspace:0pt;width;100%;box-sizing:border-box;min-width:100%!important;' width='100%'>
     <tbody>
         <tr>
-            <td align='{3}' style='font-family:  sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
-                <table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+            <td align='{align}' style='{GetFontStyles(1)}margin-bottom:0px;vertical-align:top;text-align:{align}' valign='top'>
+                <table border='0' cellpadding='0' cellspacing='0' style='border-collapse:separate;mso-table-lspace: 0pt;mso-table-rspace:0pt;width:auto;'>
                     <tbody>
                         <tr>
-                            <td style='font-family:  sans-serif; font-size: 14px; vertical-align: top; background-color: {2}; border-radius: 5px; text-align: {3};' valign='top' bgcolor='{2}' align='{3}'>
-                                <a href='{1}' target='_blank' style='display: inline-block; color: #ffffff; background-color: {2}; border: solid 1px {2}; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: {2};'>
-                                    {0}
+                            <td style='vetical-align:top;background-color:{colour};border-radius:5px;text-align:{align};' valign='top' bgcolor='{colour}' align='{align}'>
+                                <a href='{url}' target='_blank' style='display:inline-block;color:#ffffff;background-color:{colour};border:solid 1px {colour};border-radius:5px;box-sizing:border-box;cursor:pointer;text-decoration:none;{GetFontStyles(1)}margin-bottom:0px;font-weight:bold;margin:0;padding:12px 25px;border-color:{colour};'>
+                                    {content}
                                 </a>
                             </td>
                         </tr>
@@ -247,7 +259,7 @@ namespace Hood.Models
         </tr>
     </tbody>
 </table>
-", content, url, colour, align));
+");
         }
     }
 }
