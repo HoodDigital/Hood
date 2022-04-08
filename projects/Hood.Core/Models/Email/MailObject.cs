@@ -158,52 +158,52 @@ namespace Hood.Models
             _textBody.WriteLine();
             _body.WriteLine(string.Format(@"<br />"));
         }
-        public void AddH1(string content, string colour = "#222222", string align = "left")
+        public void AddH1(string content, string colour = "#222222", string align = "left", double fontSizeMultiplier = 2.5, double lineHeightMultiplier = 1)
         {
             _textBody.WriteLine();
             _textBody.WriteLine(content);
             _textBody.WriteLine();
             _textBody.WriteLine();
-            _body.WriteLine($"<h1 class='align-{align}' style='color:{colour};{GetFontStyles(2.5, 1)}text-align:{align};'>{content}</h1>");
+            _body.WriteLine($"<h1 class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</h1>");
         }
-        public void AddH2(string content, string colour = "#222222", string align = "left")
+        public void AddH2(string content, string colour = "#222222", string align = "left", double fontSizeMultiplier = 2, double lineHeightMultiplier = 1.1)
         {
             _textBody.WriteLine();
             _textBody.WriteLine(content);
             _textBody.WriteLine();
             _textBody.WriteLine();
-            _body.WriteLine($"<h2 class='align-{align}' style='color:{colour};{GetFontStyles(2, 1.1)}text-align:{align};'>{content}</h2>");
+            _body.WriteLine($"<h2 class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</h2>");
         }
-        public void AddH3(string content, string colour = "#222222", string align = "left")
+        public void AddH3(string content, string colour = "#222222", string align = "left", double fontSizeMultiplier = 1.75, double lineHeightMultiplier = 1.25)
         {
             _textBody.WriteLine();
             _textBody.WriteLine(content);
             _textBody.WriteLine();
             _textBody.WriteLine();
-            _body.WriteLine($"<h3 class='align-{align}' style='color:{colour};{GetFontStyles(1.75)}text-align:{align};'>{content}</h3>");
+            _body.WriteLine($"<h3 class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</h3>");
         }
 
-        public void AddH4(string content, string colour = "#222222", string align = "left")
+        public void AddH4(string content, string colour = "#222222", string align = "left", double fontSizeMultiplier = 1.3, double lineHeightMultiplier = 1.25)
         {
             _textBody.WriteLine();
             _textBody.WriteLine(content);
             _textBody.WriteLine();
             _textBody.WriteLine();
-            _body.WriteLine($"<h4 class='align-{align}' style='color:{colour};{GetFontStyles(1.3)}text-align:{align};'>{content}</h4>");
+            _body.WriteLine($"<h4 class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</h4>");
         }
-        public void AddParagraph(string content, string colour = "#222222", string align = "left")
+        public void AddParagraph(string content, string colour = "#222222", string align = "left", double fontSizeMultiplier = 1, double lineHeightMultiplier = 1.5)
         {
             _textBody.WriteLine(content);
             _textBody.WriteLine();
-            _body.WriteLine($"<p class='align-{align}' style='color:{colour};{GetFontStyles(1, 1.5)}text-align:{align};'>{content}</p>");
+            _body.WriteLine($"<p class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</p>");
         }
-        public void AddDiv(string content, string colour = "#222222", string align = "left")
+        public void AddDiv(string content, string colour = "#222222", string align = "left", double fontSizeMultiplier = 1, double lineHeightMultiplier = 1.25)
         {
             _textBody.WriteLine(content);
             _textBody.WriteLine();
-            _body.WriteLine($"<div class='align-{align}' style='color:{colour};{GetFontStyles(1)}text-align:{align};'>{content}</div>");
+            _body.WriteLine($"<div class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</div>");
         }
-        public void AddUnorderedList(List<string> items, string colour = "#222222")
+        public void AddUnorderedList(List<string> items, string colour = "#222222", double fontSizeMultiplier = 1, double lineHeightMultiplier = 1.25)
         {
             foreach (string item in items)
             {
@@ -211,14 +211,14 @@ namespace Hood.Models
             }
             _textBody.WriteLine();
 
-            _body.WriteLine($"<ul style='color:{colour};{GetFontStyles(1)}margin-top:0;margin-bottom:1em;'>");
+            _body.WriteLine($"<ul style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}'>");
             foreach (string item in items)
             {
-                _body.WriteLine($"<li style='color:{colour};{GetFontStyles(1)}margin-top:0;margin-bottom:1em;'>{item}</li>");
+                _body.WriteLine($"<li style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)};margin-bottom:.5em;'>{item}</li>");
             }
             _body.WriteLine("</ul>");
         }
-        public void AddOrderedList(List<string> items, string colour = "#222222")
+        public void AddOrderedList(List<string> items, string colour = "#222222", double fontSizeMultiplier = 1, double lineHeightMultiplier = 1.25)
         {
             foreach (string item in items)
             {
@@ -226,10 +226,10 @@ namespace Hood.Models
             }
             _textBody.WriteLine();
 
-            _body.WriteLine($"<ol style='color:{colour};{GetFontStyles(1)}margin-top:0;margin-bottom:1em;'>");
+            _body.WriteLine($"<ol style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}'>");
             foreach (string item in items)
             {
-                _body.WriteLine($"<li style='color:{colour};{GetFontStyles(1)}margin-top:0;margin-bottom:1em;'>{item}</li>");
+                _body.WriteLine($"<li style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)};margin-bottom:.5em;'>{item}</li>");
             }
             _body.WriteLine("</ol>");
         }
