@@ -262,5 +262,21 @@ namespace Hood.Models
 </table>
 ");
         }
+
+        public void AddSpacer(int pixelHeight = 0)
+        {
+            if (pixelHeight == 0){
+                pixelHeight = BaseFontSize;
+            }
+            _body.WriteLine($@"<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='height:{pixelHeight};width:100%;' height='{pixelHeight}' width='100%'>
+    <tbody>
+        <tr>
+            <td style='height:{pixelHeight};width:100%;' height='{pixelHeight}'>                
+            </td>
+        </tr>
+    </tbody>
+</table>
+");
+        }
     }
 }
