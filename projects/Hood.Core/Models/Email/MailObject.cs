@@ -23,6 +23,7 @@ namespace Hood.Models
         public string FontFamily { get; set; } = "Poppins,sans-serif";
         public string LogoAlign { get; set; } = "left";
         public string BackgroundColour { get; set; }
+        public string TextAreaColour { get; set; } = "#ffffff";
         public int BaseFontSize { get; set; } = 18;
         public string MailPadding { get; set; } = "30px";
 
@@ -55,17 +56,17 @@ namespace Hood.Models
             if (Logo.IsSet())
                 return
                 @$"<tr>
-                    <td style='padding:{MailPadding};text-align:{LogoAlign}'>
-                        <h1 class='align-{LogoAlign}' style='color:#222222;margin:0;margin-bottom:0px;text-align:{LogoAlign};text-decoration:none;'>
-                            <img src='{Logo}' alt='{Title}' align='center' style='border:none;-ms-interpolation-mode:bicubic;width:250px;height:auto;' width='300'>
+                    <td style='background-color:{TextAreaColour};padding:{MailPadding};text-align:{LogoAlign}'>
+                        <h1 class='align-{LogoAlign}' style='padding:{MailPadding};color:#222222;margin:0;margin-bottom:0px;text-align:{LogoAlign};text-decoration:none;'>
+                            <img src='{Logo}' alt='{Title}' align='center' style='border:none;-ms-interpolation-mode:bicubic;max-height:50px;height:auto;width:auto;' height='50'>
                         </h1>
                     </td>
                 </tr>";
             else
                 return
                 @$"<tr>
-                    <td style='padding:{MailPadding};text-align:{LogoAlign}'>
-                        <h1 class='align-{LogoAlign}' style='color:#222222;{GetFontStyles(2.5)}margin-bottom:0px;text-align:{LogoAlign};text-decoration:none;'>
+                    <td style='background-color:{TextAreaColour};padding:{MailPadding};text-align:{LogoAlign}'>
+                        <h1 class='align-{LogoAlign}' style='padding:{MailPadding};color:#222222;{GetFontStyles(2.5)}margin-bottom:0px;text-align:{LogoAlign};text-decoration:none;'>
                             {Title}
                         </h1>
                     </td>
@@ -83,7 +84,7 @@ namespace Hood.Models
             if (HeroImage.IsSet())
                 return
                 @$"<tr>
-                    <td style='background-color: #ffffff;'>
+                    <td style='background-color:{TextAreaColour};'>
                         <img src='{HeroImage}' width='680' height='' alt='alt_text' border='0'
                             style='width:100%;max-width:680px;height:auto;background:#dddddd;margin:auto;display:block;' class='g-img'>
                     </td>
@@ -243,7 +244,7 @@ namespace Hood.Models
             _body.WriteLine($@"<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='margin-bottom:{BaseFontSize}px;border-collapse:separate;mso-table-lspace:0pt;mso-table-rspace:0pt;width;100%;box-sizing:border-box;min-width:100%!important;' width='100%'>
     <tbody>
         <tr>
-            <td align='{align}' style='{GetFontStyles(1)}margin-bottom:0px;vertical-align:top;text-align:{align}' valign='top'>
+            <td align='{align}' style='{GetFontStyles(1)};vertical-align:top;text-align:{align}' valign='top'>
                 <table border='0' cellpadding='0' cellspacing='0' style='border-collapse:separate;mso-table-lspace: 0pt;mso-table-rspace:0pt;width:auto;'>
                     <tbody>
                         <tr>
