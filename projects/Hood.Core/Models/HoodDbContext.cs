@@ -96,23 +96,52 @@ namespace Hood.Models
 
         public async virtual Task Seed()
         {
+            await CheckDatabaseIsInitialisedAsync();
+
+            ApplicationUser siteAdmin = await GetOrUpdateSiteOwnerAsync();
+            
+            await SetupRequiredRolesAsync();
+            await SetupHoodMediaDirectoriesAsync(siteAdmin);
+            await InitialiseHoodSettingsAsync();
+            await UpdateLegacyMediaDirectoryReferencesAsync();
+            await SetDatabaseVersionAsync();
+        }
+
+        protected virtual async Task SetupRequiredRolesAsync()
+        {
             try
             {
-                Option option = await Options.FirstOrDefaultAsync();
+                var roleManager = Engine.Services.Resolve<RoleManager<ApplicationRole>>();
+                var userManager = Engine.Services.Resolve<UserManager<ApplicationUser>>();
+                if (Engine.AccountManager.SupportsRoles())
+                {
+                    // Check all required roles exist locally 
+                    foreach (string role in Models.Roles.All)
+                    {
+                        if (!await roleManager.RoleExistsAsync(role))
+                        {
+                            await Engine.AccountManager.CreateRoleAsync(role);
+                        }
+                        else
+                        {
+                            // If it does exist locally, ensure it has a remote id linked to it.
+                            var localRole = await roleManager.FindByNameAsync(role);
+                            if (!localRole.RemoteId.IsSet())
+                            {
+                                await Engine.AccountManager.CreateRoleAsync(role);
+                            }
+                        }
+                    }
+                }
             }
-            catch (SqlException ex)
+            catch (Exception ex)
             {
-                if (ex.Message.Contains("Login failed for user") || ex.Message.Contains("permission was denied"))
-                {
-                    throw new StartupException("There was a problem connecting to the database.", ex, StartupError.DatabaseConnectionFailed);
-                }
-                else if (ex.Message.Contains("Invalid object name"))
-                {
-
-                    throw new StartupException("There are migrations missing.", ex, StartupError.MigrationMissing);
-                }
+                throw new StartupException("An error occurred syncing local roles with Auth0.", ex, StartupError.Auth0Issue);
             }
+        }
 
+        protected virtual async Task<ApplicationUser> GetOrUpdateSiteOwnerAsync()
+        {
             try
             {
                 string ownerEmail = Engine.SiteOwnerEmail;
@@ -150,52 +179,52 @@ namespace Hood.Models
                     }
                 }
 
+                ApplicationUser siteAdmin = await Engine.AccountManager.GetUserByEmailAsync(Engine.SiteOwnerEmail);
+                var siteOwnerRef = await Options.SingleOrDefaultAsync(o => o.Id == "Hood.Settings.SiteOwner");
+                if (siteOwnerRef == null)
+                {
+                    Options.Add(new Option
+                    {
+                        Id = "Hood.Settings.SiteOwner",
+                        Value = siteAdmin.Id
+                    });
+                }
+                else
+                {
+                    siteOwnerRef.Value = siteAdmin.Id;
+                }
+                await SaveChangesAsync();
+
+                return siteAdmin;
+
             }
             catch (Exception ex)
             {
                 throw new StartupException("An error occurred while loading or creating the admin user.", ex, StartupError.AdminUserSetupError);
             }
+        }
 
-            ApplicationUser siteAdmin = await Engine.AccountManager.GetUserByEmailAsync(Engine.SiteOwnerEmail);
+        public virtual async Task CheckDatabaseIsInitialisedAsync()
+        {
             try
             {
-                var roleManager = Engine.Services.Resolve<RoleManager<ApplicationRole>>();
-                var userManager = Engine.Services.Resolve<UserManager<ApplicationUser>>();
-                if (Engine.AccountManager.SupportsRoles())
+                Option option = await Options.FirstOrDefaultAsync();
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Message.Contains("Login failed for user") || ex.Message.Contains("permission was denied"))
                 {
-                    // Check all required roles exist locally 
-                    foreach (string role in Models.Roles.All)
-                    {
-                        if (!await roleManager.RoleExistsAsync(role))
-                        {
-                            await Engine.AccountManager.CreateRoleAsync(role);
-                        }
-                        else
-                        {
-                            // If it does exist locally, ensure it has a remote id linked to it.
-                            var localRole = await roleManager.FindByNameAsync(role);
-                            if (!localRole.RemoteId.IsSet())
-                            {
-                                await Engine.AccountManager.CreateRoleAsync(role);
-                            }
-                        }
-                    }
+                    throw new StartupException("There was a problem connecting to the database.", ex, StartupError.DatabaseConnectionFailed);
+                }
+                else if (ex.Message.Contains("Invalid object name"))
+                {
+                    throw new StartupException("There are migrations missing.", ex, StartupError.MigrationMissing);
                 }
             }
-            catch (Exception ex)
-            {
-                throw new StartupException("An error occurred syncing local roles with Auth0.", ex, StartupError.Auth0Issue);
-            }
+        }
 
-            if (!Options.Any(o => o.Id == "Hood.Settings.SiteOwner"))
-            {
-                Options.Add(new Option
-                {
-                    Id = "Hood.Settings.SiteOwner",
-                    Value = siteAdmin.Id
-                });
-            }
-
+        protected virtual async Task SetupHoodMediaDirectoriesAsync(ApplicationUser siteAdmin)
+        {
             if (!MediaDirectories.Any(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System))
             {
                 MediaDirectories.Add(new MediaDirectory { DisplayName = "Default", Slug = MediaManager.SiteDirectorySlug, OwnerId = siteAdmin.Id, Type = DirectoryType.System });
@@ -215,7 +244,11 @@ namespace Hood.Models
             {
                 MediaDirectories.Add(new MediaDirectory { DisplayName = "Property", Slug = MediaManager.PropertyDirectorySlug, OwnerId = siteAdmin.Id, Type = DirectoryType.System });
             }
+            await SaveChangesAsync();
+        }
 
+        protected virtual async Task InitialiseHoodSettingsAsync()
+        {
             if (!Options.Any(o => o.Id == "Hood.Settings.Theme"))
             {
                 Options.Add(new Option { Id = "Hood.Settings.Theme", Value = JsonConvert.SerializeObject("default") });
@@ -355,8 +388,11 @@ namespace Hood.Models
                     Options.Add(new Option { Id = typeof(SeoSettings).ToString(), Value = JsonConvert.SerializeObject(new SeoSettings()) });
                 }
             }
+            await SaveChangesAsync();
+        }
 
-
+        protected virtual async Task UpdateLegacyMediaDirectoryReferencesAsync()
+        {
             if (Media.Any(o => o.DirectoryId == null))
             {
                 // Save any existing seeding, in case directories needed creating.
@@ -405,14 +441,10 @@ namespace Hood.Models
                     }
                 }
             }
+        }
 
-            if (!Options.Any(o => o.Id == "Hood.Api.SystemPrivateKey"))
-            {
-                string guid = Guid.NewGuid().ToString();
-                string key = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(guid));
-                Options.Add(new Option { Id = "Hood.Api.SystemPrivateKey", Value = JsonConvert.SerializeObject(key) });
-            }
-
+        protected virtual async Task SetDatabaseVersionAsync()
+        {
             // Mark the database with the current version of Hood.
             if (!Options.Any(o => o.Id == "Hood.Version"))
             {
@@ -426,6 +458,5 @@ namespace Hood.Models
 
             await SaveChangesAsync();
         }
-
     }
 }

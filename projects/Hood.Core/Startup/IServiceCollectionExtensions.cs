@@ -286,22 +286,7 @@ namespace Hood.Startup
                 options.Scope = auth0Options.Scope;
             });
 
-            // Mock Aspnet Identity stores.
-            services.TryAddScoped<IUserValidator<ApplicationUser>, UserValidator<ApplicationUser>>();
-            services.TryAddScoped<IPasswordValidator<ApplicationUser>, PasswordValidator<ApplicationUser>>();
-            services.TryAddScoped<IPasswordHasher<ApplicationUser>, PasswordHasher<ApplicationUser>>();
-            services.TryAddScoped<ILookupNormalizer, UpperInvariantLookupNormalizer>();
-            services.TryAddScoped<IdentityErrorDescriber>();
-            //services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<ApplicationUser>>();
-
-            var identityBuilder = new IdentityBuilder(typeof(ApplicationUser), services);
-
-            identityBuilder.AddRoles<ApplicationRole>();
-            identityBuilder.AddRoleStore<RoleStore<ApplicationRole, HoodDbContext, string>>();
-            identityBuilder.AddUserStore<UserStore<ApplicationUser, ApplicationRole, HoodDbContext, string>>();
-            identityBuilder.AddUserManager<UserManager<ApplicationUser>>();
-
-            services.AddScoped<IAccountRepository, Auth0AccountRepository>();
+            services.AddAuth0IdentityStores();
 
             services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
                 .Configure(options =>
@@ -316,6 +301,27 @@ namespace Hood.Startup
             });
             return services;
 
+        }
+
+        public static void AddAuth0IdentityStores(this IServiceCollection services)
+        {
+            // Mock Aspnet Identity stores.
+            services.TryAddScoped<IUserValidator<ApplicationUser>, UserValidator<ApplicationUser>>();
+            services.TryAddScoped<IPasswordValidator<ApplicationUser>, PasswordValidator<ApplicationUser>>();
+            services.TryAddScoped<IPasswordHasher<ApplicationUser>, PasswordHasher<ApplicationUser>>();
+            services.TryAddScoped<ILookupNormalizer, UpperInvariantLookupNormalizer>();
+            services.TryAddScoped<IdentityErrorDescriber>();
+            //services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<ApplicationUser>>();
+
+            var identityBuilder = new IdentityBuilder(typeof(ApplicationUser), services);
+
+            identityBuilder.AddRoles<ApplicationRole>();
+            identityBuilder.AddRoleStore<RoleStore<ApplicationRole, HoodDbContext, string>>();
+            identityBuilder.AddUserStore<UserStore<ApplicationUser, ApplicationRole, HoodDbContext, string>>();
+            identityBuilder.AddUserManager<UserManager<ApplicationUser>>();
+            identityBuilder.AddRoleManager<RoleManager<ApplicationRole>>();
+
+            services.AddScoped<IAccountRepository, Auth0AccountRepository>();
         }
 
         private static void SetAuthenticationCookieDefaults(IConfiguration config, CookieAuthenticationOptions options)

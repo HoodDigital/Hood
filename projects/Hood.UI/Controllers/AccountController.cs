@@ -14,9 +14,11 @@ using Hood.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Routing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,7 +88,7 @@ namespace Hood.Controllers
                     ApplicationUser user = await _userManager.FindByNameAsync(model.Username);
                     if (Engine.Settings.Account.RequireEmailConfirmation && !user.EmailConfirmed)
                     {
-                        await _account.SendVerificationEmail(user, User.GetUserId(), Url.AbsoluteAction("Login", "Account"));
+                        await SendVerificationEmail(user, User.GetUserId(), Url.AbsoluteAction("Login", "Account"));
                         return RedirectToAction(nameof(ConfirmRequired), new { user = user.Id });
                     }
 
@@ -201,7 +203,7 @@ namespace Hood.Controllers
 
                     if (Engine.Settings.Account.RequireEmailConfirmation)
                     {
-                        await _account.SendVerificationEmail(user, User.GetUserId(), Url.AbsoluteAction("Login", "Account"));
+                        await SendVerificationEmail(user, User.GetUserId(), Url.AbsoluteAction("Login", "Account"));
                         return RedirectToAction(nameof(AccountController.ConfirmRequired), "Account");
                     }
                     return RedirectToLocal(returnUrl);
@@ -247,6 +249,7 @@ namespace Hood.Controllers
                 throw new ApplicationException("This endpoint is only available when using Auth0.");
             }
 
+            // TODO: #269 Insert colours and logos and parameters for standard login.
             var authenticationPropertiesBuilder = new LoginAuthenticationPropertiesBuilder()
                 // .WithParameter("logo", "https://cdn.jsdelivr.net/npm/hoodcms@5.0.15/images/icons/file.png")
                 // .WithParameter("color", "black")
@@ -726,7 +729,14 @@ namespace Hood.Controllers
             try
             {
                 ApplicationUser user = await GetCurrentUserOrThrow();
-                await _account.SendVerificationEmail(user, User.GetUserId(), Url.AbsoluteAction("Login", "Account"));
+                if (Engine.Auth0Enabled)
+                {
+                    await SendAuth0VerificationEmail(user, User.GetUserId(), Url.AbsoluteAction("Login", "Account"));
+                }
+                else
+                {
+                    await SendVerificationEmail(user, User.GetUserId(), Url.AbsoluteAction("Login", "Account"));
+                }
                 SaveMessage = $"Email verification has been resent.";
                 MessageType = AlertType.Success;
 
@@ -861,7 +871,7 @@ namespace Hood.Controllers
                     return View("ForgotPasswordConfirmation");
                 }
 
-                await _account.SendPasswordResetToken(user);
+                await SendPasswordResetToken(user);
 
                 return RedirectToAction(nameof(ForgotPasswordConfirmation));
             }
@@ -981,6 +991,68 @@ namespace Hood.Controllers
         #endregion
 
         #region Helpers
+        protected virtual async Task SendVerificationEmail(ApplicationUser localUser, string userId, string returnUrl)
+        {
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(localUser);
+            var contextAccessor = Engine.Services.Resolve<IHttpContextAccessor>();
+            if (contextAccessor == null)
+            {
+                return;
+            }
+            var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
+            if (linkGenerator == null)
+            {
+                return;
+            }
+            var callbackUrl = linkGenerator.GetUriByAction(contextAccessor.HttpContext, "ConfirmEmail", "Account", new { userId = localUser.Id, code, returnUrl });
+            var verifyModel = new VerifyEmailModel(localUser, callbackUrl)
+            {
+                SendToRecipient = true
+            };
+            await _mailService.ProcessAndSend(verifyModel);
+        }
+
+        protected virtual async Task SendAuth0VerificationEmail(ApplicationUser localUser, string userId, string returnUrl)
+        {
+            // get the users' current connected account.
+            // send a verification email on the whattheolddowntheold.
+            var authService = new Auth0Service();
+            var ticket = await authService.GetEmailVerificationTicket(userId, returnUrl);
+            var verifyModel = new VerifyEmailModel(localUser, ticket.Value)
+            {
+                SendToRecipient = true
+            };
+            await _mailService.ProcessAndSend(verifyModel);
+        }
+
+        protected virtual async Task SendPasswordResetToken(ApplicationUser user)
+        {
+            string code = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            var contextAccessor = Engine.Services.Resolve<IHttpContextAccessor>();
+            if (contextAccessor == null)
+            {
+                return;
+            }
+            var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
+            if (linkGenerator == null)
+            {
+                return;
+            }
+
+            string callbackUrl = linkGenerator.GetUriByAction(contextAccessor.HttpContext, "ResetPassword", "Account", new { userId = user.Id, code });
+
+            MailObject message = new MailObject()
+            {
+                To = new SendGrid.Helpers.Mail.EmailAddress(user.Email),
+                PreHeader = "Reset your password.",
+                Subject = "Reset your password."
+            };
+            message.AddParagraph($"Please reset your password by clicking here:");
+            message.AddCallToAction("Reset your password", callbackUrl);
+            message.Template = MailSettings.WarningTemplate;
+            await _emailSender.SendEmailAsync(message);
+        }
 
         protected virtual async Task SendWelcomeEmail(ApplicationUser user)
         {

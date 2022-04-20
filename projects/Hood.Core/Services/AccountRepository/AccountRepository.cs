@@ -18,18 +18,10 @@ namespace Hood.Services
     public class AccountRepository : IAccountRepository
     {
         protected readonly HoodDbContext _db;
-        protected readonly IHttpContextAccessor _contextAccessor;
-        protected readonly LinkGenerator _linkGenerator;
-        protected readonly IMailService _mailService;
-        protected readonly IEmailSender _emailSender;
 
         public AccountRepository()
         {
             _db = Engine.Services.Resolve<HoodDbContext>();
-            _contextAccessor = Engine.Services.Resolve<IHttpContextAccessor>();
-            _linkGenerator = Engine.Services.Resolve<LinkGenerator>();
-            _mailService = Engine.Services.Resolve<IMailService>();
-            _emailSender = Engine.Services.Resolve<IEmailSender>();
         }
 
         #region Helpers 
@@ -190,16 +182,7 @@ namespace Hood.Services
                 throw new Exception(setPhoneResult.Errors.FirstOrDefault().Description);
             }
         }
-        public virtual async Task SendVerificationEmail(ApplicationUser localUser, string userId, string returnUrl)
-        {
-            var code = await UserManager.GenerateEmailConfirmationTokenAsync(localUser);
-            var callbackUrl = _linkGenerator.GetUriByAction(_contextAccessor.HttpContext, "ConfirmEmail", "Account", new { userId = localUser.Id, code, returnUrl });
-            var verifyModel = new VerifyEmailModel(localUser, callbackUrl)
-            {
-                SendToRecipient = true
-            };
-            await _mailService.ProcessAndSend(verifyModel);
-        }
+
         public virtual async Task<IdentityResult> ChangePassword(ApplicationUser user, string oldPassword, string newPassword)
         {
             return await UserManager.ChangePasswordAsync(user, oldPassword, newPassword);
@@ -208,22 +191,7 @@ namespace Hood.Services
         {
             return await UserManager.ResetPasswordAsync(user, code, password);
         }
-        public virtual async Task SendPasswordResetToken(ApplicationUser user)
-        {
-            string code = await UserManager.GeneratePasswordResetTokenAsync(user);
-            string callbackUrl = _linkGenerator.GetUriByAction(_contextAccessor.HttpContext, "ResetPassword", "Account", new { userId = user.Id, code });
 
-            MailObject message = new MailObject()
-            {
-                To = new SendGrid.Helpers.Mail.EmailAddress(user.Email),
-                PreHeader = "Reset your password.",
-                Subject = "Reset your password."
-            };
-            message.AddParagraph($"Please reset your password by clicking here:");
-            message.AddCallToAction("Reset your password", callbackUrl);
-            message.Template = MailSettings.WarningTemplate;
-            await _emailSender.SendEmailAsync(message);
-        }
         public virtual async Task<IdentityResult> CreateAsync(ApplicationUser user, string password)
         {
             return await UserManager.CreateAsync(user, password);

@@ -19,7 +19,6 @@ namespace Hood.Services
         Task<MediaDirectory> GetDirectoryAsync(string id);
         Task SetEmailAsync(ApplicationUser modelToUpdate, string email);
         Task SetPhoneNumberAsync(ApplicationUser modelToUpdate, string email);
-        Task SendVerificationEmail(ApplicationUser localUser, string userId, string returnUrl);
         Task<IdentityResult> ChangePassword(ApplicationUser user, string oldPassword, string newPassword);
         Task<IdentityResult> ConfirmEmailAsync(ApplicationUser user, string code);
         Task<IdentityResult> ResetPasswordAsync(ApplicationUser user, string code, string password);
@@ -54,7 +53,6 @@ namespace Hood.Services
 
         #region Statistics
         Task<UserStatistics> GetStatisticsAsync();
-        Task SendPasswordResetToken(ApplicationUser user);
         #endregion
     }
 }
