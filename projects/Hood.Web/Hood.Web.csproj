@@ -22,8 +22,8 @@
   </ItemGroup>
   
   <!-- <ItemGroup>
-    <PackageReference Include="Hood.Admin" Version="5.0.5" />
-    <PackageReference Include="Hood.UI" Version="5.0.5" />
+    <PackageReference Include="Hood.Admin" Version="6.0.10" />
+    <PackageReference Include="Hood.UI" Version="6.0.10" />
   </ItemGroup> -->
 
 </Project>
