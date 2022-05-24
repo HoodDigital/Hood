@@ -50,27 +50,11 @@ namespace Hood.Services
             // now delete the user
             await base.DeleteUserAsync(localUserId, adminUser);
         }
-        public override async Task SendVerificationEmail(ApplicationUser localUser, string userId, string returnUrl)
-        {
-            // get the users' current connected account.
-            // send a verification email on the whattheolddowntheold.
-            var authService = new Auth0Service();
-            var ticket = await authService.GetEmailVerificationTicket(userId, returnUrl);
-            var verifyModel = new VerifyEmailModel(localUser, ticket.Value)
-            {
-                SendToRecipient = true
-            };
-            await _mailService.ProcessAndSend(verifyModel);
-        }
         public override Task<IdentityResult> ChangePassword(ApplicationUser user, string oldPassword, string newPassword)
         {
             throw new ApplicationException("This feature is disabled when using Auth0.");
         }
         public override Task<IdentityResult> ResetPasswordAsync(ApplicationUser user, string code, string password)
-        {
-            throw new ApplicationException("This feature is disabled when using Auth0.");
-        }
-        public override Task SendPasswordResetToken(ApplicationUser user)
         {
             throw new ApplicationException("This feature is disabled when using Auth0.");
         }

@@ -4,9 +4,9 @@ import { Alerts } from '../core/Alerts';
 declare global {
     interface JQuery {
         exists(): number;
-        restrictToSlug(): void;
-        restrictToPageSlug(): void;
-        restrictToMetaSlug(): void;
+        restrictToSlug(restrictPattern?: RegExp): void;
+        restrictToPageSlug(restrictPattern?: RegExp): void;
+        restrictToMetaSlug(restrictPattern?: RegExp): void;
         characterCounter(): void;
         warningAlert(): void;
     }

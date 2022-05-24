@@ -15,7 +15,6 @@ namespace Hood.Services
 {
     public class EmailSender : IEmailSender
     {
-        protected readonly IHttpContextAccessor _contextAccessor;
         protected Models.MailSettings _mail;
         protected Models.BasicSettings _info;
         protected readonly IRazorViewRenderer _renderer;        
@@ -24,7 +23,6 @@ namespace Hood.Services
 
         public EmailSender()
         {
-            _contextAccessor = Engine.Services.Resolve<IHttpContextAccessor>();
             _renderer = Engine.Services.Resolve<IRazorViewRenderer>();
         }
 
