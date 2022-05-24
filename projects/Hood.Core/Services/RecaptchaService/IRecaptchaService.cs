@@ -4,6 +4,6 @@ namespace Hood.Services
 {
     public interface IRecaptchaService
     {
-        System.Threading.Tasks.Task<RecaptchaResponse> Validate(HttpRequest request, bool antiForgery = true);
+        System.Threading.Tasks.Task<RecaptchaResponse> Validate(HttpRequest request);
     }
 }

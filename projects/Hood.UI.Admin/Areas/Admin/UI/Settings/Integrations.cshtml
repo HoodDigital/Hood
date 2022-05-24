@@ -4,10 +4,10 @@
     Layout = "_Layout_Settings";
 }
 @section buttons {
-    @if (User.IsAdminOrBetter())
-    {
-        <a asp-action="ResetIntegrations" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
-    }
+@if (User.IsAdminOrBetter())
+{
+<a asp-action="ResetIntegrations" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+}
 }
 <div class="card">
     <div class="card-header">
@@ -63,6 +63,17 @@
                     <input asp-for="GoogleRecaptchaSecretKey" class="form-control">
                     <label asp-for="GoogleRecaptchaSecretKey"></label>
                     <small asp-for="GoogleRecaptchaSecretKey"></small>
+                </div>
+                <div class="form-floating">
+                    <select asp-for="GoogleRecaptchaThreshold" class="form-select">
+                        <option value="0.1">Easy</option>
+                        <option value="0.3">Low</option>
+                        <option value="0.5">Medium</option>
+                        <option value="0.7">High</option>
+                        <option value="0.9">Strict</option>
+                    </select>
+                    <label asp-for="GoogleRecaptchaThreshold"></label>
+                    <small asp-for="GoogleRecaptchaThreshold"></small>
                 </div>
             </div>
             <div id="unsplash" class="tab-pane in" role="tabpanel" aria-labelledby="unsplash-tab">

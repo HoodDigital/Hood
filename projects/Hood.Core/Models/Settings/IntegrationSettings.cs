@@ -50,6 +50,8 @@ namespace Hood.Models
         public string GoogleRecaptchaSiteKey { get; set; }
         [Display(Name = "Google Recaptcha Secret Key")]
         public string GoogleRecaptchaSecretKey { get; set; }
+        [Display(Name = "Google Recaptcha Security Threshold")]
+        public decimal GoogleRecaptchaThreshold { get; set; }
 
 
         // Unsplash Api
