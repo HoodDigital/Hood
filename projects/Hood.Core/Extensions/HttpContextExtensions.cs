@@ -12,44 +12,6 @@ namespace Hood.Extensions
 {
     public static class HttpContextExtensions
     {
-        public static async Task ProcessCaptchaOrThrowAsync(this HttpRequest request)
-        {
-            if (Engine.Settings.Integrations.EnableGoogleRecaptcha)
-            {
-                var captcha = request.Form["g-recaptcha-response"].FirstOrDefault();
-                if (captcha.IsSet())
-                {
-                    // process the captcha.
-                    using (var client = new HttpClient())
-                    {
-                        var remoteIpAddress = request.HttpContext.Connection.RemoteIpAddress.ToString();
-                        var values = new Dictionary<string, string>
-                        {
-                            { "secret",  Engine.Settings.Integrations.GoogleRecaptchaSecretKey },
-                            { "response", captcha },
-                            { "remoteip", remoteIpAddress }
-                        };
-
-                        var content = new FormUrlEncodedContent(values);
-
-                        var responseContent = await client.PostAsync("https://www.google.com/recaptcha/api/siteverify", content);
-
-                        var responseString = await responseContent.Content.ReadAsStringAsync();
-
-                        RecaptchaResponse response = JsonConvert.DeserializeObject<RecaptchaResponse>(responseString);
-
-                        if (!response.success)
-                            throw new Exception("Sorry, your reCaptcha validation failed.");
-
-                        if (request.Host.Host != response.hostname)
-                            throw new Exception("Sorry, your reCaptcha validation failed, your host name does not match the validated host name.");
-                    }
-                }
-                else
-                    throw new Exception("Sorry, your reCaptcha validation failed, no captcha response found.");
-            }
-        }
-
         public static string GetSubdomain(this HttpContext httpContext)
         {
 

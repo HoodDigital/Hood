@@ -5,20 +5,36 @@ namespace Hood.Services
 {
     public class RecaptchaResponse
     {
+        public RecaptchaResponse()
+        { }
+
+        public RecaptchaResponse(bool success, string message)
+        {
+            Passed = success;
+            Message = message;
+        }        
+
         [JsonProperty(PropertyName = "success")]
-        public bool Success { get; set; }
+        internal bool Success { get; set; }
 
         [JsonProperty(PropertyName = "score")]
-        public decimal Score { get; set; }
+        internal decimal Score { get; set; }
 
         [JsonProperty(PropertyName = "action")]
-        public string Action { get; set; }
+        internal string Action { get; set; }
 
         [JsonProperty(PropertyName = "challenge_ts")]
-        public DateTime ChallengeTS { get; set; }
+        internal DateTime ChallengeTS { get; set; }
 
         [JsonProperty(PropertyName = "hostname")]
-        public string HostName { get; set; }
+        internal string HostName { get; set; }
+
+        [JsonIgnore]
+        public bool Passed { get; internal set; }
+
+        [JsonIgnore]
+        public string Message { get; internal set; }
+
     }
 }
 

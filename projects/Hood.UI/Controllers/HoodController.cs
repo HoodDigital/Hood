@@ -40,8 +40,8 @@ namespace Hood.Controllers
                 }
 
                 var recaptcha = await _recaptcha.Validate(Request);
-                if (!recaptcha.Success)
-                    return new Response("You have failed to pass the reCaptcha check.");
+                if (!recaptcha.Passed)
+                    return new Response("You have failed to pass the reCaptcha check. Please refresh your page and try again.");
 
                 model.SendToRecipient = true;
                 model.NotifyRole = "ContactFormNotifications";
