@@ -567,7 +567,7 @@ namespace Hood.Services
                 {
                     XElement urlElement = new XElement(
                         xmlns + "url",
-                        new XElement(xmlns + "loc", Uri.EscapeUriString(sitemapNode.Url)),
+                        new XElement(xmlns + "loc", Uri.EscapeDataString(sitemapNode.Url)),
                         sitemapNode.LastModified == null ? null : new XElement(
                             xmlns + "lastmod",
                             sitemapNode.LastModified.Value.ToLocalTime().ToString("yyyy-MM-ddTHH:mm:sszzz")),

@@ -120,7 +120,6 @@ namespace Hood.Startup
 
             // Register singletons.
             services.AddSingleton<IPropertyImporter, BlmFileImporter>();
-            services.AddSingleton<IMediaRefreshService, MediaRefreshService>();
             services.AddSingleton<IDirectoryManager, DirectoryManager>();
             services.AddSingleton<IMediaManager, MediaManager>();
             services.AddSingleton<ContentCategoryCache>();

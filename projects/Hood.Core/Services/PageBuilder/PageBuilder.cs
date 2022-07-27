@@ -185,7 +185,7 @@ namespace Hood.Services
                 throw new ArgumentException("parts");
 
             var hash = "";
-            using (SHA256 sha = new SHA256Managed())
+            using (SHA256 sha = SHA256.Create())
             {
                 var hashInput = "";
                 foreach (var part in parts)

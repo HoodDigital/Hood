@@ -22,7 +22,7 @@ namespace Hood.Services
         private void GenerateSalt()
         {
             Salt = new byte[128 / 8];
-            using (var rngCsp = new RNGCryptoServiceProvider())
+            using (var rngCsp = RandomNumberGenerator.Create())
             {
                 rngCsp.GetNonZeroBytes(Salt);
             }

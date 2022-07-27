@@ -83,22 +83,11 @@ namespace Hood.Services
 
         Task<BlockBlobClient> GetBlob(string directory, string filename);
 
-#warning Todo: Redo the Upload to shared access/ download via shared access on media service.
-        //Task<string> UploadToSharedAccess(Stream file, string filename, DateTimeOffset? expiry, SharedAccessBlobPermissions permissions = SharedAccessBlobPermissions.Read);
-
         /// <summary>
         /// Deletes any stored files associated with the TMediaItem object.
         /// </summary>
         /// <param name="media">The media item to remove all associated media from Azure.</param>
         /// <returns></returns>
         Task DeleteStoredMedia(IMediaObject media);
-
-
-        /// <summary>
-        /// Refreshes image data for all files stored on the media item, reuploading to the current storage account, CDN and folder structure etc.
-        /// </summary>
-        /// <param name="media">The media item to remove all associated media from Azure.</param>
-        /// <returns></returns>
-        Task<IMediaObject> RefreshMedia(IMediaObject media, string tempDirectory);
     }
 }

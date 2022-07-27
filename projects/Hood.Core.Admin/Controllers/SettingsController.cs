@@ -19,11 +19,9 @@ namespace Hood.Areas.Admin.Controllers
 {
     public abstract class BaseSettingsController : BaseController
     {
-        protected IMediaRefreshService _mediaRefresh;
         public BaseSettingsController()
             : base()
         {
-            _mediaRefresh = Engine.Services.Resolve<IMediaRefreshService>();
         }
 
         [Route("admin/settings/basics/")]
@@ -327,8 +325,6 @@ namespace Hood.Areas.Admin.Controllers
             if (model == null)
                 model = new MediaSettings();
 
-            model.UpdateReport = _mediaRefresh.Report();
-
             return View(model);
         }
         [HttpPost]
@@ -347,8 +343,6 @@ namespace Hood.Areas.Admin.Controllers
                 MessageType = AlertType.Danger;
             }
 
-            model.UpdateReport = _mediaRefresh.Report();
-
             return View(model);
         }
 
@@ -359,24 +353,7 @@ namespace Hood.Areas.Admin.Controllers
             Engine.Settings.Set(model);
             return RedirectWithResetMessage("Media");
         }
-        [Route("admin/settings/media/refresh/")]
-        public virtual IActionResult RefreshMedia()
-        {
-            _mediaRefresh.Kill();
-            _mediaRefresh.RunUpdate(HttpContext);
 
-            SaveMessage = "Media refreshing...";
-            MessageType = AlertType.Success;
-
-            return RedirectToAction("Media");
-        }
-        [HttpPost]
-        [Route("admin/settings/media/refresh/cancel/")]
-        public virtual IActionResult RefreshMediaKillAsync()
-        {
-            _mediaRefresh.Kill();
-            return Json(new { success = true });
-        }
 
         [Route("admin/settings/mail/")]
         public virtual IActionResult Mail()

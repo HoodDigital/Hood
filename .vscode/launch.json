@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build-dev",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/projects/Hood.Development/bin/Debug/net5.0/Hood.Development.dll",
+            "program": "${workspaceFolder}/projects/Hood.Development/bin/Debug/net6.0/Hood.Development.dll",
             "args": [],
             "cwd": "${workspaceFolder}/projects/Hood.Development/",
             "stopAtEntry": false,
@@ -37,7 +37,7 @@
             "request": "launch",
             "preLaunchTask": "build-dev",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/projects/Hood.Development/bin/Debug/net5.0/Hood.Development.dll",
+            "program": "${workspaceFolder}/projects/Hood.Development/bin/Debug/net6.0/Hood.Development.dll",
             "args": [],
             "cwd": "${workspaceFolder}/projects/Hood.Development/",
             "stopAtEntry": false,
