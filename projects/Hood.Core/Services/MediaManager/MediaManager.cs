@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Processing;
 using System;
 using System.IO;
 using System.Linq;
@@ -244,79 +247,41 @@ namespace Hood.Services
 
         private async Task<IMediaObject> ProcessImage(IMediaObject media)
         {
-            string fileName = Path.GetFileNameWithoutExtension(media.Url);
-            string fileExt = Path.GetExtension(media.Url);
-            string tempDir = _env.ContentRootPath + "\\Temporary\\" + typeof(ImageProcessor) + "\\";
-
-            string tempGuid = Guid.NewGuid().ToString();
-            string tempFileName = tempDir + tempGuid + fileExt;
-
-            // create three thumbnailed versions, and add to the array of files to upload.
-
-            if (!Directory.Exists(tempDir))
-            {
-                Directory.CreateDirectory(tempDir);
-            }
-
             HttpClient client = new HttpClient();
             var response = await client.GetAsync(media.Url);
-            using (var fs = new FileStream(tempFileName, FileMode.CreateNew))
+            using (var fs = new System.IO.MemoryStream())
             {
                 await response.Content.CopyToAsync(fs);
+                media.ThumbUrl = await GenerateThumb(media, fs, ".xs", 250);
+                media.SmallUrl = await GenerateThumb(media, fs, ".sm", 600);
+                media.MediumUrl = await GenerateThumb(media, fs, ".md", 1280);
+                media.LargeUrl = await GenerateThumb(media, fs, ".xl", 1920);
             }
-
-            Task[] tasks = new Task[4]
-            {
-                Task.Factory.StartNew(() => media.ThumbUrl = GenerateThumb(media, tempFileName, tempGuid, ".xs", 250)),
-                Task.Factory.StartNew(() => media.SmallUrl = GenerateThumb(media, tempFileName, tempGuid, ".sm", 600)),
-                Task.Factory.StartNew(() => media.MediumUrl = GenerateThumb(media, tempFileName, tempGuid, ".md", 1280)),
-                Task.Factory.StartNew(() => media.LargeUrl = GenerateThumb(media, tempFileName, tempGuid, ".xl", 1920))
-            };
-
-            //Block until all tasks complete.
-            Task.WaitAll(tasks);
             return media;
         }
 
-        private string GenerateThumb(IMediaObject media, string tempFileName, string tempGuid, string prefix, int size)
+        private async Task<string> GenerateThumb(IMediaObject media, Stream stream, string prefix, int size)
         {
             try
             {
+                string url = "";
+
                 string fileName = Path.GetFileNameWithoutExtension(media.Url);
                 string fileExt = Path.GetExtension(media.Url);
-                string tempDir = _env.ContentRootPath + "\\Temporary\\" + typeof(ImageProcessor) + "\\";
-
-                string tempThumbFile = tempDir + tempGuid + prefix + fileExt;
-                string thumbFilename = $"{media.Path}/{fileName}{prefix}{fileExt}";
-
-                System.Drawing.Imaging.ImageFormat format = System.Drawing.Imaging.ImageFormat.Jpeg;
-                switch (fileExt.ToLowerInvariant())
+                string thumbBlobReference = $"{media.Path}/{fileName}{prefix}{fileExt}";
+                IImageFormat format;
+                stream.Position = 0;
+                using (Image image = Image.Load(stream, out format))
                 {
-                    case ".gif":
-                        format = System.Drawing.Imaging.ImageFormat.Gif;
-                        break;
-                    case ".bmp":
-                        format = System.Drawing.Imaging.ImageFormat.Bmp;
-                        break;
-                    case ".png":
-                        format = System.Drawing.Imaging.ImageFormat.Png;
-                        break;
+                    image.Mutate(x => x.Resize(size, 0));
+                    using (Stream outputStream = new System.IO.MemoryStream())
+                    {
+                        image.Save(outputStream, format);
+                        outputStream.Position = 0;
+                        var blob = await Upload(outputStream, thumbBlobReference);
+                        url = blob.Uri.ToUrlString();
+                    }
                 }
-
-                ImageProcessor.ResizeImage(tempFileName, tempThumbFile, size, size, format);
-
-                // foreach, file in the list of thumbnails
-                // upload to the thumbLocation
-                string url = "";
-                using (FileStream fs = File.OpenRead(tempThumbFile))
-                {
-                    url = Upload(fs, thumbFilename).Result.Uri.ToUrlString();
-                }
-
-                // add the url to the array of urls to send back
-                // remove the temporary image
-                try { File.Delete(tempFileName); } catch (Exception) { }
-                try { File.Delete(tempThumbFile); } catch (Exception) { }
 
                 return url;
             }
