@@ -354,6 +354,16 @@ namespace Hood.Extensions
             }
         }
 
+        public static string Truncate(this string value, int length)
+        {
+            if (value == null || value.Length <= length)
+            {
+                return value;
+            }
+
+            return value.Substring(0, length) + "...";
+        }
+
         public static string TruncateAtWord(this string value, int length)
         {
             if (value == null || value.Length < length || value.IndexOf(" ", length) == -1)

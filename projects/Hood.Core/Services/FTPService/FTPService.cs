@@ -110,7 +110,9 @@ namespace Hood.Services
                     }
 
                     outputStream = new FileStream(destination + filename, FileMode.OpenOrCreate);
+                    #pragma warning disable SYSLIB0014
                     FtpWebRequest reqFTP = (FtpWebRequest)WebRequest.Create(new Uri(server + filename));
+                    #pragma warning restore SYSLIB0014
                     reqFTP.Method = WebRequestMethods.Ftp.DownloadFile;
                     reqFTP.UseBinary = true;
                     reqFTP.Credentials = new NetworkCredential(username, password);

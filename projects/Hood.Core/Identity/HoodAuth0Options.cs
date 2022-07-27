@@ -75,8 +75,8 @@ namespace Hood.Identity
             var repo = Engine.Services.Resolve<IAccountRepository>();
             var principal = e.Principal;
             var userId = e.Principal.GetUserId();
-            var returnUrl = e.ReturnUri;                
-            
+            var returnUrl = e.ReturnUri;
+
             var identity = (ClaimsIdentity)principal.Identity;
 
             // Check if user exists and is linked to this Auth0 account
@@ -101,8 +101,6 @@ namespace Hood.Identity
             if (user != null)
             {
                 // user exists, but the current Auth0 signin method is not saved, force them into the connect account flow.
-
-
                 if (user.ConnectedAuth0Accounts != null && user.ConnectedAuth0Accounts.Count() > 0)
                 {
                     identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountLinkRequired, "true"));
@@ -115,6 +113,7 @@ namespace Hood.Identity
 
                 await SetDefaultClaims(e, user);
 
+                identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountCreationFailed, "true"));
                 e.Response.Redirect(linkGenerator.GetPathByAction("ConnectAccount", this.AccountControllerName, new { returnUrl = e.ReturnUri }));
                 e.HandleResponse();
                 return;
@@ -124,6 +123,7 @@ namespace Hood.Identity
             if (!Engine.Settings.Account.AllowRemoteSignups)
             {
                 // user has not been found, or created & signups are disabled on this end
+                identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountCreationFailed, "true"));
                 returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = "signup-disabled" });
                 e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new { returnUrl }));
                 e.HandleResponse();
@@ -158,6 +158,7 @@ namespace Hood.Identity
             if (!result.Succeeded)
             {
                 // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
+                identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountCreationFailed, "true"));
                 returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = "account-creation-failed" });
                 e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new { returnUrl }));
                 e.HandleResponse();
@@ -168,6 +169,7 @@ namespace Hood.Identity
             if (user == null)
             {
                 // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
+                identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountCreationFailed, "true"));
                 returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = "account-linking-failed" });
                 e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new { returnUrl }));
                 e.HandleResponse();
@@ -202,6 +204,7 @@ namespace Hood.Identity
             e.HandleResponse();
             return;
         }
+        
         public virtual Task OnRemoteFailure(RemoteFailureContext e)
         {
             // // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
@@ -261,5 +264,6 @@ namespace Hood.Identity
             e.Principal.SetUserClaims(user);
             await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, e.Principal, e.Properties);
         }
+
     }
 }

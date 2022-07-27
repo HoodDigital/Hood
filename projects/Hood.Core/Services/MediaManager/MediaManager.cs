@@ -9,10 +9,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Processing;
 using System;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Hood.Services
@@ -202,7 +206,7 @@ namespace Hood.Services
             switch (media.GenericFileType)
             {
                 case GenericFileType.Image:
-                    media = ProcessImage(media);
+                    media = await ProcessImage(media);
                     break;
             }
 
@@ -234,130 +238,50 @@ namespace Hood.Services
             switch (type)
             {
                 case GenericFileType.Image:
-                    media = ProcessImage(media);
+                    media = await ProcessImage(media);
                     break;
             }
 
             return media;
         }
 
-        #warning Todo: Redo the Upload to shared access/ download via shared access on media service.
-
-        //public async Task<string> UploadToSharedAccess(Stream file, string filename, DateTimeOffset? expiry, SharedAccessBlobPermissions permissions = SharedAccessBlobPermissions.Read)
-        //{
-        //    string sasBlobToken;
-
-        //    // Upload the media, filename as the name, check it doesn't already exist first.
-        //    var client = await GetClientAsync();
-        //    var blockBlob = client.GetBlockBlobClient(blobReference);
-
-        //    // If container doesn’t exist, create it.
-        //    await blobContainer.CreateIfNotExistsAsync();
-        //    await blobContainer.SetPermissionsAsync(new BlobContainerPermissions
-        //    {
-        //        PublicAccess = BlobContainerPublicAccessType.Off
-        //    });
-
-        //    // Get a reference to the blob named blobReference
-        //    CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(filename);
-        //    await blockBlob.UploadFromStreamAsync(file);
-
-        //    // Create a new access policy and define its constraints.
-        //    // Note that the SharedAccessBlobPolicy class is used both to define the parameters of an ad-hoc SAS, and
-        //    // to construct a shared access policy that is saved to the container's shared access policies.
-        //    SharedAccessBlobPolicy adHocSAS = new SharedAccessBlobPolicy()
-        //    {
-        //        // When the start time for the SAS is omitted, the start time is assumed to be the time when the storage service receives the request.
-        //        // Omitting the start time for a SAS that is effective immediately helps to avoid clock skew.
-        //        SharedAccessExpiryTime = expiry ?? DateTime.UtcNow.AddHours(24),
-        //        Permissions = permissions
-        //    };
-
-        //    // Generate the shared access signature on the blob, setting the constraints directly on the signature.
-        //    sasBlobToken = blockBlob.GetSharedAccessSignature(adHocSAS);
-
-        //    Console.WriteLine("SAS for blob (ad hoc): {0}", sasBlobToken);
-        //    Console.WriteLine();
-
-        //    return blockBlob.Uri + sasBlobToken;
-        //}
-
-
-
-        private IMediaObject ProcessImage(IMediaObject media)
+        private async Task<IMediaObject> ProcessImage(IMediaObject media)
         {
-            string fileName = Path.GetFileNameWithoutExtension(media.Url);
-            string fileExt = Path.GetExtension(media.Url);
-            string tempDir = _env.ContentRootPath + "\\Temporary\\" + typeof(ImageProcessor) + "\\";
-
-            string tempGuid = Guid.NewGuid().ToString();
-            string tempFileName = tempDir + tempGuid + fileExt;
-
-            // create three thumbnailed versions, and add to the array of files to upload.
-
-            if (!Directory.Exists(tempDir))
+            HttpClient client = new HttpClient();
+            var response = await client.GetAsync(media.Url);
+            using (var fs = new System.IO.MemoryStream())
             {
-                Directory.CreateDirectory(tempDir);
+                await response.Content.CopyToAsync(fs);
+                media.ThumbUrl = await GenerateThumb(media, fs, ".xs", 250);
+                media.SmallUrl = await GenerateThumb(media, fs, ".sm", 600);
+                media.MediumUrl = await GenerateThumb(media, fs, ".md", 1280);
+                media.LargeUrl = await GenerateThumb(media, fs, ".xl", 1920);
             }
-
-            // download the file.
-            using (WebClient client = new())
-            {
-                client.DownloadFile(media.Url, tempFileName);
-            }
-
-            Task[] tasks = new Task[4]
-            {
-                Task.Factory.StartNew(() => media.ThumbUrl = GenerateThumb(media, tempFileName, tempGuid, ".xs", 250)),
-                Task.Factory.StartNew(() => media.SmallUrl = GenerateThumb(media, tempFileName, tempGuid, ".sm", 600)),
-                Task.Factory.StartNew(() => media.MediumUrl = GenerateThumb(media, tempFileName, tempGuid, ".md", 1280)),
-                Task.Factory.StartNew(() => media.LargeUrl = GenerateThumb(media, tempFileName, tempGuid, ".xl", 1920))
-            };
-
-            //Block until all tasks complete.
-            Task.WaitAll(tasks);
             return media;
         }
 
-        private string GenerateThumb(IMediaObject media, string tempFileName, string tempGuid, string prefix, int size)
+        private async Task<string> GenerateThumb(IMediaObject media, Stream stream, string prefix, int size)
         {
             try
             {
+                string url = "";
+
                 string fileName = Path.GetFileNameWithoutExtension(media.Url);
                 string fileExt = Path.GetExtension(media.Url);
-                string tempDir = _env.ContentRootPath + "\\Temporary\\" + typeof(ImageProcessor) + "\\";
-
-                string tempThumbFile = tempDir + tempGuid + prefix + fileExt;
-                string thumbFilename = $"{media.Path}/{fileName}{prefix}{fileExt}";
-
-                System.Drawing.Imaging.ImageFormat format = System.Drawing.Imaging.ImageFormat.Jpeg;
-                switch (fileExt.ToLowerInvariant())
+                string thumbBlobReference = $"{media.Path}/{fileName}{prefix}{fileExt}";
+                IImageFormat format;
+                stream.Position = 0;
+                using (Image image = Image.Load(stream, out format))
                 {
-                    case ".gif":
-                        format = System.Drawing.Imaging.ImageFormat.Gif;
-                        break;
-                    case ".bmp":
-                        format = System.Drawing.Imaging.ImageFormat.Bmp;
-                        break;
-                    case ".png":
-                        format = System.Drawing.Imaging.ImageFormat.Png;
-                        break;
+                    image.Mutate(x => x.Resize(size, 0));
+                    using (Stream outputStream = new System.IO.MemoryStream())
+                    {
+                        image.Save(outputStream, format);
+                        outputStream.Position = 0;
+                        var blob = await Upload(outputStream, thumbBlobReference);
+                        url = blob.Uri.ToUrlString();
+                    }
                 }
-
-                ImageProcessor.ResizeImage(tempFileName, tempThumbFile, size, size, format);
-
-                // foreach, file in the list of thumbnails
-                // upload to the thumbLocation
-                string url = "";
-                using (FileStream fs = File.OpenRead(tempThumbFile))
-                {
-                    url = Upload(fs, thumbFilename).Result.Uri.ToUrlString();
-                }
-
-                // add the url to the array of urls to send back
-                // remove the temporary image
-                try { File.Delete(tempFileName); } catch (Exception) { }
-                try { File.Delete(tempThumbFile); } catch (Exception) { }
 
                 return url;
             }
@@ -378,29 +302,6 @@ namespace Hood.Services
                 try { await Remove(media.LargeUrl); } catch (Exception) { }
                 try { await Remove(media.ThumbUrl); } catch (Exception) { }
             }
-        }
-
-        public async Task<IMediaObject> RefreshMedia(IMediaObject media, string tempDirectory)
-        {
-            // copy record of original files into new object
-            MediaObject old = new();
-            media.CopyProperties(old);
-
-            // download the orignal file, and save it to temp.
-            string tempFile = tempDirectory + media.UniqueId;
-            using (WebClient client = new())
-            {
-                client.DownloadFile(new Uri(media.Url), tempFile);
-            }
-
-            using (FileStream fileStream = File.OpenRead(tempFile))
-            {
-                // reupload to a new location, and process.
-                await ProcessUpload(fileStream, media.Filename, media.FileType, media.FileSize, media.Path);
-            }
-
-            // save the new file urls to the media object
-            return media;
         }
 
         public const string UserDirectorySlug = "users";

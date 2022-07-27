@@ -35,7 +35,7 @@ namespace Hood.Services
             RepeatCharacters = true;
             PatternDriven = false;
             Pattern = "";
-            Random = new RNGCryptoServiceProvider();
+            Random = RandomNumberGenerator.Create();
             ExistingStrings = new List<string>();
         }
 
@@ -544,7 +544,7 @@ namespace Hood.Services
         private char[] CurrentNumericCharacters;
         private char[] CurrentSpecialCharacters;
         private char[] CurrentGeneralCharacters; // All used characters
-        private readonly RNGCryptoServiceProvider Random;
+        private readonly RandomNumberGenerator Random;
         private readonly List<string> ExistingStrings; // History
         #endregion
     }
