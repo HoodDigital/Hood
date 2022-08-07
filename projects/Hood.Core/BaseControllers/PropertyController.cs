@@ -69,7 +69,7 @@ namespace Hood.BaseControllers
 
             ShowPropertyModel um = new ShowPropertyModel()
             {
-                Property = await _property.GetPropertyByIdAsync(id)
+                Property = await _property.GetPropertyViewByIdAsync(id)
             };
 
             if (um.Property == null)
@@ -87,7 +87,7 @@ namespace Hood.BaseControllers
         {
             ShowPropertyModel um = new ShowPropertyModel()
             {
-                Property = await _property.GetPropertyByIdAsync(id)
+                Property = await _property.GetPropertyViewByIdAsync(id)
             };
 
             // if not admin, and not published, hide.

@@ -23,7 +23,7 @@ namespace Hood.Models
 {
     public class HoodDbContext : DbContext
     {
-        public HoodDbContext(DbContextOptions options)
+        public HoodDbContext(DbContextOptions<HoodDbContext> options)
             : base(options)
         {
         }

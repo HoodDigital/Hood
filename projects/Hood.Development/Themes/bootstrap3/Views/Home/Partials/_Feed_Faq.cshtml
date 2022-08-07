@@ -7,7 +7,7 @@ else
 {
     <div class="panel-group" id="faq-accordion" role="tablist" aria-multiselectable="true">
 
-        @foreach (Content content in Model.List)
+        @foreach (ContentView content in Model.List)
         {
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="@string.Format("faq-heading-{0}", content.Id)">

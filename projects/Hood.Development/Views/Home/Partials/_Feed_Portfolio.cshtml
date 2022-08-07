@@ -6,7 +6,7 @@
 else
 {
     <div class="card-columns">
-        @foreach (Content content in Model.List)
+        @foreach (ContentView content in Model.List)
         {
             <div class="card">
                 <a href="@content.Url"><fixedImage src="@content.FeaturedImage.MediumUrl" class="card-img-top img img-wide img-full" style="@content.GetImageStyle()" /></a>

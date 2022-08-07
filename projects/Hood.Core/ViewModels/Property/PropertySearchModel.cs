@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Hood.ViewModels
 {
-    public class PropertyListModel : PagedList<PropertyListing>, IPageableModel
+    public class PropertyListModel : PagedList<PropertyListingView>, IPageableModel
     {
         public PropertyListModel() : base()
         {

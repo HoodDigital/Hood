@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
 namespace Hood.Models
@@ -15,6 +16,8 @@ namespace Hood.Models
         [IgnoreDataMember] 
         public Content Content { get; set; }
 
+        [NotMapped]
+        public ContentView ContentView { get; set; }
     }
 }
 

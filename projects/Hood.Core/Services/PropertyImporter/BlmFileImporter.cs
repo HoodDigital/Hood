@@ -124,10 +124,13 @@ namespace Hood.Services
                 StatusMessage = "Starting import, loading property files from FTP Service...";
                 _propertySettings = Engine.Settings.Property;
                 // Get a new instance of the HoodDbContext for this import.
-                DbContextOptionsBuilder options = new DbContextOptionsBuilder();
-                options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
-                _db = new PropertyContext(options.Options);
-                _hoodDb = new HoodDbContext(options.Options);
+                DbContextOptionsBuilder<HoodDbContext> dbOptions = new DbContextOptionsBuilder<HoodDbContext>();
+                dbOptions.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
+                _hoodDb = new HoodDbContext(dbOptions.Options);
+                
+                DbContextOptionsBuilder<PropertyContext> propertyDbOptions = new DbContextOptionsBuilder<PropertyContext>();
+                dbOptions.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
+                _db = new PropertyContext(propertyDbOptions.Options);
 
                 _media = new MediaManager(_env, _config);
 

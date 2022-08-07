@@ -45,11 +45,11 @@ namespace Hood.Services
         #region Content CRUD
         public async Task<ContentModel> GetContentAsync(ContentModel model)
         {
-            IQueryable<Content> content = _db.Content.Include(p => p.Author)
-                                                     .Include(p => p.Media)
-                                                     .Include(p => p.Metadata)
-                                                     .Include(p => p.Categories).ThenInclude(c => c.Category)
-                                                     .AsNoTracking();
+            IQueryable<ContentView> content = _db.ContentViews
+                .Include(p => p.Media)
+                .Include(p => p.Metadata)
+                .Include(p => p.Categories).ThenInclude(c => c.Category)
+                .AsNoTracking();
 
             // filter posts by type
             if (model.ContentType != null)
@@ -76,7 +76,7 @@ namespace Hood.Services
             // posts by author
             if (!string.IsNullOrEmpty(model.AuthorName))
             {
-                content = content.Where(n => n.Author.UserName == model.AuthorName);
+                content = content.Where(n => n.AuthorEmail == model.AuthorName);
             }
 
             if (model.Categories != null && model.Categories.Count > 0)
@@ -178,7 +178,7 @@ namespace Hood.Services
             return model;
         }
 
-        private static IQueryable<Content> ProcessFilterByOperator(IQueryable<Content> content, string filterString, char filterOperator)
+        private static IQueryable<ContentView> ProcessFilterByOperator(IQueryable<ContentView> content, string filterString, char filterOperator)
         {
             List<string> stringParts = filterString.Split(filterOperator).ToList();
             string value = stringParts.LastOrDefault();
@@ -206,7 +206,6 @@ namespace Hood.Services
                 content = _db.Content.Include(p => p.Categories).ThenInclude(c => c.Category)
                                     .Include(p => p.Media)
                                     .Include(p => p.Metadata)
-                                    .Include(p => p.Author)
                                     .FirstOrDefault(c => c.Id == id);
                 if (content == null)
                 {
@@ -214,6 +213,24 @@ namespace Hood.Services
                 }
 
                 await RefreshMetasAsync(content);
+                _cache.Add(cacheKey, content, TimeSpan.FromMinutes(60));
+            }
+            return content;
+        }
+        public async Task<ContentView> GetContentViewByIdAsync(int id, bool clearCache = false, bool track = true)
+        {
+            string cacheKey = typeof(ContentView).ToString() + ".Single." + id;
+            if (!_cache.TryGetValue(cacheKey, out ContentView content) || clearCache)
+            {
+                content = _db.ContentViews.Include(p => p.Categories).ThenInclude(c => c.Category)
+                                    .Include(p => p.Media)
+                                    .Include(p => p.Metadata)
+                                    .FirstOrDefault(c => c.Id == id);
+                if (content == null)
+                {
+                    return content;
+                }
+
                 _cache.Add(cacheKey, content, TimeSpan.FromMinutes(60));
             }
             return content;
@@ -383,7 +400,7 @@ namespace Hood.Services
             {
                 // get all the content - sorted by publish date.
                 // find the ones either side of the id.
-                Content[] all = (await GetContentAsync(new ContentModel() { Status = ContentStatus.Published, Category = category, Type = type, PageSize = int.MaxValue, Order = "Date" })).List.ToArray();
+                ContentView[] all = (await GetContentAsync(new ContentModel() { Status = ContentStatus.Published, Category = category, Type = type, PageSize = int.MaxValue, Order = "Date" })).List.ToArray();
                 int index = Array.FindIndex(all, row => row.Id == id);
                 neighbours = new ContentNeighbours()
                 {
@@ -506,10 +523,10 @@ namespace Hood.Services
 
         #region Sitemap
         // Sitemap
-        public async Task<List<Content>> GetPages(string category = null)
+        public async Task<List<ContentView>> GetPages(string category = null)
         {
             string cacheKey = typeof(Content).ToString() + (category.IsSet() ? $".{category}" : "") + ".Pages";
-            if (!_cache.TryGetValue(cacheKey, out List<Content> pages))
+            if (!_cache.TryGetValue(cacheKey, out List<ContentView> pages))
             {
                 ContentModel content = await GetContentAsync(new ContentModel() { Type = "page", PageSize = int.MaxValue, Category = category });
                 pages = content.List;
@@ -551,7 +568,7 @@ namespace Hood.Services
                     if (type.HasPage)
                     {
                         ContentModel typeContent = await GetContentAsync(new ContentModel() { Type = type.Type, PageSize = int.MaxValue });
-                        foreach (Content content in typeContent.List.OrderByDescending(c => c.PublishDate))
+                        foreach (ContentView content in typeContent.List.OrderByDescending(c => c.PublishDate))
                         {
                             nodes.Add(new SitemapNode()
                             {

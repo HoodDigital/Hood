@@ -5,8 +5,8 @@ namespace Hood.ViewModels
 {
     public class ShowPropertyModel
     {
-        public List<PropertyListing> CloseBy { get; set; }
-        public List<PropertyListing> Similar { get; set; }
-        public PropertyListing Property { get; set; }
+        public List<PropertyListingView> CloseBy { get; set; }
+        public List<PropertyListingView> Similar { get; set; }
+        public PropertyListingView Property { get; set; }
     }
 }

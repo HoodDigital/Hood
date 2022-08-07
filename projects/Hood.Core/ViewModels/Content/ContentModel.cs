@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Hood.ViewModels
 {
-    public class ContentModel : PagedList<Content>, IPageableModel
+    public class ContentModel : PagedList<ContentView>, IPageableModel
     {
         public ContentModel() : base()
         {
@@ -47,12 +47,12 @@ namespace Hood.ViewModels
 
         // Sidebar Stuff
         public ContentType ContentType { get; set; }
-        public PagedList<Content> Recent { get; set; }
+        public PagedList<ContentView> Recent { get; set; }
 
         // Single Stuff
-        public Content Content { get; set; }
-        public Content Previous { get; set; }
-        public Content Next { get; set; }
+        public ContentView Content { get; set; }
+        public ContentView Previous { get; set; }
+        public ContentView Next { get; set; }
         public bool EditMode { get; set; }
 
         // List Stuff

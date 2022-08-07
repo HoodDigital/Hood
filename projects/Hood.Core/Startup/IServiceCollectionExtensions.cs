@@ -50,9 +50,9 @@ namespace Hood.Startup
                 {
                     throw new StartupException("Database connection string is not configured.", StartupError.NoConnectionString);
                 }
-                services.ConfigureHoodDatabase(config);       
+                services.ConfigureHoodDatabase(config);
 
-                services.ConfigureHoodDatabaseDependentServices();     
+                services.ConfigureHoodDatabaseDependentServices();
 
                 services.ConfigureProperty(config);
                 services.ConfigureContent(config);
@@ -63,7 +63,7 @@ namespace Hood.Startup
                 }
                 else
                 {
-                    services.ConfigureAuthentication(config);
+                    services.ConfigurePasswordAuthentication(config);
                 }
 
             }
@@ -74,20 +74,19 @@ namespace Hood.Startup
                 services.AddDatabaseDeveloperPageExceptionFilter();
             }
 
-
             services.ConfigureCache(config);
             services.ConfigureCacheProfiles();
-
-            services.ConfigureViewEngine(config);
-            services.ConfigureAntiForgery(config);
-
             services.AddDistributedMemoryCache();
 
-            services.ConfigureCookies(config);
+            services.ConfigureViewEngine(config);
+
+            services.ConfigureAntiForgery(config);
+
+            services.ConfigureCookieConsent(config);
+
             services.ConfigureSession(config);
 
-            services.ConfigureImpersonation();
-            services.ConfigureRoutes();
+            services.ConfigureHoodSlugRouteConstraints();
 
             services.AddControllersWithViews()
                 .AddRazorRuntimeCompilation()
@@ -103,9 +102,8 @@ namespace Hood.Startup
 
             services.AddRazorPages();
 
-            services.ConfigureEngine(config);
-
-
+            services.ConfigureHoodEngine(config);
+            
             return services;
         }
 
@@ -140,6 +138,19 @@ namespace Hood.Startup
             return services;
         }
 
+        public static IServiceCollection ConfigureHoodEngine(this IServiceCollection services, IConfiguration configuration)
+        {
+            //add accessor to HttpContext
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            //create, initialize and configure the engine
+            IHoodServiceProvider engine = Engine.CreateHoodServiceProvider();
+            engine.Initialize(services);
+            IServiceProvider serviceProvider = engine.ConfigureServices(services, configuration);
+
+            return services;
+        }
+        
         #region Caching
 
         public static IServiceCollection ConfigureCache(this IServiceCollection services, IConfiguration config)
@@ -212,19 +223,6 @@ namespace Hood.Startup
 
         #endregion
 
-        public static IServiceCollection ConfigureEngine(this IServiceCollection services, IConfiguration configuration)
-        {
-            //add accessor to HttpContext
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-            //create, initialize and configure the engine
-            IHoodServiceProvider engine = Engine.CreateHoodServiceProvider();
-            engine.Initialize(services);
-            IServiceProvider serviceProvider = engine.ConfigureServices(services, configuration);
-
-            return services;
-        }
-
         #region Contexts
 
         public static IServiceCollection ConfigureHoodDatabase(this IServiceCollection services, IConfiguration config)
@@ -251,7 +249,8 @@ namespace Hood.Startup
 
         #endregion
 
-        #region Password Authentication
+        #region Anti Forgery
+
         public static IServiceCollection ConfigureAntiForgery(this IServiceCollection services, IConfiguration config)
         {
             string cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Constants.CookieDefaultName;
@@ -262,7 +261,12 @@ namespace Hood.Startup
             });
             return services;
         }
-        public static IServiceCollection ConfigureCookies(this IServiceCollection services, IConfiguration config)
+
+        #endregion
+
+        #region Cookie Consent
+
+        public static IServiceCollection ConfigureCookieConsent(this IServiceCollection services, IConfiguration config)
         {
             string cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Constants.CookieDefaultName;
             bool consentRequired = config.GetValue("Identity:Cookies:ConsentRequired", true);
@@ -277,8 +281,94 @@ namespace Hood.Startup
             });
             return services;
         }
-        public static IServiceCollection ConfigureAuthentication(this IServiceCollection services, IConfiguration config)
+
+        #endregion
+
+        #region Password Authentication
+
+        public static IServiceCollection ConfigurePasswordAuthentication(this IServiceCollection services, IConfiguration config)
         {
+            services.AddDbContext<IdentityContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]));
+
+            services.AddIdentity<ApplicationUser, IdentityRole>(o =>
+            {
+                // configure identity options
+                o.User.RequireUniqueEmail = true;
+
+                o.SignIn.RequireConfirmedEmail = false;
+                o.SignIn.RequireConfirmedPhoneNumber = false;
+
+                o.Password.RequireDigit = !config["Identity:Password:RequireDigit"].IsSet() || bool.Parse(config["Identity:Password:RequireDigit"]);
+                o.Password.RequireLowercase = config["Identity:Password:RequireLowercase"].IsSet() && bool.Parse(config["Identity:Password:RequireLowercase"]);
+                o.Password.RequireUppercase = config["Identity:Password:RequireUppercase"].IsSet() && bool.Parse(config["Identity:Password:RequireUppercase"]);
+                o.Password.RequireNonAlphanumeric = !config["Identity:Password:RequireNonAlphanumeric"].IsSet() || bool.Parse(config["Identity:Password:RequireNonAlphanumeric"]);
+                o.Password.RequiredLength = config["Identity:Password:RequiredLength"].IsSet() ? int.Parse(config["Identity:Password:RequiredLength"]) : 6;
+            })
+                .AddEntityFrameworkStores<HoodDbContext>()
+                .AddDefaultTokenProviders();
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                SetAuthenticationCookieDefaults(config, options);
+
+                options.Cookie.SameSite = SameSiteMode.Strict;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.Domain = config["Identity:Cookies:Domain"].IsSet() ? config["Identity:Cookies:Domain"] : null;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(config.GetValue("Session:Timeout", 60));
+                options.SlidingExpiration = true;
+
+                options.Events = new CookieAuthenticationEvents()
+                {
+                    OnValidatePrincipal = async e =>
+                    {
+                        // get the user profile and store important bits on the claim.
+                        var repo = Engine.Services.Resolve<IPasswordAccountRepository>();
+                        var user = await repo.GetUserProfileByIdAsync(e.Principal.GetUserId());
+                        e.Principal.SetUserClaims(user);
+                        if (user.EmailConfirmed)
+                        {
+                            e.Principal.AddOrUpdateClaimValue(HoodClaimTypes.EmailConfirmed, "true");
+                        }
+                        if (user.Active || !Engine.Settings.Account.RequireEmailConfirmation)
+                        {
+                            e.Principal.AddOrUpdateClaimValue(HoodClaimTypes.Active, "true");
+                        }
+                    }
+                };
+            });
+
+            services.AddScoped<IPasswordAccountRepository, AccountRepository>();
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(Policies.Active, policy => policy.RequireClaim(Identity.HoodClaimTypes.Active));
+                options.AddPolicy(Policies.AccountNotConnected, policy => policy.RequireClaim(Identity.HoodClaimTypes.AccountNotConnected));
+                options.AddPolicy(Policies.AccountLinkRequired, policy => policy.RequireClaim(Identity.HoodClaimTypes.AccountLinkRequired));
+            });
+
+            services.ConfigurePasswordImpersonation();
+
+            return services;
+        }
+
+        public static IServiceCollection ConfigurePasswordImpersonation(this IServiceCollection services)
+        {
+            services.Configure<SecurityStampValidatorOptions>(options => // different class name
+            {
+                options.ValidationInterval = TimeSpan.FromMinutes(1);  // new property name
+                options.OnRefreshingPrincipal = context =>             // new property name
+                {
+                    System.Security.Claims.Claim originalUserIdClaim = context.CurrentPrincipal.FindFirst(HoodClaimTypes.OriginalUserId);
+                    System.Security.Claims.Claim isImpersonatingClaim = context.CurrentPrincipal.FindFirst(HoodClaimTypes.IsImpersonating);
+                    if (originalUserIdClaim != null && isImpersonatingClaim.Value == "true")
+                    {
+                        context.NewPrincipal.Identities.First().AddClaim(originalUserIdClaim);
+                        context.NewPrincipal.Identities.First().AddClaim(isImpersonatingClaim);
+                    }
+                    return Task.FromResult(0);
+                };
+            });
+
             return services;
         }
 
@@ -288,8 +378,8 @@ namespace Hood.Startup
 
         public static IServiceCollection ConfigureAuth0(this IServiceCollection services, IConfiguration config, IHoodAuth0Options auth0Options)
         {
+            services.AddDbContext<Auth0IdentityContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]));
 
-            
             services.ConfigureSameSiteNoneCookies();
 
             services.AddAuth0WebAppAuthentication(options =>
@@ -335,7 +425,7 @@ namespace Hood.Startup
             options.LogoutPath = config["Identity:LogoutPath"].IsSet() ? config["Identity:LogoutPath"] : "/account/logout";
             options.ReturnUrlParameter = Constants.ReturnUrlParameter;
         }
-        public static IServiceCollection ConfigureSameSiteNoneCookies(this IServiceCollection services)
+        private static IServiceCollection ConfigureSameSiteNoneCookies(this IServiceCollection services)
         {
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -390,27 +480,9 @@ namespace Hood.Startup
 
         #endregion
 
-        public static IServiceCollection ConfigureImpersonation(this IServiceCollection services)
-        {
-            services.Configure<SecurityStampValidatorOptions>(options => // different class name
-            {
-                options.ValidationInterval = TimeSpan.FromMinutes(1);  // new property name
-                options.OnRefreshingPrincipal = context =>             // new property name
-                {
-                    System.Security.Claims.Claim originalUserIdClaim = context.CurrentPrincipal.FindFirst(HoodClaimTypes.OriginalUserId);
-                    System.Security.Claims.Claim isImpersonatingClaim = context.CurrentPrincipal.FindFirst(HoodClaimTypes.IsImpersonating);
-                    if (originalUserIdClaim != null && isImpersonatingClaim.Value == "true")
-                    {
-                        context.NewPrincipal.Identities.First().AddClaim(originalUserIdClaim);
-                        context.NewPrincipal.Identities.First().AddClaim(isImpersonatingClaim);
-                    }
-                    return Task.FromResult(0);
-                };
-            });
+        #region RouteConstraints
 
-            return services;
-        }
-        public static IServiceCollection ConfigureRoutes(this IServiceCollection services)
+        public static IServiceCollection ConfigureHoodSlugRouteConstraints(this IServiceCollection services)
         {
             services.Configure<RouteOptions>(options =>
             {
@@ -421,6 +493,11 @@ namespace Hood.Startup
             });
             return services;
         }
+
+        #endregion
+
+        #region View Engine (File Providers & Theme)
+
         public static IServiceCollection ConfigureViewEngine(this IServiceCollection services, IConfiguration config)
         {
             services.Configure<MvcRazorRuntimeCompilationOptions>(options =>
@@ -442,5 +519,7 @@ namespace Hood.Startup
             });
             return services;
         }
+
+        #endregion
     }
 }

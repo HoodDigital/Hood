@@ -24,12 +24,13 @@ namespace Hood.Contexts
 {
     public class ContentContext : DbContext
     {
-        public ContentContext(DbContextOptions options)
+        public ContentContext(DbContextOptions<ContentContext> options)
             : base(options)
         { }
 
         // Content
         public DbSet<Content> Content { get; set; }
+        public DbSet<ContentView> ContentViews { get; set; }
         public DbSet<ContentMeta> ContentMetadata { get; set; }
         public DbSet<ContentMedia> ContentMedia { get; set; }
         public DbSet<ContentCategory> ContentCategories { get; set; }
@@ -54,6 +55,11 @@ namespace Hood.Contexts
             builder.Entity<ContentMeta>().ToTable("HoodContentMetadata");
             builder.Entity<ContentMeta>().HasAlternateKey(ol => new { ol.ContentId, ol.Name });
             builder.Entity<ContentMeta>().HasOne(c => c.Content).WithMany(cc => cc.Metadata).HasForeignKey(au => au.ContentId);
+            
+            builder.Entity<ContentView>().ToView("HoodContentViews");
+            builder.Entity<ContentView>().HasMany(c => c.Metadata).WithOne(c=> c.ContentView).HasForeignKey(c => c.ContentId);
+            builder.Entity<ContentView>().HasMany(c => c.Categories).WithOne(c=> c.ContentView).HasForeignKey(c => c.ContentId);
+            builder.Entity<ContentView>().HasMany(c => c.Media).WithOne(c=> c.ContentView).HasForeignKey(c => c.ContentId);
         }
 
     }

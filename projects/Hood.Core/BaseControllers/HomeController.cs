@@ -104,7 +104,7 @@ namespace Hood.BaseControllers
             ContentModel model = new ContentModel()
             {
                 EditMode = editMode,
-                Content = await _content.GetContentByIdAsync(id)
+                Content = await _content.GetContentViewByIdAsync(id)
             };
             if (model.Content == null)
                 return NotFound();

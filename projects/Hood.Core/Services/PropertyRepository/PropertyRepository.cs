@@ -36,8 +36,7 @@ namespace Hood.Services
         #region Property CRUD
         public async Task<PropertyListModel> GetPropertiesAsync(PropertyListModel model)
         {
-            IQueryable<PropertyListing> properties = _db.Properties
-                .Include(p => p.Agent)
+            IQueryable<PropertyListingView> properties = _db.PropertyViews
                 .Include(p => p.Metadata);
 
             if (model.LoadImages)
@@ -72,7 +71,7 @@ namespace Hood.Services
 
             if (model.Agent.IsSet())
             {
-                properties = properties.Where(n => n.Agent.UserName == model.Agent);
+                properties = properties.Where(n => n.AgentEmail == model.Agent);
             }
 
             if (model.Location.IsSet())
@@ -258,7 +257,17 @@ namespace Hood.Services
             PropertyListing property = await _db.Properties
                     .Include(p => p.Media)
                     .Include(p => p.FloorPlans)
-                    .Include(p => p.Agent)
+                    .Include(p => p.Metadata)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.Id == id);
+
+            return property;
+        }
+        public async Task<PropertyListingView> GetPropertyViewByIdAsync(int id, bool nocache = false)
+        {
+            PropertyListingView property = await _db.PropertyViews
+                    .Include(p => p.Media)
+                    .Include(p => p.FloorPlans)
                     .Include(p => p.Metadata)
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id == id);
@@ -270,7 +279,6 @@ namespace Hood.Services
             _db.Entry(property).State = EntityState.Added;
             await _db.Entry(property).Collection(s => s.Media).LoadAsync();
             await _db.Entry(property).Collection(s => s.FloorPlans).LoadAsync();
-            await _db.Entry(property).Reference(s => s.Agent).LoadAsync();
             await _db.Entry(property).Collection(s => s.Metadata).LoadAsync();
             return property;
         }

@@ -8,23 +8,23 @@ namespace Hood.Web
 {
     public class Startup
     {
-        public IConfiguration config { get; }
+        public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Environment { get; }
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
-            config = configuration;
+            this.Configuration = configuration;
+            this.Environment = env;
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.ConfigureHood(config);
+            services.ConfigureHood(Configuration, Environment);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            app.UseHood(env, config);
+            app.UseHood(Environment, Configuration);
         }
     }
 }

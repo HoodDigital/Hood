@@ -1,20 +1,11 @@
-﻿using Hood.Contexts;
-using Hood.Core;
-using Hood.Entities;
+﻿using Hood.Core;
 using Hood.Enums;
-using Hood.Extensions;
-using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
-using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
@@ -25,7 +16,7 @@ namespace Hood.Contexts
 
     public class IdentityContext : IdentityDbContext<ApplicationUser, IdentityRole, string>, IHoodIdentityContext
     {
-        public IdentityContext(DbContextOptions options)
+        public IdentityContext(DbContextOptions<IdentityContext> options)
             : base(options)
         { }
 
@@ -76,7 +67,7 @@ namespace Hood.Contexts
                     typeBuilder.Property(o => o.LastLoginLocation).HasColumnName("LastLoginLocation");
                 });
 
-            builder.Entity<UserProfileView<IdentityRole>>().HasNoKey().ToView("HoodUserProfiles");
+            builder.Entity<UserProfileView<IdentityRole>>().ToView("HoodUserProfiles");
         }
 
         public async Task<IHoodIdentity> GetSiteAdmin()

@@ -22,11 +22,12 @@ namespace Hood.Services
         Task<ContentCategory> GetCategoryByIdAsync(int categoryId);
         Task<ContentModel> GetContentAsync(ContentModel model);
         Task<Content> GetContentByIdAsync(int id, bool clearCache = false, bool track = true);
+        Task<ContentView> GetContentViewByIdAsync(int id, bool clearCache = false, bool track = true);
         Task<MediaDirectory> GetDirectoryAsync();
         Task<ContentModel> GetFeaturedAsync(string type, string category = null, int pageSize = 5);
         List<string> GetMetasForTemplate(string templateName, string folder);
         Task<ContentNeighbours> GetNeighbourContentAsync(int id, string type, string category = null);
-        Task<List<Content>> GetPages(string category = null);
+        Task<List<ContentView>> GetPages(string category = null);
         Task<ContentModel> GetRecentAsync(string type, string category = null, int pageSize = 5);
         Task<string> GetSitemapDocumentAsync(IUrlHelper urlHelper);
         Task<ContentStatitsics> GetStatisticsAsync();

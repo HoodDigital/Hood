@@ -1,8 +1,8 @@
-@model PagedList<Content>
+@model PagedList<ContentView>
 @inject IContentRepository _content
 @if (Model != null && Model.List.Count > 0)
 {
-            @foreach (Content content in Model.List)
+            @foreach (ContentView content in Model.List)
             {
                 <div class="card mb-3" style="max-width: 540px;">
                     <div class="row no-gutters">
@@ -14,23 +14,11 @@
                         <div class="col-md-9">
                             <div class="card-body">
                         <p class="media-heading mb-0"><a class="title-link" href="@content.Url"><strong>@content.Title</strong></a></p>
-                        @switch (content.ContentType)
-                        {
-                            case "news":
-                            case "blog":
+                        
                                 <small>
-                                    <i class="mr-2 fa fa-user"></i><a asp-action="Author" asp-route-author="@content.Author.UserName" asp-route-type="@content.ContentType">@content.Author.ToDisplayName()</a><br />
-                                    <i class="mr-2 fa fa-clock"></i> @content.PublishDate.ToLongDateString()
-                                </small>
-
-                                break;
-                            default:
-                                <small>
-                                    <i class="mr-2 fa fa-user"></i>@content.Author.ToDisplayName()<br />
+                                    <i class="mr-2 fa fa-user"></i>@content.ToDisplayName()<br />
                                     <i class="mr-2 fa fa-clock"></i>@content.PublishDate.ToLongDateString()
                                 </small>
-                                break;
-                        }
                             </div>
                         </div>
                     </div>

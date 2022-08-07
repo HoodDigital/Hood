@@ -24,11 +24,12 @@ namespace Hood.Contexts
 {
     public class PropertyContext : DbContext
     {
-        public PropertyContext(DbContextOptions options)
+        public PropertyContext(DbContextOptions<PropertyContext> options)
             : base(options)
         {}
 
         public DbSet<PropertyListing> Properties { get; set; }
+        public DbSet<PropertyListingView> PropertyViews { get; set; }
         public DbSet<PropertyMedia> PropertyMedia { get; set; }
         public DbSet<PropertyFloorplan> PropertyFloorplans { get; set; }
         public DbSet<PropertyMeta> PropertyMetadata { get; set; }
@@ -52,6 +53,8 @@ namespace Hood.Contexts
             builder.Entity<PropertyFloorplan>().ToTable("HoodPropertyFloorplans");
             builder.Entity<PropertyFloorplan>().HasOne(up => up.Property).WithMany(t => t.FloorPlans).HasForeignKey(au => au.PropertyId).OnDelete(DeleteBehavior.Restrict);
             builder.Entity<PropertyFloorplan>().Property(b => b.Path).HasColumnName("Directory");
+            
+            builder.Entity<PropertyListingView>().ToView("HoodPropertyViews");
         }
 
     }

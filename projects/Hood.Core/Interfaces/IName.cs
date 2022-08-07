@@ -5,7 +5,6 @@ namespace Hood.Interfaces
     public interface IName
     {
         bool Anonymous { get; set; }
-        string FullName { get; set; }
         string DisplayName { get; set; }
         string FirstName { get; set; }
         string LastName { get; set; }
@@ -32,8 +31,6 @@ namespace Hood.Interfaces
         }
         public static string ToInternalName(this IName name)
         {
-            if (name.FullName.IsSet())
-                return name.FullName;
             if (name.FirstName.IsSet() && name.LastName.IsSet())
                 return name.FirstName + " " + name.LastName;
             else if (name.FirstName.IsSet() && !name.LastName.IsSet())

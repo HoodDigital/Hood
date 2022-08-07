@@ -77,6 +77,7 @@ namespace Hood.Startup
             }
 
             app.UseHoodComponents(env, config);
+            
             app.UseHoodDefaultRoutes(config);
 
             return app;
@@ -105,24 +106,6 @@ namespace Hood.Startup
         }
         public static IApplicationBuilder UseHoodDefaultRoutes(this IApplicationBuilder app, IConfiguration config)
         {
-            try
-            {
-                if (config.IsDatabaseConnected())
-                {
-                    try
-                    {
-                        var context = Engine.Services.Resolve<HoodDbContext>();
-                        var profile = context.UserProfiles.FirstOrDefault();
-                    }
-                    catch (Microsoft.Data.SqlClient.SqlException ex)
-                    {
-                        throw new StartupException("Database views are not installed.", ex, StartupError.DatabaseViewsNotInstalled);
-                    }
-                }
-            }
-            catch (StartupException)
-            { }
-
             app.UseEndpoints(endpoints =>
             {
 

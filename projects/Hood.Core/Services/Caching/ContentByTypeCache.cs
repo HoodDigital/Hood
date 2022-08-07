@@ -44,7 +44,7 @@ namespace Hood.Caching
 
         public void ResetCache()
         {
-            var options = new DbContextOptionsBuilder();
+            var options = new DbContextOptionsBuilder<ContentContext>();
             options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
             var db = new ContentContext(options.Options);
 

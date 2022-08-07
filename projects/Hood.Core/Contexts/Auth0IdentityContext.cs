@@ -11,7 +11,7 @@ namespace Hood.Contexts
 {
     public class Auth0IdentityContext : DbContext, IHoodIdentityContext
     {
-        public Auth0IdentityContext(DbContextOptions options)
+        public Auth0IdentityContext(DbContextOptions<Auth0IdentityContext> options)
             : base(options)
         {
         }

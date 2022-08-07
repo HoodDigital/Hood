@@ -107,14 +107,6 @@ namespace Hood.Models
             get { return AvatarJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(AvatarJson) : MediaObject.BlankAvatar; }
             set { AvatarJson = JsonConvert.SerializeObject(value); }
         }
-        public virtual string GetAvatar()
-        {
-            if (AvatarJson.IsSet())
-            {
-                return Avatar.LargeUrl;
-            }
-            return MediaBase.BlankAvatar.LargeUrl;
-        }
         #endregion
 
         #region Metadata

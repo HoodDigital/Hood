@@ -13,7 +13,12 @@ using System.Linq;
 
 namespace Hood.Models
 {
-    public partial class PropertyListing : BaseEntity, IAddress, IMetaObect<PropertyMeta>
+    public class PropertyListing : BasePropertyListing
+    {
+
+    }
+
+    public partial class BasePropertyListing : BaseEntity, IAddress, IMetaObect<PropertyMeta>
     {
         // Content
         [FormUpdatable]
@@ -239,8 +244,6 @@ namespace Hood.Models
         [FormUpdatable]
         [Display(Name = "Agent/Owner", Description = "The agent or creator of this property.")]
         public string AgentId { get; set; }
-        [Display(Name = "Agent/Owner", Description = "The agent or creator of this property.")]
-        public IUserProfile Agent { get; set; }
 
         [NotMapped]
         public IList<IUserProfile> AvailableAgents { get; set; }

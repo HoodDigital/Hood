@@ -9,13 +9,22 @@
         {
             @foreach (var content in Model.List)
             {
+
+@foreach (var ting in content.Categories)
+{
+    <div>@ting.CategoryId - @ting.Category.DisplayName</div>
+}
+@foreach (var ting in content.Media)
+{
+    <div>@ting.MediumUrl - @ting.BlobReference</div>
+}
                 <div class="card @content.ContentType shadow-lg border-0 rounded-0 mb-5">
                     <partial name="_FeaturedMedia" model="content" />
                     <div class="card-body">
                         @if (content.ShowAuthor)
                         {
                             <p class="text-muted mb-0">
-                                <small><i class="fa fa-calendar me-2"></i>@content.PublishDate.ToShortDateString() by <a href="@string.Format("/{0}/author/{1}", Model.ContentType.Type.ToLower(), content.Author.UserName)">content.Author.ToDisplayName()</a></small>
+                                <small><i class="fa fa-calendar me-2"></i>@content.PublishDate.ToShortDateString() by @content.ToDisplayName()</small>
                             </p>
                         }
                         else
