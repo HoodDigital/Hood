@@ -9,15 +9,6 @@
         {
             @foreach (var content in Model.List)
             {
-
-@foreach (var ting in content.Categories)
-{
-    <div>@ting.CategoryId - @ting.Category.DisplayName</div>
-}
-@foreach (var ting in content.Media)
-{
-    <div>@ting.MediumUrl - @ting.BlobReference</div>
-}
                 <div class="card @content.ContentType shadow-lg border-0 rounded-0 mb-5">
                     <partial name="_FeaturedMedia" model="content" />
                     <div class="card-body">
