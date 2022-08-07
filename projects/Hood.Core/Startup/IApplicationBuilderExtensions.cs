@@ -24,7 +24,6 @@ namespace Hood.Startup
     {
         public static IApplicationBuilder UseHood(this IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config)
         {
-
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.GetCultureInfo("en-GB");
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-GB");
 
@@ -82,7 +81,6 @@ namespace Hood.Startup
 
             return app;
         }
-
         public static IApplicationBuilder UseHoodComponents(this IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config)
         {
             if (app == null)
@@ -109,7 +107,6 @@ namespace Hood.Startup
         {
             try
             {
-
                 if (config.IsDatabaseConnected())
                 {
                     try

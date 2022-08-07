@@ -17,9 +17,7 @@ namespace Hood.Services
     {
         protected Models.MailSettings _mail;
         protected Models.BasicSettings _info;
-        protected readonly IRazorViewRenderer _renderer;        
-        private UserManager<ApplicationUser> UserManager => Engine.Services.Resolve<UserManager<ApplicationUser>>();
- 
+        protected readonly IRazorViewRenderer _renderer;         
 
         public EmailSender()
         {

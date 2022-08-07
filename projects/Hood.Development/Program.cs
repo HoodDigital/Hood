@@ -10,9 +10,9 @@ namespace Hood.Web
         public static async Task Main(string[] args)
         {
             var builder = await CreateHostBuilder(args)
-                  .Build()
-                  .LoadHoodAsync();
-                  
+                .Build()
+                .LoadHoodAsync();
+
             builder.Run();
         }
 
