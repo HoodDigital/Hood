@@ -5,15 +5,10 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Hood.Web.Controllers
 {
-    public class HomeController : Hood.Controllers.HomeController
+    public class HomeController : Hood.BaseControllers.ErrorController
     {
-        private readonly IActionDescriptorCollectionProvider _actionDescriptorCollectionProvider;
-
-        public HomeController(IActionDescriptorCollectionProvider actionDescriptorCollectionProvider)
-        {
-            _actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
-        }
-        
-        public override async Task<IActionResult> Index() => await base.Index();
+        public HomeController()
+            : base()
+        { }
     }
 }

@@ -23,7 +23,6 @@
     <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
     <ProjectReference Include="..\Hood.Admin\Hood.Admin.csproj" />
     
-    <ProjectReference Include="..\Hood.UI\Hood.UI.csproj" />
     <ProjectReference Include="..\Hood.UI.Core\Hood.UI.Core.csproj" />
   </ItemGroup>
 

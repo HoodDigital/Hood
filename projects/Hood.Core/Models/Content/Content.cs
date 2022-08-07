@@ -178,7 +178,7 @@ namespace Hood.Models
         [Display(Name = "Author/Owner", Description = "The author or creator of this content.")]
         public string AuthorId { get; set; }
         [Display(Name = "Author/Owner", Description = "The author or creator of this content.")]
-        public ApplicationUser Author { get; set; }
+        public IUserProfile Author { get; set; }
 
         public List<ContentCategoryJoin> Categories { get; set; }
         public List<ContentMeta> Metadata { get; set; }
@@ -211,7 +211,7 @@ namespace Hood.Models
         [NotMapped]
         public Dictionary<string, string> Templates { get; set; }
         [NotMapped]
-        public List<UserProfile> Authors { get; set; }
+        public IList<IUserProfile> Authors { get; set; }
         #endregion
 
         #region Metadata

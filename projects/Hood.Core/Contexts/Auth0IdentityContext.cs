@@ -1,0 +1,139 @@
+﻿using Hood.Core;
+using Hood.Enums;
+using Hood.Models;
+using Hood.Services;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Hood.Contexts
+{
+    public class Auth0IdentityContext : DbContext, IHoodIdentityContext
+    {
+        public Auth0IdentityContext(DbContextOptions options)
+            : base(options)
+        {
+        }
+
+        public DbSet<Auth0User> Users { get; set; } = default!;
+        public DbSet<UserProfile> UserProfiles { get; set; } = default!;
+        public DbSet<Auth0UserRole> UserRoles { get; set; } = default!;
+        public DbSet<Auth0Role> Roles { get; set; } = default!;
+        public DbSet<Auth0Identity> Auth0Users { get; set; } = default!;
+        public DbSet<UserProfileView<Auth0Role>> UserProfileViews { get; set; } = default!;
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<Auth0User>(
+                typeBuilder =>
+                {
+                    typeBuilder.ToTable("AspNetUsers");
+                    typeBuilder.Property(o => o.UserName).HasColumnName("UserName");
+                    typeBuilder.Property(o => o.EmailConfirmed).HasColumnName("EmailConfirmed");
+                    typeBuilder.Property(o => o.Email).HasColumnName("Email");
+                    typeBuilder.Property(o => o.PhoneNumberConfirmed).HasColumnName("PhoneNumberConfirmed");
+                    typeBuilder.Property(o => o.PhoneNumber).HasColumnName("PhoneNumber");
+                    typeBuilder.Property(o => o.Active).HasColumnName("Active");
+                    typeBuilder.Property(o => o.BillingAddressJson).HasColumnName("BillingAddressJson");
+                    typeBuilder.Property(o => o.DeliveryAddressJson).HasColumnName("DeliveryAddressJson");
+                    typeBuilder.Property(o => o.AvatarJson).HasColumnName("AvatarJson");
+                    typeBuilder.Property(o => o.CreatedOn).HasColumnName("CreatedOn");
+                    typeBuilder.Property(o => o.LastLogOn).HasColumnName("LastLogOn");
+                    typeBuilder.Property(o => o.LastLoginIP).HasColumnName("LastLoginIP");
+                    typeBuilder.Property(o => o.LastLoginLocation).HasColumnName("LastLoginLocation");
+
+                    typeBuilder.HasOne(o => o.UserProfile).WithOne().HasForeignKey<UserProfile>(o => o.Id);
+                    typeBuilder.HasMany<Auth0UserRole>().WithOne().HasForeignKey(ur => ur.UserId).IsRequired();
+                });
+
+            builder.Entity<UserProfile>(
+                typeBuilder =>
+                {
+                    typeBuilder.ToTable("AspNetUsers");
+                    typeBuilder.Property(o => o.UserName).HasColumnName("UserName");
+                    typeBuilder.Property(o => o.EmailConfirmed).HasColumnName("EmailConfirmed");
+                    typeBuilder.Property(o => o.Email).HasColumnName("Email");
+                    typeBuilder.Property(o => o.PhoneNumberConfirmed).HasColumnName("PhoneNumberConfirmed");
+                    typeBuilder.Property(o => o.PhoneNumber).HasColumnName("PhoneNumber");
+                    typeBuilder.Property(o => o.Active).HasColumnName("Active");
+                    typeBuilder.Property(o => o.BillingAddressJson).HasColumnName("BillingAddressJson");
+                    typeBuilder.Property(o => o.DeliveryAddressJson).HasColumnName("DeliveryAddressJson");
+                    typeBuilder.Property(o => o.AvatarJson).HasColumnName("AvatarJson");
+                    typeBuilder.Property(o => o.CreatedOn).HasColumnName("CreatedOn");
+                    typeBuilder.Property(o => o.LastLogOn).HasColumnName("LastLogOn");
+                    typeBuilder.Property(o => o.LastLoginIP).HasColumnName("LastLoginIP");
+                    typeBuilder.Property(o => o.LastLoginLocation).HasColumnName("LastLoginLocation");
+                });
+            builder.Entity<Auth0Identity>().ToTable("AspNetAuth0Identities");
+            builder.Entity<Auth0Identity>().HasOne(m => m.User).WithMany(m => m.ConnectedAuth0Accounts).HasForeignKey(m => m.UserId).OnDelete(DeleteBehavior.Cascade);
+
+
+            builder.Entity<Auth0Role>(b =>
+            {
+                b.HasKey(r => r.Id);
+                b.HasIndex(r => r.NormalizedName).HasDatabaseName("RoleNameIndex").IsUnique();
+                b.ToTable("AspNetRoles");
+                b.Property(r => r.ConcurrencyStamp).IsConcurrencyToken();
+
+                b.Property(u => u.Name).HasMaxLength(256);
+                b.Property(u => u.NormalizedName).HasMaxLength(256);
+
+                b.HasMany<Auth0UserRole>().WithOne().HasForeignKey(ur => ur.RoleId).IsRequired();
+            });
+
+            builder.Entity<Auth0UserRole>(b =>
+            {
+                b.HasKey(r => new { r.UserId, r.RoleId });
+                b.ToTable("AspNetUserRoles");
+            });
+
+            builder.Entity<UserProfileView<Auth0Role>>().HasNoKey().ToView("HoodUserProfiles");
+        }
+
+        public async Task<IHoodIdentity> GetSiteAdmin()
+        {
+            try
+            {
+                IAuth0AccountRepository repo = Engine.Services.Resolve<IAuth0AccountRepository>();
+                string ownerEmail = Engine.SiteOwnerEmail;
+                if (!Users.Any(u => u.UserName == ownerEmail))
+                {
+                    Auth0User userToInsert = new Auth0User
+                    {
+                        CreatedOn = DateTime.UtcNow,
+                        EmailConfirmed = true,
+                        PhoneNumber = "",
+                        LastLogOn = DateTime.UtcNow,
+                        LastLoginIP = "127.0.0.1",
+                        LastLoginLocation = "UK",
+                        Email = ownerEmail,
+                        UserName = ownerEmail,
+                        Active = true,
+                        UserProfile = new UserProfile
+                        {
+                            FirstName = "Website",
+                            LastName = "Administrator",
+                            JobTitle = "Website Administrator",
+                            Anonymous = false
+                        }
+                    };
+                    Users.Add(userToInsert);
+                    await SaveChangesAsync();
+                }
+
+                Auth0User siteAdmin = await repo.GetUserByEmailAsync(Engine.SiteOwnerEmail);
+                return siteAdmin;
+
+            }
+            catch (Exception ex)
+            {
+                throw new StartupException("An error occurred while loading or creating the admin user.", ex, StartupError.AdminUserSetupError);
+            }
+        }
+
+    }
+
+}

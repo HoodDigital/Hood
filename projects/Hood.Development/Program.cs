@@ -11,7 +11,7 @@ namespace Hood.Web
         {
             var builder = await CreateHostBuilder(args)
                   .Build()
-                  .LoadHoodAsync<ApplicationDbContext>();
+                  .LoadHoodAsync();
                   
             builder.Run();
         }

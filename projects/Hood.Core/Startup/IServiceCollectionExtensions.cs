@@ -34,8 +34,7 @@ namespace Hood.Startup
     /// </summary>
     public static class IServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureHood<TContext>(this IServiceCollection services, IConfiguration config)
-          where TContext : HoodDbContext
+        public static IServiceCollection ConfigureHood(this IServiceCollection services, IConfiguration config)
         {
 
             services.Configure<HoodConfiguration>(config.GetSection("Hood"));
@@ -49,7 +48,7 @@ namespace Hood.Startup
                 {
                     throw new StartupException("Database connection string is not configured.", StartupError.NoConnectionString);
                 }
-                services.ConfigureHoodDatabase<TContext>(config);
+                services.ConfigureHoodDatabase(config);
                 services.ConfigureHoodDatabaseDependentServices();
                 if (config.IsConfigured("Identity:Auth0:Domain") && config.IsConfigured("Identity:Auth0:ClientId"))
                 {
@@ -172,10 +171,8 @@ namespace Hood.Startup
 
             return serviceProvider;
         }
-        public static IServiceCollection ConfigureHoodDatabase<TContext>(this IServiceCollection services, IConfiguration config)
-            where TContext : HoodDbContext
+        public static IServiceCollection ConfigureHoodDatabase(this IServiceCollection services, IConfiguration config)
         {
-            services.AddDbContext<TContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]));
             services.AddDbContext<HoodDbContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]));
             return services;
         }
@@ -206,63 +203,6 @@ namespace Hood.Startup
         }
         public static IServiceCollection ConfigureAuthentication(this IServiceCollection services, IConfiguration config)
         {
-            services.AddIdentity<ApplicationUser, ApplicationRole>(o =>
-            {
-                // configure identity options
-                o.User.RequireUniqueEmail = true;
-
-                o.SignIn.RequireConfirmedEmail = false;
-                o.SignIn.RequireConfirmedPhoneNumber = false;
-
-                o.Password.RequireDigit = !config["Identity:Password:RequireDigit"].IsSet() || bool.Parse(config["Identity:Password:RequireDigit"]);
-                o.Password.RequireLowercase = config["Identity:Password:RequireLowercase"].IsSet() && bool.Parse(config["Identity:Password:RequireLowercase"]);
-                o.Password.RequireUppercase = config["Identity:Password:RequireUppercase"].IsSet() && bool.Parse(config["Identity:Password:RequireUppercase"]);
-                o.Password.RequireNonAlphanumeric = !config["Identity:Password:RequireNonAlphanumeric"].IsSet() || bool.Parse(config["Identity:Password:RequireNonAlphanumeric"]);
-                o.Password.RequiredLength = config["Identity:Password:RequiredLength"].IsSet() ? int.Parse(config["Identity:Password:RequiredLength"]) : 6;
-            })
-                .AddEntityFrameworkStores<HoodDbContext>()
-                .AddDefaultTokenProviders()
-                .AddMagicLoginTokenProvider();
-
-            services.ConfigureApplicationCookie(options =>
-            {
-                SetAuthenticationCookieDefaults(config, options);
-
-                options.Cookie.SameSite = SameSiteMode.Strict;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                options.Cookie.Domain = config["Identity:Cookies:Domain"].IsSet() ? config["Identity:Cookies:Domain"] : null;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(config.GetValue("Session:Timeout", 60));
-                options.SlidingExpiration = true;
-
-                options.Events = new CookieAuthenticationEvents()
-                {
-                    OnValidatePrincipal = async e =>
-                    {
-                        // get the user profile and store important bits on the claim.
-                        var repo = Engine.Services.Resolve<IAccountRepository>();
-                        var user = await repo.GetUserByIdAsync(e.Principal.GetUserId());
-                        e.Principal.SetUserClaims(user);
-                        if (user.EmailConfirmed)
-                        {
-                            e.Principal.AddOrUpdateClaimValue(HoodClaimTypes.EmailConfirmed, "true");
-                        }
-                        if (user.Active || !Engine.Settings.Account.RequireEmailConfirmation)
-                        {
-                            e.Principal.AddOrUpdateClaimValue(HoodClaimTypes.Active, "true");
-                        }
-                    }
-                };
-            });
-
-            services.AddScoped<IAccountRepository, AccountRepository>();
-
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy(Policies.Active, policy => policy.RequireClaim(Identity.HoodClaimTypes.Active));
-                options.AddPolicy(Policies.AccountNotConnected, policy => policy.RequireClaim(Identity.HoodClaimTypes.AccountNotConnected));
-                options.AddPolicy(Policies.AccountLinkRequired, policy => policy.RequireClaim(Identity.HoodClaimTypes.AccountLinkRequired));
-            });
-
             return services;
         }
 
@@ -285,8 +225,6 @@ namespace Hood.Startup
                 options.Scope = auth0Options.Scope;
             });
 
-            services.AddAuth0IdentityStores();
-
             services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
                 .Configure(options =>
                 {
@@ -300,27 +238,6 @@ namespace Hood.Startup
             });
             return services;
 
-        }
-
-        public static void AddAuth0IdentityStores(this IServiceCollection services)
-        {
-            // Mock Aspnet Identity stores.
-            services.TryAddScoped<IUserValidator<ApplicationUser>, UserValidator<ApplicationUser>>();
-            services.TryAddScoped<IPasswordValidator<ApplicationUser>, PasswordValidator<ApplicationUser>>();
-            services.TryAddScoped<IPasswordHasher<ApplicationUser>, PasswordHasher<ApplicationUser>>();
-            services.TryAddScoped<ILookupNormalizer, UpperInvariantLookupNormalizer>();
-            services.TryAddScoped<IdentityErrorDescriber>();
-            //services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<ApplicationUser>>();
-
-            var identityBuilder = new IdentityBuilder(typeof(ApplicationUser), services);
-
-            identityBuilder.AddRoles<ApplicationRole>();
-            identityBuilder.AddRoleStore<RoleStore<ApplicationRole, HoodDbContext, string>>();
-            identityBuilder.AddUserStore<UserStore<ApplicationUser, ApplicationRole, HoodDbContext, string>>();
-            identityBuilder.AddUserManager<UserManager<ApplicationUser>>();
-            identityBuilder.AddRoleManager<RoleManager<ApplicationRole>>();
-
-            services.AddScoped<IAccountRepository, Auth0AccountRepository>();
         }
 
         private static void SetAuthenticationCookieDefaults(IConfiguration config, CookieAuthenticationOptions options)
@@ -495,31 +412,6 @@ namespace Hood.Startup
             {
                 options.ViewLocationExpanders.Add(new ViewLocationExpander());
             });
-            return services;
-        }
-        private static IServiceCollection AddStores(this IServiceCollection services)
-        {
-            Type userType = typeof(ApplicationUser);
-            Type roleType = typeof(ApplicationRole);
-            Type contextType = typeof(HoodDbContext);
-            Type keyType = typeof(string);
-
-            Type userStoreType;
-            Type roleStoreType;
-            var identityContext = typeof(HoodDbContext);
-
-            userStoreType = typeof(UserStore<ApplicationUser, ApplicationRole, HoodDbContext, string>);
-            roleStoreType = typeof(RoleStore<ApplicationRole, HoodDbContext, string>);
-
-
-            services.TryAddScoped(typeof(IRoleValidator<ApplicationRole>), typeof(RoleValidator<ApplicationRole>));
-            services.TryAddScoped(typeof(IUserStore<>).MakeGenericType(userType), userStoreType);
-            services.TryAddScoped(typeof(IRoleStore<>).MakeGenericType(roleType), roleStoreType);
-            services.TryAddScoped<RoleManager<ApplicationRole>>();
-            services.AddScoped(typeof(IUserClaimsPrincipalFactory<>).MakeGenericType(userType), typeof(UserClaimsPrincipalFactory<,>).MakeGenericType(userType, roleType));
-
-            services.AddScoped(typeof(UserManager<>).MakeGenericType(userType), typeof(UserManager<ApplicationUser>));
-
             return services;
         }
     }

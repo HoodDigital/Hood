@@ -13,29 +13,12 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
 
-namespace Hood.Controllers
+namespace Hood.BaseControllers
 {
-    public abstract class BaseController : BaseController<HoodDbContext, ApplicationUser, ApplicationRole>
-    {
-        public BaseController()
-            : base()
-        {
-
-        }
-    }
-
     [Installed]
-    public abstract class BaseController<TContext, TUser, TRole> : Controller
-         where TContext : HoodDbContext
-         where TUser : ApplicationUser
-         where TRole : ApplicationRole
+    public abstract class BaseController : Controller
     {
-        protected readonly UserManager<TUser> _userManager;
-        protected readonly IAccountRepository _account;
-        protected readonly IContentRepository _content;
-        protected readonly ContentCategoryCache _contentCategoryCache;
-        protected readonly IPropertyRepository _property;
-        protected readonly TContext _db;
+        protected readonly HoodDbContext _db;
         protected readonly IEmailSender _emailSender;
         protected readonly IMailService _mailService;
         protected readonly ISmsSender _smsSender;
@@ -59,12 +42,7 @@ namespace Hood.Controllers
         {
             if (Engine.Services.Installed)
             {
-                _userManager = Engine.Services.Resolve<UserManager<TUser>>();
-                _content = Engine.Services.Resolve<IContentRepository>();
-                _contentCategoryCache = Engine.Services.Resolve<ContentCategoryCache>();
-                _property = Engine.Services.Resolve<IPropertyRepository>();
-                _account = Engine.Services.Resolve<IAccountRepository>();
-                _db = Engine.Services.Resolve<TContext>();
+                _db = Engine.Services.Resolve<HoodDbContext>();
                 _emailSender = Engine.Services.Resolve<IEmailSender>();
                 _mailService = Engine.Services.Resolve<IMailService>();
                 _smsSender = Engine.Services.Resolve<ISmsSender>();
@@ -116,15 +94,5 @@ namespace Hood.Controllers
             await _logService.AddExceptionAsync<TSource>(errorMessage, logObject, ex);
             return new Response(ex, errorMessage);
         }
-        protected virtual async Task<ApplicationUser> GetCurrentUserOrThrow()
-        {
-            var user = await _account.GetUserByIdAsync(User.GetLocalUserId());
-            if (user == null)
-            {
-                throw new ApplicationException($"Unable to load user with email '{User.GetEmail()}'.");
-            }
-            return user;
-        }
-
     }
 }

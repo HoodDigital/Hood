@@ -51,7 +51,6 @@ namespace Hood.Extensions
             identity.AddClaim(new Claim(claimName, value));
             return principal;
         }
-
         public static void SetUserClaims(this ClaimsPrincipal principal, IUserProfile user)
         {
 

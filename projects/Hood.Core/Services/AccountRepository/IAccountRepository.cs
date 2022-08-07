@@ -1,58 +1,51 @@
-﻿using Hood.Models;
+using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Hood.Services
 {
-    public interface IAccountRepository
+    public interface IAuth0AccountRepository : IAccountRepository<Auth0User, Auth0Role>
+    {        
+        Task<bool> CreateAsync(Auth0User user);
+    }
+    public interface IPasswordAccountRepository : IAccountRepository<ApplicationUser, IdentityRole>
     {
-        #region Account stuff
         Task<IdentityResult> CreateAsync(ApplicationUser user, string password);
-        Task<ApplicationUser> GetUserByIdAsync(string id, bool track = true);
-        Task<ApplicationUser> GetUserByEmailAsync(string email, bool track = true);
-        Task<UserProfile> GetUserProfileByIdAsync(string id);
-        Task UpdateUserAsync(ApplicationUser user);
-        Task DeleteUserAsync(string userId, System.Security.Claims.ClaimsPrincipal adminUser);
-        Task<MediaDirectory> GetDirectoryAsync(string id);
-        Task SetEmailAsync(ApplicationUser modelToUpdate, string email);
-        Task SetPhoneNumberAsync(ApplicationUser modelToUpdate, string email);
         Task<IdentityResult> ChangePassword(ApplicationUser user, string oldPassword, string newPassword);
-        Task<IdentityResult> ConfirmEmailAsync(ApplicationUser user, string code);
         Task<IdentityResult> ResetPasswordAsync(ApplicationUser user, string code, string password);
-        #endregion
-
-        #region Profiles
-        Task<UserListModel> GetUserProfilesAsync(UserListModel model, IQueryable<UserProfile> query = null);
-        Task<UserProfile> GetProfileAsync(string id);
-        Task UpdateProfileAsync(UserProfile user);
-        #endregion
-
-        #region Roles
-        bool SupportsRoles();
-        Task<IPagedList<ApplicationRole>> GetRolesAsync(IPagedList<ApplicationRole> model = null);
-        Task<IList<ApplicationRole>> GetRolesForUser(ApplicationUser user);
-        Task<IList<ApplicationUser>> GetUsersInRole(string role);
-        Task<bool> RoleExistsAsync(string role);
-        Task<ApplicationRole> GetRoleAsync(string role);
-        Task<ApplicationRole> CreateRoleAsync(string role);
+        Task SetEmailAsync(ApplicationUser modelToUpdate, string email);
+        Task SetPhoneNumberAsync(ApplicationUser modelToUpdate, string phoneNumber);
+    }
+    public interface IAccountRepository<TUser, TRole> : IHoodAccountRepository
+    {
+        Task AddUserToRolesAsync(TUser user, TRole[] roles);
+        Task<TRole> CreateRoleAsync(string role);
         Task DeleteRoleAsync(string role);
-        Task AddUserToRolesAsync(ApplicationUser user, ApplicationRole[] roles);
-        Task RemoveUserFromRolesAsync(ApplicationUser user, ApplicationRole[] roles);
-        #endregion
-
-        #region Addresses
-        Task<Models.Address> GetAddressByIdAsync(int id);
-        Task DeleteAddressAsync(int id);
-        Task UpdateAddressAsync(Models.Address address);
-        Task SetBillingAddressAsync(string userId, int id);
-        Task SetDeliveryAddressAsync(string userId, int id);
-        #endregion
-
-        #region Statistics
+        Task DeleteUserAsync(string userId, ClaimsPrincipal adminUser);
+        Task<MediaDirectory> GetDirectoryAsync(string id);
+        Task<UserProfileView<TRole>> GetUserProfileViewById(string id);
+        Task<TRole> GetRoleAsync(string role);
+        Task<IPagedList<TRole>> GetRolesAsync(IPagedList<TRole> model);
+        Task<IList<TRole>> GetRolesForUser(TUser user);
         Task<UserStatistics> GetStatisticsAsync();
-        #endregion
+        Task<TUser> GetUserByEmailAsync(string email, bool track = true);
+        Task<TUser> GetUserByIdAsync(string id, bool track = true);
+        Task<UserListModel> GetUserProfileViewsAsync(UserListModel model, IQueryable<UserProfileView<TRole>> query = null);
+        Task RemoveUserFromRolesAsync(TUser user, TRole[] roles);
+        Task SetupRolesAsync();
+        Task UpdateProfileAsync(UserProfile user);
+        Task UpdateUserAsync(TUser user);
+    }
+    public interface IHoodAccountRepository
+    {
+        Task<UserProfile> GetUserProfileByIdAsync(string id);
+        Task<UserListModel> GetUserProfilesAsync(UserListModel model, IQueryable<IUserProfile> query = null);
+        Task<IList<IUserProfile>> GetUsersInRole(string roleName);
+        Task<bool> RoleExistsAsync(string role);
+
     }
 }

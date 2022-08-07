@@ -1,5 +1,5 @@
 ﻿using Hood.Core;
-using Hood.Controllers;
+using Hood.Admin.BaseControllers;
 using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;

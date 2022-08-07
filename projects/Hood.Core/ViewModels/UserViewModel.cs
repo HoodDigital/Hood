@@ -30,7 +30,7 @@ namespace Hood.ViewModels
 
         public IMediaObject Avatar { get; set; }
 
-        public IList<ApplicationRole> AllRoles { get; set; }
+        public IList<IdentityRole> AllRoles { get; set; }
 
         [FromQuery(Name = "created")]
         public bool NewAccountCreated { get; set; }

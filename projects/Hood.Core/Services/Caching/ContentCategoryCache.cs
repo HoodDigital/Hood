@@ -1,4 +1,5 @@
-﻿using Hood.Core;
+﻿using Hood.Contexts;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
@@ -58,9 +59,9 @@ namespace Hood.Caching
             if (!Engine.Services.Installed) {
                 return;
             }
-            var options = new DbContextOptionsBuilder<HoodDbContext>();
+            var options = new DbContextOptionsBuilder<ContentContext>();
             options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
-            var db = new HoodDbContext(options.Options);
+            var db = new ContentContext(options.Options);
             byKey = new Lazy<Dictionary<int, ContentCategory>>(() =>
             {
                 var q = from d in db.ContentCategories

@@ -1,18 +1,25 @@
-﻿using Newtonsoft.Json;
+﻿using Hood.Extensions;
+using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.Models
 {
-    public partial class ApplicationUser : UserProfileBase
+    public class ApplicationUser : IdentityUser<string>, IHoodIdentity
     {
-        #region Related Tables
-
-        [JsonIgnore]
-        public List<Content> Content { get; set; }
-        [JsonIgnore]
-        public List<PropertyListing> Properties { get; set; }
-
-        #endregion
+        public string BillingAddressJson { get; set; }
+        public string DeliveryAddressJson { get; set; }
+        public string AvatarJson { get; set; }
+        public UserProfile UserProfile { get; set; }        
+        public bool Active { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime LastLogOn { get; set; }
+        public string LastLoginIP { get; set; }
+        public string LastLoginLocation { get; set; }
+        public string Latitude { get; set; }
+        public string Longitude { get; set; }
     }
 
 

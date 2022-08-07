@@ -27,25 +27,6 @@ namespace Hood.Filters
                 return;
             }
 
-            if (Engine.Configuration.InitializeOnStartup || Engine.Auth0Configuration.SetupRemoteOnIntitialize)
-            {
-                if (Engine.Auth0Enabled && Engine.Auth0Configuration.SetupRemoteOnIntitialize)
-                {
-                    var authService = new Auth0Service();
-                    await authService.InitialiseApp();
-                }
-                context.Result = new RedirectToRouteResult(
-                    new RouteValueDictionary(
-                        new
-                        {
-                            controller = "Install",
-                            action = "Initialized"
-                        }
-                    )
-                );
-                return;
-            }
-
             await next();
         }
     }

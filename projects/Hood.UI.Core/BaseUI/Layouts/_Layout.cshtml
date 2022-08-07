@@ -46,7 +46,7 @@
     }
 
     <div class="wrapper" id="wrapper">
-        @await Component.InvokeAsync(nameof(Hood.ViewComponents.Header))
+        <partial name="_Header" />
         @RenderBody()
     </div>
 

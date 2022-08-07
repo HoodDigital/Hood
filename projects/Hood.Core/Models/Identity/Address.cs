@@ -5,9 +5,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Models
 {
-    public partial class Address : BaseEntity, IAddress
+    public class Address : BaseEntity, IAddress
     {
-
         public string ContactName { get; set; }
         public string QuickName { get; set; }
 
@@ -33,24 +32,5 @@ namespace Hood.Models
         public double Longitude { get; set; }
 
         public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
-
-        public string FullAddress
-        {
-            get
-            {
-                var output = Address1 + ", ";
-                if (!string.IsNullOrEmpty(Address2))
-                    output += Address2 + ", ";
-                output += City + ", ";
-                output += County + ", ";
-                output += Country + ", ";
-                output += Postcode;
-                return output;
-            }
-        }
-        public bool IsDelivery { get { return User != null ? Id == User.DeliveryAddress?.Id : false; } }
-        public bool IsBilling { get { return User != null ? Id == User.BillingAddress?.Id : false; } }
-
     }
 }

@@ -8,7 +8,7 @@ namespace Hood.Models
 {
     public class WelcomeEmailModel : IEmailSendable
     {
-        public WelcomeEmailModel(ApplicationUser user, string loginLink)
+        public WelcomeEmailModel(IUserProfile user, string loginLink)
         {
             User = user;
             LoginLink = loginLink;
@@ -17,7 +17,7 @@ namespace Hood.Models
         public EmailAddress From { get; set; } = null;
         public EmailAddress ReplyTo { get; set; } = null;
 
-        public ApplicationUser User { get; set; }
+        public IUserProfile User { get; set; }
         public string LoginLink { get; }
         public string ConfirmLink { get; }
 

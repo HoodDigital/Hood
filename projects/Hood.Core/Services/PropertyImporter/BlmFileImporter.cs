@@ -1,4 +1,5 @@
 ﻿using Geocoding.Google;
+using Hood.Contexts;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
@@ -92,7 +93,8 @@ namespace Hood.Services
         private ApplicationUser User { get; set; }
         private IMediaManager _media;
         private PropertySettings _propertySettings;
-        private HoodDbContext _db { get; set; }
+        private PropertyContext _db { get; set; }
+        private HoodDbContext _hoodDb { get; set; }
         private bool _killFlag;
         private readonly IAddressService _address;
         private readonly ILogService _logService;
@@ -122,20 +124,14 @@ namespace Hood.Services
                 StatusMessage = "Starting import, loading property files from FTP Service...";
                 _propertySettings = Engine.Settings.Property;
                 // Get a new instance of the HoodDbContext for this import.
-                DbContextOptionsBuilder<HoodDbContext> options = new DbContextOptionsBuilder<HoodDbContext>();
+                DbContextOptionsBuilder options = new DbContextOptionsBuilder();
                 options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
-                _db = new HoodDbContext(options.Options);
+                _db = new PropertyContext(options.Options);
+                _hoodDb = new HoodDbContext(options.Options);
 
                 _media = new MediaManager(_env, _config);
 
-                
-                User = _db.Users.SingleOrDefault(u => u.Email == Engine.SiteOwnerEmail);
-                if (User == null)
-                {
-                    throw new Exception("Could not load the site admin account to use for importing.");
-                }
-
-                MediaDirectory propertyDirectory = _db.MediaDirectories.SingleOrDefault(md => md.Slug == MediaManager.PropertyDirectorySlug && md.Type == DirectoryType.System);
+                MediaDirectory propertyDirectory = _hoodDb.MediaDirectories.SingleOrDefault(md => md.Slug == MediaManager.PropertyDirectorySlug && md.Type == DirectoryType.System);
                 if (propertyDirectory == null)
                 {
                     throw new Exception("Could not load the Property directory.");

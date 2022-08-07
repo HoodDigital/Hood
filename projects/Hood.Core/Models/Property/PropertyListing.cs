@@ -240,10 +240,10 @@ namespace Hood.Models
         [Display(Name = "Agent/Owner", Description = "The agent or creator of this property.")]
         public string AgentId { get; set; }
         [Display(Name = "Agent/Owner", Description = "The agent or creator of this property.")]
-        public ApplicationUser Agent { get; set; }
+        public IUserProfile Agent { get; set; }
 
         [NotMapped]
-        public List<ApplicationUser> AvailableAgents { get; set; }
+        public IList<IUserProfile> AvailableAgents { get; set; }
 
         public List<PropertyMeta> Metadata { get; set; }
         public List<PropertyMedia> Media { get; set; }

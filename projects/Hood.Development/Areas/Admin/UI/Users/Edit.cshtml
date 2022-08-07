@@ -1,4 +1,4 @@
-@model UserProfile
+@model UserProfileView<IdentityRole>
 @{
     ViewBag.Title = "Edit User: " + Model.UserName;
     BasicSettings _basicSettings = Engine.Settings.Basic;
@@ -48,16 +48,6 @@
                                     Roles
                                 </a>
                             </li>
-                            @*<li class="nav-item">
-                                    <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="false">
-                                        Addresses
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="codes-tab" data-bs-toggle="tab" href="#codes" role="tab" aria-controls="codes" aria-selected="false">
-                                        Access codes
-                                    </a>
-                                </li>*@
                             <li class="nav-item">
                                 <a class="nav-link" id="notes-tab" data-bs-toggle="tab" href="#notes" role="tab" aria-controls="notes" aria-selected="false">
                                     Notes

@@ -167,16 +167,6 @@ namespace Hood.Core
             }
         }
         /// <summary>
-        /// Gets the current resolvable version of the IAccountRepository.
-        /// </summary>
-        public static IAccountRepository AccountManager
-        {
-            get
-            {
-                return Services.Resolve<IAccountRepository>();
-            }
-        }
-        /// <summary>
         /// Gets the current resolvable version of the IMediaManager<MediaObject>.
         /// </summary>
         public static IMediaManager Media

@@ -1,6 +1,8 @@
-﻿namespace Hood.Web.Controllers
+﻿using Hood.BaseControllers;
+
+namespace Hood.Web.Controllers
 {
-    public class AccountController : Hood.Controllers.AccountController
+    public class AccountController : BaseController
     {
         public AccountController()
             : base()

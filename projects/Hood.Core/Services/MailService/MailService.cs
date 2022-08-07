@@ -43,9 +43,6 @@ namespace Hood.Services
                     }
                 }
 
-                if (model.NotifyRole.IsSet())
-                    await _email.NotifyRoleAsync(message, model.NotifyRole, model.From, model.ReplyTo);
-
                 return new Response(true, $"The message has been sent.");
             }
             catch (Exception sendEx)

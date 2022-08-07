@@ -1,4 +1,5 @@
 ﻿using Hood.Caching;
+using Hood.Contexts;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
@@ -15,16 +16,19 @@ namespace Hood.Services
 {
     public class PropertyRepository : IPropertyRepository
     {
-        private readonly HoodDbContext _db;
+        private readonly PropertyContext _db;
+        private readonly HoodDbContext _hoodDb;
         private readonly IHoodCache _cache;
         private readonly IMediaManager _media;
 
         public PropertyRepository(
-            HoodDbContext db,
+            PropertyContext db,
+            HoodDbContext hoodDb,
             IHoodCache cache,
             IMediaManager media)
         {
             _db = db;
+            _hoodDb = hoodDb;
             _cache = cache;
             _media = media;
         }
@@ -356,7 +360,7 @@ namespace Hood.Services
         }
         public async Task<MediaDirectory> GetDirectoryAsync()
         {
-            MediaDirectory contentDirectory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.Slug == MediaManager.PropertyDirectorySlug && md.Type == DirectoryType.System);
+            MediaDirectory contentDirectory = await _hoodDb.MediaDirectories.SingleOrDefaultAsync(md => md.Slug == MediaManager.PropertyDirectorySlug && md.Type == DirectoryType.System);
             if (contentDirectory == null)
             {
                 throw new Exception("Site folder is not available.");

@@ -72,7 +72,7 @@ namespace Hood.Identity
         {
             var authService = new Auth0Service();
             var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
-            var repo = Engine.Services.Resolve<IAccountRepository>();
+            var repo = Engine.Services.Resolve<IAuth0AccountRepository>();
             var principal = e.Principal;
             var userId = e.Principal.GetUserId();
             var returnUrl = e.ReturnUri;
@@ -91,7 +91,6 @@ namespace Hood.Identity
                     await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, e.Properties);
                 }
 
-                await authService.SyncLocalRoles(user, e.Principal.GetRoles());
                 await SetDefaultClaims(e, user);
                 return;
             }
@@ -136,26 +135,15 @@ namespace Hood.Identity
             {
                 throw new ApplicationException("Something went wrong while authorizing your account.");
             }
-            user = new ApplicationUser
+            user = new Auth0User
             {
                 UserName = authUser.UserName.IsSet() ? authUser.UserName : authUser.Email,
                 Email = authUser.Email,
-                FirstName = authUser.FirstName,
-                LastName = authUser.LastName,
-                DisplayName = authUser.NickName,
                 PhoneNumber = authUser.PhoneNumber,
-                EmailConfirmed = authUser.EmailVerified.HasValue ? authUser.EmailVerified.Value : false,
-                Active = authUser.EmailVerified.HasValue ? authUser.EmailVerified.Value : false,
-                Avatar = authUser.Picture.IsSet() ? new MediaObject(authUser.Picture) : null,
-                CreatedOn = DateTime.UtcNow,
-                LastLogOn = DateTime.UtcNow,
-                LastLoginLocation = authUser.LastIpAddress,
-                LastLoginIP = authUser.LastIpAddress
+                EmailConfirmed = authUser.EmailVerified.HasValue ? authUser.EmailVerified.Value : false
             };
-            var keygen = new KeyGenerator();
-            var password = keygen.Generate("llnlslLLlslsnsnllsll");
-            var result = await repo.CreateAsync(user, password);
-            if (!result.Succeeded)
+            var result = await repo.CreateAsync(user);
+            if (!result)
             {
                 // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
                 identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountCreationFailed, "true"));
@@ -186,7 +174,6 @@ namespace Hood.Identity
                 identity.AddClaim(new Claim(Identity.HoodClaimTypes.Active, "true"));
             }
 
-            await authService.SyncLocalRoles(user, e.Principal.GetRoles());
             await SetDefaultClaims(e, user);
 
             identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountCreated, "true"));
@@ -252,7 +239,7 @@ namespace Hood.Identity
         }
         public virtual Task OnTokenValidated(TokenValidatedContext e) { return Task.CompletedTask; }
         public virtual Task OnUserInformationReceived(UserInformationReceivedContext e) { return Task.CompletedTask; }
-        protected virtual async Task SetDefaultClaims(TicketReceivedContext e, ApplicationUser user)
+        protected virtual async Task SetDefaultClaims(TicketReceivedContext e, Auth0User user)
         {
             // Set the remote avatar on a local claim, in case the local overrides it. 
             if (e.Principal.HasClaim(HoodClaimTypes.Picture))
@@ -261,7 +248,7 @@ namespace Hood.Identity
             }
 
             // Set the user claims locally
-            e.Principal.SetUserClaims(user);
+            e.Principal.SetUserClaims(user.UserProfile);
             await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, e.Principal, e.Properties);
         }
 
