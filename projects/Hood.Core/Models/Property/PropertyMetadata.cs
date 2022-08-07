@@ -1,5 +1,6 @@
 ﻿
 
+using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
 namespace Hood.Models
@@ -14,6 +15,8 @@ namespace Hood.Models
 
         [JsonIgnore]
         public PropertyListing Property { get; set; }
+        [NotMapped]
+        public PropertyListingView PropertyListingView { get; set; }
 
     }
 }

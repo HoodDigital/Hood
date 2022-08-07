@@ -55,6 +55,9 @@ namespace Hood.Contexts
             builder.Entity<PropertyFloorplan>().Property(b => b.Path).HasColumnName("Directory");
             
             builder.Entity<PropertyListingView>().ToView("HoodPropertyViews");
+            builder.Entity<PropertyListingView>().HasMany(c => c.Metadata).WithOne(c=> c.PropertyListingView).HasForeignKey(c => c.PropertyId);
+            builder.Entity<PropertyListingView>().HasMany(c => c.Media).WithOne(c=> c.PropertyListingView).HasForeignKey(c => c.PropertyId);
+            builder.Entity<PropertyListingView>().HasMany(c => c.FloorPlans).WithOne(c=> c.PropertyListingView).HasForeignKey(c => c.PropertyId);
         }
 
     }
