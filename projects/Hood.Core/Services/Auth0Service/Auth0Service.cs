@@ -22,7 +22,6 @@ using RestSharp;
 
 namespace Hood.Services
 {
-
     public class Auth0Service : IAuth0Service
     {
         protected IHoodCache _cache { get; set; }
@@ -174,6 +173,97 @@ namespace Hood.Services
                 UserId = accountId
             });
             return ticket;
+        }
+
+        #endregion
+
+        #region Roles 
+
+        public async Task<System.Collections.Generic.IPagedList<Role>> GetRoles(string search = "", int page = 0, int pageSize = 50)
+        {
+            var client = await GetClientAsync();
+            var request = new GetRolesRequest()
+            {
+                NameFilter = search
+            };
+            var roles = await client.Roles.GetAllAsync(request, new PaginationInfo(page, pageSize, true));
+            var pagedList = new System.Collections.Generic.PagedList<Role>()
+            {
+                List = roles.ToList(),
+                TotalCount = roles.Paging.Total,
+                Search = search,
+                PageIndex = page,
+                PageSize = pageSize,
+                TotalPages = pageSize == 0 ? 0 : (int)(roles.Paging.Total / pageSize) + 1
+            };
+            return pagedList;
+        }
+
+        public async Task<Role> GetRoleById(string roleId)
+        {
+            var client = await GetClientAsync();
+            var Role = await client.Roles.GetAsync(roleId);
+            return Role;
+        }
+
+        public async Task<Role> GetRoleByName(string roleName)
+        {
+            var roles = await GetRoles(roleName);
+            if (roles.TotalCount > 0)
+            {
+                return roles.List.FirstOrDefault();
+            }
+            return null;
+        }
+
+        public async Task DeleteRole(string roleId)
+        {
+            var client = await GetClientAsync();
+            await client.Roles.DeleteAsync(roleId);
+        }
+
+        public async Task<System.Collections.Generic.PagedList<Role>> GetRolesForUser(string userId, int page = 0, int pageSize = 50)
+        {
+            var client = await GetClientAsync();
+            var roles = await client.Users.GetRolesAsync(userId, new PaginationInfo(page, pageSize, true));
+            var pagedList = new System.Collections.Generic.PagedList<Role>()
+            {
+                List = roles.ToList(),
+                TotalCount = roles.Paging.Total,
+                Search = "",
+                PageIndex = page,
+                PageSize = pageSize,
+                TotalPages = pageSize == 0 ? 0 : (int)(roles.Paging.Total / pageSize) + 1
+            };
+            return pagedList;
+        }
+
+        public async Task AssignRolesToUser(string userId, string[] roleIds)
+        {
+            var client = await GetClientAsync();
+            await client.Users.AssignRolesAsync(userId, new AssignRolesRequest()
+            {
+                Roles = roleIds
+            });
+        }
+
+        public async Task RemoveRolesFromUser(string userId, string[] roleIds)
+        {
+            var client = await GetClientAsync();
+            await client.Users.RemoveRolesAsync(userId, new AssignRolesRequest()
+            {
+                Roles = roleIds
+            });
+        }
+
+        public async Task<Role> CreateRoleForLocalRole(Auth0Role role)
+        {
+            var client = await GetClientAsync();
+            var remoteRole = await client.Roles.CreateAsync(new RoleCreateRequest() {
+                Name = role.Name,
+                Description = $"Role connected to role {role.Id} on Hood CMS."
+            });
+            return remoteRole;
         }
 
         #endregion

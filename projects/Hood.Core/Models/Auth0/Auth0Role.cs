@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Hood.Models
 {
     /// <summary>
@@ -18,6 +20,9 @@ namespace Hood.Models
         {
             Name = roleName;
         }
+
+        [NotMapped]
+        public Auth0.ManagementApi.Models.Role RemoteRole { get; set; }
 
         /// <summary>
         /// Gets or sets the primary key for this role.
@@ -40,6 +45,11 @@ namespace Hood.Models
         public virtual string ConcurrencyStamp { get; set; }
 
         /// <summary>
+        /// A random value that should change whenever a role is persisted to the store
+        /// </summary>
+        public virtual string RemoteId { get; set; }
+
+        /// <summary>
         /// Returns the name of the role.
         /// </summary>
         /// <returns>The name of the role.</returns>
@@ -48,7 +58,7 @@ namespace Hood.Models
             return Name ?? string.Empty;
         }
 
-    
+
     }
 
 

@@ -68,6 +68,8 @@ namespace Hood.Contexts
             {
                 b.HasKey(r => new { r.UserId, r.RoleId });
                 b.ToTable("AspNetUserRoles");
+                // b.HasOne<Auth0User>().WithMany(u => u.Roles).HasForeignKey(u => u.UserId);
+                // b.HasOne<Auth0Role>().WithMany(u => u.Roles).HasForeignKey(u => u.UserId);
             });
 
             builder.Entity<UserProfileView<Auth0Role>>().HasNoKey().ToView("HoodUserProfiles");

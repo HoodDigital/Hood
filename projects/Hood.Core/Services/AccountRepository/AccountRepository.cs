@@ -347,11 +347,11 @@ namespace Hood.Services
         #endregion
 
         #region Roles
-        public virtual async Task<IPagedList<IdentityRole>> GetRolesAsync(IPagedList<IdentityRole> model)
+        public virtual async Task<RoleListModel<IdentityRole>> GetRolesAsync(RoleListModel<IdentityRole> model)
         {
             if (model == null)
             {
-                model = new PagedList<IdentityRole>() { PageIndex = 0, PageSize = 50 };
+                model = new RoleListModel<IdentityRole>() { PageIndex = 0, PageSize = 50 };
             }
             var query = _db.Roles.AsQueryable();
 
@@ -431,19 +431,21 @@ namespace Hood.Services
             _db.Roles.Remove(identityRole);
             await _db.SaveChangesAsync();
         }
-        public virtual async Task AddUserToRolesAsync(ApplicationUser user, IdentityRole[] roles)
+        public virtual async Task<Response> AddUserToRolesAsync(ApplicationUser user, IdentityRole[] roles)
         {
             foreach (IdentityRole role in roles)
             {
                 await UserManager.AddToRoleAsync(user, role.Name);
             }
+            return new Response(true, "The roles have been added to the user.");
         }
-        public virtual async Task RemoveUserFromRolesAsync(ApplicationUser user, IdentityRole[] roles)
+        public virtual async Task<Response> RemoveUserFromRolesAsync(ApplicationUser user, IdentityRole[] roles)
         {
             foreach (IdentityRole role in roles)
             {
                 await UserManager.RemoveFromRoleAsync(user, role.Name);
             }
+            return new Response(true, "The roles have been removed from the user.");
         }
 
         public async Task SetupRolesAsync()

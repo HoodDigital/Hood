@@ -7,7 +7,7 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Policies.Active, Roles = "SuperUser,Admin")]
-    public class UsersController : BaseUsersController
+    public class UsersController : Auth0UsersController
     {
         public UsersController()
             : base()

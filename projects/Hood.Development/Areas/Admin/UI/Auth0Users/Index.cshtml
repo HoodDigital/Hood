@@ -1,16 +1,20 @@
-@model UserListModel<UserProfileView<IdentityRole>>
-@inject IPasswordAccountRepository _account;
+@model UserListModel<UserProfileView<Auth0Role>>
+@inject IAuth0AccountRepository _account;
 @{
     ViewBag.Title = "Website Users";
 }
 @section buttons {
     <a class="btn btn-success user-create" asp-action="Create"><i class="fa fa-user-plus me-2"></i>Create New User</a>
 }
+@if (Model.SaveMessage.IsSet())
+{
+    <alert type="@Model.MessageType" size="Medium">@Model.SaveMessage</alert>
+}
 <form class="inline" data-target="#user-list" novalidate>
     <div class="row">
         <div class="col-sm">
             <div id="user-list" class="query hood-inline" data-url="@Url.Action("List")">
-                <partial name="_List_Users" />
+                <partial name="../Auth0Users/_List_Users" />
             </div>
         </div>
         <div class="col-sm-3">
@@ -95,7 +99,7 @@
                 </div>
                 <div class="card-body p-0 collapse show" aria-labelledby="users-roles-panel-heading" id="users-roles-panel">
                     <div class="list-group list-group-flush">
-                        @foreach (var role in (await _account.GetRolesAsync(new RoleListModel<IdentityRole>() { PageSize = int.MaxValue })).List)
+                        @foreach (var role in (await _account.GetRolesAsync(new RoleListModel<Auth0Role>() { PageSize = int.MaxValue })).List)
                         {
                             <div class="list-group-item list-group-item-action p-2">
                                 <div class="form-check form-switch">

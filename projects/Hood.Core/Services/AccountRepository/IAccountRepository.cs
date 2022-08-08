@@ -16,7 +16,7 @@ namespace Hood.Services
         Task<Auth0Identity> CreateLocalAuthIdentity(string fullAuthUserId, Auth0User user, string picture);
         Task DeleteLocalAuthIdentity(string id);
         Task UpdateLocalAuthIdentity(Auth0Identity user);
-
+        Task UpdateRoleAsync(Auth0Role role);
     }
 
     public interface IPasswordAccountRepository : IAccountRepository<ApplicationUser, IdentityRole>
@@ -31,20 +31,20 @@ namespace Hood.Services
 
     public interface IAccountRepository<TUser, TRole> : IHoodAccountRepository
     {
-        Task AddUserToRolesAsync(TUser user, TRole[] roles);
+        Task<Response> AddUserToRolesAsync(TUser user, TRole[] roles);
         Task<TRole> CreateRoleAsync(string role);
         Task DeleteRoleAsync(string role);
         Task DeleteUserAsync(string userId, ClaimsPrincipal adminUser);
         Task<MediaDirectory> GetDirectoryAsync(string id);
         Task<UserProfileView<TRole>> GetUserProfileViewById(string id);
         Task<TRole> GetRoleAsync(string role);
-        Task<IPagedList<TRole>> GetRolesAsync(IPagedList<TRole> model);
+        Task<RoleListModel<TRole>> GetRolesAsync(RoleListModel<TRole> model);
         Task<IList<TRole>> GetRolesForUser(TUser user);
         Task<UserStatistics> GetStatisticsAsync();
         Task<TUser> GetUserByEmailAsync(string email, bool track = true);
         Task<TUser> GetUserByIdAsync(string id, bool track = true);
         Task<UserListModel<UserProfileView<TRole>>> GetUserProfileViewsAsync(UserListModel<UserProfileView<TRole>> model);
-        Task RemoveUserFromRolesAsync(TUser user, TRole[] roles);
+        Task<Response> RemoveUserFromRolesAsync(TUser user, TRole[] roles);
         Task SetupRolesAsync();
         Task<TUser> UpdateProfileAsync(TUser user, IUserProfile profile);
         Task UpdateUserAsync(TUser user);

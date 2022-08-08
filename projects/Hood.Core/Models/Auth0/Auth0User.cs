@@ -31,7 +31,6 @@ namespace Hood.Models
 
         public UserProfile UserProfile { get; set; }
         public IList<Auth0Identity> ConnectedAuth0Accounts { get; set; }
-        public virtual ICollection<Auth0UserRole> Roles { get; set; }
         [PersonalData]
         public string Id { get; set; }
         [ProtectedPersonalData]

@@ -201,7 +201,7 @@ namespace Hood.Services
             _db.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             await _db.SaveChangesAsync();
         }
-        
+
         public async Task<List<Auth0Identity>> GetUserAuth0IdentitiesById(string id)
         {
             return await _db.Auth0Identities
@@ -303,7 +303,17 @@ namespace Hood.Services
         }
         public virtual async Task<UserListModel<UserProfileView<Auth0Role>>> GetUserProfileViewsAsync(UserListModel<UserProfileView<Auth0Role>> model)
         {
-            var query = _db.UserProfileViews.AsQueryable();           
+            var query = _db.UserProfileViews.AsQueryable();
+
+            if (model.Role.IsSet())
+            {
+                query = query.Where(q => q.RoleIds.Contains(model.Role));
+            }
+
+            if (model.RoleIds != null && model.RoleIds.Count > 0)
+            {
+                query = query.Where(q => q.RoleIds != null && model.RoleIds.ToArray().Any(m => q.RoleIds.Contains(m)));
+            }
 
             if (!string.IsNullOrEmpty(model.Search))
             {
@@ -375,6 +385,7 @@ namespace Hood.Services
 
             return model;
         }
+
         public virtual async Task<Auth0User> UpdateProfileAsync(Auth0User user, IUserProfile profile)
         {
             foreach (PropertyInfo property in typeof(IUserProfile).GetProperties())
@@ -394,17 +405,17 @@ namespace Hood.Services
 
             _db.Update(user);
             await _db.SaveChangesAsync();
-            
+
             return user;
         }
         #endregion
 
         #region Roles
-        public virtual async Task<IPagedList<Auth0Role>> GetRolesAsync(IPagedList<Auth0Role> model)
+        public virtual async Task<RoleListModel<Auth0Role>> GetRolesAsync(RoleListModel<Auth0Role> model)
         {
             if (model == null)
             {
-                model = new PagedList<Auth0Role>() { PageIndex = 0, PageSize = 50 };
+                model = new RoleListModel<Auth0Role>() { PageIndex = 0, PageSize = 50 };
             }
             var query = _db.Roles.AsQueryable();
 
@@ -479,36 +490,59 @@ namespace Hood.Services
             }
             return roleObject;
         }
+
         public virtual async Task DeleteRoleAsync(string role)
         {
             var Auth0Role = await GetRoleAsync(role);
             _db.Roles.Remove(Auth0Role);
-            await _db.SaveChangesAsync();
-        }
-        public virtual async Task AddUserToRolesAsync(Auth0User user, Auth0Role[] roles)
-        {
-            foreach (Auth0Role role in roles)
+            if (Auth0Role.RemoteId.IsSet())
             {
-                _db.UserRoles.Add(new Auth0UserRole()
+                try
                 {
-                    UserId = user.Id,
-                    RoleId = role.Id
-                });
+                    await _auth0.DeleteRole(Auth0Role.RemoteId);
+                }
+                catch (Exception)
+                { }
             }
             await _db.SaveChangesAsync();
         }
-        public virtual async Task RemoveUserFromRolesAsync(Auth0User user, Auth0Role[] roles)
+
+        public virtual async Task<Response> AddUserToRolesAsync(Auth0User user, Auth0Role[] roles)
         {
-            foreach (Auth0Role role in roles)
+            foreach (var ac in user.ConnectedAuth0Accounts)
             {
-                var userRole = await FindUserRoleAsync(user.Id, role.Id);
-                if (userRole != null)
+                foreach (Auth0Role role in roles)
                 {
-                    _db.UserRoles.Remove(userRole);
+                    _db.UserRoles.Add(new Auth0UserRole()
+                    {
+                        UserId = user.Id,
+                        RoleId = role.Id
+                    });
+                }
+                await _auth0.AssignRolesToUser(ac.Id, roles.Select(r => r.RemoteId).ToArray());
+            }
+            await _db.SaveChangesAsync();
+            return new Response(true);
+        }
+
+        public virtual async Task<Response> RemoveUserFromRolesAsync(Auth0User user, Auth0Role[] roles)
+        {
+            foreach (var ac in user.ConnectedAuth0Accounts)
+            {
+                foreach (Auth0Role role in roles)
+                {
+                    var userRole = await FindUserRoleAsync(user.Id, role.Id);
+                    if (userRole != null)
+                    {
+                        _db.UserRoles.Remove(userRole);
+                    }
+                    await _auth0.AssignRolesToUser(ac.Id, roles.Select(r => r.RemoteId).ToArray());
                 }
             }
             await _db.SaveChangesAsync();
+            return new Response(true);
         }
+
         protected Task<Auth0UserRole> FindUserRoleAsync(string userId, string roleId)
         {
             return _db.UserRoles.FindAsync(new object[] { userId, roleId }).AsTask();
@@ -524,6 +558,13 @@ namespace Hood.Services
                 }
             }
         }
+
+        public async Task UpdateRoleAsync(Auth0Role role)
+        {
+            _db.Entry(role).State = EntityState.Modified;
+            await _db.SaveChangesAsync();
+        }
+
         #endregion
 
         #region Statistics

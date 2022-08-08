@@ -1,4 +1,5 @@
 ﻿using Hood.BaseControllers;
+using Hood.Constants.Identity;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
@@ -19,36 +20,45 @@ using System.Threading.Tasks;
 
 namespace Hood.Admin.BaseControllers
 {
+    [Authorize(Policies.Active, Roles = "SuperUser,Admin")]
     public abstract class Auth0UsersController : BaseController
     {
         protected readonly IAuth0AccountRepository _account;
+        protected readonly IAuth0Service _auth0;
         public Auth0UsersController()
             : base()
         {
             _account = Engine.Services.Resolve<IAuth0AccountRepository>();
+            _auth0 = Engine.Services.Resolve<IAuth0Service>();
         }
 
+
+        #region User List 
+
         [Route("admin/users/")]
-        public virtual async Task<IActionResult> Index(UserListModel model)
+        public virtual async Task<IActionResult> Index(UserListModel<UserProfileView<Auth0Role>> model)
         {
-            return await List(model, "Index");
+            return await List(model, "../Auth0Users/Index");
         }
 
         [HttpGet]
         [Route("admin/users/list/")]
-        public virtual async Task<IActionResult> List(UserListModel model, string viewName = "_List_Users")
+        public virtual async Task<IActionResult> List(UserListModel<UserProfileView<Auth0Role>> model, string viewName = "../Auth0Users/_List_Users")
         {
-            model = await _account.GetUserProfilesAsync(model) as UserListModel;
+            model = await _account.GetUserProfileViewsAsync(model);
             return View(viewName, model);
         }
+
+        #endregion
+
         #region Edit
         [Route("admin/users/{id}/edit/")]
         public virtual async Task<IActionResult> Edit(string id)
         {
             UserProfileView<Auth0Role> model = await _account.GetUserProfileViewById(id);
-            var roles = await _account.GetRolesAsync(new PagedList<Auth0Role> { PageIndex = 0, PageSize = int.MaxValue });
+            var roles = await _account.GetRolesAsync(new RoleListModel<Auth0Role> { PageIndex = 0, PageSize = int.MaxValue });
             model.AllRoles = roles.List;
-            return View(model);
+            return View("../Auth0Users/Edit", model);
         }
 
         [Route("admin/users/{id}/edit/")]
@@ -76,9 +86,9 @@ namespace Hood.Admin.BaseControllers
 
             }
 
-            var roles = await _account.GetRolesAsync(new PagedList<Auth0Role> { PageIndex = 0, PageSize = int.MaxValue });
+            var roles = await _account.GetRolesAsync(new RoleListModel<Auth0Role> { PageIndex = 0, PageSize = int.MaxValue });
             model.AllRoles = roles.List;
-            return View(model);
+            return View("../Auth0Users/Edit", model);
         }
 
         #endregion
@@ -87,7 +97,7 @@ namespace Hood.Admin.BaseControllers
         [Route("admin/users/create/")]
         public virtual IActionResult Create()
         {
-            return View();
+            return View("../Auth0Users/Create");
         }
 
         [Route("admin/users/create/")]
@@ -172,12 +182,12 @@ namespace Hood.Admin.BaseControllers
                         throw new Exception("There was a problem sending the email, ensure the site's email address and SendGrid settings are set up correctly before sending.");
                     }
                 }
-                await _logService.AddLogAsync<BaseUsersController>($"A new user account has been created in the admin area for {user.Email}", type: LogType.Success);
+                await _logService.AddLogAsync<UsersController>($"A new user account has been created in the admin area for {user.Email}", type: LogType.Success);
                 return new Response(true, "Successfully created.");
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseUsersController>($"Error creating a user via the admin panel.", ex);
+                return await ErrorResponseAsync<UsersController>($"Error creating a user via the admin panel.", ex);
             }
         }
         #endregion
@@ -196,12 +206,12 @@ namespace Hood.Admin.BaseControllers
                 }
 
                 await _account.DeleteUserAsync(id, User);
-                await _logService.AddLogAsync<BaseUsersController>($"The user account ({user.Email}) has been deleted via the admin area by {User.Identity.Name}", type: LogType.Warning);
+                await _logService.AddLogAsync<UsersController>($"The user account ({user.Email}) has been deleted via the admin area by {User.Identity.Name}", type: LogType.Warning);
                 return new Response(true, "Deleted successfully.");
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseUsersController>($"Error deleting a user via the admin panel.", ex);
+                return await ErrorResponseAsync<UsersController>($"Error deleting a user via the admin panel.", ex);
             }
         }
         #endregion
@@ -231,12 +241,12 @@ namespace Hood.Admin.BaseControllers
                 });
                 await _account.UpdateUserAsync(user);
 
-                await _logService.AddLogAsync<BaseUsersController>($"The user account ({user.Email}) email confirmed via admin panel by {User.Identity.Name}", type: LogType.Warning);
+                await _logService.AddLogAsync<UsersController>($"The user account ({user.Email}) email confirmed via admin panel by {User.Identity.Name}", type: LogType.Warning);
                 return new Response(true, "Email confirmed successfully.");
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseUsersController>($"Error confirming email for user via the admin panel.", ex);
+                return await ErrorResponseAsync<UsersController>($"Error confirming email for user via the admin panel.", ex);
             }
         }
         #endregion
@@ -246,7 +256,7 @@ namespace Hood.Admin.BaseControllers
         public virtual async Task<IActionResult> Notes(string id)
         {
             UserProfile model = await _account.GetUserProfileByIdAsync(id);
-            return View("_Inline_Notes", model);
+            return View("../Auth0Users/_Inline_Notes", model);
         }
 
         [Route("admin/users/{id}/notes/add/")]
@@ -268,7 +278,7 @@ namespace Hood.Admin.BaseControllers
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseUsersController>($"Error adding a user note via the admin panel.", ex);
+                return await ErrorResponseAsync<UsersController>($"Error adding a user note via the admin panel.", ex);
             }
         }
 
@@ -291,12 +301,141 @@ namespace Hood.Admin.BaseControllers
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseUsersController>($"Error deleting a note from a user.", ex);
+                return await ErrorResponseAsync<UsersController>($"Error deleting a note from a user.", ex);
             }
         }
         #endregion
 
         #region Roles
+
+        [Route("admin/roles/")]
+        public virtual async Task<IActionResult> Roles(RoleListModel<Auth0Role> model)
+        {
+            return await ListRoles(model, "../Auth0Users/Roles");
+        }
+
+        [HttpGet]
+        [Route("admin/roles/list/")]
+        public virtual async Task<IActionResult> ListRoles(RoleListModel<Auth0Role> model, string viewName = "../Auth0Users/_List_Roles")
+        {
+            model = await _account.GetRolesAsync(model);
+            var allRemoteRoles = await _auth0.GetRoles("", 0, 100);
+            foreach (var role in model.List)
+            {
+                if (role.RemoteId.IsSet())
+                {
+                    var remote = allRemoteRoles.List.SingleOrDefault(r => r.Id == role.RemoteId);
+                    role.RemoteRole = remote;
+                }
+            }
+            return View(viewName, model);
+        }
+
+        [Route("admin/roles/create/")]
+        public virtual IActionResult CreateRole()
+        {
+            return View("../Auth0Users/CreateRole");
+        }
+
+        [Route("admin/roles/create/")]
+        [HttpPost]
+        public virtual async Task<Response> CreateRole(AdminCreateRoleViewModel model)
+        {
+            try
+            {
+                await _account.CreateRoleAsync(model.Name);
+                return new Response(true, "Successfully created.");
+            }
+            catch (Exception ex)
+            {
+                return await ErrorResponseAsync<Auth0UsersController>($"Error creating a role via the admin panel.", ex);
+            }
+        }
+
+        [Route("admin/roles/edit/")]
+        public virtual async Task<IActionResult> EditRole(string roleName)
+        {
+            var role = await _account.GetRoleAsync(roleName);
+
+            try
+            {
+                if (role.RemoteId.IsSet())
+                {
+                    role.RemoteRole = await _auth0.GetRoleById(role.RemoteId);
+                }
+            }
+            catch (Exception)
+            { }
+            return View("../Auth0Users/EditRole", role);
+        }
+
+        [Route("admin/roles/delete/")]
+        public virtual async Task<IActionResult> DeleteRole(string roleName)
+        {
+            try
+            {
+                Auth0Role role = await _account.GetRoleAsync(roleName);
+                if (role == null)
+                {
+                    throw new Exception($"The role {roleName} could not be found, therefore could not be deleted.");
+                }
+
+                await _account.DeleteRoleAsync(roleName);
+
+                SaveMessage = $"The role ({role.Name}) has been deleted via the admin area by {User.Identity.Name}";
+                MessageType = AlertType.Danger;
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = $"Error deleting a role via the admin panel:" + ex;
+                MessageType = AlertType.Danger;
+            }
+            return RedirectToAction("Roles");
+        }
+
+        [Route("admin/roles/link/")]
+        public virtual async Task<IActionResult> LinkRole(string roleName)
+        {
+            try
+            {
+                Auth0Role role = await _account.GetRoleAsync(roleName);
+                if (role == null)
+                {
+                    throw new Exception($"The role {roleName} could not be found, therefore could not be relinked.");
+                }
+
+                if (role.RemoteId.IsSet())
+                {
+                    try
+                    {
+                        role.RemoteRole = await _auth0.GetRoleById(role.RemoteId);
+                    }
+                    catch (System.Exception)
+                    {}
+                    if (role.RemoteRole != null)
+                    {
+                        throw new Exception("This role is already connected to a remote role. Remove the remote before re-linking.");
+                    }
+                }
+
+                role.RemoteRole = await _auth0.CreateRoleForLocalRole(role);
+
+                role.RemoteId = role.RemoteRole.Id;
+                await _account.UpdateRoleAsync(role);
+
+                SaveMessage = $"The role ({role.Name}) has been relinked to Auth0";
+                MessageType = AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = $"Error relinking a role via the admin panel:" + ex.Message;
+                MessageType = AlertType.Danger;
+            }
+            return RedirectToAction("Roles");
+        }
+        #endregion
+
+        #region User Roles
         [Route("admin/users/{id}/get-roles/")]
         [HttpGet]
         public virtual async Task<JsonResult> GetRoles(string id)
@@ -324,34 +463,26 @@ namespace Hood.Admin.BaseControllers
 
                 if (add)
                 {
-                    await _account.AddUserToRolesAsync(user, roles.ToArray());
+                    return await _account.AddUserToRolesAsync(user, roles.ToArray());
                 }
                 else
                 {
-                    await _account.RemoveUserFromRolesAsync(user, roles.ToArray());
-                }
-
-                if (add)
-                {
-                    return await SuccessResponseAsync<BaseUsersController>($"The user has been added the {role} role.");
-                }
-                else
-                {
-                    return await SuccessResponseAsync<BaseUsersController>($"The user has been removed from the {role} role.");
+                    return await _account.RemoveUserFromRolesAsync(user, roles.ToArray());
                 }
             }
             catch (Exception ex)
             {
                 if (add)
                 {
-                    return await ErrorResponseAsync<BaseUsersController>($"Error adding a user to a role via the admin panel.", ex);
+                    return await ErrorResponseAsync<Auth0UsersController>($"Error adding a user to a role via the admin panel.", ex);
                 }
                 else
                 {
-                    return await ErrorResponseAsync<BaseUsersController>($"Error removing a user from a role via the admin panel.", ex);
+                    return await ErrorResponseAsync<Auth0UsersController>($"Error removing a user from a role via the admin panel.", ex);
                 }
             }
         }
+
         #endregion
 
         #region Impersonation
@@ -395,7 +526,7 @@ namespace Hood.Admin.BaseControllers
             {
                 SaveMessage = $"Error impersonating user with {id}";
                 MessageType = AlertType.Danger;
-                await _logService.AddExceptionAsync<BaseUsersController>(SaveMessage, ex);
+                await _logService.AddExceptionAsync<Auth0UsersController>(SaveMessage, ex);
             }
             return RedirectToAction(nameof(Edit), new { id });
         }
@@ -429,7 +560,7 @@ namespace Hood.Admin.BaseControllers
             {
                 SaveMessage = $"Error stopping impersonating user";
                 MessageType = AlertType.Danger;
-                await _logService.AddExceptionAsync<BaseUsersController>(SaveMessage, ex);
+                await _logService.AddExceptionAsync<Auth0UsersController>(SaveMessage, ex);
             }
             return RedirectToAction("Index", "Home", new { area = "" });
         }
@@ -461,7 +592,7 @@ namespace Hood.Admin.BaseControllers
                         Note = $"User password reset via admin panel by {User.Identity.Name}."
                     });
                     await userManager.UpdateAsync(user);
-                    await _logService.AddLogAsync<BaseUsersController>($"The password has been reset by an admin for user with Id: {id}", type: LogType.Success);
+                    await _logService.AddLogAsync<Auth0UsersController>($"The password has been reset by an admin for user with Id: {id}", type: LogType.Success);
                     return new Response(true, $"The user's password has been reset.");
                 }
                 else
@@ -476,7 +607,7 @@ namespace Hood.Admin.BaseControllers
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseUsersController>($"Error resetting a password via the admin panel for user with Id: {id}", ex);
+                return await ErrorResponseAsync<UsersController>($"Error resetting a password via the admin panel for user with Id: {id}", ex);
             }
         }
         #endregion
