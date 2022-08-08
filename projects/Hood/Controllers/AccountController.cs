@@ -2,7 +2,7 @@
 
 namespace Hood.Web.Controllers
 {
-    public class AccountController : BaseController
+    public class AccountController : Hood.BaseControllers.AccountController
     {
         public AccountController()
             : base()

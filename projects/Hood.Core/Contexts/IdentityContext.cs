@@ -32,18 +32,8 @@ namespace Hood.Contexts
                 {
                     typeBuilder.ToTable("AspNetUsers");
                     typeBuilder.Property(o => o.UserName).HasColumnName("UserName");
-                    typeBuilder.Property(o => o.EmailConfirmed).HasColumnName("EmailConfirmed");
                     typeBuilder.Property(o => o.Email).HasColumnName("Email");
-                    typeBuilder.Property(o => o.PhoneNumberConfirmed).HasColumnName("PhoneNumberConfirmed");
                     typeBuilder.Property(o => o.PhoneNumber).HasColumnName("PhoneNumber");
-                    typeBuilder.Property(o => o.Active).HasColumnName("Active");
-                    typeBuilder.Property(o => o.BillingAddressJson).HasColumnName("BillingAddressJson");
-                    typeBuilder.Property(o => o.DeliveryAddressJson).HasColumnName("DeliveryAddressJson");
-                    typeBuilder.Property(o => o.AvatarJson).HasColumnName("AvatarJson");
-                    typeBuilder.Property(o => o.CreatedOn).HasColumnName("CreatedOn");
-                    typeBuilder.Property(o => o.LastLogOn).HasColumnName("LastLogOn");
-                    typeBuilder.Property(o => o.LastLoginIP).HasColumnName("LastLoginIP");
-                    typeBuilder.Property(o => o.LastLoginLocation).HasColumnName("LastLoginLocation");
 
                     typeBuilder.HasOne(o => o.UserProfile).WithOne().HasForeignKey<UserProfile>(o => o.Id);
                 });
@@ -53,18 +43,8 @@ namespace Hood.Contexts
                 {
                     typeBuilder.ToTable("AspNetUsers");
                     typeBuilder.Property(o => o.UserName).HasColumnName("UserName");
-                    typeBuilder.Property(o => o.EmailConfirmed).HasColumnName("EmailConfirmed");
                     typeBuilder.Property(o => o.Email).HasColumnName("Email");
-                    typeBuilder.Property(o => o.PhoneNumberConfirmed).HasColumnName("PhoneNumberConfirmed");
                     typeBuilder.Property(o => o.PhoneNumber).HasColumnName("PhoneNumber");
-                    typeBuilder.Property(o => o.Active).HasColumnName("Active");
-                    typeBuilder.Property(o => o.BillingAddressJson).HasColumnName("BillingAddressJson");
-                    typeBuilder.Property(o => o.DeliveryAddressJson).HasColumnName("DeliveryAddressJson");
-                    typeBuilder.Property(o => o.AvatarJson).HasColumnName("AvatarJson");
-                    typeBuilder.Property(o => o.CreatedOn).HasColumnName("CreatedOn");
-                    typeBuilder.Property(o => o.LastLogOn).HasColumnName("LastLogOn");
-                    typeBuilder.Property(o => o.LastLoginIP).HasColumnName("LastLoginIP");
-                    typeBuilder.Property(o => o.LastLoginLocation).HasColumnName("LastLoginLocation");
                 });
 
             builder.Entity<UserProfileView<IdentityRole>>().ToView("HoodUserProfiles");
@@ -92,6 +72,10 @@ namespace Hood.Contexts
                         Active = true,
                         UserProfile = new UserProfile
                         {
+                            Email = ownerEmail,
+                            UserName = ownerEmail,
+                            PhoneNumber = "",
+                            
                             FirstName = "Website",
                             LastName = "Administrator",
                             JobTitle = "Website Administrator",

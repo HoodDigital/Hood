@@ -2,14 +2,12 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
-using Hood.Identity;
 using System.Collections.Generic;
 using System.Net.Http;
-using Auth0.AspNetCore.Authentication;
 
-namespace Hood.Identity
+namespace Hood.Services
 {
-    public interface IHoodAuth0Options
+    public interface IAuth0LoginService
     {
 
 #nullable enable

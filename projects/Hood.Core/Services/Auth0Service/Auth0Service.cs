@@ -26,106 +26,19 @@ namespace Hood.Services
     public class Auth0Service : IAuth0Service
     {
         protected IHoodCache _cache { get; set; }
-        protected Auth0IdentityContext _db { get; set; }
         public Auth0Service()
         {
             _cache = Engine.Services.Resolve<IHoodCache>();
-            _db = Engine.Services.Resolve<Auth0IdentityContext>();
         }
 
-        #region Data CRUD
-        public async Task<Auth0User> GetUserByAuth0UserId(string userId)
-        {
-            var auth0user = await _db.Auth0Users.Include(au => au.User).SingleOrDefaultAsync(au => au.UserId == userId);
-            if (auth0user != null)
-            {
-                return auth0user.User;
-            }
-            return null;
-        }
-        public async Task<Auth0User> GetUserByAuth0Id(string id)
-        {
-            var auth0user = await _db.Auth0Users.Include(au => au.User).SingleOrDefaultAsync(au => au.Id == id);
-            if (auth0user != null)
-            {
-                return auth0user.User;
-            }
-            return null;
-        }
-        public async Task GetLocalAuthIdentity(string userId)
-        {
-            var db = Engine.Services.Resolve<Auth0IdentityContext>();
-            var userToRemove = db.Auth0Users.SingleOrDefault(u => u.UserId == userId);
-            db.Entry(userToRemove).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
-            await db.SaveChangesAsync();
-        }
-        public async Task<Auth0Identity> CreateLocalAuthIdentity(string fullAuthUserId, Auth0User user, string picture)
-        {
-            var authProviderName = fullAuthUserId.Split('|')[0];
-            var authUserId = fullAuthUserId.Split('|')[1];
-            User newAuthUser = null;
-            try
-            {
-                newAuthUser = await GetUserById(fullAuthUserId);
-            }
-            catch (Auth0.Core.Exceptions.ErrorApiException)
-            {
-            }
+        #region Client
 
-            var primaryIdentity = user.GetPrimaryIdentity();
-            if (newAuthUser == null && primaryIdentity != null)
-            {
-                newAuthUser = await GetUserById(primaryIdentity.Id);
-            }
-
-            if (newAuthUser == null)
-            {
-                throw new Exception("Could not find the user on the remote service.");
-            }
-
-            var identity = newAuthUser.Identities.SingleOrDefault(i => i.UserId == authUserId);
-            if (identity == null)
-            {
-                throw new Exception("Could not find the identity on the remote user profile.");
-            }
-
-            var newIdentity = new Auth0Identity(identity);
-
-            if (primaryIdentity == null)
-            {
-                newIdentity.IsPrimary = true;
-            }
-
-            newIdentity.Id = fullAuthUserId;
-            newIdentity.UserId = user.Id;
-            newIdentity.Picture = picture;
-
-            var db = Engine.Services.Resolve<Auth0IdentityContext>();
-            db.Add(newIdentity);
-            await db.SaveChangesAsync();
-            return newIdentity;
-        }
-        public async Task DeleteLocalAuthIdentity(string id)
-        {
-            var db = Engine.Services.Resolve<Auth0IdentityContext>();
-            var userToRemove = db.Auth0Users.SingleOrDefault(u => u.Id == id);
-            db.Entry(userToRemove).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
-            await db.SaveChangesAsync();
-        }
-        public async Task UpdateLocalAuthIdentity(Auth0Identity user)
-        {
-            var db = Engine.Services.Resolve<Auth0IdentityContext>();
-            db.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            await db.SaveChangesAsync();
-        }
-        #endregion
-
-        #region Auth0 API - Helpers
-        public async Task<ManagementApiClient> GetClientAsync()
+        protected async Task<ManagementApiClient> GetClientAsync()
         {
             var token = await GetTokenAsync();
             return new ManagementApiClient(token.Token, new Uri($"https://{Engine.Auth0Configuration.Domain}/api/v2"));
         }
+
         private async Task<AuthToken> GetTokenAsync()
         {
             var cacheKey = $"{typeof(AuthToken)}";
@@ -157,7 +70,8 @@ namespace Hood.Services
         }
         #endregion
 
-        #region Auth0 API - Users
+        #region Users
+
         public async Task<System.Collections.Generic.IPagedList<User>> GetUsers(string search = "", int page = 0, int pageSize = 50)
         {
             var client = await GetClientAsync();
@@ -177,13 +91,15 @@ namespace Hood.Services
             };
             return pagedList;
         }
+
         public async Task<User> GetUserById(string userId)
         {
             var client = await GetClientAsync();
             var user = await client.Users.GetAsync(userId);
             return user;
         }
-        public async Task<System.Collections.Generic.IList<User>> GetUserByEmail(string email)
+
+        public async Task<System.Collections.Generic.IList<User>> GetUsersByEmail(string email)
         {
             if (!email.IsSet())
             {
@@ -193,12 +109,13 @@ namespace Hood.Services
             var users = await client.Users.GetUsersByEmailAsync(email);
             return users.ToList();
         }
+
         public async Task<User> CreateUserWithPassword(Auth0User user, string password)
         {
             var client = await GetClientAsync();
             var newUser = await client.Users.CreateAsync(new UserCreateRequest()
             {
-                Connection = Constants.UsernamePasswordConnectionName,
+                Connection = Authentication.UsernamePasswordConnectionName,
                 Email = user.Email,
                 Password = password,
                 PhoneNumber = user.PhoneNumber,
@@ -206,14 +123,48 @@ namespace Hood.Services
             });
             return newUser;
         }
+
         public async Task DeleteUser(string userId)
         {
             var client = await GetClientAsync();
             await client.Users.DeleteAsync(userId);
         }
+
         #endregion
 
-        #region Auth0 API - Email Validation
+        #region Account Linking
+
+        public async Task LinkAccountAsync(Auth0Identity primaryAccount, string fullAuthUserId)
+        {
+            var authProviderName = fullAuthUserId.Split('|')[0];
+            var authUserId = fullAuthUserId.Split('|')[1];
+            var client = await GetClientAsync();
+            var response = await client.Users.LinkAccountAsync(primaryAccount.Id, new Auth0.ManagementApi.Models.UserAccountLinkRequest()
+            {
+                Provider = authProviderName,
+                UserId = authUserId
+            });
+        }
+
+        public async Task UnlinkAccountAsync(Auth0Identity primaryAccount, Auth0Identity identityToDisconnect)
+        {
+            var client = await GetClientAsync();
+            var response = await client.Users.UnlinkAccountAsync(primaryAccount.Id, identityToDisconnect.Provider, identityToDisconnect.LocalUserId);
+        }
+
+        public async Task<Ticket> CreatePasswordChangeTicket(Auth0Identity remoteUser)
+        {
+            var client = await GetClientAsync();
+            return await client.Tickets.CreatePasswordChangeTicketAsync(new Auth0.ManagementApi.Models.PasswordChangeTicketRequest()
+            {
+                UserId = remoteUser.LocalUserId
+            });
+        }
+
+        #endregion
+
+        #region Email Validation
+
         public async Task<Ticket> GetEmailVerificationTicket(string accountId, string returnUrl)
         {
             var client = await GetClientAsync();
@@ -224,6 +175,7 @@ namespace Hood.Services
             });
             return ticket;
         }
+
         #endregion
 
     }

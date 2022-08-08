@@ -28,6 +28,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Hood.Enums;
 using Hood.Contexts;
 using Microsoft.AspNetCore.Hosting;
+using Hood.Constants.Identity;
 
 namespace Hood.Startup
 {
@@ -59,7 +60,7 @@ namespace Hood.Startup
 
                 if (config.IsConfigured("Identity:Auth0:Domain") && config.IsConfigured("Identity:Auth0:ClientId"))
                 {
-                    services.ConfigureAuth0(config, new HoodAuth0Options(config));
+                    services.ConfigureAuth0(config, new Auth0LoginService(config));
                 }
                 else
                 {
@@ -253,7 +254,7 @@ namespace Hood.Startup
 
         public static IServiceCollection ConfigureAntiForgery(this IServiceCollection services, IConfiguration config)
         {
-            string cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Constants.CookieDefaultName;
+            string cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Authentication.CookieDefaultName;
             services.AddAntiforgery(options =>
             {
                 options.Cookie.Name = $"{cookieName}_af";
@@ -268,7 +269,7 @@ namespace Hood.Startup
 
         public static IServiceCollection ConfigureCookieConsent(this IServiceCollection services, IConfiguration config)
         {
-            string cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Constants.CookieDefaultName;
+            string cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Authentication.CookieDefaultName;
             bool consentRequired = config.GetValue("Identity:Cookies:ConsentRequired", true);
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -289,6 +290,8 @@ namespace Hood.Startup
         public static IServiceCollection ConfigurePasswordAuthentication(this IServiceCollection services, IConfiguration config)
         {
             services.AddDbContext<IdentityContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]));
+            services.AddScoped<IPasswordAccountRepository, AccountRepository>();
+            services.AddScoped<IHoodAccountRepository, AccountRepository>();
 
             services.AddIdentity<ApplicationUser, IdentityRole>(o =>
             {
@@ -304,7 +307,7 @@ namespace Hood.Startup
                 o.Password.RequireNonAlphanumeric = !config["Identity:Password:RequireNonAlphanumeric"].IsSet() || bool.Parse(config["Identity:Password:RequireNonAlphanumeric"]);
                 o.Password.RequiredLength = config["Identity:Password:RequiredLength"].IsSet() ? int.Parse(config["Identity:Password:RequiredLength"]) : 6;
             })
-                .AddEntityFrameworkStores<HoodDbContext>()
+                .AddEntityFrameworkStores<IdentityContext>()
                 .AddDefaultTokenProviders();
 
             services.ConfigureApplicationCookie(options =>
@@ -323,27 +326,26 @@ namespace Hood.Startup
                     {
                         // get the user profile and store important bits on the claim.
                         var repo = Engine.Services.Resolve<IPasswordAccountRepository>();
-                        var user = await repo.GetUserProfileByIdAsync(e.Principal.GetUserId());
-                        e.Principal.SetUserClaims(user);
+                        var user = await repo.GetUserByIdAsync(e.Principal.GetUserId());
+                        e.Principal.SetUserClaims(user.UserProfile);
                         if (user.EmailConfirmed)
                         {
-                            e.Principal.AddOrUpdateClaimValue(HoodClaimTypes.EmailConfirmed, "true");
+                            e.Principal.AddOrUpdateClaimValue(Hood.Constants.Identity.ClaimTypes.EmailConfirmed, "true");
                         }
                         if (user.Active || !Engine.Settings.Account.RequireEmailConfirmation)
                         {
-                            e.Principal.AddOrUpdateClaimValue(HoodClaimTypes.Active, "true");
+                            e.Principal.AddOrUpdateClaimValue(Hood.Constants.Identity.ClaimTypes.Active, "true");
                         }
                     }
                 };
             });
 
-            services.AddScoped<IPasswordAccountRepository, AccountRepository>();
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(Policies.Active, policy => policy.RequireClaim(Identity.HoodClaimTypes.Active));
-                options.AddPolicy(Policies.AccountNotConnected, policy => policy.RequireClaim(Identity.HoodClaimTypes.AccountNotConnected));
-                options.AddPolicy(Policies.AccountLinkRequired, policy => policy.RequireClaim(Identity.HoodClaimTypes.AccountLinkRequired));
+                options.AddPolicy(Policies.Active, policy => policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.Active));
+                options.AddPolicy(Policies.AccountNotConnected, policy => policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.AccountNotConnected));
+                options.AddPolicy(Policies.AccountLinkRequired, policy => policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.AccountLinkRequired));
             });
 
             services.ConfigurePasswordImpersonation();
@@ -358,8 +360,8 @@ namespace Hood.Startup
                 options.ValidationInterval = TimeSpan.FromMinutes(1);  // new property name
                 options.OnRefreshingPrincipal = context =>             // new property name
                 {
-                    System.Security.Claims.Claim originalUserIdClaim = context.CurrentPrincipal.FindFirst(HoodClaimTypes.OriginalUserId);
-                    System.Security.Claims.Claim isImpersonatingClaim = context.CurrentPrincipal.FindFirst(HoodClaimTypes.IsImpersonating);
+                    System.Security.Claims.Claim originalUserIdClaim = context.CurrentPrincipal.FindFirst(Hood.Constants.Identity.ClaimTypes.OriginalUserId);
+                    System.Security.Claims.Claim isImpersonatingClaim = context.CurrentPrincipal.FindFirst(Hood.Constants.Identity.ClaimTypes.IsImpersonating);
                     if (originalUserIdClaim != null && isImpersonatingClaim.Value == "true")
                     {
                         context.NewPrincipal.Identities.First().AddClaim(originalUserIdClaim);
@@ -376,9 +378,12 @@ namespace Hood.Startup
 
         #region Auth0 Authentication
 
-        public static IServiceCollection ConfigureAuth0(this IServiceCollection services, IConfiguration config, IHoodAuth0Options auth0Options)
+        public static IServiceCollection ConfigureAuth0(this IServiceCollection services, IConfiguration config, IAuth0LoginService auth0Options)
         {
             services.AddDbContext<Auth0IdentityContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]));
+            services.AddSingleton<IAuth0Service, Auth0Service>();
+            services.AddScoped<IAuth0AccountRepository, Auth0AccountRepository>();
+            services.AddScoped<IHoodAccountRepository, Auth0AccountRepository>();
 
             services.ConfigureSameSiteNoneCookies();
 
@@ -405,15 +410,15 @@ namespace Hood.Startup
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(Policies.Active, policy => policy.RequireClaim(Identity.HoodClaimTypes.Active));
-                options.AddPolicy(Policies.AccountNotConnected, policy => policy.RequireClaim(Identity.HoodClaimTypes.AccountNotConnected));
+                options.AddPolicy(Policies.Active, policy => policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.Active));
+                options.AddPolicy(Policies.AccountNotConnected, policy => policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.AccountNotConnected));
             });
             return services;
 
         }
         private static void SetAuthenticationCookieDefaults(IConfiguration config, CookieAuthenticationOptions options)
         {
-            string cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Constants.CookieDefaultName;
+            string cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Authentication.CookieDefaultName;
 
             options.Cookie.Name = $"{cookieName}_auth";
             options.Cookie.HttpOnly = true;
@@ -423,7 +428,7 @@ namespace Hood.Startup
             options.AccessDeniedPath = config["Identity:AccessDeniedPath"].IsSet() ? config["Identity:AccessDeniedPath"] : "/account/access-denied";
             options.LoginPath = config["Identity:LoginPath"].IsSet() ? config["Identity:LoginPath"] : "/account/login";
             options.LogoutPath = config["Identity:LogoutPath"].IsSet() ? config["Identity:LogoutPath"] : "/account/logout";
-            options.ReturnUrlParameter = Constants.ReturnUrlParameter;
+            options.ReturnUrlParameter = Authentication.ReturnUrlParameter;
         }
         private static IServiceCollection ConfigureSameSiteNoneCookies(this IServiceCollection services)
         {
@@ -449,7 +454,7 @@ namespace Hood.Startup
 
         public static IServiceCollection ConfigureSession(this IServiceCollection services, IConfiguration config)
         {
-            string cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Constants.CookieDefaultName;
+            string cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Authentication.CookieDefaultName;
             services.Configure<CookieTempDataProviderOptions>(options =>
             {
                 options.Cookie.IsEssential = true;

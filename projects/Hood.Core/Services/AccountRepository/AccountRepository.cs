@@ -19,9 +19,9 @@ namespace Hood.Services
     {
         protected readonly IdentityContext _db;
         protected readonly HoodDbContext _hoodDb;
-        private DbSet<ApplicationUser> Users { get { return _db.Set<ApplicationUser>(); } }
-        private DbSet<IdentityRole> Roles { get { return _db.Set<IdentityRole>(); } }
-        private DbSet<IdentityUserRole<string>> UserRoles { get { return _db.Set<IdentityUserRole<string>>(); } }
+        private IQueryable<ApplicationUser> Users { get { return _db.Users.Include(u => u.UserProfile); } }
+        private IQueryable<IdentityRole> Roles { get { return _db.Roles; } }
+        private IQueryable<IdentityUserRole<string>> UserRoles { get { return _db.UserRoles; } }
         private UserManager<ApplicationUser> UserManager => Engine.Services.Resolve<UserManager<ApplicationUser>>();
         private RoleManager<IdentityRole> RoleManager => Engine.Services.Resolve<RoleManager<IdentityRole>>();
         
@@ -93,7 +93,7 @@ namespace Hood.Services
         }
         protected virtual async Task<ApplicationUser> PrepareUserForDelete(string userId, System.Security.Claims.ClaimsPrincipal adminUser)
         {
-            ApplicationUser user = await _db.Users
+            ApplicationUser user = await Users
                 .SingleOrDefaultAsync(u => u.Id == userId);
 
             if (user.Email == Engine.Configuration.SuperAdminEmail)
@@ -101,7 +101,7 @@ namespace Hood.Services
                 throw new Exception("You cannot delete the site owner account, the owner is set via an environment variable and cannot be changed from the admin area.");
             }
 
-            ApplicationUser siteOwner = await _db.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Email == Engine.Configuration.SuperAdminEmail);
+            ApplicationUser siteOwner = await Users.AsNoTracking().SingleOrDefaultAsync(u => u.Email == Engine.Configuration.SuperAdminEmail);
             if (siteOwner == null)
             {
                 throw new Exception("Could not load the owner account, check your settings, the owner is set via an environment variable and cannot be changed from the admin area.");
@@ -148,6 +148,10 @@ namespace Hood.Services
             {
                 throw new Exception(setEmailResult.Errors.FirstOrDefault().Description);
             }
+        }
+        public virtual async Task<IdentityResult> ConfirmEmailAsync(ApplicationUser user, string code)
+        {
+            return await UserManager.ConfirmEmailAsync(user, code);
         }
         public virtual async Task SetPhoneNumberAsync(ApplicationUser modelToUpdate, string phoneNumber)
         {
@@ -198,31 +202,6 @@ namespace Hood.Services
                 );
             }
 
-            if (model.Active)
-            {
-                query = query.Where(q => q.Active);
-            }
-
-            if (model.Inactive)
-            {
-                query = query.Where(q => !q.Active);
-            }
-
-            if (model.PhoneUnconfirmed)
-            {
-                query = query.Where(q => !q.PhoneNumberConfirmed);
-            }
-
-            if (model.EmailUnconfirmed)
-            {
-                query = query.Where(q => !q.EmailConfirmed);
-            }
-
-            if (model.Unused)
-            {
-                query = query.Where(q => q.LastLoginLocation == null || q.LastLoginLocation == null || q.LastLogOn == DateTime.MinValue);
-            }
-
             switch (model.Order)
             {
                 case "UserName":
@@ -233,9 +212,6 @@ namespace Hood.Services
                     break;
                 case "LastName":
                     query = query.OrderBy(n => n.LastName);
-                    break;
-                case "LastLogOn":
-                    query = query.OrderByDescending(n => n.LastLogOn);
                     break;
 
                 case "UserNameDesc":
@@ -349,27 +325,27 @@ namespace Hood.Services
             UserProfileView<IdentityRole> profile = await _db.UserProfileViews.FirstOrDefaultAsync(u => u.Id == id);
             return profile;
         }
-        public virtual async Task UpdateProfileAsync(UserProfile user)
+        public virtual async Task<ApplicationUser> UpdateProfileAsync(ApplicationUser user, IUserProfile profile)
         {
-            ApplicationUser userToUpdate = await _db.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
-
             foreach (PropertyInfo property in typeof(IUserProfile).GetProperties())
             {
-                property.SetValue(userToUpdate, property.GetValue(user));
+                property.SetValue(user.UserProfile, property.GetValue(profile));
             }
 
             foreach (PropertyInfo property in typeof(IName).GetProperties())
             {
-                property.SetValue(userToUpdate, property.GetValue(user));
+                property.SetValue(user.UserProfile, property.GetValue(profile));
             }
 
             foreach (PropertyInfo property in typeof(IJsonMetadata).GetProperties())
             {
-                property.SetValue(userToUpdate, property.GetValue(user));
+                property.SetValue(user.UserProfile, property.GetValue(profile));
             }
 
-            _db.Update(userToUpdate);
-            _db.SaveChanges();
+            _db.Update(user);
+            await _db.SaveChangesAsync();
+            
+            return user;
         }
         #endregion
 

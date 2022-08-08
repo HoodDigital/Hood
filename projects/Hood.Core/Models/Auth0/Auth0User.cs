@@ -1,78 +1,14 @@
 ﻿using Hood.Extensions;
+using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Security.Claims;
 
 namespace Hood.Models
 {
-    /// <summary>
-    /// Represents a role in the identity system
-    /// </summary>
-    public class Auth0Role
-    {
-        /// <summary>
-        /// Initializes a new instance of <see cref="Auth0Role"/>.
-        /// </summary>
-        public Auth0Role() { }
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="Auth0Role"/>.
-        /// </summary>
-        /// <param name="roleName">The role name.</param>
-        public Auth0Role(string roleName) : this()
-        {
-            Name = roleName;
-        }
-
-        /// <summary>
-        /// Gets or sets the primary key for this role.
-        /// </summary>
-        public virtual string Id { get; set; } = default!;
-
-        /// <summary>
-        /// Gets or sets the name for this role.
-        /// </summary>
-        public virtual string Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the normalized name for this role.
-        /// </summary>
-        public virtual string NormalizedName { get; set; }
-
-        /// <summary>
-        /// A random value that should change whenever a role is persisted to the store
-        /// </summary>
-        public virtual string ConcurrencyStamp { get; set; }
-
-        /// <summary>
-        /// Returns the name of the role.
-        /// </summary>
-        /// <returns>The name of the role.</returns>
-        public override string ToString()
-        {
-            return Name ?? string.Empty;
-        }
-    }
-
-
-    /// <summary>
-    /// Represents the link between a user and a role.
-    /// </summary>
-    public class Auth0UserRole
-    {
-        /// <summary>
-        /// Gets or sets the primary key of the user that is linked to a role.
-        /// </summary>
-        public virtual string UserId { get; set; } = default!;
-
-        /// <summary>
-        /// Gets or sets the primary key of the role that is linked to the user.
-        /// </summary>
-        public virtual string RoleId { get; set; } = default!;
-    }
-
     public partial class Auth0User : IHoodIdentity
     {
         /// <summary>
@@ -93,28 +29,32 @@ namespace Hood.Models
             UserName = userName;
         }
 
-        public virtual ICollection<Auth0UserRole> Roles { get; set; }
-
-        public string Id { get; set; }
-        public string UserName { get; set; }
-        public bool EmailConfirmed { get; set; }
-        public string Email { get; set; }
-        public bool PhoneNumberConfirmed { get; set; }
-        public string PhoneNumber { get; set; }
-        public string BillingAddressJson { get; set; }
-        public string DeliveryAddressJson { get; set; }
-        public string AvatarJson { get; set; }
         public UserProfile UserProfile { get; set; }
-
         public IList<Auth0Identity> ConnectedAuth0Accounts { get; set; }
+        public virtual ICollection<Auth0UserRole> Roles { get; set; }
+        [PersonalData]
+        public string Id { get; set; }
+        [ProtectedPersonalData]
+        public string UserName { get; set; }
+        [PersonalData]
+        public bool EmailConfirmed { get; set; }
+        [ProtectedPersonalData]
+        public string Email { get; set; }
+        [PersonalData]
+        public bool PhoneNumberConfirmed { get; set; }
+        [ProtectedPersonalData]
+        public string PhoneNumber { get; set; }
 
         public bool Active { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime LastLogOn { get; set; }
         public string LastLoginIP { get; set; }
         public string LastLoginLocation { get; set; }
-        public string Latitude { get; set; }
-        public string Longitude { get; set; }
+        public int AccessFailedCount { get; set; }
+        [PersonalData]
+        public bool TwoFactorEnabled { get; set; }
+        public bool LockoutEnabled { get; set; }
+        public DateTimeOffset? LockoutEnd { get; set; }
 
         public Auth0Identity GetPrimaryIdentity()
         {
@@ -122,7 +62,49 @@ namespace Hood.Models
             {
                 return null;
             }
-            return ConnectedAuth0Accounts.SingleOrDefault(ca => ca.IsPrimary);
+            return ConnectedAuth0Accounts.FirstOrDefault(ca => ca.IsPrimary);
+        }
+
+        public bool UpdateFromPrincipal(ClaimsPrincipal principal)
+        {
+            bool changed = false;
+
+            string firstName = principal.GetClaimValue(ClaimTypes.GivenName);
+            if (!this.UserProfile.FirstName.IsSet() && firstName.IsSet())
+            {
+                this.UserProfile.FirstName = firstName;
+                changed = true;
+            }
+
+            string lastName = principal.GetClaimValue(ClaimTypes.Surname);
+            if (!this.UserProfile.LastName.IsSet() && lastName.IsSet())
+            {
+                this.UserProfile.LastName = lastName;
+                changed = true;
+            }
+
+            string mobile = principal.GetClaimValue(ClaimTypes.MobilePhone);
+            if (!this.PhoneNumber.IsSet() && mobile.IsSet())
+            {
+                this.PhoneNumber = mobile;
+                changed = true;
+            }
+
+            bool emailConfirmed = principal.IsEmailConfirmed();
+            if (!this.EmailConfirmed && emailConfirmed)
+            {
+                this.EmailConfirmed = emailConfirmed;
+                changed = true;
+            }
+
+            string avatar = principal.GetAvatar();
+            if (!this.UserProfile.AvatarJson.IsSet() && avatar.IsSet())
+            {
+                this.UserProfile.Avatar = new MediaObject(avatar);
+                changed = true;
+            }
+
+            return changed;
         }
     }
 

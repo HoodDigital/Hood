@@ -8,18 +8,14 @@ namespace Hood.Services
 {
     public interface IAuth0Service
     {
-        Task<Auth0Identity> CreateLocalAuthIdentity(string fullAuthUserId, Auth0User user, string picture);
         Task<User> CreateUserWithPassword(Auth0User user, string password);
-        Task DeleteLocalAuthIdentity(string id);
         Task DeleteUser(string userId);
-        Task<ManagementApiClient> GetClientAsync();
         Task<Ticket> GetEmailVerificationTicket(string accountId, string returnUrl);
-        Task GetLocalAuthIdentity(string userId);
-        Task<Auth0User> GetUserByAuth0Id(string id);
-        Task<Auth0User> GetUserByAuth0UserId(string userId);
-        Task<IList<User>> GetUserByEmail(string email);
         Task<User> GetUserById(string userId);
         Task<System.Collections.Generic.IPagedList<User>> GetUsers(string search = "", int page = 0, int pageSize = 50);
-        Task UpdateLocalAuthIdentity(Auth0Identity user);
+        Task<IList<User>> GetUsersByEmail(string email);
+        Task LinkAccountAsync(Auth0Identity primaryAccount, string v);
+        Task UnlinkAccountAsync(Auth0Identity primaryAccount, Auth0Identity identityToDisconnect);
+        Task<Ticket> CreatePasswordChangeTicket(Auth0Identity remoteUser);
     }
 }

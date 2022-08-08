@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,16 +22,17 @@ namespace Hood.Services
     {
         protected readonly Auth0IdentityContext _db;
         protected readonly HoodDbContext _hoodDb;
+        protected readonly IAuth0Service _auth0;
 
-        private DbSet<Auth0User> Users { get { return _db.Set<Auth0User>(); } }
-        private IQueryable<Auth0User> UserQuery { get { return _db.Users.Include(u => u.ConnectedAuth0Accounts); } }
-        private DbSet<Auth0Role> Roles { get { return _db.Set<Auth0Role>(); } }
-        private DbSet<Auth0UserRole> UserRoles { get { return _db.Set<Auth0UserRole>(); } }
+        private IQueryable<Auth0User> Users { get { return _db.Users.Include(u => u.ConnectedAuth0Accounts).Include(u => u.UserProfile); } }
+        private IQueryable<Auth0Role> Roles { get { return _db.Set<Auth0Role>(); } }
+        private IQueryable<Auth0UserRole> UserRoles { get { return _db.Set<Auth0UserRole>(); } }
 
         public Auth0AccountRepository()
         {
             _db = Engine.Services.Resolve<Auth0IdentityContext>();
             _hoodDb = Engine.Services.Resolve<HoodDbContext>();
+            _auth0 = Engine.Services.Resolve<IAuth0Service>();
         }
 
         #region Account stuff                 
@@ -41,7 +43,7 @@ namespace Hood.Services
                 return null;
             }
 
-            IQueryable<Auth0User> query = UserQuery;
+            IQueryable<Auth0User> query = Users;
             if (!track)
             {
                 query = query.AsNoTracking();
@@ -56,7 +58,7 @@ namespace Hood.Services
                 return null;
             }
 
-            IQueryable<Auth0User> query = UserQuery;
+            IQueryable<Auth0User> query = Users;
             if (!track)
             {
                 query = query.AsNoTracking();
@@ -85,13 +87,12 @@ namespace Hood.Services
             var user = await PrepareUserForDelete(localUserId, adminUser);
 
             // go through all the auth0 accounts and remove them from the system.
-            var auth0Service = new Auth0Service();
             foreach (var account in user.ConnectedAuth0Accounts)
             {
                 //remove from auth0
                 if (Engine.Settings.Account.DeleteRemoteAccounts)
                 {
-                    await auth0Service.DeleteUser(account.Id);
+                    await _auth0.DeleteUser(account.Id);
                 }
                 _db.Entry(account).State = EntityState.Deleted;
             }
@@ -126,13 +127,95 @@ namespace Hood.Services
             }
             return directory;
         }
+        #endregion       
+
+        #region Auth0 Identities
+
+        public async Task<Auth0User> GetUserByAuth0Id(string id)
+        {
+            var auth0user = await _db.Auth0Identities
+                    .Include(au => au.User).ThenInclude(u => u.UserProfile)
+                    .SingleOrDefaultAsync(au => au.Id == id);
+            if (auth0user != null)
+            {
+                return auth0user.User;
+            }
+            return null;
+        }
+
+        public async Task<Auth0Identity> CreateLocalAuthIdentity(string fullAuthUserId, Auth0User user, string picture)
+        {
+            var authProviderName = fullAuthUserId.Split('|')[0];
+            var authUserId = fullAuthUserId.Split('|')[1];
+            Auth0.ManagementApi.Models.User newAuthUser = null;
+            try
+            {
+                newAuthUser = await _auth0.GetUserById(fullAuthUserId);
+            }
+            catch (Auth0.Core.Exceptions.ErrorApiException)
+            {
+            }
+
+            var primaryIdentity = user.GetPrimaryIdentity();
+            if (newAuthUser == null && primaryIdentity != null)
+            {
+                newAuthUser = await _auth0.GetUserById(primaryIdentity.Id);
+            }
+
+            if (newAuthUser == null)
+            {
+                throw new Exception("Could not find the user on the remote service.");
+            }
+
+            var identity = newAuthUser.Identities.SingleOrDefault(i => i.UserId == authUserId);
+            if (identity == null)
+            {
+                throw new Exception("Could not find the identity on the remote user profile.");
+            }
+
+            var newIdentity = new Auth0Identity(identity);
+
+            if (primaryIdentity == null)
+            {
+                newIdentity.IsPrimary = true;
+            }
+
+            newIdentity.Id = fullAuthUserId;
+            newIdentity.LocalUserId = user.Id;
+            newIdentity.Picture = picture;
+
+            _db.Add(newIdentity);
+            await _db.SaveChangesAsync();
+            return newIdentity;
+        }
+
+        public async Task DeleteLocalAuthIdentity(string id)
+        {
+            var userToRemove = _db.Auth0Identities.SingleOrDefault(u => u.Id == id);
+            _db.Entry(userToRemove).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task UpdateLocalAuthIdentity(Auth0Identity user)
+        {
+            _db.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            await _db.SaveChangesAsync();
+        }
+        
+        public async Task<List<Auth0Identity>> GetUserAuth0IdentitiesById(string id)
+        {
+            return await _db.Auth0Identities
+                .Where(u => u.LocalUserId == id)
+                .ToListAsync();
+        }
+
         #endregion
 
         #region Helpers
 
         protected virtual async Task<Auth0User> PrepareUserForDelete(string userId, System.Security.Claims.ClaimsPrincipal adminUser)
         {
-            Auth0User user = await _db.Users
+            Auth0User user = await Users
                 .SingleOrDefaultAsync(u => u.Id == userId);
 
             if (user.Email == Engine.Configuration.SuperAdminEmail)
@@ -140,7 +223,7 @@ namespace Hood.Services
                 throw new Exception("You cannot delete the site owner account, the owner is set via an environment variable and cannot be changed from the admin area.");
             }
 
-            Auth0User siteOwner = await _db.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Email == Engine.Configuration.SuperAdminEmail);
+            Auth0User siteOwner = await Users.AsNoTracking().SingleOrDefaultAsync(u => u.Email == Engine.Configuration.SuperAdminEmail);
             if (siteOwner == null)
             {
                 throw new Exception("Could not load the owner account, check your settings, the owner is set via an environment variable and cannot be changed from the admin area.");
@@ -182,31 +265,6 @@ namespace Hood.Services
                 );
             }
 
-            if (model.Active)
-            {
-                query = query.Where(q => q.Active);
-            }
-
-            if (model.Inactive)
-            {
-                query = query.Where(q => !q.Active);
-            }
-
-            if (model.PhoneUnconfirmed)
-            {
-                query = query.Where(q => !q.PhoneNumberConfirmed);
-            }
-
-            if (model.EmailUnconfirmed)
-            {
-                query = query.Where(q => !q.EmailConfirmed);
-            }
-
-            if (model.Unused)
-            {
-                query = query.Where(q => q.LastLoginLocation == null || q.LastLoginLocation == null || q.LastLogOn == DateTime.MinValue);
-            }
-
             switch (model.Order)
             {
                 case "UserName":
@@ -217,9 +275,6 @@ namespace Hood.Services
                     break;
                 case "LastName":
                     query = query.OrderBy(n => n.LastName);
-                    break;
-                case "LastLogOn":
-                    query = query.OrderByDescending(n => n.LastLogOn);
                     break;
 
                 case "UserNameDesc":
@@ -323,27 +378,27 @@ namespace Hood.Services
 
             return model;
         }
-        public virtual async Task UpdateProfileAsync(UserProfile user)
+        public virtual async Task<Auth0User> UpdateProfileAsync(Auth0User user, IUserProfile profile)
         {
-            Auth0User userToUpdate = await _db.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
-
             foreach (PropertyInfo property in typeof(IUserProfile).GetProperties())
             {
-                property.SetValue(userToUpdate, property.GetValue(user));
+                property.SetValue(user.UserProfile, property.GetValue(profile));
             }
 
             foreach (PropertyInfo property in typeof(IName).GetProperties())
             {
-                property.SetValue(userToUpdate, property.GetValue(user));
+                property.SetValue(user.UserProfile, property.GetValue(profile));
             }
 
             foreach (PropertyInfo property in typeof(IJsonMetadata).GetProperties())
             {
-                property.SetValue(userToUpdate, property.GetValue(user));
+                property.SetValue(user.UserProfile, property.GetValue(profile));
             }
 
-            _db.Update(userToUpdate);
-            _db.SaveChanges();
+            _db.Update(user);
+            await _db.SaveChangesAsync();
+            
+            return user;
         }
         #endregion
 
@@ -437,7 +492,7 @@ namespace Hood.Services
         {
             foreach (Auth0Role role in roles)
             {
-                UserRoles.Add(new Auth0UserRole()
+                _db.UserRoles.Add(new Auth0UserRole()
                 {
                     UserId = user.Id,
                     RoleId = role.Id
@@ -452,14 +507,14 @@ namespace Hood.Services
                 var userRole = await FindUserRoleAsync(user.Id, role.Id);
                 if (userRole != null)
                 {
-                    UserRoles.Remove(userRole);
+                    _db.UserRoles.Remove(userRole);
                 }
             }
             await _db.SaveChangesAsync();
         }
         protected Task<Auth0UserRole> FindUserRoleAsync(string userId, string roleId)
         {
-            return UserRoles.FindAsync(new object[] { userId, roleId }).AsTask();
+            return _db.UserRoles.FindAsync(new object[] { userId, roleId }).AsTask();
         }
 
         public async Task SetupRolesAsync()
@@ -503,6 +558,7 @@ namespace Hood.Services
 
             return new UserStatistics(totalUsers, totalAdmins, days, months);
         }
+
         #endregion
 
     }

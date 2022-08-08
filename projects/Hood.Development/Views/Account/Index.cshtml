@@ -1,4 +1,4 @@
-@model UserViewModel
+@model ManageAccountViewModel
 @{
     Layout = "_Layout_Account";
     ViewData["Title"] = "Update your profile";
@@ -40,33 +40,6 @@
     <div class="tabs">
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="basics">
-
-                <div class="mb-3">
-                    <label asp-for="Username"></label>
-                    <input asp-for="Username" class="form-control" disabled />
-                </div>
-                <div class="mb-3">
-                    <label asp-for="Email"></label>
-                    @if (Model.IsEmailConfirmed)
-                    {
-                        <div class="input-group">
-                            <input asp-for="Email" class="form-control" />
-                            <div class="input-group-append">
-                                <span class="input-group-text text-success"><i class="fa fa-check mr-2"></i>Verified</span>
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="input-group">
-                            <input asp-for="Email">
-                            <div class="input-group-append">
-                                <a class="btn btn-outline-secondary" asp-action="SendVerificationEmail">Request Verification Email</a>
-                            </div>
-                        </div>
-                    }
-                    <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
                 <div class="mb-3">
                     <label asp-for="PhoneNumber"></label>
                     <input type="text" class="form-control" asp-for="PhoneNumber">
@@ -127,7 +100,7 @@
                                 @if (!account.IsPrimary && User.GetUserId() != account.Id)
                                 {
                                     <div class="ms-2">
-                                        <a class="btn btn-sm btn-danger" asp-action="DisconnectAccount" asp-controller="Account" asp-route-accountId="@account.UserId">Disconnect</a>
+                                        <a class="btn btn-sm btn-danger" asp-action="DisconnectAccount" asp-controller="Account" asp-route-accountId="@account.Id">Disconnect</a>
                                     </div>
                                 }
                             </div>

@@ -11,7 +11,14 @@ namespace Hood.Services
     public interface IAuth0AccountRepository : IAccountRepository<Auth0User, Auth0Role>
     {        
         Task<bool> CreateAsync(Auth0User user);
+        Task<Auth0User> GetUserByAuth0Id(string id);
+        Task<List<Auth0Identity>> GetUserAuth0IdentitiesById(string id);
+        Task<Auth0Identity> CreateLocalAuthIdentity(string fullAuthUserId, Auth0User user, string picture);
+        Task DeleteLocalAuthIdentity(string id);
+        Task UpdateLocalAuthIdentity(Auth0Identity user);
+
     }
+
     public interface IPasswordAccountRepository : IAccountRepository<ApplicationUser, IdentityRole>
     {
         Task<IdentityResult> CreateAsync(ApplicationUser user, string password);
@@ -19,7 +26,9 @@ namespace Hood.Services
         Task<IdentityResult> ResetPasswordAsync(ApplicationUser user, string code, string password);
         Task SetEmailAsync(ApplicationUser modelToUpdate, string email);
         Task SetPhoneNumberAsync(ApplicationUser modelToUpdate, string phoneNumber);
+        Task<IdentityResult> ConfirmEmailAsync(ApplicationUser user, string code);
     }
+
     public interface IAccountRepository<TUser, TRole> : IHoodAccountRepository
     {
         Task AddUserToRolesAsync(TUser user, TRole[] roles);
@@ -37,15 +46,15 @@ namespace Hood.Services
         Task<UserListModel> GetUserProfileViewsAsync(UserListModel model, IQueryable<UserProfileView<TRole>> query = null);
         Task RemoveUserFromRolesAsync(TUser user, TRole[] roles);
         Task SetupRolesAsync();
-        Task UpdateProfileAsync(UserProfile user);
+        Task<TUser> UpdateProfileAsync(TUser user, IUserProfile profile);
         Task UpdateUserAsync(TUser user);
     }
+
     public interface IHoodAccountRepository
     {
         Task<UserProfile> GetUserProfileByIdAsync(string id);
         Task<UserListModel> GetUserProfilesAsync(UserListModel model, IQueryable<IUserProfile> query = null);
         Task<IList<IUserProfile>> GetUsersInRole(string roleName);
         Task<bool> RoleExistsAsync(string role);
-
     }
 }

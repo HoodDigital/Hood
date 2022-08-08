@@ -60,7 +60,6 @@ namespace Hood.BaseControllers
             sw.WriteLine("User-agent: *");
             sw.WriteLine("Disallow: /admin/ ");
             sw.WriteLine("Disallow: /account/ ");
-            sw.WriteLine("Disallow: /manage/ ");
             sw.WriteLine("Disallow: /install/ ");
             foreach (ContentType ct in Engine.Settings.Content.RestrictedTypes)
             {

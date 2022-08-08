@@ -20,7 +20,7 @@ namespace Hood.Contexts
         public DbSet<UserProfile> UserProfiles { get; set; } = default!;
         public DbSet<Auth0UserRole> UserRoles { get; set; } = default!;
         public DbSet<Auth0Role> Roles { get; set; } = default!;
-        public DbSet<Auth0Identity> Auth0Users { get; set; } = default!;
+        public DbSet<Auth0Identity> Auth0Identities { get; set; } = default!;
         public DbSet<UserProfileView<Auth0Role>> UserProfileViews { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -32,18 +32,8 @@ namespace Hood.Contexts
                 {
                     typeBuilder.ToTable("AspNetUsers");
                     typeBuilder.Property(o => o.UserName).HasColumnName("UserName");
-                    typeBuilder.Property(o => o.EmailConfirmed).HasColumnName("EmailConfirmed");
                     typeBuilder.Property(o => o.Email).HasColumnName("Email");
-                    typeBuilder.Property(o => o.PhoneNumberConfirmed).HasColumnName("PhoneNumberConfirmed");
                     typeBuilder.Property(o => o.PhoneNumber).HasColumnName("PhoneNumber");
-                    typeBuilder.Property(o => o.Active).HasColumnName("Active");
-                    typeBuilder.Property(o => o.BillingAddressJson).HasColumnName("BillingAddressJson");
-                    typeBuilder.Property(o => o.DeliveryAddressJson).HasColumnName("DeliveryAddressJson");
-                    typeBuilder.Property(o => o.AvatarJson).HasColumnName("AvatarJson");
-                    typeBuilder.Property(o => o.CreatedOn).HasColumnName("CreatedOn");
-                    typeBuilder.Property(o => o.LastLogOn).HasColumnName("LastLogOn");
-                    typeBuilder.Property(o => o.LastLoginIP).HasColumnName("LastLoginIP");
-                    typeBuilder.Property(o => o.LastLoginLocation).HasColumnName("LastLoginLocation");
 
                     typeBuilder.HasOne(o => o.UserProfile).WithOne().HasForeignKey<UserProfile>(o => o.Id);
                     typeBuilder.HasMany<Auth0UserRole>().WithOne().HasForeignKey(ur => ur.UserId).IsRequired();
@@ -54,21 +44,11 @@ namespace Hood.Contexts
                 {
                     typeBuilder.ToTable("AspNetUsers");
                     typeBuilder.Property(o => o.UserName).HasColumnName("UserName");
-                    typeBuilder.Property(o => o.EmailConfirmed).HasColumnName("EmailConfirmed");
                     typeBuilder.Property(o => o.Email).HasColumnName("Email");
-                    typeBuilder.Property(o => o.PhoneNumberConfirmed).HasColumnName("PhoneNumberConfirmed");
                     typeBuilder.Property(o => o.PhoneNumber).HasColumnName("PhoneNumber");
-                    typeBuilder.Property(o => o.Active).HasColumnName("Active");
-                    typeBuilder.Property(o => o.BillingAddressJson).HasColumnName("BillingAddressJson");
-                    typeBuilder.Property(o => o.DeliveryAddressJson).HasColumnName("DeliveryAddressJson");
-                    typeBuilder.Property(o => o.AvatarJson).HasColumnName("AvatarJson");
-                    typeBuilder.Property(o => o.CreatedOn).HasColumnName("CreatedOn");
-                    typeBuilder.Property(o => o.LastLogOn).HasColumnName("LastLogOn");
-                    typeBuilder.Property(o => o.LastLoginIP).HasColumnName("LastLoginIP");
-                    typeBuilder.Property(o => o.LastLoginLocation).HasColumnName("LastLoginLocation");
                 });
             builder.Entity<Auth0Identity>().ToTable("AspNetAuth0Identities");
-            builder.Entity<Auth0Identity>().HasOne(m => m.User).WithMany(m => m.ConnectedAuth0Accounts).HasForeignKey(m => m.UserId).OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Auth0Identity>().HasOne(m => m.User).WithMany(m => m.ConnectedAuth0Accounts).HasForeignKey(m => m.LocalUserId).OnDelete(DeleteBehavior.Cascade);
 
 
             builder.Entity<Auth0Role>(b =>
@@ -114,6 +94,10 @@ namespace Hood.Contexts
                         Active = true,
                         UserProfile = new UserProfile
                         {
+                            Email = ownerEmail,
+                            UserName = ownerEmail,
+                            PhoneNumber = "",
+
                             FirstName = "Website",
                             LastName = "Administrator",
                             JobTitle = "Website Administrator",

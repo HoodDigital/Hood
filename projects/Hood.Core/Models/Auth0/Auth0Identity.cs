@@ -25,7 +25,7 @@ namespace Hood.Models
         public string Id { get; set; }
         
         [JsonIgnore]
-        public string UserId { get; set; }
+        public string LocalUserId { get; set; }
         [JsonIgnore]
         public Auth0User User { get; set; }
         

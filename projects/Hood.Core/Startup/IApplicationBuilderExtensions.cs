@@ -64,7 +64,7 @@ namespace Hood.Startup
                 app.UseAuthentication();
                 app.UseAuthorization();
 
-                var cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Constants.CookieDefaultName;
+                var cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Authentication.CookieDefaultName;
 
                 var builder = new CookieBuilder() { Name = $".{cookieName}.Session" };
                 builder.Expiration = TimeSpan.FromMinutes(config.GetValue("Session:Timeout", 60));

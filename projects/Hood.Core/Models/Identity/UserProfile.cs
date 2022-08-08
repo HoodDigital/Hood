@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace Hood.Models
 {
-    public class UserProfileView<TRole> : UserProfile
+    public class UserProfileView<TRole> : UserProfileBase
     {
         public string RoleIds { get; set; }
         public int RoleCount { get; set; }
@@ -26,21 +26,30 @@ namespace Hood.Models
         }
         [NotMapped]
         public List<TRole> AllRoles { get; set; }
-    }
-    public class UserProfile : IUserProfile, IName
-    {
-        public virtual string Id { get; set; }
-
-        public virtual string UserName { get; set; }
-        public virtual bool EmailConfirmed { get; set; }
-        public virtual string Email { get; set; }
-        public virtual bool PhoneNumberConfirmed { get; set; }
-        public virtual string PhoneNumber { get; set; }
         public bool Active { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime LastLogOn { get; set; }
         public string LastLoginIP { get; set; }
         public string LastLoginLocation { get; set; }
+        public int AccessFailedCount { get; set; }
+        public bool EmailConfirmed { get; set; }
+        public bool PhoneNumberConfirmed { get; set; }
+    }
+
+
+    public class UserProfile : UserProfileBase
+    {
+        public UserProfile()
+        { }
+    }
+
+    public class UserProfileBase : IUserProfile, IName
+    {
+        public virtual string Id { get; set; }
+
+        public virtual string UserName { get; set; }
+        public virtual string Email { get; set; }
+        public virtual string PhoneNumber { get; set; }
 
         #region IName 
 
@@ -80,7 +89,7 @@ namespace Hood.Models
         #endregion
 
         #region Addresses   
-              
+
         public virtual string BillingAddressJson { get; set; }
         [NotMapped]
         public virtual Address DeliveryAddress
@@ -106,6 +115,15 @@ namespace Hood.Models
         {
             get { return AvatarJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(AvatarJson) : MediaObject.BlankAvatar; }
             set { AvatarJson = JsonConvert.SerializeObject(value); }
+        }
+
+        public virtual string GetAvatar()
+        {
+            if (AvatarJson.IsSet())
+            {
+                return Avatar.LargeUrl;
+            }
+            return MediaBase.BlankAvatar.LargeUrl;
         }
         #endregion
 

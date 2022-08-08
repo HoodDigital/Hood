@@ -1,7 +1,6 @@
 using Hood.Core;
 using Hood.Extensions;
 using Hood.Models;
-using Hood.Services;
 using Microsoft.AspNetCore.Routing;
 using StackExchange.Redis;
 using System;
@@ -15,12 +14,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net.Http;
 using Microsoft.Extensions.Configuration;
+using Hood.Identity;
 
-namespace Hood.Identity
+namespace Hood.Services
 {
-    public class HoodAuth0Options : IHoodAuth0Options
+    public class Auth0LoginService : IAuth0LoginService
     {
-        public HoodAuth0Options(IConfiguration config)
+        public Auth0LoginService(IConfiguration config)
         {
             this.Domain = this.Domain.IsSet() ? this.Domain : config["Identity:Auth0:Domain"];
             this.ClientId = this.ClientId.IsSet() ? this.ClientId : config["Identity:Auth0:ClientId"];
@@ -33,6 +33,8 @@ namespace Hood.Identity
         public string ClientId { get; set; }
         public string? ClientSecret { get; set; }
         public string Scope { get; set; }
+
+
         public string? CallbackPath { get; set; }
         public string? Organization { get; set; }
         public IDictionary<string, string>? LoginParameters { get; set; }
@@ -43,7 +45,7 @@ namespace Hood.Identity
         public bool ForwardToReturnUriOnSignup { get; set; } = false;
         public string AccountControllerName { get; set; } = "Account";
         public string SignupCompleteAction { get; set; } = "Index";
-        public string SignupCompleteController { get; set; } = "Manage";
+        public string SignupCompleteController { get; set; } = "Account";
 
 
 #nullable disable
@@ -70,9 +72,10 @@ namespace Hood.Identity
         public virtual Task OnTokenResponseReceived(TokenResponseReceivedContext e) { return Task.CompletedTask; }
         public virtual async Task OnTicketReceived(TicketReceivedContext e)
         {
-            var authService = new Auth0Service();
-            var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
-            var repo = Engine.Services.Resolve<IAuth0AccountRepository>();
+            var _account = Engine.Services.Resolve<IAuth0AccountRepository>();
+            var _auth0 = Engine.Services.Resolve<IAuth0Service>();
+            var _linkGenerator = Engine.Services.Resolve<LinkGenerator>();
+
             var principal = e.Principal;
             var userId = e.Principal.GetUserId();
             var returnUrl = e.ReturnUri;
@@ -80,14 +83,14 @@ namespace Hood.Identity
             var identity = (ClaimsIdentity)principal.Identity;
 
             // Check if user exists and is linked to this Auth0 account
-            var user = await authService.GetUserByAuth0Id(userId);
+            var user = await _account.GetUserByAuth0Id(userId);
             if (user != null)
             {
                 // user exists and has auth0 account linked to it.
                 var emailVerifiedClaim = e.Principal.FindFirst("email_verified");
                 if (user.Active || (emailVerifiedClaim != null && emailVerifiedClaim.Value == "true"))
                 {
-                    identity.AddClaim(new Claim(Identity.HoodClaimTypes.Active, "true"));
+                    identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.Active, "true"));
                     await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, e.Properties);
                 }
 
@@ -96,24 +99,24 @@ namespace Hood.Identity
             }
 
             // check if the user has an account, via email, if so, the should be asked to link to this account                           
-            user = await repo.GetUserByEmailAsync(e.Principal.GetEmail());
+            user = await _account.GetUserByEmailAsync(e.Principal.GetEmail());
             if (user != null)
             {
                 // user exists, but the current Auth0 signin method is not saved, force them into the connect account flow.
                 if (user.ConnectedAuth0Accounts != null && user.ConnectedAuth0Accounts.Count() > 0)
                 {
-                    identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountLinkRequired, "true"));
+                    identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.AccountLinkRequired, "true"));
                 }
 
                 // This is a legacy account just send to the local account connect flow - 
                 // Email needs to be verified to attach to a local account.
 
-                identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountNotConnected, "true"));
+                identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.AccountNotConnected, "true"));
 
                 await SetDefaultClaims(e, user);
 
-                identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountCreationFailed, "true"));
-                e.Response.Redirect(linkGenerator.GetPathByAction("ConnectAccount", this.AccountControllerName, new { returnUrl = e.ReturnUri }));
+                identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreationFailed, "true"));
+                e.Response.Redirect(_linkGenerator.GetPathByAction("ConnectAccount", this.AccountControllerName, new { returnUrl = e.ReturnUri }));
                 e.HandleResponse();
                 return;
             }
@@ -122,15 +125,15 @@ namespace Hood.Identity
             if (!Engine.Settings.Account.AllowRemoteSignups)
             {
                 // user has not been found, or created & signups are disabled on this end
-                identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountCreationFailed, "true"));
-                returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = "signup-disabled" });
-                e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new { returnUrl }));
+                identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreationFailed, "true"));
+                returnUrl = _linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = "signup-disabled" });
+                e.Response.Redirect(_linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new { returnUrl }));
                 e.HandleResponse();
                 return;
             }
 
             // user does not exist, signups are allowed, so create and send them to the complete signup page.
-            var authUser = await authService.GetUserById(userId);
+            var authUser = await _auth0.GetUserById(userId);
             if (authUser == null)
             {
                 throw new ApplicationException("Something went wrong while authorizing your account.");
@@ -140,15 +143,29 @@ namespace Hood.Identity
                 UserName = authUser.UserName.IsSet() ? authUser.UserName : authUser.Email,
                 Email = authUser.Email,
                 PhoneNumber = authUser.PhoneNumber,
-                EmailConfirmed = authUser.EmailVerified.HasValue ? authUser.EmailVerified.Value : false
+                EmailConfirmed = authUser.EmailVerified.HasValue ? authUser.EmailVerified.Value : false,
+                CreatedOn = DateTime.Now,
+                LastLogOn = DateTime.Now,
+                UserProfile = new UserProfile
+                {
+                    UserName = authUser.UserName.IsSet() ? authUser.UserName : authUser.Email,
+                    Email = authUser.Email,
+                    PhoneNumber = authUser.PhoneNumber,
+
+                    FirstName = principal.GetClaimValue(ClaimTypes.GivenName),
+                    LastName = principal.GetClaimValue(ClaimTypes.Surname),
+                    DisplayName = "",
+                    JobTitle = "",
+                    Anonymous = false
+                }
             };
-            var result = await repo.CreateAsync(user);
+            var result = await _account.CreateAsync(user);
             if (!result)
             {
                 // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
-                identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountCreationFailed, "true"));
-                returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = "account-creation-failed" });
-                e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new { returnUrl }));
+                identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreationFailed, "true"));
+                returnUrl = _linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = "account-creation-failed" });
+                e.Response.Redirect(_linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new { returnUrl }));
                 e.HandleResponse();
                 return;
             }
@@ -157,26 +174,26 @@ namespace Hood.Identity
             if (user == null)
             {
                 // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
-                identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountCreationFailed, "true"));
-                returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = "account-linking-failed" });
-                e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new { returnUrl }));
+                identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreationFailed, "true"));
+                returnUrl = _linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = "account-linking-failed" });
+                e.Response.Redirect(_linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new { returnUrl }));
                 e.HandleResponse();
                 return;
             }
 
             // User exists at this point, for sure, but no auth0 connection for it, create it now.
-            await authService.CreateLocalAuthIdentity(e.Principal.GetUserId(), user, authUser.Picture);
+            await _account.CreateLocalAuthIdentity(e.Principal.GetUserId(), user, authUser.Picture);
 
             if (user.Active)
             {
                 // Account is already active, so mark it as such, this allows access to secure areas.
 
-                identity.AddClaim(new Claim(Identity.HoodClaimTypes.Active, "true"));
+                identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.Active, "true"));
             }
 
             await SetDefaultClaims(e, user);
 
-            identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountCreated, "true"));
+            identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreated, "true"));
 
             if (ForwardToReturnUriOnSignup)
             {
@@ -186,12 +203,12 @@ namespace Hood.Identity
             }
 
             // Account setup complete, send user to manage profile with new-account-connection flag.
-            returnUrl = linkGenerator.GetPathByAction(this.SignupCompleteAction, this.SignupCompleteController, new { returnUrl = e.ReturnUri, created = true });
+            returnUrl = _linkGenerator.GetPathByAction(this.SignupCompleteAction, this.SignupCompleteController, new { returnUrl = e.ReturnUri, created = true });
             e.Response.Redirect(returnUrl);
             e.HandleResponse();
             return;
         }
-        
+
         public virtual Task OnRemoteFailure(RemoteFailureContext e)
         {
             // // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
@@ -207,8 +224,8 @@ namespace Hood.Identity
             else
             {
                 var data = e.Failure.Data.Cast<DictionaryEntry>()
-                                            .Where(de => de.Key is string && de.Value is string)
-                                            .ToDictionary(de => (string)de.Key, de => (string)de.Value);
+                    .Where(de => de.Key is string && de.Value is string)
+                    .ToDictionary(de => (string)de.Key, de => (string)de.Value);
                 if (data.ContainsKey("error")) { reason = data["error"]; }
                 if (data.ContainsKey("error_description")) { description = data["error_description"]; }
             }
@@ -242,9 +259,9 @@ namespace Hood.Identity
         protected virtual async Task SetDefaultClaims(TicketReceivedContext e, Auth0User user)
         {
             // Set the remote avatar on a local claim, in case the local overrides it. 
-            if (e.Principal.HasClaim(HoodClaimTypes.Picture))
+            if (e.Principal.HasClaim(Hood.Constants.Identity.ClaimTypes.Picture))
             {
-                e.Principal.AddOrUpdateClaimValue(HoodClaimTypes.RemotePicture, e.Principal.GetClaimValue(HoodClaimTypes.Picture));
+                e.Principal.AddOrUpdateClaimValue(Hood.Constants.Identity.ClaimTypes.RemotePicture, e.Principal.GetClaimValue(Hood.Constants.Identity.ClaimTypes.Picture));
             }
 
             // Set the user claims locally

@@ -203,10 +203,10 @@ namespace Hood.Services
             string cacheKey = typeof(Content).ToString() + ".Single." + id;
             if (!_cache.TryGetValue(cacheKey, out Content content) || clearCache)
             {
-                content = _db.Content.Include(p => p.Categories).ThenInclude(c => c.Category)
+                content = await _db.Content.Include(p => p.Categories).ThenInclude(c => c.Category)
                                     .Include(p => p.Media)
                                     .Include(p => p.Metadata)
-                                    .FirstOrDefault(c => c.Id == id);
+                                    .FirstOrDefaultAsync(c => c.Id == id);
                 if (content == null)
                 {
                     return content;
@@ -222,10 +222,10 @@ namespace Hood.Services
             string cacheKey = typeof(ContentView).ToString() + ".Single." + id;
             if (!_cache.TryGetValue(cacheKey, out ContentView content) || clearCache)
             {
-                content = _db.ContentViews.Include(p => p.Categories).ThenInclude(c => c.Category)
+                content = await _db.ContentViews.Include(p => p.Categories).ThenInclude(c => c.Category)
                                     .Include(p => p.Media)
                                     .Include(p => p.Metadata)
-                                    .FirstOrDefault(c => c.Id == id);
+                                    .FirstOrDefaultAsync(c => c.Id == id);
                 if (content == null)
                 {
                     return content;

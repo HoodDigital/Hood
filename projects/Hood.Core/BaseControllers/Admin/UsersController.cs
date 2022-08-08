@@ -125,6 +125,10 @@ namespace Hood.Admin.BaseControllers
                     LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString(),
                     UserProfile = new UserProfile
                     {
+                        UserName = model.Username,
+                        Email = model.Email,
+                        PhoneNumber = model.Phone,
+
                         FirstName = model.FirstName,
                         LastName = model.LastName,
                         DisplayName = model.DisplayName,
@@ -259,7 +263,7 @@ namespace Hood.Admin.BaseControllers
         [Route("admin/users/{id}/notes/")]
         public virtual async Task<IActionResult> Notes(string id)
         {
-            UserProfile model = await _account.GetUserProfileViewById(id);
+            UserProfileView<IdentityRole> model = await _account.GetUserProfileViewById(id);
             return View("_Inline_Notes", model);
         }
 
@@ -396,7 +400,6 @@ namespace Hood.Admin.BaseControllers
                     IdentityRole
                 };
 
-                var auth0Service = new Auth0Service();
                 if (add)
                 {
                     await _account.AddUserToRolesAsync(user, roles.ToArray());
@@ -448,8 +451,8 @@ namespace Hood.Admin.BaseControllers
                 ApplicationUser impersonatedUser = await _account.GetUserByIdAsync(id);
                 ClaimsPrincipal userPrincipal = await signInManager.CreateUserPrincipalAsync(impersonatedUser);
 
-                userPrincipal.Identities.First().AddClaim(new Claim(HoodClaimTypes.OriginalUserId, User.GetLocalUserId()));
-                userPrincipal.Identities.First().AddClaim(new Claim(HoodClaimTypes.IsImpersonating, "true"));
+                userPrincipal.Identities.First().AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.OriginalUserId, User.GetLocalUserId()));
+                userPrincipal.Identities.First().AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.IsImpersonating, "true"));
 
                 impersonatedUser.UserProfile.AddUserNote(new UserNote()
                 {
@@ -490,7 +493,7 @@ namespace Hood.Admin.BaseControllers
                     throw new Exception("You are not impersonating.");
                 }
 
-                string originalUserId = User.FindFirst(HoodClaimTypes.OriginalUserId).Value;
+                string originalUserId = User.FindFirst(Hood.Constants.Identity.ClaimTypes.OriginalUserId).Value;
 
                 ApplicationUser originalUser = await _account.GetUserByIdAsync(originalUserId);
 
