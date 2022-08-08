@@ -330,26 +330,26 @@ namespace Hood.Admin.BaseControllers
             return View(viewName, model);
         }
 
-        [Route("admin/roles/create/")]
-        public virtual IActionResult CreateRole()
-        {
-            return View();
-        }
+        // [Route("admin/roles/create/")]
+        // public virtual IActionResult CreateRole()
+        // {
+        //     return View();
+        // }
 
-        [Route("admin/roles/create/")]
-        [HttpPost]
-        public virtual async Task<Response> CreateRole(AdminCreateRoleViewModel model)
-        {
-            try
-            {
-                await _account.CreateRoleAsync(model.Name);
-                return new Response(true, "Successfully created.");
-            }
-            catch (Exception ex)
-            {
-                return await ErrorResponseAsync<UsersController>($"Error creating a role via the admin panel.", ex);
-            }
-        }
+        // [Route("admin/roles/create/")]
+        // [HttpPost]
+        // public virtual async Task<Response> CreateRole(AdminCreateRoleViewModel model)
+        // {
+        //     try
+        //     {
+        //         await _account.CreateRoleAsync(model.Name);
+        //         return new Response(true, "Successfully created.");
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return await ErrorResponseAsync<UsersController>($"Error creating a role via the admin panel.", ex);
+        //     }
+        // }
 
         [Route("admin/roles/edit/")]
         public virtual async Task<IActionResult> EditRole(string roleName)
