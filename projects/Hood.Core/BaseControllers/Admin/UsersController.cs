@@ -32,16 +32,16 @@ namespace Hood.Admin.BaseControllers
         #region User List 
 
         [Route("admin/users/")]
-        public virtual async Task<IActionResult> Index(UserListModel model)
+        public virtual async Task<IActionResult> Index(UserListModel<UserProfileView<IdentityRole>> model)
         {
             return await List(model, "Index");
         }
 
         [HttpGet]
         [Route("admin/users/list/")]
-        public virtual async Task<IActionResult> List(UserListModel model, string viewName = "_List_Users")
+        public virtual async Task<IActionResult> List(UserListModel<UserProfileView<IdentityRole>> model, string viewName = "_List_Users")
         {
-            model = await _account.GetUserProfilesAsync(model) as UserListModel;
+            model = await _account.GetUserProfileViewsAsync(model);
             return View(viewName, model);
         }
 
@@ -437,11 +437,6 @@ namespace Hood.Admin.BaseControllers
         {
             try
             {
-                if (Engine.Auth0Enabled)
-                {
-                    throw new ApplicationException("This feature is not supported by Hood CMS Auth0 yet.");
-                }
-
                 if (!id.IsSet())
                 {
                     throw new Exception("Cannot impersonate a user with no Id!");
@@ -520,11 +515,6 @@ namespace Hood.Admin.BaseControllers
         {
             try
             {
-                if (Engine.Auth0Enabled)
-                {
-                    throw new ApplicationException("This feature is not supported by Hood CMS Auth0 yet.");
-                }
-
                 UserManager<ApplicationUser> userManager = Engine.Services.Resolve<UserManager<ApplicationUser>>();
                 SignInManager<ApplicationUser> signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
                 ApplicationUser user = await userManager.FindByIdAsync(id);

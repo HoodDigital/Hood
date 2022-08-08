@@ -74,13 +74,10 @@
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane" id="accounts">
-                @{
-                    var accounts = Model.Accounts;
-                }
-                @if (accounts.Count > 0)
+                @if (Model.Accounts != null && Model.Accounts.Count > 0)
                 {
                     <p>Your account can be accessed with the following methods:</p>
-                    @foreach (var account in accounts)
+                    @foreach (var account in Model.Accounts)
                     {
                         <div class="card p-2 mb-2">
                             <div class="d-flex align-items-center">
@@ -115,7 +112,7 @@
                 }
             </div>
             <div role="tabpanel" class="tab-pane" id="roles"> @{
-                    var roles = User.GetRoles();
+                var roles = User.GetRoles();
                 }
                 @if (roles.Count > 0)
                 {

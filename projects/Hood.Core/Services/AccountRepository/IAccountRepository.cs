@@ -43,7 +43,7 @@ namespace Hood.Services
         Task<UserStatistics> GetStatisticsAsync();
         Task<TUser> GetUserByEmailAsync(string email, bool track = true);
         Task<TUser> GetUserByIdAsync(string id, bool track = true);
-        Task<UserListModel> GetUserProfileViewsAsync(UserListModel model, IQueryable<UserProfileView<TRole>> query = null);
+        Task<UserListModel<UserProfileView<TRole>>> GetUserProfileViewsAsync(UserListModel<UserProfileView<TRole>> model);
         Task RemoveUserFromRolesAsync(TUser user, TRole[] roles);
         Task SetupRolesAsync();
         Task<TUser> UpdateProfileAsync(TUser user, IUserProfile profile);

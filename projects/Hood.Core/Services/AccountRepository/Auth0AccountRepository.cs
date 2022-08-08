@@ -301,12 +301,9 @@ namespace Hood.Services
             UserProfileView<Auth0Role> profile = await _db.UserProfileViews.FirstOrDefaultAsync(u => u.Id == id);
             return profile;
         }
-        public virtual async Task<UserListModel> GetUserProfileViewsAsync(UserListModel model, IQueryable<UserProfileView<Auth0Role>> query = null)
+        public virtual async Task<UserListModel<UserProfileView<Auth0Role>>> GetUserProfileViewsAsync(UserListModel<UserProfileView<Auth0Role>> model)
         {
-            if (query == null)
-            {
-                query = _db.UserProfileViews.AsQueryable();
-            }
+            var query = _db.UserProfileViews.AsQueryable();           
 
             if (!string.IsNullOrEmpty(model.Search))
             {

@@ -233,12 +233,9 @@ namespace Hood.Services
 
             return model;
         }
-        public virtual async Task<UserListModel> GetUserProfileViewsAsync(UserListModel model, IQueryable<UserProfileView<IdentityRole>> query = null)
+        public virtual async Task<UserListModel<UserProfileView<IdentityRole>>> GetUserProfileViewsAsync(UserListModel<UserProfileView<IdentityRole>> model)
         {
-            if (query == null)
-            {
-                query = _db.UserProfileViews.AsQueryable();
-            }
+            var query = _db.UserProfileViews.AsQueryable();    
 
             if (model.Role.IsSet())
             {

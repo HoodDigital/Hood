@@ -25,6 +25,8 @@ SELECT
 	AspNetUsers.Latitude,	
 	AspNetUsers.Longitude,	
 	AspNetUsers.UserVars,
+	AspNetUsers.AccessFailedCount, 
+	COUNT(AspNetRoles.Name) AS RoleCount,
 	(
 		SELECT 
 			AspNetRoles.Id, AspNetRoles.Name, AspNetRoles.NormalizedName 
@@ -79,5 +81,6 @@ GROUP BY
 	AspNetUsers.CreatedOn,	
 	AspNetUsers.Latitude,	
 	AspNetUsers.Longitude,	
-	AspNetUsers.UserVars
+	AspNetUsers.UserVars,
+	AspNetUsers.AccessFailedCount
 GO

@@ -43,84 +43,60 @@ namespace Hood.BaseControllers
 
         // #region Account Home
 
-        // [HttpGet]
-        // [Route("account/")]
-        // public virtual async Task<IActionResult> Index(string returnUrl, bool created = false)
-        // {
-        //     var user = await GetCurrentUserOrThrow();
-        //     var model = new UserViewModel
-        //     {
-        //         LocalUserId = user.Id,
-        //         Username = user.UserName,
-        //         Email = user.Email,
-        //         PhoneNumber = user.PhoneNumber,
-        //         IsEmailConfirmed = user.EmailConfirmed,
-        //         StatusMessage = SaveMessage,
-        //         Avatar = user.Avatar,
-        //         Profile = await _account.GetUserProfileByIdAsync(user.Id),
-        //         Accounts = user.ConnectedAuth0Accounts,
-        //         ReturnUrl = returnUrl,
-        //         NewAccountCreated = created
-        //     };
-        //     return View(model);
-        // }
+        [HttpGet]
+        [Route("account/")]
+        public virtual async Task<IActionResult> Index(string returnUrl, bool created = false)
+        {
+            var user = await GetCurrentUserOrThrow();
+            var model = new ManageAccountViewModel
+            {
+                LocalUserId = user.Id,
+                PhoneNumber = user.PhoneNumber,
+                IsEmailConfirmed = user.EmailConfirmed,
+                StatusMessage = SaveMessage,
+                Avatar = user.UserProfile.Avatar,
+                Profile = await _account.GetUserProfileByIdAsync(user.Id),
+                ReturnUrl = returnUrl,
+                NewAccountCreated = created
+            };
+            return View(model);
+        }
 
-        // [HttpPost]
-        // [ValidateAntiForgeryToken]
-        // [Route("account/")]
-        // public virtual async Task<IActionResult> Index(UserViewModel model, string returnUrl, bool created = false)
-        // {
-        //     var user = await _account.GetUserByIdAsync(User.GetLocalUserId());
-        //     try
-        //     {
-        //         if (!ModelState.IsValid)
-        //         {
-        //             return View(model);
-        //         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("account/")]
+        public virtual async Task<IActionResult> Index(ManageAccountViewModel model, string returnUrl, bool created = false)
+        {
+            try
+            {
+                var user = await GetCurrentUserOrThrow();
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
 
-        //         var email = user.Email;
-        //         if (model.Email != email)
-        //         {
-        //             await _account.SetEmailAsync(user, model.Email);
-        //         }
+                user = await _account.UpdateProfileAsync(user, model.Profile);
 
-        //         var phoneNumber = user.PhoneNumber;
-        //         if (model.PhoneNumber != phoneNumber)
-        //         {
-        //             await _account.SetPhoneNumberAsync(user, model.PhoneNumber);
-        //         }
+                User.SetUserClaims(user.UserProfile);
 
-        //         await _account.UpdateProfileAsync(model.Profile);
+                var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
+                await signInManager.SignInAsync(user, isPersistent: false);
 
-        //         user = await GetCurrentUserOrThrow();
+                SaveMessage = "Your profile has been updated.";
+                MessageType = AlertType.Success;
+                return RedirectToAction(nameof(Index));
 
-        //         User.SetUserClaims(user);
-        //         if (Engine.Auth0Enabled)
-        //         {
-        //             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
-        //         }
-        //         else
-        //         {
-        //             var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
-        //             await signInManager.SignInAsync(user, isPersistent: false);
-        //         }
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = "Something went wrong: " + ex.Message;
+                MessageType = AlertType.Danger;
+                model.ReturnUrl = returnUrl;
+                model.NewAccountCreated = created;
+                return View(model);
+            }
 
-        //         SaveMessage = "Your profile has been updated.";
-        //         MessageType = AlertType.Success;
-        //         return RedirectToAction(nameof(Index));
-
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         SaveMessage = "Something went wrong: " + ex.Message;
-        //         MessageType = AlertType.Danger;
-        //         model.Accounts = user.ConnectedAuth0Accounts;
-        //         model.ReturnUrl = returnUrl;
-        //         model.NewAccountCreated = created;
-        //         return View(model);
-        //     }
-
-        // }
+        }
 
         // [Route("account/avatar")]
         // public virtual async Task<Response> UploadAvatar(IFormFile file, string userId)
