@@ -1,0 +1,64 @@
+@model Content
+@{
+    ViewBag.Title = "Edit " + Model.Type.TypeName + ": " + Model.Title;
+}
+@section buttons {
+    <a href="javascript:document.getElementById('content-edit-form').submit()" class="btn btn-success"><i class="fa fa-save"></i> Save</a>
+    <button type="button" class="btn btn-outline-dark" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-ellipsis-h"></i>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        @if (Model.Type.HasPage)
+        {
+            <a class="dropdown-item" href="@Model.Url" target="_blank"><i class="fa fa-search"></i>Preview</a>
+            <div class="dropdown-divider"></div>
+        }
+        <a class="dropdown-item" asp-action="Duplicate" asp-route-id="@Model.Id"><i class="fa fa-copy"></i>Duplicate</a>
+        <a class="dropdown-item content-delete" asp-action="Delete" asp-route-id="@Model.Id" data-redirect="@Url.Action("Index", new { type = Model.ContentType })"><i class="fa fa-trash-alt"></i> Delete</a>
+    </div>
+}
+@section breadcrumbs {
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item text-decoration-none active" aria-current="page"><a asp-action="Index" asp-controller="Home" asp-route-area="Admin">Home</a></li>
+            @if (Model.Type.IsUnknown)
+            {
+                <li class="breadcrumb-item text-decoration-none active" aria-current="page"><a asp-action="Index" asp-controller="Content" asp-route-type="" asp-route-area="Admin"><i class="fa fa-archive me-2"></i>All Content</a></li>
+            }
+            else
+            {
+                <li class="breadcrumb-item text-decoration-none active" aria-current="page"><a asp-action="Index" asp-controller="Content" asp-route-type="@Model.Type.Type" asp-route-area="Admin"><i class="fa @Model.Type.Icon me-2"></i>@Model.Type.TypeNamePlural</a></li>
+            }
+            <li class="breadcrumb-item active" aria-current="page">@ViewBag.Title</li>
+        </ol>
+    </nav>
+}
+@if (Model.SaveMessage.IsSet())
+{
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
+}
+<form method="post" id="content-edit-form" data-id="@Model.Id" data-type="@Model.ContentType">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <partial name="_Partial_Tabs" />
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="tab-content">
+                        <partial name="_Partial_TabContent" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <partial name="_Editor_Sidebar" />                    
+            @if (Model.Type.ShowCategories)
+            {
+                <div id="content-categories-list" class="hood-inline-list" data-url="@Url.Action("CategoriesContent", new { id = Model.Id })"></div>
+            }
+        </div>
+    </div>
+</form>

@@ -1,0 +1,39 @@
+@model MailObject
+@{
+    Layout = "_Layout_Email";
+    string headerBackgroundColour = "#f39c12";
+    string headerColour = "#ffffff";
+}
+@if (Model.PreHeader.IsSet())
+{
+    <tr>
+        <td style="vertical-align: top;" valign="top">
+            <table border="0" cellpadding="0" cellspacing="0" class="alert alert-info" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; min-width: 100%;" width="100%">
+                <tr>
+                    <td align="center" style="padding:20px;text-align:center;background-color:@headerBackgroundColour;" valign="top" bgcolor="@headerBackgroundColour">
+                        <p class="h6" style="@(Model.GetFontStyles(1.25, 1.1));margin-bottom:0px;color:@headerColour;font-weight:bold;">@Model.PreHeader</p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+}
+<tr>
+    <td style="vertical-align: top;" valign="top">
+        <table border="0" cellpadding="0" cellspacing="0" class="main" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #fff; border-radius: 3px;" width="100%">
+            <tr>
+                <td class="wrapper" style="vertical-align: top; box-sizing: border-box; padding: @Model.MailPadding;" valign="top">
+                    <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
+                        <tr>
+                            <td style="vertical-align: top;" valign="top">
+                                @Html.Raw(Model.Html)
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+
+

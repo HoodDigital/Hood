@@ -1,0 +1,8 @@
+@inject IThemesService _themes
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
+<environment exclude="Production">
+    <link rel="stylesheet" href="@Engine.Resource("/src/css/app.css")" asp-append-version="true">
+</environment>
+<environment include="Production">
+    <link rel="stylesheet" href="@Engine.Resource("/dist/css/app.css")" asp-append-version="true">
+</environment>

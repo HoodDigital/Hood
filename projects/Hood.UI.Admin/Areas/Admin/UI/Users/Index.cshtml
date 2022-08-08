@@ -1,0 +1,114 @@
+@model UserListModel<UserProfileView<IdentityRole>>
+@inject IPasswordAccountRepository _account;
+@{
+    ViewBag.Title = "Website Users";
+}
+@section buttons {
+    <a class="btn btn-success user-create" asp-action="Create"><i class="fa fa-user-plus me-2"></i>Create New User</a>
+}
+<form class="inline" data-target="#user-list" novalidate>
+    <div class="row">
+        <div class="col-sm">
+            <div id="user-list" class="query hood-inline" data-url="@Url.Action("List")">
+                <partial name="_List_Users" />
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="card mb-3">
+                <div class="card-header position-relative" id="users-search-panel-heading">
+                    <p class="card-title m-0 font-weight-bold">
+                        <a class="stretched-link text-dark text-decoration-none" data-bs-toggle="collapse" data-target="#users-search-panel" href="#users-search-panel" aria-expanded="false" aria-controls="users-search-panel">
+                            Search Filters
+                            <i class="fe fe-arrow-up mt-1"></i>
+                        </a>
+                    </p>
+                </div>
+                <div class="card-body p-4 collapse show" aria-labelledby="users-search-panel-heading" id="users-search-panel">
+                    <input type="hidden" asp-for="PageIndex" />
+                    <input type="hidden" asp-for="PageSize" />
+                    <div class="form-floating mb-3">
+                        <select class="form-select submit-on-change" asp-for="Order">
+                            <option value="DateDesc">Newest First</option>
+                            <option value="Date">Oldest First</option>
+                            <option value="LastLogOn">By Log in time</option>
+                            <option value="UserName">By Username (A-Z)</option>
+                            <option value="UserNameDesc">By Username (Z-A)</option>
+                            <option value="Email">By Email (A-Z)</option>
+                            <option value="EmailDesc">By Email (Z-A)</option>
+                            <option value="LastName">By Last Name (A-Z)</option>
+                            <option value="LastNameDesc">By Last Name (Z-A)</option>
+                        </select>
+                        <label asp-for="Order"></label>
+                        <small asp-for="Order"></small>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Search" type="text" placeholder="Search" class="form-control">
+                        <label asp-for="Search"></label>
+                        <small asp-for="Search"></small>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="Active" class="form-check-input submit-on-change" />
+                            <label asp-for="Active" class="form-check-label d-block"></label>
+                            <small asp-for="Active"></small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="Inactive" class="form-check-input submit-on-change" />
+                            <label asp-for="Inactive" class="form-check-label d-block"></label>
+                            <small asp-for="Inactive"></small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="EmailUnconfirmed" class="form-check-input submit-on-change" />
+                            <label asp-for="EmailUnconfirmed" class="form-check-label d-block"></label>
+                            <small asp-for="EmailUnconfirmed"></small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="PhoneUnconfirmed" class="form-check-input submit-on-change" />
+                            <label asp-for="PhoneUnconfirmed" class="form-check-label d-block"></label>
+                            <small asp-for="PhoneUnconfirmed"></small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="Unused" class="form-check-input submit-on-change" />
+                            <label asp-for="Unused" class="form-check-label d-block"></label>
+                            <small asp-for="Unused"></small>
+                        </div>
+                    </div>                    
+                    <button type="submit" class="btn btn-success btn-block"> Search</button>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header position-relative" id="users-roles-panel-heading">
+                    <p class="card-title m-0 font-weight-bold">
+                        <a class="stretched-link text-dark text-decoration-none" data-bs-toggle="collapse" data-target="#users-roles-panel" href="#users-roles-panel" aria-expanded="false" aria-controls="users-roles-panel">
+                            Roles
+                            <i class="fe fe-arrow-up mt-1"></i>
+                        </a>
+                    </p>
+                </div>
+                <div class="card-body p-0 collapse show" aria-labelledby="users-roles-panel-heading" id="users-roles-panel">
+                    <div class="list-group list-group-flush">
+                        @foreach (var role in (await _account.GetRolesAsync(new RoleListModel<IdentityRole>() { PageSize = int.MaxValue })).List)
+                        {
+                            <div class="list-group-item list-group-item-action p-2">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input submit-on-change" id="Role-@role.Id" name="role" type="checkbox" value="@role.Id" />
+                                    <label class="form-check-label d-block" for="Role-@role.Id">
+                                        @role.Name.CamelCaseToString().ToTitleCase()
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

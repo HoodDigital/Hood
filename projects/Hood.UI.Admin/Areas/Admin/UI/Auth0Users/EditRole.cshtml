@@ -1,0 +1,57 @@
+@model Auth0Role
+@{
+    ViewBag.Title = "Edit Role: " + Model.Name;
+    BasicSettings _basicSettings = Engine.Settings.Basic;
+}
+@section buttons {
+<a href="javascript:document.getElementById('edit-user-form').submit()" class="btn btn-success"><i class="fa fa-save"></i> Save Profile</a>
+<button type="button" class="btn btn-outline-dark" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <i class="fa fa-ellipsis-h"></i>
+</button>
+<div class="dropdown-menu dropdown-menu-right">
+    <a class="dropdown-item user-delete" asp-action="DeleteRole" asp-route-id="@Model.Id"><i class="fa fa-trash-alt"></i> Delete</a>
+</div>
+}
+@section breadcrumbs {
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page"><a asp-action="Index" asp-controller="Home" asp-route-area="Admin">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a asp-action="Roles" asp-controller="Users" asp-route-area="Admin"><i class="fa fa-users me-2"></i>Roles</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@ViewBag.Title</li>
+    </ol>
+</nav>
+}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3>Role @Model.Name</h3>
+            </div>
+            <div class="card-body">
+                @if (Model.RemoteRole != null)
+                {
+                    <alert type="Success">
+                        <div>This role is currently linked to a remote role on Auth0.</div>
+                    </alert>
+                    <p><strong>Auth0 Role Id: @Model.RemoteRole.Id - @Model.RemoteRole.Name</strong></p>
+                }
+                else
+                {
+                    if (Model.RemoteId.IsSet())
+                    {
+                        <alert type="Danger">
+                            <div>This role is incorrectly linked, and the remote role cannot be found.</div>
+                        </alert>
+                    }
+                    else
+                    {
+                        <alert type="Danger">
+                            <div>This role is not linked to a remote role so cannot be used for access control.</div>
+                        </alert>
+                    }
+                    <a asp-action="LinkRole" asp-controller="Users" asp-route-area="Admin">Link Role</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

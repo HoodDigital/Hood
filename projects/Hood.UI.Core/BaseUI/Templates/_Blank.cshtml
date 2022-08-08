@@ -1,0 +1,11 @@
+@{
+    Layout = "_Layout";
+    Content currentContent = ViewData["Content"] as Content;
+}
+@section styles {
+@RenderSection("styles", required: false)
+}
+@section metas {
+@RenderSection("metas", required: false)
+}
+@RenderBody()

@@ -1,0 +1,33 @@
+
+@{
+
+    BasicSettings _basicSettings  = Engine.Settings.Basic;
+    SeoSettings _seoSettings = Engine.Settings.Seo;
+    string description = _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
+    string title = _basicSettings.FullTitle;
+    if (_seoSettings.Home != null)
+    {
+        description = _seoSettings.Home.Description.IsSet() ? _seoSettings.Home.Description : _seoSettings.Description.IsSet() ? _seoSettings.Description : "Home - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
+        title = _seoSettings.Home.Title.IsSet() ? _seoSettings.Home.Title : _seoSettings.Title.IsSet() ? _seoSettings.Title : "Home - " + _basicSettings.FullTitle;
+    }
+    ViewData["Title"] = title;
+
+}
+
+@section metas {
+    <meta name="description" content="@description" />
+    <meta property="og:author" content="@_seoSettings.OgAuthor" />
+    <meta property="og:title" content="@title" />
+    <meta property="og:image" content="@_seoSettings.OgImageUrl" />
+    <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
+    <meta property="og:description" content="@description" />
+    <meta name="twitter:title" content="@title" />
+    <meta name="twitter:description" content="@description" />
+    <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
+}
+<div class="jumbotron">
+    <div class="container">
+        <h1>Holding Page</h1>
+        <p>This is the default holding page, this site is closed.</p>
+    </div>
+</div>

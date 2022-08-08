@@ -1,0 +1,96 @@
+@model AdminCreateUserViewModel
+@{
+    Layout = null;
+}
+<div class="modal fade" id="user-create-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="user-create-form" action="@Url.Action("Create")" asp-antiforgery="true" autocomplete="off" class="modal-content" novalidate>
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title">
+                        <i class="fa fa-user-plus text-success me-2"></i>  Create new user
+                    </h5>
+                    <p class="m-0 text-muted">
+                        Add a new user account to the website.
+                    </p>
+                </div>
+                <button type="button" class="btn-close " data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating mb-3">
+                            <input class="form-control prevent-autocomplete" asp-for="Username" required>
+                            <label asp-for="Username"></label>
+                            <small asp-for="Username"></small>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating mb-3">
+                            <input class="form-control prevent-autocomplete" asp-for="Password" type="text" required>
+                            <label asp-for="Password"></label>
+                            <small asp-for="Password"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="GeneratePassword">
+                        <label class="form-check-label d-block" for="GeneratePassword">Generate Password</label>
+                        <small class="text-info">Generate a secure password for the user, change to regenerate.</small>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating mb-3">
+                            <input class="form-control" asp-for="FirstName" required>
+                            <label asp-for="FirstName"></label>
+                            <small asp-for="FirstName"></small>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating mb-3">
+                            <input class="form-control" asp-for="LastName" required>
+                            <label asp-for="LastName"></label>
+                            <small asp-for="LastName"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating mb-3">
+                            <input class="form-control" asp-for="Email" required>
+                            <label asp-for="Email"></label>
+                            <small asp-for="Email"></small>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating mb-3">
+                            <input class="form-control" asp-for="PhoneNumber">
+                            <label asp-for="PhoneNumber"></label>
+                            <small asp-for="PhoneNumber"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" asp-for="NotifyUser">
+                        <label class="form-check-label d-block" asp-for="NotifyUser"></label>
+                        <small asp-for="NotifyUser"></small>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" asp-for="CreateValidated">
+                        <label class="form-check-label d-block" asp-for="CreateValidated"></label>
+                        <small asp-for="CreateValidated"></small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success"><i class="fa fa-user-plus"></i> Create user</button>
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-ban"></i> Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>

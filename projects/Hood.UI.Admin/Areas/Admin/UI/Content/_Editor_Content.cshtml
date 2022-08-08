@@ -1,0 +1,33 @@
+@model Content
+<h5 class="mb-0">Content, Title and Description</h5>
+<p>Set titles, descriptions and enter the main body of the content. You can adjust what editors you see here in the <a asp-action="Content" asp-controller="Settings">content settings</a> area.</p>
+<div class="form-floating mb-3">
+    <input asp-for="Title" value="@Model.Title" type="text" class="form-control" />
+    <label asp-for="Title">@Model.Type.TitleName</label>
+    <small asp-for="Title"></small>
+</div>
+@if (Model.Type.MultiLineExcerpt)
+{
+    <div class="form-floating mb-3">
+        <textarea asp-for="Excerpt" class="form-control @(Model.Type.RichTextExcerpt ? "tinymce-simple" : "")" style="@(Model.Type.RichTextExcerpt ? "" : "height:100px;")">@Model.Excerpt</textarea>
+        <label asp-for="Excerpt">@Model.Type.ExcerptName</label>
+        <small asp-for="Title"></small>
+    </div>
+}
+else
+{
+    <div class="form-floating mb-3">
+        <input asp-for="Excerpt" value="@Model.Excerpt" type="text" class="form-control" />
+        <label asp-for="Excerpt">@Model.Type.ExcerptName</label>
+        <small asp-for="Title"></small>
+    </div>
+}
+<div class="">
+    @if (Model.Type.ShowEditor)
+    {
+        <label asp-for="Body" class="sr-only"></label>
+        <textarea asp-for="Body" class="form-control tinymce-full" 
+                  data-hood-media-list="@Url.Action("Action", "Media", new { doAction = MediaWindowAction.Insert })"></textarea>
+        <small asp-for="Body"></small>
+    }
+</div>

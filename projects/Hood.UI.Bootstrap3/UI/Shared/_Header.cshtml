@@ -1,0 +1,33 @@
+@{
+    BasicSettings _basicSettings = Engine.Settings.Basic;
+}
+<header class="header" id="header">
+    <div class="wrap" id="header-wrap">
+        <div class="contact-slim">
+            <a class="logo" href="/" title="@_basicSettings.FullTitle">
+                <img src="@_basicSettings.LogoLight" />
+            </a>
+        </div>
+        <div class="top-bar">
+            <div class="container">
+                <div class="contact">
+                    <span class="phone">
+                        <i class="fa fa-phone m-r-sm"></i>@_basicSettings.Phone
+                    </span>
+                </div>
+                <div class="brand">
+                    <a class="logo" href="/" title="@_basicSettings.FullTitle">
+                        <img src="@_basicSettings.Logo" />
+                    </a>
+                </div>
+            </div>
+        </div>
+        <partial name="_Header_Menu_Main" />
+        <partial name="_Header_Menu_Mobile" />
+        <button class="hamburger elastic mobile-menu-trigger" type="button" aria-label="Menu" aria-controls="mobile-menu">
+            <span class="hamburger-box">
+                <span class="hamburger-inner"></span>
+            </span>
+        </button>
+    </div>
+</header>

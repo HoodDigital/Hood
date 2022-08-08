@@ -1,0 +1,43 @@
+@model ContentModel
+
+@if (Model.List.Count == 0)
+{
+    <partial name="_NoResults" />
+}
+else
+{
+    <div class="row">
+        @foreach (ContentView content in Model.List)
+        {
+            <div class="col-md-4 col-sm-6 col-xs-12 mb-30">
+                <div class="thumbnail">
+                    <fixedImage src="@content.FeaturedImage.MediumUrl" class="img img-square img-full" style="@content.GetImageStyle()" />
+                    <div class="caption">                        
+                        <h3>@content.Title</h3>
+                        <p class="text-muted">@(content.GetMetaValue<string>("JobTitle"))</p>
+                        <p>@content.Excerpt</p>
+                        <ul class="social">
+                            @if (content.GetMetaValue<string>("Facebook").IsSet())
+                            {
+                                <li><a href="@(content.GetMetaValue<string>("Facebook"))" target="_blank"><i class="fa fa-facebook"></i></a></li>
+                            }
+                            @if (content.GetMetaValue<string>("Twitter").IsSet())
+                            {
+                                <li><a href="@(content.GetMetaValue<string>("Twitter"))" target="_blank"><i class="fa fa-twitter"></i></a></li>
+                            }
+                            @if (content.GetMetaValue<string>("GooglePlus").IsSet())
+                            {
+                                <li><a href="@(content.GetMetaValue<string>("GooglePlus"))" target="_blank"><i class="fa fa-google-plus"></i></a></li>
+                            }
+                            @if (content.GetMetaValue<string>("LinkedIn").IsSet())
+                            {
+                                <li><a href="@(content.GetMetaValue<string>("LinkedIn"))" target="_blank"><i class="fa fa-linkedin"></i></a></li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <partial name="_Pagination" />
+}

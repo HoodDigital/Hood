@@ -1,0 +1,28 @@
+@model MediaListModel
+@inject IDirectoryManager _directoryManager
+@{
+    Layout = null;
+}
+<div class="modal fade modal-right" id="media-select-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title">
+                        <i class="fa fa-file text-success me-2"></i> Choose image...
+                    </h5>
+                    <p class="m-0 text-muted">
+                        You can either select from existing site media, previously set versions, or upload a new file.
+                    </p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+             </div>
+            <div class="modal-body">
+                <div id="media-list" class="" data-url="@Url.Action("List")"></div>
+            </div>
+            <div class="modal-footer d-none">
+                <a class="btn btn-success media-add-selected">Add selected files<i class="fa fa-arrow-alt-circle-right ms-2"></i></a>
+            </div>
+        </div>
+    </div>
+</div>

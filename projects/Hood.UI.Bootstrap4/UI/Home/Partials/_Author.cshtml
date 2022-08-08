@@ -1,0 +1,48 @@
+@model ContentModel
+@{
+    BasicSettings _basicSettings = Engine.Settings.Basic;
+}
+@if (Model.Content.ShowAuthor)
+{
+    <hr />
+    <div class="media">
+        <div class="media-left">
+            <fixedImage src="@Model.Content.Avatar.SmallUrl" class="img-xs m-r-sm content-feature-@Model.Content.Id" alt="@Model.Content.ToDisplayName()" />
+        </div>
+        <div class="media-body media-middle">
+            <h6>
+                @Model.Content.ToDisplayName()
+                @if (!string.IsNullOrEmpty(Model.Content.JobTitle))
+                {
+                    <small>
+                        @Model.Content.JobTitle
+                        @if (!string.IsNullOrEmpty(Model.Content.CompanyName))
+                        {
+                            <span>at @Model.Content.CompanyName</span>
+                        }
+                    </small>
+                }
+            </h6>
+            @if (!string.IsNullOrEmpty(Model.Content.AuthorEmail))
+            {
+                <a href="mailto:@Model.Content.AuthorEmail" target="_blank"><i class="fa fa-envelope"></i></a>
+            }
+            @if (!string.IsNullOrEmpty(Model.Content.Facebook))
+            {
+                <a href="@Model.Content.Facebook" target="_blank"><i class="fa fa-facebook"></i></a>
+            }
+            @if (!string.IsNullOrEmpty(Model.Content.Twitter))
+            {
+                <a href="@Model.Content.Twitter" target="_blank"><i class="fa fa-twitter"></i></a>
+            }
+            @if (!string.IsNullOrEmpty(Model.Content.LinkedIn))
+            {
+                <a href="@Model.Content.LinkedIn" target="_blank"><i class="fa fa-linkedin"></i></a>
+            }
+            @if (!string.IsNullOrEmpty(Model.Content.Instagram))
+            {
+                <a href="@Model.Content.Instagram" target="_blank"><i class="fa fa-instagram"></i></a>
+            }
+        </div>
+    </div>
+}

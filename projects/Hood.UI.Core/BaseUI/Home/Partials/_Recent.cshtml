@@ -1,0 +1,21 @@
+@model PagedList<ContentView>
+@inject IContentRepository _content
+@if (Model != null && Model.List.Count > 0)
+{
+    @foreach (ContentView content in Model.List)
+    {
+        <div class="ratio ratio-16x9 mb-3">
+            <div class="text-white d-flex flex-column justify-content-center text-center">
+                <div style="background-image:url(@content.FeaturedImage.ThumbUrl);@content.GetImageStyle()" class="position-absolute top-0 start-0 end-0 bottom-0"></div>
+                <div style="background-color:rgba(0,0,0,0.4)" class="position-absolute top-0 start-0 end-0 bottom-0"></div>
+                <div class="position-relative">
+                    <p class="lead my-3 text-white"><a class="text-white text-decoration-none" href="@content.Url"><strong>@content.Title</strong></a></p>
+                    <small>
+                        <i class="me-2 fa fa-user"></i>@content.ToDisplayName()<br />
+                        <i class="me-2 fa fa-clock"></i>@content.PublishDate.ToLongDateString()
+                    </small>
+                </div>
+            </div>
+        </div>
+    }
+}

@@ -1,0 +1,18 @@
+@if (Engine.Settings.Property.Enabled)
+{
+    <environment exclude="Production">
+        <script src="@Engine.Resource("/src/js/app.property.js")" asp-append-version="true"></script>
+    </environment>
+    <environment include="Production">
+        <script src="@Engine.Resource("/dist/js/app.property.js")" asp-append-version="true"></script>
+    </environment>
+}
+else
+{
+    <environment exclude="Production">
+        <script src="@Engine.Resource("/src/js/app.js")" asp-append-version="true"></script>
+    </environment>
+    <environment include="Production">
+        <script src="@Engine.Resource("/dist/js/app.js")" asp-append-version="true"></script>
+    </environment>
+}

@@ -1,0 +1,44 @@
+@{
+}
+<div class="navbar-user justify-content-around" id="sidebarUser">
+    <div class="row align-items-center text-center mt-2 mx-2">
+        <div class="col-4 text-start">
+            <div class="dropup">
+                <a href="#" id="sidebarIconCopy" class="icon-link" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Your profile">
+                    <i class="fa fa-user-alt fa-2x"></i><span class="sr-only">Your profile</span>
+                </a>
+                <div class="dropdown-menu" aria-labelledby="sidebarIconCopy">
+                    <ul class="navbar-nav m-0 p-1">
+                        <li class="nav-item">
+                            <a asp-action="Index" asp-controller="Account" class="nav-link">
+                                <i class="fa fa-cogs"></i>Manage Account
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="ChangePassword" asp-controller="Account" class="nav-link">
+                                <i class="fa fa-lock"></i>Change Password
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <hr />
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="javascript:document.getElementById('logoutForm').submit()" title="Sign out">
+                                <i class="fa fa-sign-out-alt"></i>Sign out
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-4 text-center">
+            <fixedImage src="@User.GetAvatar()" class="img-xxs img-circle m-auto" />
+        </div>
+        <div class="col-4 text-end">
+            <a class="icon-link" href="javascript:document.getElementById('logoutForm').submit()" title="Sign out">
+                <i class="fa fa-sign-out-alt"></i><span class="sr-only">Sign out</span>
+            </a>
+            <form asp-controller="Account" asp-action="LogOff" asp-area="" method="post" id="logoutForm"></form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+@model IPageableModel
+@{ 
+    string baseUrl = Context.Request.Path;
+}
+<div class="row align-items-center">
+    <div class="col">
+        <ul class="pagination m-0">
+            @if (Model.PageIndex > 1)
+            {
+                <li class="page-item"><a class="page-link" href="@string.Concat(baseUrl, Model.GetPageUrl(1))" aria-label="Previous"><span aria-hidden="true"><i class="fa fa-angle-double-left"></i></span></a></li>
+            }
+            @for (int i = Model.PageIndex - 1; i <= Model.PageIndex + 1; i++)
+            {
+                if (i > 0 && i <= Model.TotalPages)
+                {
+                    if (i == Model.PageIndex)
+                    {
+                        <li class="active page-item"><a class="page-link" href="@string.Concat(baseUrl, Model.GetPageUrl(i))">@i</a></li>
+                    }
+                    else
+                    {
+                        <li class="page-item"><a class="page-link" href="@string.Concat(baseUrl, Model.GetPageUrl(i))">@i</a></li>
+                    }
+                }
+            }
+            @if (Model.PageIndex < Model.TotalPages)
+            {
+                <li class="page-item"><a class="page-link" href="@string.Concat(baseUrl, Model.GetPageUrl(Model.TotalPages))" aria-label="Next"><span aria-hidden="true"><i class="fa fa-angle-double-right"></i></span></a></li>
+            }
+        </ul>
+    </div>
+    <div class="col text-end">
+        <span>@Model.TotalCount Results</span><br />
+        <strong>Showing page @Model.PageIndex of @Model.TotalPages</strong>
+    </div>
+</div>

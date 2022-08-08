@@ -1,0 +1,52 @@
+@model ContentModel
+<input type="hidden" asp-for="PageIndex" />
+<input type="hidden" asp-for="PageSize" />
+<input type="hidden" asp-for="Type" />
+
+@if (Model.ContentType.ShowCategories)
+{
+    <div id="content-categories-list" class="refresh-only" data-url="@Url.Action("Categories", new { type = Model.Type })">
+        <partial name="_List_Categories" />
+    </div>
+}
+
+<div class="card mb-3">
+    <div class="card-header position-relative" id="content-search-panel-heading">
+        <p class="card-title m-0 font-weight-bold">
+            <a class="stretched-link text-dark text-decoration-none" data-bs-toggle="collapse" data-target="#content-search-panel" href="#content-search-panel" aria-expanded="true" aria-controls="content-search-panel">
+                Search Filters
+                <i class="fe fe-arrow-up mt-1"></i>
+            </a>
+        </p>
+    </div>
+    <div class="card-body collapse show" aria-labelledby="content-search-panel-heading" id="content-search-panel">
+        <div class="form-floating mb-3">
+            <select class="form-select submit-on-change" asp-for="Order">
+                <option value="PublishDesc">Recently Published</option>
+                <option value="Publish">Published Date (Oldest-Newest)</option>
+                <option value="DateDesc">Newest First</option>
+                <option value="Date">Oldest First</option>
+                <option value="Title">By Title (A-Z)</option>
+                <option value="TitleDesc">By Title (Z-A)</option>
+            </select>
+            <label asp-for="Order"></label>
+            <small asp-for="Order"></small>
+        </div>
+        <div class="form-floating mb-3">
+            <input asp-for="Search" type="text" placeholder="Search" class="form-control">
+            <label asp-for="Search"></label>
+            <small asp-for="Search"></small>
+        </div>
+        <div class="form-floating mb-3">
+            <select class="form-select submit-on-change" asp-for="Status">
+                <option value="">Show All</option>
+                <option value="1">Draft</option>
+                <option value="2">Published</option>
+                <option value="3">Archived</option>
+            </select>
+            <label asp-for="Status"></label>
+            <small asp-for="Status"></small>
+        </div>
+        <button type="submit" class="btn btn-success btn-block"> Search</button>
+    </div>
+</div>

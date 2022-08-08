@@ -1,0 +1,22 @@
+@model ContentModel
+
+@if (Model.List.Count == 0)
+{
+    <partial name="_NoResults" />
+}
+else
+{
+    <div class="row">
+        @foreach (ContentView content in Model.List)
+        {
+            <div class="col-md-offset-2 col-md-8 mb-30">
+                <div class="testimonial">
+                    <blockquote>@content.Excerpt</blockquote>
+                    <p class="testimonial-author">@content.Title</p>
+                    <p class="testimonial-company">@(content.GetMetaValue<string>("CompanyName"))</p>
+                </div>
+            </div>
+        }
+    </div>
+     <partial name="_Pagination" />
+}

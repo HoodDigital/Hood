@@ -1,0 +1,93 @@
+@model IntegrationSettings
+@{
+    ViewData["Title"] = "Integrations";
+    Layout = "_Layout_Settings";
+}
+@section buttons {
+@if (User.IsAdminOrBetter())
+{
+<a asp-action="ResetIntegrations" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+}
+}
+<div class="card">
+    <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs" data-hood-tabs="@($"tabs-settings-integrations")">
+            <li class="nav-item">
+                <a class="nav-link" id="google-tab" data-bs-toggle="tab" href="#google" role="tab" aria-controls="google" aria-selected="false">
+                    Google API
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="unsplash-tab" data-bs-toggle="tab" href="#unsplash" role="tab" aria-controls="google" aria-selected="false">
+                    Unsplash API
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body p-4">
+        <div class="tab-content">
+            <div id="google" class="tab-pane in active" role="tabpanel" aria-labelledby="google-tab">
+                <div class="mb-3">
+                    <div class="form-check form-switch">
+                        <input asp-for="EnableGoogleMaps" class="form-check-input">
+                        <label asp-for="EnableGoogleMaps" class="form-check-label d-block"></label>
+                        <small asp-for="EnableGoogleMaps"></small>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check form-switch">
+                        <input asp-for="EnableGoogleGeocoding" class="form-check-input">
+                        <label asp-for="EnableGoogleGeocoding" class="form-check-label d-block"></label>
+                        <small asp-for="EnableGoogleGeocoding"></small>
+                    </div>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="GoogleMapsApiKey" class="form-control">
+                    <label asp-for="GoogleMapsApiKey"></label>
+                    <small asp-for="GoogleMapsApiKey"></small>
+                </div>
+                <hr class="mt-4 mb-4" />
+                <div class="mb-3">
+                    <div class="form-check form-switch">
+                        <input asp-for="EnableGoogleRecaptcha" class="form-check-input">
+                        <label asp-for="EnableGoogleRecaptcha" class="form-check-label d-block"></label>
+                        <small asp-for="EnableGoogleRecaptcha"></small>
+                    </div>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="GoogleRecaptchaSiteKey" class="form-control">
+                    <label asp-for="GoogleRecaptchaSiteKey"></label>
+                    <small asp-for="GoogleRecaptchaSiteKey"></small>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="GoogleRecaptchaSecretKey" class="form-control">
+                    <label asp-for="GoogleRecaptchaSecretKey"></label>
+                    <small asp-for="GoogleRecaptchaSecretKey"></small>
+                </div>
+                <div class="form-floating">
+                    <select asp-for="GoogleRecaptchaThreshold" class="form-select">
+                        <option value="0.1">Easy</option>
+                        <option value="0.3">Low</option>
+                        <option value="0.5">Medium</option>
+                        <option value="0.7">High</option>
+                        <option value="0.9">Strict</option>
+                    </select>
+                    <label asp-for="GoogleRecaptchaThreshold"></label>
+                    <small asp-for="GoogleRecaptchaThreshold"></small>
+                </div>
+            </div>
+            <div id="unsplash" class="tab-pane in" role="tabpanel" aria-labelledby="unsplash-tab">
+                <div class="form-floating mb-3">
+                    <input asp-for="UnsplashAccessKey" class="form-control">
+                    <label asp-for="UnsplashAccessKey"></label>
+                    <small asp-for="UnsplashAccessKey"></small>
+                </div>
+                <div class="form-floating">
+                    <input asp-for="UnsplashSecretKey" class="form-control">
+                    <label asp-for="UnsplashSecretKey"></label>
+                    <small asp-for="UnsplashSecretKey"></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

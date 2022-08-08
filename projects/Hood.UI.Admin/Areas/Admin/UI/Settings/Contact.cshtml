@@ -1,0 +1,118 @@
+@model ContactSettings
+@{
+    Layout = "_Layout_Settings";
+    ViewData["Title"] = "Contact Form & Page Settings";
+}
+@section buttons {
+    @if (User.IsAdminOrBetter())
+    {
+        <a asp-action="ResetContact" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    }
+}
+<div class="card">
+    <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs" data-hood-tabs="@($"tabs-settings-contact")">
+            <li class="nav-item">
+                <a class="nav-link active" id="contact-tab" data-bs-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">
+                    Form Settings
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="user-tab" data-bs-toggle="tab" href="#user" role="tab" aria-controls="user" aria-selected="false">
+                    User Emails
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="notifications-tab" data-bs-toggle="tab" href="#notifications" role="tab" aria-controls="notifications" aria-selected="false">
+                    Notifications
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body p-4">
+        <div class="tab-content">
+            <div id="contact" class="tab-pane in active" role="tabpanel" aria-labelledby="contact-tab">
+                <div class="panel-body form-horizontal">
+                    <div class="alert alert-info">
+                        Set up how the form works, you can set where the user is sent after the form is submitted, or customise the message displayed when they do.<br />
+                        The enquiries are not stored in the database, so it is vital you set this up correctly.
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Email" class="form-control">
+                        <label asp-for="Email"></label>
+                        <small asp-for="Email"></small>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="ContactFormTitle" class="form-control"/>
+                        <label asp-for="ContactFormTitle"></label>
+                        <small asp-for="ContactFormTitle"></small>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <textarea asp-for="ContactFormMessage" class="form-control" style="height:100px;"></textarea>
+                        <label asp-for="ContactFormMessage"></label>
+                        <small asp-for="ContactFormMessage"></small>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="ThankYouUrl" class="form-control">
+                        <label asp-for="ThankYouUrl"></label>
+                        <small asp-for="ThankYouUrl"></small>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="ThankYouTitle" class="form-control"/>
+                        <label asp-for="ThankYouTitle"></label>
+                        <small asp-for="ThankYouTitle"></small>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ThankYouMessage"></label>
+                        <textarea asp-for="ThankYouMessage" class="form-control tinymce-simple"></textarea>
+                        <small asp-for="ThankYouMessage"></small>
+                    </div>
+                </div>
+            </div>
+            <div id="user" class="tab-pane" role="tabpanel" aria-labelledby="user-tab">
+                <div class="panel-body form-horizontal">
+                    <div class="alert alert-info">
+                        You can add placeholders to any of these fields such as <strong>{Site.Title}</strong>, <strong>{Site.Owner.Name}</strong>, <strong>{Site.Email}</strong>, <strong>{Site.Phone}</strong>.
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Title" class="form-control">
+                        <label asp-for="Title"></label>
+                        <small asp-for="Title"></small>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Subject" class="form-control">
+                        <label asp-for="Subject"></label>
+                        <small asp-for="Subject"></small>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Message"></label>
+                        <input asp-for="Message" class="form-control tinymce-simple">
+                        <small asp-for="Message"></small>
+                    </div>
+                </div>
+            </div>
+            <div id="notifications" class="tab-pane" role="tabpanel" aria-labelledby="notifications-tab">
+                <div class="panel-body form-horizontal">
+                    <div class="alert alert-info">
+                        You can add placeholders to any of these fields such as <strong>{Site.Title}</strong>, <strong>{Site.Owner.Name}</strong>, <strong>{Site.Email}</strong>, <strong>{Site.Phone}</strong>.
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="AdminNoficationTitle" class="form-control">
+                        <label asp-for="AdminNoficationTitle"></label>
+                        <small asp-for="AdminNoficationTitle"></small>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="AdminNoficationSubject" class="form-control">
+                        <label asp-for="AdminNoficationSubject"></label>
+                        <small asp-for="AdminNoficationSubject"></small>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="AdminNoficationMessage"></label>
+                        <input asp-for="AdminNoficationMessage" class="form-control tinymce-simple">
+                        <small asp-for="AdminNoficationMessage"></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

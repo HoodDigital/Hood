@@ -1,0 +1,29 @@
+@{
+    Layout = "_Layout";
+}
+@section styles {
+    @RenderSection("styles", required: false)
+}
+@section metas {
+    @RenderSection("metas", required: false)
+}
+<fixedImage src="https://source.unsplash.com/random" class="jumbotron p-4 p-md-5 text-white bg-dark rounded-0 img img-full">
+    <div class="container">
+        <div class="px-0">
+            <h1 class="display-4">
+                @if (ViewData.ContainsKey("PageTitle")) 
+                {
+                    @ViewData["PageTitle"]
+                }
+                else
+                {
+                    @ViewData["Title"]
+                }
+            </h1>
+            <p class="lead my-3">@Html.Raw(ViewData["SubTitle"])</p>
+        </div>
+    </div>
+</fixedImage>
+<section class="container">
+    @RenderBody()
+</section>

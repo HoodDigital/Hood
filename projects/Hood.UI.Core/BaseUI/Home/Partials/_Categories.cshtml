@@ -1,0 +1,16 @@
+@model ContentModel
+@inject ContentCategoryCache _categories
+@{
+    var categories = _categories.TopLevel(Model.ContentType.Type);
+}
+@if (Model.ContentType.ShowCategories)
+{
+    <h6>Categories</h6>
+    @if (categories.Count() > 0)
+    {
+        @_categories.ContentCategoryTree(categories, Model.ContentType.Slug);
+    }
+    <ul class="list-unstyled mb-0">
+        <li><a href="/@Model.ContentType.Slug">Show All</a></li>
+    </ul>
+}

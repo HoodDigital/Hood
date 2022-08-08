@@ -1,0 +1,24 @@
+@model ConnectAccountModel
+@{
+    ViewData["Title"] = "Account connected";
+}
+<div class="header">
+    <h2>@ViewData["Title"]</h2>
+    <div class="d-flex align-items-center my-4">
+        <div>
+            <fixedImage src="@Model.RemotePicture" class="img-sm ms-3 rounded" />
+        </div>
+        <div class="flex-fill">
+            <i class="fa fa-check-circle fa-2x text-success mx-3"></i>
+        </div>
+        <div>
+            <fixedImage src="@Model.LocalPicture" class="img-sm me-3 rounded" />
+        </div>
+    </div>
+    <p>
+        The account is now connected, click below to continue to your new account.
+    </p>
+    <div class="d-grid gap-2">
+        <a class="btn btn-success" asp-action="Index" asp-controller="Account">Manage Account</a>
+    </div>
+</div>

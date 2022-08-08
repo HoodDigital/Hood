@@ -1,0 +1,63 @@
+@model ContentCategory
+@inject ContentCategoryCache _categories
+@{
+    Layout = null;
+    var formAction = Url.Action("EditCategory");
+    if (Model.Id == 0)
+    {
+        formAction = Url.Action("CreateCategory");
+    }
+}
+
+<div class="modal fade" id="content-category-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="content-categories-edit-form" action="@formAction" asp-antiforgery="true" autocomplete="off" class="modal-content" novalidate>
+            <div class="modal-header">
+                <div>
+                    @if (Model.Id == 0)
+                    {
+                        <h5 class="modal-title">
+                            <i class="fa fa-plus-circle text-success me-2"></i> Add a category
+                        </h5>
+                        <p class="m-0 text-muted">
+                             Create a new category to group your content together
+                        </p>
+                    }
+                    else
+                    {
+                        <h5 class="modal-title">
+                            <i class="fa fa-user-plus text-success me-2"></i>Edit category
+                        </h5>
+                        <p class="m-0 text-muted">
+                            Edit and save the category. All content in the category will remain.
+                        </p>
+                    }
+                </div>
+                <button type="button" class="btn-close " data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input asp-for="Id" type="hidden" />
+                <input asp-for="ContentType" type="hidden" />
+                <div class="form-floating mb-3">
+                    <input asp-for="DisplayName" required class="form-control" />
+                    <label asp-for="DisplayName" class="control-label"></label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Slug" required class="form-control" />
+                    <label asp-for="Slug" class="control-label"></label>
+                </div>
+                <div class="form-floating">
+                    <select asp-for="ParentCategoryId" class="form-select">
+                        <option>No Parent</option>
+                        @_categories.CategorySelectOptions(Model.Categories, Model.ParentCategoryId)
+                    </select>
+                    <label asp-for="ParentCategoryId" class="control-label"></label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> Save</button>
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-ban"></i> Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>

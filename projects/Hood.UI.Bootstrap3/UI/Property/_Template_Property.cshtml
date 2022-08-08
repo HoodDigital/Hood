@@ -1,0 +1,51 @@
+@model PropertyListing
+@{
+    PropertySettings _propertySettings = Engine.Settings.Property;
+}
+<div class="thumbnail">
+    <a href="@Model.Url"><fixedImage src="@Model.FeaturedImage.MediumUrl" class="img img-md img-full content-feature-@Model.Id" /></a>
+    <div class="caption">
+        <a href="@Model.Url">
+            <h3>@Model.Title</h3>
+        </a>
+        <h4>@Model.Title</h4>
+        <p class="text-muted">@_propertySettings.GetPlanningFromType(Model.Planning)</p>
+        @if (_propertySettings.ShowAskingPrice)
+        {
+            <div class="ratings text-left">
+                <p class="pull-right">@Model.FormattedAskingPrice</p>
+                <p>
+                    Asking Price:
+                </p>
+            </div>
+        }
+        @if (_propertySettings.ShowRent)
+        {
+            <div class="ratings text-left">
+                <p class="pull-right">@Model.FormattedRent</p>
+                <p>
+                    Rent:
+                </p>
+            </div>
+        }
+        @if (_propertySettings.ShowPremium)
+        {
+            <div class="ratings text-left">
+                <p class="pull-right">@Model.FormattedPremium</p>
+                <p>
+                    Premium:
+                </p>
+            </div>
+        }
+        @if (_propertySettings.ShowFees)
+        {
+            <div class="ratings text-left">
+                <p class="pull-right">@Model.FormattedFees</p>
+                <p>
+                    Fees:
+                </p>
+            </div>
+        }
+        <p><a href="@Model.Url" class="btn btn-primary" role="button">Learn more...</a></p>
+    </div>
+</div>

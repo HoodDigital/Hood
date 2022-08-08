@@ -1,0 +1,169 @@
+@model ShowPropertyModel
+
+@{
+    SeoSettings _seoSettings = Engine.Settings.Seo;
+    BasicSettings _basicSettings = Engine.Settings.Basic;
+    PropertySettings _propertySettings = Engine.Settings.Property;
+
+    var cmTitle = Model.Property.GetMeta("SEO.Meta.Title");
+    var cmDesc = Model.Property.GetMeta("SEO.Meta.Description");
+    string metaTitle = Model.Property.Title + " - " + _basicSettings.FullTitle;
+    string metaDesc = Model.Property.ShortDescription;
+    if (!cmTitle.GetStringValue().IsNullOrEmpty())
+    {
+        metaTitle = cmTitle.GetStringValue();
+    }
+    if (!cmDesc.GetStringValue().IsNullOrEmpty())
+    {
+        metaDesc = cmDesc.GetStringValue();
+    }
+    ViewBag.Title = metaTitle;
+    ViewBag.PageTitle = Model.Property.Title;
+    ViewData["EditUrl"] = Url.Action("Edit", "Property", new { area = "Admin", id = Model.Property.Id });
+
+    Layout = "_Layout_Property";
+}
+@section metas {
+    <meta name="description" content="@Model.Property.ShortDescription" />
+    <meta property="og:author" content="@Model.Property.ToDisplayName()" />
+    <meta property="og:title" content="@Model.Property.Title - @_basicSettings.FullTitle" />
+    @if (Model.Property.FeaturedImage.DownloadUrl.IsSet())
+    {
+        <meta property="og:image" content="@Model.Property.FeaturedImage.LargeUrl" />
+        <meta property="og:image:secure_url" content="@Model.Property.FeaturedImage.LargeUrl" />
+        <meta name="twitter:image" content="@Model.Property.FeaturedImage.LargeUrl" />
+    }
+    else
+    {
+        <meta property="og:image" content="@_seoSettings.OgImageUrl" />
+        <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
+        <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
+    }
+    <meta property="og:description" content="@Model.Property.ShortDescription" />
+    <meta name="twitter:title" content="@Model.Property.Title - @_basicSettings.FullTitle" />
+    <meta name="twitter:description" content="@Model.Property.ShortDescription" />
+}
+<div class="container m-t-lg">
+    <div class="row">
+        <div class="col-sm-4">
+            <a href="@Model.Property.FeaturedImage.LargeUrl" class="colorbox"><img src="@Model.Property.FeaturedImage.MediumUrl" class="img img-full content-feature-@Model.Property.Id m-b-xs" /></a>
+            <div class="card-deck card-deck-3 no-gutters mt-4">
+                @foreach (var media in Model.Property.Media)
+                {
+                    <div class="card border-0 rounded-0">
+                        <a href="@media.LargeUrl" class="colorbox">
+                            <fixedImage src="@media.SmallUrl" class="img img-full img-square m-0"></fixedImage>
+                        </a>
+                    </div>
+                }
+            </div>
+            <table class="table border-top-0 m-0">
+                @if (_propertySettings.ShowAskingPrice)
+                {
+                    <tr class="ratings text-left">
+                        <th>
+                            Asking Price
+                        </th>
+                        <td>
+                            @Model.Property.FormattedAskingPrice
+                        </td>
+                    </tr>
+                }
+                @if (_propertySettings.ShowRent)
+                {
+                    <tr class="ratings text-left">
+                        <th>
+                            Rent
+                        </th>
+                        <td>
+                            @Model.Property.FormattedRent
+                        </td>
+                    </tr>
+                }
+                @if (_propertySettings.ShowPremium)
+                {
+                    <tr class="ratings text-left">
+                        <th>
+                            Premium
+                        </th>
+                        <td>
+                            @Model.Property.FormattedPremium
+                        </td>
+                    </tr>
+                }
+                @if (_propertySettings.ShowFees)
+                {
+                    <tr class="ratings text-left">
+                        <th>
+                            Fees
+                        </th>
+                        <td>
+                            @Model.Property.FormattedFees
+                        </td>
+                    </tr>
+                }
+            </table>
+            <p>
+                <a class="btn btn-primary btn-block" href="@string.Format("/contact?subject={0}", Model.Property.ToFormat(AddressFormat.SingleLine))">Enquire <i class="fa fa-long-arrow-right"></i></a>
+            </p>                
+            @if (Model.Property.InfoDownloadJson.IsSet())
+            {
+                <p>
+                    <a class="btn btn-block btn-primary" href="@Model.Property.InfoDownload.DownloadUrl"><i class="fa fa-file-pdf-o"></i> Download info pack</a>
+                </p>
+            }
+        </div>
+        <div class="col-sm-8">
+            <div class="m-b-md">
+                <h2>@Model.Property.Title</h2>
+                <p class="lead">@Html.Raw(Model.Property.ShortDescription)</p>
+            </div>
+            <blockquote>
+                <h5 class="no-margin">@_propertySettings.GetPlanningFromType(Model.Property.Planning)</h5>
+                <p class="m-t-sm">
+                    @if (Model.Property.InfoDownloadJson.IsSet())
+                    {
+                        <a class="btn btn-primary" href="@Model.Property.InfoDownload.DownloadUrl"><i class="fa fa-file-pdf-o"></i> Download info pack</a>
+                    }
+                    <a class="btn btn-primary" href="@string.Format("/contact?subject={0}", Model.Property.ToFormat(AddressFormat.SingleLine))">Enquire <i class="fa fa-long-arrow-right"></i></a>
+                </p>
+            </blockquote>
+            <h5>Description</h5>
+            @if (Model.Property.Description.IsSet())
+            {
+                <blockquote class="pre-line">@Html.Raw(Model.Property.Description)</blockquote>
+            }
+            else
+            {
+                <blockquote>No description has been added to this property yet...</blockquote>
+            }
+            @if (Model.Property.Location.IsSet())
+            {
+                <h5>About the Location</h5>
+                <blockquote class="pre-line">@Html.Raw(Model.Property.Location)</blockquote>
+            }
+            @if (Model.Property.Lease.IsSet())
+            {
+                <h5>About the Lease</h5>
+                <blockquote class="pre-line">@Html.Raw(Model.Property.Lease)</blockquote>
+            }
+            @if (Model.Property.Areas.IsSet())
+            {
+                <h5>About the Internal Areas</h5>
+                <blockquote class="pre-line">@Html.Raw(Model.Property.Areas)</blockquote>
+            }
+            @if (Model.Property.Additional.IsSet())
+            {
+                <h5>Additional Information</h5>
+                <blockquote class="pre-line">@Html.Raw(Model.Property.Additional)</blockquote>
+            }
+            <h5>Contact the Agent</h5>
+            @if (Model.Property.AgentInfo.IsSet())
+            {
+                <blockquote class="pre-line">
+                    @Html.Raw(Model.Property.AgentInfo)
+                </blockquote>
+            }
+        </div>
+    </div>
+</div>
