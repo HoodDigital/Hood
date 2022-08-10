@@ -23,6 +23,7 @@ namespace Hood.Services
         Task LinkAccountAsync(Auth0Identity primaryAccount, string fullAuthUserId);
         Task RemoveRolesFromUser(string userId, string[] roleIds);
         Task UnlinkAccountAsync(Auth0Identity primaryAccount, Auth0Identity identityToDisconnect);
+        Task<User> UpdateUser(string userId, UserUpdateRequest updateRequest);
         Task<Role> CreateRoleForLocalRole(Auth0Role role);
     }
 }

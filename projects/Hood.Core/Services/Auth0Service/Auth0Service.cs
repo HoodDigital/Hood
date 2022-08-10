@@ -98,6 +98,13 @@ namespace Hood.Services
             return user;
         }
 
+        public async Task<User> UpdateUser(string userId, UserUpdateRequest updateRequest)
+        {
+            var client = await GetClientAsync();
+            var user = await client.Users.UpdateAsync(userId, updateRequest);
+            return user;
+        }
+
         public async Task<System.Collections.Generic.IList<User>> GetUsersByEmail(string email)
         {
             if (!email.IsSet())
