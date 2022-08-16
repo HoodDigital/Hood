@@ -160,7 +160,7 @@ namespace Hood.Core
 
                     return _contextAccessor.HttpContext.User;
                 }
-                catch (SqlException)
+                catch (Exception)
                 {
                     return null;
                 }
