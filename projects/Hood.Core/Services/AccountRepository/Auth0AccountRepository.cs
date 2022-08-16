@@ -28,11 +28,11 @@ namespace Hood.Services
         private IQueryable<Auth0Role> Roles { get { return _db.Set<Auth0Role>(); } }
         private IQueryable<Auth0UserRole> UserRoles { get { return _db.Set<Auth0UserRole>(); } }
 
-        public Auth0AccountRepository()
+        public Auth0AccountRepository(Auth0IdentityContext db, HoodDbContext hoodDb, IAuth0Service auth0)
         {
-            _db = Engine.Services.Resolve<Auth0IdentityContext>();
-            _hoodDb = Engine.Services.Resolve<HoodDbContext>();
-            _auth0 = Engine.Services.Resolve<IAuth0Service>();
+            _db = db;
+            _hoodDb = hoodDb;
+            _auth0 = auth0;
         }
 
         #region Account stuff                 
