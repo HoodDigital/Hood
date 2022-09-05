@@ -7,11 +7,16 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Hood.ViewModels
 {
-    public class UserListModel : UserListModel<UserProfile> 
-    { }
-
-    public class UserListModel<TUserProfile> : PagedList<TUserProfile>, IPageableModel where TUserProfile : UserProfileBase
+    public class UserListModel : UserListModel<IUserProfile>
     {
+        public UserListModel()
+        { }
+    }
+    public class UserListModel<TUserProfile> : PagedList<TUserProfile>, IPageableModel
+    {
+        public UserListModel()
+        { }
+
         [FromQuery(Name = "role")]
         public string Role { get; set; }
 

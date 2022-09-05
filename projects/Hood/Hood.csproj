@@ -6,7 +6,7 @@
     <PackageId>Hood</PackageId>
     <Description>Complete Hood CMS Package, includes all default controllers for basic setup, packaged with the Bootstrap 4 default theme.</Description>
 
-    <Version>6.0.11</Version>
+    <Version>6.1.0</Version>
     <TargetFramework>net6.0</TargetFramework>
     <Authors>Hood Digital;George Whysall;</Authors>
     <OutputType>Library</OutputType>
@@ -23,7 +23,6 @@
     <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
     <ProjectReference Include="..\Hood.Admin\Hood.Admin.csproj" />
     
-    <ProjectReference Include="..\Hood.UI\Hood.UI.csproj" />
     <ProjectReference Include="..\Hood.UI.Core\Hood.UI.Core.csproj" />
   </ItemGroup>
 

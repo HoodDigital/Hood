@@ -1,4 +1,5 @@
 ﻿using Hood.Caching;
+using Hood.Contexts;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
@@ -15,16 +16,19 @@ namespace Hood.Services
 {
     public class PropertyRepository : IPropertyRepository
     {
-        private readonly HoodDbContext _db;
+        private readonly PropertyContext _db;
+        private readonly HoodDbContext _hoodDb;
         private readonly IHoodCache _cache;
         private readonly IMediaManager _media;
 
         public PropertyRepository(
-            HoodDbContext db,
+            PropertyContext db,
+            HoodDbContext hoodDb,
             IHoodCache cache,
             IMediaManager media)
         {
             _db = db;
+            _hoodDb = hoodDb;
             _cache = cache;
             _media = media;
         }
@@ -32,8 +36,7 @@ namespace Hood.Services
         #region Property CRUD
         public async Task<PropertyListModel> GetPropertiesAsync(PropertyListModel model)
         {
-            IQueryable<PropertyListing> properties = _db.Properties
-                .Include(p => p.Agent)
+            IQueryable<PropertyListingView> properties = _db.PropertyViews
                 .Include(p => p.Metadata);
 
             if (model.LoadImages)
@@ -68,7 +71,7 @@ namespace Hood.Services
 
             if (model.Agent.IsSet())
             {
-                properties = properties.Where(n => n.Agent.UserName == model.Agent);
+                properties = properties.Where(n => n.AgentEmail == model.Agent);
             }
 
             if (model.Location.IsSet())
@@ -254,7 +257,17 @@ namespace Hood.Services
             PropertyListing property = await _db.Properties
                     .Include(p => p.Media)
                     .Include(p => p.FloorPlans)
-                    .Include(p => p.Agent)
+                    .Include(p => p.Metadata)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.Id == id);
+
+            return property;
+        }
+        public async Task<PropertyListingView> GetPropertyViewByIdAsync(int id, bool nocache = false)
+        {
+            PropertyListingView property = await _db.PropertyViews
+                    .Include(p => p.Media)
+                    .Include(p => p.FloorPlans)
                     .Include(p => p.Metadata)
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id == id);
@@ -266,7 +279,6 @@ namespace Hood.Services
             _db.Entry(property).State = EntityState.Added;
             await _db.Entry(property).Collection(s => s.Media).LoadAsync();
             await _db.Entry(property).Collection(s => s.FloorPlans).LoadAsync();
-            await _db.Entry(property).Reference(s => s.Agent).LoadAsync();
             await _db.Entry(property).Collection(s => s.Metadata).LoadAsync();
             return property;
         }
@@ -356,7 +368,7 @@ namespace Hood.Services
         }
         public async Task<MediaDirectory> GetDirectoryAsync()
         {
-            MediaDirectory contentDirectory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.Slug == MediaManager.PropertyDirectorySlug && md.Type == DirectoryType.System);
+            MediaDirectory contentDirectory = await _hoodDb.MediaDirectories.SingleOrDefaultAsync(md => md.Slug == MediaManager.PropertyDirectorySlug && md.Type == DirectoryType.System);
             if (contentDirectory == null)
             {
                 throw new Exception("Site folder is not available.");

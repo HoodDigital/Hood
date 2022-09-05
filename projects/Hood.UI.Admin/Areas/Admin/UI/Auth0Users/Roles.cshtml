@@ -1,0 +1,55 @@
+@model RoleListModel<Auth0Role>
+@inject IAuth0AccountRepository _account;
+@{
+    ViewBag.Title = "Website Roles";
+}
+@if (Model.SaveMessage.IsSet())
+{
+    <alert type="@Model.MessageType" size="Medium">@Model.SaveMessage</alert>
+}
+<form class="inline" data-target="#user-list" novalidate>
+    <div class="row">
+        <div class="col-sm">
+            <div id="user-list" class="query hood-inline" data-url="@Url.Action("ListRoles")">
+                <partial name="../Auth0Users/_List_Roles" />
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="card mb-3">
+                <div class="card-header position-relative" id="users-search-panel-heading">
+                    <p class="card-title m-0 font-weight-bold">
+                        <a class="stretched-link text-dark text-decoration-none" data-bs-toggle="collapse" data-target="#users-search-panel" href="#users-search-panel" aria-expanded="false" aria-controls="users-search-panel">
+                            Search Filters
+                            <i class="fe fe-arrow-up mt-1"></i>
+                        </a>
+                    </p>
+                </div>
+                <div class="card-body p-4 collapse show" aria-labelledby="users-search-panel-heading" id="users-search-panel">
+                    <input type="hidden" asp-for="PageIndex" />
+                    <input type="hidden" asp-for="PageSize" />
+                    <div class="form-floating mb-3">
+                        <select class="form-select submit-on-change" asp-for="Order">
+                            <option value="DateDesc">Newest First</option>
+                            <option value="Date">Oldest First</option>
+                            <option value="LastLogOn">By Log in time</option>
+                            <option value="UserName">By Username (A-Z)</option>
+                            <option value="UserNameDesc">By Username (Z-A)</option>
+                            <option value="Email">By Email (A-Z)</option>
+                            <option value="EmailDesc">By Email (Z-A)</option>
+                            <option value="LastName">By Last Name (A-Z)</option>
+                            <option value="LastNameDesc">By Last Name (Z-A)</option>
+                        </select>
+                        <label asp-for="Order"></label>
+                        <small asp-for="Order"></small>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Search" type="text" placeholder="Search" class="form-control">
+                        <label asp-for="Search"></label>
+                        <small asp-for="Search"></small>
+                    </div>              
+                    <button type="submit" class="btn btn-success btn-block"> Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

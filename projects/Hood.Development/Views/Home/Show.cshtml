@@ -49,30 +49,30 @@
     }
 }
 @section metas {
-    <meta name="description" content="@description" />
-    <meta property="og:author" content="@Model.Content.Author.ToDisplayName()" />
-    <meta property="og:title" content="@title" />
-    @if (Model.Content.ShareImageJson.IsSet())
-    {
-        <meta property="og:image" content="@Model.Content.ShareImage.LargeUrl" />
-        <meta property="og:image:secure_url" content="@Model.Content.ShareImage.LargeUrl" />
-        <meta name="twitter:image" content="@Model.Content.ShareImage.LargeUrl" />
-    }
-    else if (Model.Content.FeaturedImageJson.IsSet())
-    {
-        <meta property="og:image" content="@Model.Content.FeaturedImage.LargeUrl" />
-        <meta property="og:image:secure_url" content="@Model.Content.FeaturedImage.LargeUrl" />
-        <meta name="twitter:image" content="@Model.Content.FeaturedImage.LargeUrl" />
-    }
-    else
-    {
-        <meta property="og:image" content="@_seoSettings.OgImageUrl" />
-        <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
-        <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
-    }
-    <meta property="og:description" content="@description" />
-    <meta name="twitter:title" content="@title" />
-    <meta name="twitter:description" content="@description" />
+<meta name="description" content="@description" />
+<meta property="og:author" content="@Model.Content.ToDisplayName()" />
+<meta property="og:title" content="@title" />
+@if (Model.Content.ShareImageJson.IsSet())
+{
+<meta property="og:image" content="@Model.Content.ShareImage.LargeUrl" />
+<meta property="og:image:secure_url" content="@Model.Content.ShareImage.LargeUrl" />
+<meta name="twitter:image" content="@Model.Content.ShareImage.LargeUrl" />
+}
+else if (Model.Content.FeaturedImageJson.IsSet())
+{
+<meta property="og:image" content="@Model.Content.FeaturedImage.LargeUrl" />
+<meta property="og:image:secure_url" content="@Model.Content.FeaturedImage.LargeUrl" />
+<meta name="twitter:image" content="@Model.Content.FeaturedImage.LargeUrl" />
+}
+else
+{
+<meta property="og:image" content="@_seoSettings.OgImageUrl" />
+<meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
+<meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
+}
+<meta property="og:description" content="@description" />
+<meta name="twitter:title" content="@title" />
+<meta name="twitter:description" content="@description" />
 }
 @if (template.IsSet())
 {

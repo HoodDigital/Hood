@@ -1,0 +1,61 @@
+@model RoleListModel<Auth0Role>
+@{
+    Layout = null;
+}
+@if (Model.TotalCount > 0)
+{
+    @foreach (var role in Model.List)
+    {
+        <div class="card hover mb-3 p-3">
+            <div class="row no-gutters align-items-center">
+                <div class="col">
+                    <div class="mb-2">
+                        <h3 class="card-title d-lg-inline">
+                            <a asp-action="EditRole" asp-route-roleName="@role.Name" class="text-decoration-none">@role.Name</a>
+                        </h3>
+                    </div>
+                    @if (role.RemoteRole != null)
+                    {
+                        <alert type="Success" class="mb-0">
+                            <div>This role is currently linked to a remote role on Auth0.</div>
+                            <div><strong>Auth0 Role Id: @role.RemoteRole.Id - @role.RemoteRole.Name</strong></div>
+                        </alert>
+                    }
+                    else
+                    {
+                        if (role.RemoteId.IsSet())
+                        {
+                            <alert type="Danger" class="mb-0">
+                                <div>This role is incorrectly linked, and the remote role cannot be found.</div>
+                                <a asp-action="LinkRole" asp-controller="Users" asp-route-area="Admin" asp-route-roleName="@role.Name">Relink Role</a>
+                            </alert>
+                        }
+                        else
+                        {
+                            <alert type="Danger" class="mb-0">
+                                <div>This role is not linked to a remote role so cannot be used for access control.</div>
+                                <a asp-action="LinkRole" asp-controller="Users" asp-route-area="Admin" asp-route-roleName="@role.Name">Link Role</a>
+                            </alert>
+                        }
+                    }
+                </div>
+                <div class="col-auto d-flex align-items-center">
+                    <button type="button" class="btn btn-lg shadow-none v-middle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" asp-action="EditRole" asp-route-roleName="@role.Name"><i class="fa fa-edit"></i> Edit</a>
+                        <a class="dropdown-item" asp-action="DeleteRole" asp-route-roleName="@role.Name"><i class="fa fa-trash-alt"></i> Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <partial name="_Pagination" />
+}
+else
+{
+    <alert type="Info" icon="fa-info" size="Epic" class="text-center m-0">
+        No users found.
+    </alert>
+}

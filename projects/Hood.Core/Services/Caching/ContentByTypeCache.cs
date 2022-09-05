@@ -1,4 +1,5 @@
-﻿using Hood.Core;
+﻿using Hood.Contexts;
+using Hood.Core;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.EntityFrameworkCore;
@@ -43,9 +44,9 @@ namespace Hood.Caching
 
         public void ResetCache()
         {
-            var options = new DbContextOptionsBuilder<HoodDbContext>();
+            var options = new DbContextOptionsBuilder<ContentContext>();
             options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
-            var db = new HoodDbContext(options.Options);
+            var db = new ContentContext(options.Options);
 
             ContentSettings contentSettings = Engine.Settings.Content;
             bySlug = new Dictionary<string, Lazy<Dictionary<int, Content>>>();

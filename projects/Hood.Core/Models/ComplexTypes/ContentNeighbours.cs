@@ -2,7 +2,7 @@
 {
     public class ContentNeighbours
     {
-        public Content Next { get; set; }
-        public Content Previous { get; set; }
+        public ContentView Next { get; set; }
+        public ContentView Previous { get; set; }
     }
 }

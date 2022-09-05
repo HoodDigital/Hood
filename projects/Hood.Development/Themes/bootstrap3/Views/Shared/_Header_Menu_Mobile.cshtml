@@ -27,7 +27,7 @@
             }
         }
     </ul>
-    <h4><a asp-action="Index" asp-controller="Manage">Account</a></h4>
+    <h4><a asp-action="Index" asp-controller="Account">Account</a></h4>
     <ul>
         @if (User.Identity.IsAuthenticated)
         {
@@ -40,7 +40,7 @@
                 </li>
             }
             <li>
-                <a asp-action="ChangePassword" asp-controller="Manage">
+                <a asp-action="ChangePassword" asp-controller="Account">
                     <i class="fa fa-lock m-r-xs"></i>Change Password
                 </a>
             </li>

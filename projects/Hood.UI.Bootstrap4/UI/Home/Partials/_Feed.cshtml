@@ -15,7 +15,7 @@
                         @if (content.ShowAuthor)
                         {
                             <p class="text-muted mb-0">
-                                <small><i class="fa fa-calendar mr-2"></i>@content.PublishDate.ToShortDateString() by <a href="@string.Format("/{0}/author/{1}", Model.ContentType.Type.ToLower(), content.Author.UserName)">content.Author.ToDisplayName()</a></small>
+                                <small><i class="fa fa-calendar mr-2"></i>@content.PublishDate.ToShortDateString() by @content.ToDisplayName()</small>
                             </p>
                         }
                         else

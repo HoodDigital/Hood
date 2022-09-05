@@ -6,14 +6,14 @@
             @if (Model.Content.ShowAuthor)
             {
                 <p>
-                    <span class="me-3"><i class="fa fa-user"></i> <a href="@string.Format("/{0}/author/{1}", Model.ContentType.Type.ToLower(), Model.Content.Author.UserName)">@Model.Content.Author.ToDisplayName()</a></span>
-                    <span><i class="fa fa-clock"></i> @Model.Content.PublishDate.ToLongDateString() at @Model.Content.PublishDate.ToShortTimeString()</span>
+                    <span class="m-r-sm"><i class="fa fa-user"></i> @Model.Content.ToDisplayName()</span>
+                    <span><i class="fa fa-clock-o"></i> @Model.Content.PublishDate.ToLongDateString() at @Model.Content.PublishDate.ToShortTimeString()</span>
                 </p>
-            } 
+            }
             else
             {
                 <p>
-                    <span><i class="fa fa-clock"></i> @Model.Content.PublishDate.ToLongDateString() at @Model.Content.PublishDate.ToShortTimeString()</span>
+                    <span><i class="fa fa-clock-o"></i> @Model.Content.PublishDate.ToLongDateString() at @Model.Content.PublishDate.ToShortTimeString()</span>
                 </p>
             }
             <p>@Model.Content.Excerpt</p>

@@ -1,5 +1,4 @@
 @inject IContentRepository _content
-@model HeaderModel
 @{
     BasicSettings _basicSettings = Engine.Settings.Basic;
 }
@@ -27,7 +26,7 @@
                         </li>
                     }
                     <li class="nav-item">
-                        <a class="nav-link text-muted" asp-action="Index" asp-controller="Manage">
+                        <a class="nav-link text-muted" asp-action="Index" asp-controller="Account">
                             <i class="fa fa-cogs me-3"></i>Manage Account
                         </a>
                     </li>

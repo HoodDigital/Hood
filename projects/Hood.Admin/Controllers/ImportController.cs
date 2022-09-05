@@ -1,5 +1,5 @@
 ﻿using Hood.Core;
-using Hood.Controllers;
+using Hood.Admin.BaseControllers;
 using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
@@ -8,11 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.IO;
 using System.Threading.Tasks;
+using Hood.Constants.Identity;
 
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Hood.Identity.Policies.Active, Roles = "SuperUser,Admin")]
+    [Authorize(Policies.Active, Roles = "SuperUser,Admin")]
 
     public class ImportController : BaseImportController
     {

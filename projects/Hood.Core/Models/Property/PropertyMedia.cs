@@ -1,4 +1,5 @@
-﻿using Hood.Interfaces;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Hood.Interfaces;
 using Newtonsoft.Json;
 
 namespace Hood.Models
@@ -7,6 +8,8 @@ namespace Hood.Models
     {
         [JsonIgnore]
         public PropertyListing Property { get; set; }
+        [NotMapped]
+        public PropertyListingView PropertyListingView { get; set; }
         public int PropertyId { get; set; }
 
         public PropertyMedia()
@@ -27,6 +30,8 @@ namespace Hood.Models
     {
         [JsonIgnore]
         public PropertyListing Property { get; set; }
+        [NotMapped]
+        public PropertyListingView PropertyListingView { get; set; }
         public int PropertyId { get; set; }
 
         public PropertyFloorplan()

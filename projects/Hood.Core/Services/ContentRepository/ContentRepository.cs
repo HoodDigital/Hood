@@ -1,38 +1,42 @@
 ﻿using Hood.Caching;
+using Hood.Contexts;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Interfaces;
 using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Hood.Services
 {
+
     public class ContentRepository : IContentRepository
     {
-        private readonly HoodDbContext _db;
+        private readonly ContentContext _db;
+        private readonly HoodDbContext _hoodDb;
         private readonly IHoodCache _cache;
         private readonly IEventsService _eventService;
         private readonly IWebHostEnvironment _env;
 
         public ContentRepository(
-            HoodDbContext db,
+            ContentContext db,
+            HoodDbContext hoodDb,
             IHoodCache cache,
             IWebHostEnvironment env,
             IEventsService eventService)
         {
             _db = db;
+            _hoodDb = hoodDb;
             _cache = cache;
             _eventService = eventService;
             _env = env;
@@ -41,11 +45,11 @@ namespace Hood.Services
         #region Content CRUD
         public async Task<ContentModel> GetContentAsync(ContentModel model)
         {
-            IQueryable<Content> content = _db.Content.Include(p => p.Author)
-                                                     .Include(p => p.Media)
-                                                     .Include(p => p.Metadata)
-                                                     .Include(p => p.Categories).ThenInclude(c => c.Category)
-                                                     .AsNoTracking();
+            IQueryable<ContentView> content = _db.ContentViews
+                .Include(p => p.Media)
+                .Include(p => p.Metadata)
+                .Include(p => p.Categories).ThenInclude(c => c.Category)
+                .AsNoTracking();
 
             // filter posts by type
             if (model.ContentType != null)
@@ -72,7 +76,7 @@ namespace Hood.Services
             // posts by author
             if (!string.IsNullOrEmpty(model.AuthorName))
             {
-                content = content.Where(n => n.Author.UserName == model.AuthorName);
+                content = content.Where(n => n.AuthorEmail == model.AuthorName);
             }
 
             if (model.Categories != null && model.Categories.Count > 0)
@@ -174,7 +178,7 @@ namespace Hood.Services
             return model;
         }
 
-        private static IQueryable<Content> ProcessFilterByOperator(IQueryable<Content> content, string filterString, char filterOperator)
+        private static IQueryable<ContentView> ProcessFilterByOperator(IQueryable<ContentView> content, string filterString, char filterOperator)
         {
             List<string> stringParts = filterString.Split(filterOperator).ToList();
             string value = stringParts.LastOrDefault();
@@ -199,17 +203,34 @@ namespace Hood.Services
             string cacheKey = typeof(Content).ToString() + ".Single." + id;
             if (!_cache.TryGetValue(cacheKey, out Content content) || clearCache)
             {
-                content = _db.Content.Include(p => p.Categories).ThenInclude(c => c.Category)
+                content = await _db.Content.Include(p => p.Categories).ThenInclude(c => c.Category)
                                     .Include(p => p.Media)
                                     .Include(p => p.Metadata)
-                                    .Include(p => p.Author)
-                                    .FirstOrDefault(c => c.Id == id);
+                                    .FirstOrDefaultAsync(c => c.Id == id);
                 if (content == null)
                 {
                     return content;
                 }
 
                 await RefreshMetasAsync(content);
+                _cache.Add(cacheKey, content, TimeSpan.FromMinutes(60));
+            }
+            return content;
+        }
+        public async Task<ContentView> GetContentViewByIdAsync(int id, bool clearCache = false, bool track = true)
+        {
+            string cacheKey = typeof(ContentView).ToString() + ".Single." + id;
+            if (!_cache.TryGetValue(cacheKey, out ContentView content) || clearCache)
+            {
+                content = await _db.ContentViews.Include(p => p.Categories).ThenInclude(c => c.Category)
+                                    .Include(p => p.Media)
+                                    .Include(p => p.Metadata)
+                                    .FirstOrDefaultAsync(c => c.Id == id);
+                if (content == null)
+                {
+                    return content;
+                }
+
                 _cache.Add(cacheKey, content, TimeSpan.FromMinutes(60));
             }
             return content;
@@ -265,7 +286,7 @@ namespace Hood.Services
         }
         public async Task<MediaDirectory> GetDirectoryAsync()
         {
-            MediaDirectory contentDirectory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.Slug == MediaManager.ContentDirectorySlug && md.Type == DirectoryType.System);
+            MediaDirectory contentDirectory = await _hoodDb.MediaDirectories.SingleOrDefaultAsync(md => md.Slug == MediaManager.ContentDirectorySlug && md.Type == DirectoryType.System);
             if (contentDirectory == null)
             {
                 throw new Exception("Site folder is not available.");
@@ -379,7 +400,7 @@ namespace Hood.Services
             {
                 // get all the content - sorted by publish date.
                 // find the ones either side of the id.
-                Content[] all = (await GetContentAsync(new ContentModel() { Status = ContentStatus.Published, Category = category, Type = type, PageSize = int.MaxValue, Order = "Date" })).List.ToArray();
+                ContentView[] all = (await GetContentAsync(new ContentModel() { Status = ContentStatus.Published, Category = category, Type = type, PageSize = int.MaxValue, Order = "Date" })).List.ToArray();
                 int index = Array.FindIndex(all, row => row.Id == id);
                 neighbours = new ContentNeighbours()
                 {
@@ -502,10 +523,10 @@ namespace Hood.Services
 
         #region Sitemap
         // Sitemap
-        public async Task<List<Content>> GetPages(string category = null)
+        public async Task<List<ContentView>> GetPages(string category = null)
         {
             string cacheKey = typeof(Content).ToString() + (category.IsSet() ? $".{category}" : "") + ".Pages";
-            if (!_cache.TryGetValue(cacheKey, out List<Content> pages))
+            if (!_cache.TryGetValue(cacheKey, out List<ContentView> pages))
             {
                 ContentModel content = await GetContentAsync(new ContentModel() { Type = "page", PageSize = int.MaxValue, Category = category });
                 pages = content.List;
@@ -547,7 +568,7 @@ namespace Hood.Services
                     if (type.HasPage)
                     {
                         ContentModel typeContent = await GetContentAsync(new ContentModel() { Type = type.Type, PageSize = int.MaxValue });
-                        foreach (Content content in typeContent.List.OrderByDescending(c => c.PublishDate))
+                        foreach (ContentView content in typeContent.List.OrderByDescending(c => c.PublishDate))
                         {
                             nodes.Add(new SitemapNode()
                             {
@@ -680,7 +701,7 @@ namespace Hood.Services
             var createdByMonth = data.GroupBy(p => p.month).Select(g => new { name = g.Key, count = g.Count() });
             var publishedByDate = data.GroupBy(p => p.pubdate).Select(g => new { name = g.Key, count = g.Count() });
             var publishedByMonth = data.GroupBy(p => p.pubmonth).Select(g => new { name = g.Key, count = g.Count() });
-            var byType = data.GroupBy(p => p.type).Select(g => new ContentTypeStat() { Type = Engine.Settings.Content.GetContentType(g.Key), Total = g.Count(), Name = g.Key } );
+            var byType = data.GroupBy(p => p.type).Select(g => new ContentTypeStat() { Type = Engine.Settings.Content.GetContentType(g.Key), Total = g.Count(), Name = g.Key });
 
             List<KeyValuePair<string, int>> days = new List<KeyValuePair<string, int>>();
             List<KeyValuePair<string, int>> publishDays = new List<KeyValuePair<string, int>>();
@@ -711,6 +732,63 @@ namespace Hood.Services
             return new ContentStatitsics(totalPosts, totalPublished, days, months, publishDays, publishMonths, byType);
 
         }
+        #endregion
+
+        #region Metas 
+
+        public List<string> GetMetasForTemplate(string templateName, string folder)
+        {
+            templateName = templateName.Replace("Meta:", "");
+            var _env = Engine.Services.Resolve<IWebHostEnvironment>();
+            // get the right template file (from theme or if it doesnt appear there from base)
+            string templatePath = _env.ContentRootPath + "\\Themes\\" + Engine.Settings["Hood.Settings.Theme"] + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
+            if (!System.IO.File.Exists(templatePath))
+                templatePath = _env.ContentRootPath + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
+            if (!System.IO.File.Exists(templatePath))
+                templatePath = _env.ContentRootPath + "\\UI\\" + folder + "\\" + templateName + ".cshtml";
+            if (!System.IO.File.Exists(templatePath))
+            {
+                templatePath = null;
+            }
+            string template;
+            if (templatePath != null)
+            {
+                // get the file contents 
+                template = System.IO.File.ReadAllText(templatePath);
+            }
+            else
+            {
+                var path = "~/UI/" + folder + "/" + templateName + ".cshtml";
+                if (UserInterfaceProvider.GetFiles(path).Length > 0)
+                    template = UserInterfaceProvider.ReadAllText(path);
+                else
+                    return null;
+            }
+
+            // pull out any instance of @TemplateData["XXX"]
+            Regex regex = new Regex(@"@ViewData\[\""(.*?)\""\]");
+            List<string> metas = new List<string>();
+            var matches = regex.Matches(template);
+            foreach (Match mtch in matches)
+            {
+                var meta = mtch.Value.Replace("@ViewData[\"", "").Replace("\"]", "");
+                if (meta.StartsWith("Template."))
+                    metas.Add(meta);
+            }
+
+            regex = new Regex(@"@Html.Raw\(ViewData\[\""(.*?)\""\]\)");
+            matches = regex.Matches(template);
+            foreach (Match mtch in matches)
+            {
+                var meta = mtch.Value.Replace("@Html.Raw(ViewData[\"", "").Replace("\"])", "");
+                if (meta.StartsWith("Template."))
+                    metas.Add(meta);
+            }
+            // return list of all XXX metas.
+            return metas.Distinct().ToList();
+        }
+
+
         #endregion
     }
 

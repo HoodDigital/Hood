@@ -8,7 +8,7 @@ namespace Hood.Models
 {
     public class VerifyEmailModel : IEmailSendable
     {
-        public VerifyEmailModel(ApplicationUser user, string confirmationLink)
+        public VerifyEmailModel(IUserProfile user, string confirmationLink)
         {
             User = user;
             ConfirmLink = confirmationLink;
@@ -17,7 +17,7 @@ namespace Hood.Models
         public EmailAddress From { get; set; } = null;
         public EmailAddress ReplyTo { get; set; } = null;
 
-        public ApplicationUser User { get; set; }
+        public IUserProfile User { get; set; }
         public string ConfirmLink { get; }
 
         public EmailAddress To

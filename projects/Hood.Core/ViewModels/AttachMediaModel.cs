@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 
-namespace Hood.Areas.Admin.Controllers
+namespace Hood.ViewModels
 {
     public class AttachMediaModel
     {

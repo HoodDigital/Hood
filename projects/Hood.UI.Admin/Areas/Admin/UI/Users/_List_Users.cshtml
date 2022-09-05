@@ -1,4 +1,4 @@
-@model UserListModel
+@model UserListModel<UserProfileView<IdentityRole>>
 @{
     Layout = null;
 }
@@ -48,7 +48,9 @@
                             Email:
                             <strong>@user.Email</strong>
                             @if (!user.EmailConfirmed)
-                            {<i class="fa fa-exclamation-triangle text-danger" title="Email not confirmed."></i>}
+                            {
+                                <i class="fa fa-exclamation-triangle text-danger" title="Email not confirmed."></i>
+                            }
                         </small>
                     </p>
                 </div>

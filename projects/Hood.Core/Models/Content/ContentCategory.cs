@@ -42,6 +42,8 @@ namespace Hood.Models
         [JsonIgnore]
         [IgnoreDataMember]
         public Content Content { get; set; }
+        [NotMapped]
+        public ContentView ContentView { get; set; }
     }
 
 }

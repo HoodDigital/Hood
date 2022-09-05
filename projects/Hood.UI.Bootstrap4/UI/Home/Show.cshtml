@@ -50,7 +50,7 @@
 }
 @section metas {
     <meta name="description" content="@description" />
-    <meta property="og:author" content="@Model.Content.Author.ToDisplayName()" />
+    <meta property="og:author" content="@Model.Content.ToDisplayName()" />
     <meta property="og:title" content="@title" />
     @if (Model.Content.ShareImageJson.IsSet())
     {

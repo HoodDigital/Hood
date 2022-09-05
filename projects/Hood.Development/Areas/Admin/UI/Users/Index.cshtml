@@ -1,4 +1,5 @@
-@model UserListModel
+@model UserListModel<UserProfileView<IdentityRole>>
+@inject IPasswordAccountRepository _account;
 @{
     ViewBag.Title = "Website Users";
 }
@@ -94,7 +95,7 @@
                 </div>
                 <div class="card-body p-0 collapse show" aria-labelledby="users-roles-panel-heading" id="users-roles-panel">
                     <div class="list-group list-group-flush">
-                        @foreach (var role in (await Engine.AccountManager.GetRolesAsync()).List)
+                        @foreach (var role in (await _account.GetRolesAsync(new RoleListModel<IdentityRole>() { PageSize = int.MaxValue })).List)
                         {
                             <div class="list-group-item list-group-item-action p-2">
                                 <div class="form-check form-switch">

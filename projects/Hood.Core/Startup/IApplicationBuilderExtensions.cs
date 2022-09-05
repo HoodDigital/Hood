@@ -24,7 +24,6 @@ namespace Hood.Startup
     {
         public static IApplicationBuilder UseHood(this IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config)
         {
-
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.GetCultureInfo("en-GB");
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-GB");
 
@@ -65,7 +64,7 @@ namespace Hood.Startup
                 app.UseAuthentication();
                 app.UseAuthorization();
 
-                var cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Constants.CookieDefaultName;
+                var cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Authentication.CookieDefaultName;
 
                 var builder = new CookieBuilder() { Name = $".{cookieName}.Session" };
                 builder.Expiration = TimeSpan.FromMinutes(config.GetValue("Session:Timeout", 60));
@@ -78,11 +77,11 @@ namespace Hood.Startup
             }
 
             app.UseHoodComponents(env, config);
+            
             app.UseHoodDefaultRoutes(config);
 
             return app;
         }
-
         public static IApplicationBuilder UseHoodComponents(this IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config)
         {
             if (app == null)
@@ -107,25 +106,6 @@ namespace Hood.Startup
         }
         public static IApplicationBuilder UseHoodDefaultRoutes(this IApplicationBuilder app, IConfiguration config)
         {
-            try
-            {
-
-                if (config.IsDatabaseConnected())
-                {
-                    try
-                    {
-                        var context = Engine.Services.Resolve<HoodDbContext>();
-                        var profile = context.UserProfiles.FirstOrDefault();
-                    }
-                    catch (Microsoft.Data.SqlClient.SqlException ex)
-                    {
-                        throw new StartupException("Database views are not installed.", ex, StartupError.DatabaseViewsNotInstalled);
-                    }
-                }
-            }
-            catch (StartupException)
-            { }
-
             app.UseEndpoints(endpoints =>
             {
 

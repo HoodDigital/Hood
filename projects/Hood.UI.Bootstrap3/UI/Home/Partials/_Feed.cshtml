@@ -15,7 +15,7 @@
                     @if (content.ShowAuthor)
                     {
                         <p>
-                            <span class="m-r-sm"><i class="fa fa-user"></i> <a href="@string.Format("/{0}/author/{1}", Model.ContentType.Type.ToLower(), content.Author.UserName)">content.Author.ToDisplayName()</a></span>
+                            <span class="m-r-sm"><i class="fa fa-user"></i> <a href="@string.Format("/{0}/author/{1}", Model.ContentType.Type.ToLower(), content.AuthorEmail)">content.Author.ToDisplayName()</a></span>
                             <span><i class="fa fa-clock-o"></i> @content.PublishDate.ToLongDateString() at @content.PublishDate.ToShortTimeString()</span>
                         </p>
                     }

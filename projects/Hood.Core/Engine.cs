@@ -160,20 +160,10 @@ namespace Hood.Core
 
                     return _contextAccessor.HttpContext.User;
                 }
-                catch (SqlException)
+                catch (Exception)
                 {
                     return null;
                 }
-            }
-        }
-        /// <summary>
-        /// Gets the current resolvable version of the IAccountRepository.
-        /// </summary>
-        public static IAccountRepository AccountManager
-        {
-            get
-            {
-                return Services.Resolve<IAccountRepository>();
             }
         }
         /// <summary>

@@ -14,7 +14,13 @@ using System.Linq;
 
 namespace Hood.Models
 {
-    public partial class Content : BaseEntity
+
+    public class Content : BaseContent
+    {
+
+    }
+
+    public partial class BaseContent : BaseEntity
     {
         // Content
         [Required]
@@ -30,7 +36,7 @@ namespace Hood.Models
         [FormUpdatable]
         [Display(Name = "URL Slug", Description = "Do not start your url slug with reserved words as they will not reach this page.<br />These include: <strong>account, about, store, admin, api, services.</strong>")]
         public string Slug { get; set; }
-        
+
 
         // Parent Content
         public int? ParentId { get; set; }
@@ -58,11 +64,6 @@ namespace Hood.Models
         public DateTime LastEditedOn { get; set; }
         public string LastEditedBy { get; set; }
 
-        // Logs and notes
-        public string UserVars { get; set; }
-        public string Notes { get; set; }
-        public string SystemNotes { get; set; }
-
         // View and Sharecounts
         public int Views { get; set; }
         public int ShareCount { get; set; }
@@ -73,7 +74,7 @@ namespace Hood.Models
         {
             get
             {
-                if (Type == null || Type.HideAuthor || Author == null || Author.Anonymous)
+                if (Type == null || Type.HideAuthor)
                 {
                     return false;
                 }
@@ -88,7 +89,7 @@ namespace Hood.Models
         [FormUpdatable]
         [Display(Name = "Featured Content", Description = "This will appear in the featured lists on which can be displayed in templates.")]
         public bool Featured { get; set; }
-       
+
         // Formatted Members
         public string StatusString
         {
@@ -177,8 +178,6 @@ namespace Hood.Models
         [FormUpdatable]
         [Display(Name = "Author/Owner", Description = "The author or creator of this content.")]
         public string AuthorId { get; set; }
-        [Display(Name = "Author/Owner", Description = "The author or creator of this content.")]
-        public ApplicationUser Author { get; set; }
 
         public List<ContentCategoryJoin> Categories { get; set; }
         public List<ContentMeta> Metadata { get; set; }
@@ -211,7 +210,7 @@ namespace Hood.Models
         [NotMapped]
         public Dictionary<string, string> Templates { get; set; }
         [NotMapped]
-        public List<UserProfile> Authors { get; set; }
+        public IList<IUserProfile> Authors { get; set; }
         #endregion
 
         #region Metadata
@@ -250,7 +249,7 @@ namespace Hood.Models
 
             var newMeta = new ContentMeta()
             {
-                Name = name, 
+                Name = name,
                 Type = metaType,
                 ContentId = Id
             };
