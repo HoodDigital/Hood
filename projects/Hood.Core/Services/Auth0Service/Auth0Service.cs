@@ -268,7 +268,7 @@ namespace Hood.Services
             var client = await GetClientAsync();
             var remoteRole = await client.Roles.CreateAsync(new RoleCreateRequest() {
                 Name = role.Name,
-                Description = $"Role connected to role {role.Id} on Hood CMS."
+                Description = $"Role connected to local role {role.Id}."
             });
             return remoteRole;
         }
