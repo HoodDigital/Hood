@@ -393,7 +393,6 @@ namespace Hood.BaseControllers
                     throw new Exception("There was a problem connecting your account, please try again.");
                 }
 
-                User.AddOrUpdateClaimValue(Hood.Constants.Identity.ClaimTypes.Active, "true");
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
 
                 // Round trip the user through authorize to ensure claims are up to date.
