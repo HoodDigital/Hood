@@ -1,9 +1,8 @@
-IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
+IF OBJECT_ID(N'[__HoodMigrationHistory]') IS NULL
 BEGIN
-    CREATE TABLE [__EFMigrationsHistory] (
+    CREATE TABLE [__HoodMigrationHistory] (
         [MigrationId] nvarchar(150) NOT NULL,
-        [ProductVersion] nvarchar(32) NOT NULL,
-        CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+        CONSTRAINT [PK___HoodMigrationHistory] PRIMARY KEY ([MigrationId])
     );
 END;
 GO
@@ -974,6 +973,6 @@ GO
 IF EXISTS(select * FROM sys.views where name = 'HoodUserSubscriptionsView') DROP VIEW HoodUserSubscriptionsView
 GO
 
-INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'Hood_ScriptMigrations_v6.0', N'6.0.9');
+INSERT INTO [__HoodMigrationHistory] ([MigrationId])
+VALUES (N'Hood_ScriptMigrations_v6.0');
 GO

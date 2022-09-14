@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using System;
 using System.IO;
 using System.Linq;
@@ -109,5 +110,18 @@ namespace Hood.Contexts
             }
         }
 
+    }
+    
+    /// <summary>
+    /// Factory for creating the IdentityContext, only used for script creation.
+    /// </summary>
+    public class IdentityContextFactory : IDesignTimeDbContextFactory<IdentityContext>
+    {
+        public IdentityContext CreateDbContext(string[] args)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<IdentityContext>();
+            optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=Hood.Web;Trusted_Connection=True;MultipleActiveResultSets=true;");
+            return new IdentityContext(optionsBuilder.Options);
+        }
     }
 }
