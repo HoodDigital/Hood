@@ -7,23 +7,6 @@ BEGIN
 END;
 GO
 
-ALTER TABLE [AspNetRoles] ADD [RemoteId] nvarchar(max) NULL;
-GO
-
-CREATE TABLE [AspNetAuth0Identities] (
-    [Id] nvarchar(450) NOT NULL,
-    [LocalUserId] nvarchar(450) NULL,
-    [IsPrimary] bit NOT NULL,
-    [Picture] nvarchar(max) NULL,
-    [Connection] nvarchar(max) NULL,
-    [IsSocial] bit NULL,
-    [Provider] nvarchar(max) NULL,
-    [UserId] nvarchar(max) NULL,
-    CONSTRAINT [PK_AspNetAuth0Identities] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_AspNetAuth0Identities_AspNetUsers_LocalUserId] FOREIGN KEY ([LocalUserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE
-);
-GO
-
 IF EXISTS(select * FROM sys.views where name = 'HoodAuth0UserProfiles') DROP VIEW HoodAuth0UserProfiles
 GO
 CREATE VIEW HoodAuth0UserProfiles AS
