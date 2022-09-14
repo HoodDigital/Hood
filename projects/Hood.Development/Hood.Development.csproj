@@ -15,5 +15,12 @@
     <ProjectReference Include="..\Hood.UI.Core\Hood.UI.Core.csproj" />
     <ProjectReference Include="..\Hood.UI.Bootstrap4\Hood.UI.Bootstrap4.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.9">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
 
 </Project>
