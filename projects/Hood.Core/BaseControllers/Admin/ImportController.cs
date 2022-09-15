@@ -32,7 +32,7 @@ namespace Hood.Admin.BaseControllers
             var triggerAuth = Engine.Settings.Property.TriggerAuthKey;
             if (Request.Headers.ContainsKey("Auth") && Request.Headers["Auth"] == triggerAuth && !_blm.IsRunning())
             {
-               await _blm.RunUpdate(HttpContext);
+                await _blm.RunUpdate(HttpContext, "none", "none");
                 return StatusCode(200);
             }
 
@@ -59,10 +59,11 @@ namespace Hood.Admin.BaseControllers
 
         [HttpPost]
         [Route("admin/property/import/blm/start/")]
-        public virtual IActionResult BlmImporterStart()
+        public virtual async Task<IActionResult> BlmImporterStart()
         {
             _blm.Kill();
-            _blm.RunUpdate(HttpContext);
+            var user = Engine.Account.GetLocalUserId();
+            await _blm.RunUpdate(HttpContext, "none", "none");
             return Json(new { success = true });
         }
 

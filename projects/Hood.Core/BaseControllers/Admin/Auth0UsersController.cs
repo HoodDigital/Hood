@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Hood.Admin.BaseControllers
 {
-    [Authorize(Policies.Active, Roles = "SuperUser,Admin")]
+    [Authorize(Roles = "SuperUser,Admin")]
     public abstract class Auth0UsersController : BaseController
     {
         protected readonly IAuth0AccountRepository _account;

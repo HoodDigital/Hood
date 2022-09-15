@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Newtonsoft.Json;
@@ -353,6 +354,19 @@ namespace Hood.Models
             }
 
             await SaveChangesAsync();
+        }
+    }
+    
+    /// <summary>
+    /// Factory for creating the HoodDbContext, only used for script creation.
+    /// </summary>
+    public class HoodDbContextFactory : IDesignTimeDbContextFactory<HoodDbContext>
+    {
+        public HoodDbContext CreateDbContext(string[] args)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<HoodDbContext>();
+            optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=Hood.Web;Trusted_Connection=True;MultipleActiveResultSets=true;");
+            return new HoodDbContext(optionsBuilder.Options);
         }
     }
 }

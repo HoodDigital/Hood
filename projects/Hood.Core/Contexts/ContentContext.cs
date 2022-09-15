@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Newtonsoft.Json;
@@ -62,5 +63,18 @@ namespace Hood.Contexts
             builder.Entity<ContentView>().HasMany(c => c.Media).WithOne(c=> c.ContentView).HasForeignKey(c => c.ContentId);
         }
 
+    }
+    
+    /// <summary>
+    /// Factory for creating the ContentContext, only used for script creation.
+    /// </summary>
+    public class ContentContextFactory : IDesignTimeDbContextFactory<ContentContext>
+    {
+        public ContentContext CreateDbContext(string[] args)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<ContentContext>();
+            optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=Hood.Web;Trusted_Connection=True;MultipleActiveResultSets=true;");
+            return new ContentContext(optionsBuilder.Options);
+        }
     }
 }

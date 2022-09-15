@@ -90,7 +90,8 @@ namespace Hood.Services
         private bool Cancelled { get; set; }
         private bool FileError { get; set; }
         private List<string> RemoteList { get; set; }
-        private ApplicationUser User { get; set; }
+        private string _userId { get; set; }
+        private string _userName { get; set; }
         private IMediaManager _media;
         private PropertySettings _propertySettings;
         private PropertyContext _db { get; set; }
@@ -100,7 +101,7 @@ namespace Hood.Services
         private readonly ILogService _logService;
         private string DirectoryPath { get; set; }
 
-        public async Task RunUpdate(HttpContext context)
+        public async Task RunUpdate(HttpContext context, string userId, string userName)
         {
             try
             {
@@ -118,6 +119,8 @@ namespace Hood.Services
                 Cancelled = false;
                 Succeeded = false;
                 FileError = false;
+                _userId = userId;
+                _userName = userName;
                 RemoteList = new List<string>();
                 Errors = new List<string>();
                 Warnings = new List<string>();
@@ -127,9 +130,9 @@ namespace Hood.Services
                 DbContextOptionsBuilder<HoodDbContext> dbOptions = new DbContextOptionsBuilder<HoodDbContext>();
                 dbOptions.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
                 _hoodDb = new HoodDbContext(dbOptions.Options);
-                
+
                 DbContextOptionsBuilder<PropertyContext> propertyDbOptions = new DbContextOptionsBuilder<PropertyContext>();
-                dbOptions.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
+                propertyDbOptions.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
                 _db = new PropertyContext(propertyDbOptions.Options);
 
                 _media = new MediaManager(_env, _config);
@@ -968,12 +971,12 @@ namespace Hood.Services
 
             property.Reference = data["AGENT_REF"];
 
-            property.LastEditedBy = User.UserName;
+            property.LastEditedBy = _userName;
             property.LastEditedOn = DateTime.UtcNow;
 
             if (property.UserVars != "IMPORTED")
             {
-                property.CreatedBy = User.UserName;
+                property.CreatedBy = _userName;
                 property.CreatedOn = DateTime.UtcNow;
             }
 
@@ -1055,7 +1058,7 @@ namespace Hood.Services
             property.Number = data["ADDRESS_1"];
             property.Address1 = data["ADDRESS_2"];
             property.Address2 = data.ContainsKey("ADDRESS_3") ? data["ADDRESS_3"] : "";
-            property.AgentId = User.Id;
+            property.AgentId = _userId;
             property.AllowComments = false;
             property.AgentInfo = data.ContainsKey("ADMINISTRATION_FEE") ? data["ADMINISTRATION_FEE"] : "";
             property.City = data.ContainsKey("TOWN") ? data["TOWN"] : "";

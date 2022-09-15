@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Newtonsoft.Json;
@@ -60,5 +61,18 @@ namespace Hood.Contexts
             builder.Entity<PropertyListingView>().HasMany(c => c.FloorPlans).WithOne(c=> c.PropertyListingView).HasForeignKey(c => c.PropertyId);
         }
 
+    }
+    
+    /// <summary>
+    /// Factory for creating the PropertyContext, only used for script creation.
+    /// </summary>
+    public class PropertyContextFactory : IDesignTimeDbContextFactory<PropertyContext>
+    {
+        public PropertyContext CreateDbContext(string[] args)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<PropertyContext>();
+            optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=Hood.Web;Trusted_Connection=True;MultipleActiveResultSets=true;");
+            return new PropertyContext(optionsBuilder.Options);
+        }
     }
 }

@@ -3,6 +3,7 @@ using Hood.Enums;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -121,5 +122,17 @@ namespace Hood.Contexts
         }
 
     }
-
+    
+    /// <summary>
+    /// Factory for creating the Auth0IdentityContext, only used for script creation.
+    /// </summary>
+    public class Auth0IdentityContextFactory : IDesignTimeDbContextFactory<Auth0IdentityContext>
+    {
+        public Auth0IdentityContext CreateDbContext(string[] args)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<Auth0IdentityContext>();
+            optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=Hood.Web;Trusted_Connection=True;MultipleActiveResultSets=true;");
+            return new Auth0IdentityContext(optionsBuilder.Options);
+        }
+    }
 }

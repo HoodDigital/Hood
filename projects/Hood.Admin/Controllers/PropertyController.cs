@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Policies.Active, Roles = "SuperUser,Admin,Editor")]
+    [Authorize(Roles = "SuperUser,Admin,Editor")]
     public class PropertyController : BasePropertyController
     {
         public PropertyController()
