@@ -207,7 +207,24 @@ namespace Hood.Core
             {
                 return localPath;
             }
-            return $"https://cdn.jsdelivr.net/npm/hoodcms@{Version}{localPath}";
+            return $"{CdnPath}@{Version}{localPath}";
+        }
+
+        public static string CdnPath
+        {
+            get
+            {
+                try
+                {
+                    if (Configuration.CdnPath.IsSet())
+                    {
+                        return Configuration.CdnPath;
+                    }
+                }
+                catch (Exception)
+                { }
+                return "https://cdn.jsdelivr.net/npm/hoodcms";
+            }
         }
 
         public static string SiteOwnerEmail

@@ -7,7 +7,7 @@ namespace Hood.Services
     {
         bool IsComplete();
         bool IsRunning();
-        Task RunUpdate(HttpContext context);
+        Task RunUpdate(HttpContext context, string userId, string userName);
         void Kill();
         PropertyImporterReport Report();
     }

@@ -16,6 +16,7 @@ namespace Hood.Core
         public bool ApplyMigrationsAutomatically { get; set; }
         public LogLevel LogLevel { get; set; }
         public bool BypassCDN { get; set; }
+        public string CdnPath { get; set; }
         public Integrations Integrations { get; set; }
     }
 

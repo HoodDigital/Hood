@@ -7,6 +7,12 @@ BEGIN
 END;
 GO
 
+ALTER TABLE [dbo].[HoodContent] DROP CONSTRAINT [FK_HoodContent_AspNetUsers_AuthorId]
+GO
+
+ALTER TABLE [dbo].[HoodProperties] DROP CONSTRAINT [FK_HoodProperties_AspNetUsers_AgentId]
+GO
+
 IF EXISTS(select * FROM sys.views where name = 'HoodAuth0UserProfiles') DROP VIEW HoodAuth0UserProfiles
 GO
 CREATE VIEW HoodAuth0UserProfiles AS
