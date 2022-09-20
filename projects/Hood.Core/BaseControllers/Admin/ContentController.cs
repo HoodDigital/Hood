@@ -464,7 +464,7 @@ namespace Hood.Admin.BaseControllers
                         break;
                 }
 
-                await _db.SaveChangesAsync();
+                await _contentDb.SaveChangesAsync();
 
                 string cacheKey = typeof(Content).ToString() + ".Single." + id;
                 _cache.Remove(cacheKey);
@@ -501,7 +501,7 @@ namespace Hood.Admin.BaseControllers
                         break;
                 }
 
-                await _db.SaveChangesAsync();
+                await _contentDb.SaveChangesAsync();
                 _cache.Remove(cacheKey);
                 return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
 
@@ -559,7 +559,7 @@ namespace Hood.Admin.BaseControllers
                         propertyMedia.ContentId = content.Id;
                         propertyMedia.Id = 0;
                         _contentDb.ContentMedia.Add(propertyMedia);
-                        await _db.SaveChangesAsync();
+                        await _contentDb.SaveChangesAsync();
 
                     }
                 }
@@ -578,8 +578,8 @@ namespace Hood.Admin.BaseControllers
             try
             {
                 ContentMedia media = await _contentDb.ContentMedia.SingleOrDefaultAsync(m => m.Id == mediaId);
-                _db.Entry(media).State = EntityState.Deleted;
-                await _db.SaveChangesAsync();
+                _contentDb.Entry(media).State = EntityState.Deleted;
+                await _contentDb.SaveChangesAsync();
                 return new Response(true, "The image has now been removed.");
             }
             catch (Exception ex)
@@ -723,7 +723,7 @@ namespace Hood.Admin.BaseControllers
                     }
                 }
             }
-            await _db.SaveChangesAsync();
+            await _contentDb.SaveChangesAsync();
         }
 
     }
