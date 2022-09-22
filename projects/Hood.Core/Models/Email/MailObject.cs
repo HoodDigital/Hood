@@ -57,7 +57,7 @@ namespace Hood.Models
                 return
                 @$"<tr>
                     <td style='background-color:{TextAreaColour};padding:{MailPadding};text-align:{LogoAlign}'>
-                        <h1 class='align-{LogoAlign}' style='padding:{MailPadding};color:#222222;margin:0;margin-bottom:0px;text-align:{LogoAlign};text-decoration:none;'>
+                        <h1 class='align-{LogoAlign}' style='color:#222222;margin:0;margin-bottom:0px;text-align:{LogoAlign};text-decoration:none;'>
                             <img src='{Logo}' alt='{Title}' align='center' style='border:none;-ms-interpolation-mode:bicubic;max-height:50px;height:auto;width:auto;' height='50'>
                         </h1>
                     </td>
@@ -66,7 +66,7 @@ namespace Hood.Models
                 return
                 @$"<tr>
                     <td style='background-color:{TextAreaColour};padding:{MailPadding};text-align:{LogoAlign}'>
-                        <h1 class='align-{LogoAlign}' style='padding:{MailPadding};color:#222222;{GetFontStyles(2.5)}margin-bottom:0px;text-align:{LogoAlign};text-decoration:none;'>
+                        <h1 class='align-{LogoAlign}' style='color:#222222;{GetFontStyles(2.5)}margin-bottom:0px;text-align:{LogoAlign};text-decoration:none;'>
                             {Title}
                         </h1>
                     </td>
