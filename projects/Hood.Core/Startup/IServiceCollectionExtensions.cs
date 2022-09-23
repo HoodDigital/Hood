@@ -29,6 +29,8 @@ using Hood.Enums;
 using Hood.Contexts;
 using Microsoft.AspNetCore.Hosting;
 using Hood.Constants.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Newtonsoft.Json;
 
 namespace Hood.Startup
 {
@@ -39,45 +41,133 @@ namespace Hood.Startup
     {
         public static IServiceCollection ConfigureHood(this IServiceCollection services, IConfiguration config, IWebHostEnvironment env)
         {
+            try
+            {
+                // Register core stuff.
+                services.ConfigureHoodBasics(config, env);
+                services.ConfigureHoodSite(config, env);
+                services.ConfigureHoodEngine(config);
+            }
+            catch (StartupException) { }
+            return services;
+        }
+
+        public static IServiceCollection ConfigureHoodApi(this IServiceCollection services, IConfiguration config, IWebHostEnvironment env)
+        {
+            try
+            {
+                services.ConfigureHoodCore(config, env);
+
+                services.AddCors(options =>
+                {
+                    string[] domains = config.GetSection("Cors:Domains").Get<string[]>();
+                    options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins(domains);
+                    });
+                });
+
+                services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(options =>
+                    {
+                        options.Authority = $"https://{config["Identity:Auth0:Domain"]}/";
+                        options.Audience = config["Identity:Auth0:Audience"];
+
+                        options.Events = new JwtBearerEvents
+                        {
+                            OnChallenge = context =>
+                            {
+                                context.Response.OnStarting(async () =>
+                                {
+                                    await context.Response.WriteAsync(
+                                        JsonConvert.SerializeObject(new ApiResponse("You are not authorized!"))
+                                    );
+                                });
+                                return Task.CompletedTask;
+                            }
+                        };
+                    });
+
+                services.AddAuthorization(options =>
+                {
+                    options.AddPolicy("Admin", policy =>
+                    policy.RequireAssertion(context =>
+                        context.User.HasClaim(c =>
+                            (c.Type == "permissions" &&
+                            c.Value == "read:admin-messages") &&
+                            c.Issuer == $"https://{config["Identity:Auth0:Domain"]}/")));
+
+                });
+
+                services.AddControllers().AddNewtonsoftJson();
+            }
+            catch (StartupException) { }
+            return services;
+        }
+
+
+        public static IServiceCollection ConfigureHoodCore(this IServiceCollection services, IConfiguration config, IWebHostEnvironment env)
+        {
+            try
+            {
+                // Register core stuff.
+                services.ConfigureHoodBasics(config, env);
+                services.ConfigureHoodEngine(config);
+            }
+            catch (StartupException) { }
+            return services;
+        }
+
+        private static IServiceCollection ConfigureHoodBasics(this IServiceCollection services, IConfiguration config, IWebHostEnvironment env)
+        {
 
             services.Configure<HoodConfiguration>(config.GetSection("Hood"));
             services.Configure<Auth0Configuration>(config.GetSection("Identity:Auth0"));
 
-            services.ConfigureHoodCoreServices();
+            services.AddSingleton<ILogService, LogService>();
+            services.AddSingleton<IAddressService, AddressService>();
 
-            try
+            services.ConfigureHoodDatabase(config);
+            services.ConfigureHoodDatabaseDependentServices();
+
+            services.ConfigureProperty(config);
+            services.ConfigureContent(config);
+
+            services.ConfigureCache(config);
+            services.ConfigureCacheProfiles();
+
+            return services;
+        }
+
+        private static IServiceCollection ConfigureHoodSite(this IServiceCollection services, IConfiguration config, IWebHostEnvironment env)
+        {
+            // Register site stuff.
+            services.AddSingleton<IThemesService, ThemesService>();
+            services.AddScoped<IRazorViewRenderer, RazorViewRenderer>();
+            services.AddScoped<IPageBuilder, PageBuilder>();
+            services.AddScoped<IRecaptchaService, RecaptchaService>();
+
+            if (!config.IsDatabaseConnected())
             {
-                if (!config.IsDatabaseConnected())
-                {
-                    throw new StartupException("Database connection string is not configured.", StartupError.NoConnectionString);
-                }
-                services.ConfigureHoodDatabase(config);
-
-                services.ConfigureHoodDatabaseDependentServices();
-
-                services.ConfigureProperty(config);
-                services.ConfigureContent(config);
-
-                if (config.IsConfigured("Identity:Auth0:Domain") && config.IsConfigured("Identity:Auth0:ClientId"))
-                {
-                    services.ConfigureAuth0(config, new Auth0LoginService(config));
-                }
-                else
-                {
-                    services.ConfigurePasswordAuthentication(config);
-                }
-
+                throw new StartupException("Database connection string is not configured.", StartupError.NoConnectionString);
             }
-            catch (StartupException) { }
+
+
+            if (config.IsConfigured("Identity:Auth0:Domain") && config.IsConfigured("Identity:Auth0:ClientId"))
+            {
+                services.ConfigureAuth0(config, new Auth0LoginService(config));
+            }
+            else
+            {
+                services.ConfigurePasswordAuthentication(config);
+            }
+
 
             if (env.EnvironmentName == "Development" || env.EnvironmentName == "Hood")
             {
                 services.AddDatabaseDeveloperPageExceptionFilter();
             }
-
-            services.ConfigureCache(config);
-            services.ConfigureCacheProfiles();
-            services.AddDistributedMemoryCache();
 
             services.ConfigureViewEngine(config);
 
@@ -102,26 +192,9 @@ namespace Hood.Startup
                 .AddApplicationPart(typeof(IServiceCollectionExtensions).Assembly);
 
             services.AddRazorPages();
-
-            services.ConfigureHoodEngine(config);
-            
             return services;
         }
 
-        public static IServiceCollection ConfigureHoodCoreServices(this IServiceCollection services)
-        {
-            // Register singletons.
-            services.AddSingleton<ILogService, LogService>();
-            services.AddSingleton<IThemesService, ThemesService>();
-            services.AddSingleton<IAddressService, AddressService>();
-
-            // Register scoped.
-            services.AddScoped<IRazorViewRenderer, RazorViewRenderer>();
-            services.AddScoped<IPageBuilder, PageBuilder>();
-            services.AddScoped<IRecaptchaService, RecaptchaService>();
-
-            return services;
-        }
         public static IServiceCollection ConfigureHoodDatabaseDependentServices(this IServiceCollection services)
         {
 
@@ -151,7 +224,7 @@ namespace Hood.Startup
 
             return services;
         }
-        
+
         #region Caching
 
         public static IServiceCollection ConfigureCache(this IServiceCollection services, IConfiguration config)
@@ -159,6 +232,7 @@ namespace Hood.Startup
             // Caching
             //if (config["ConnectionStrings:RedisCache"].IsSet())
             //{
+            //    services.AddDistributedMemoryCache();
             //    services.AddSingleton<IConnectionMultiplexer>(x => ConnectionMultiplexer.Connect(config.GetValue<string>("ConnectionStrings:RedisCache")));
             //    services.AddSingleton<IHoodCache, HoodRedisCache>();
             //}
@@ -166,8 +240,8 @@ namespace Hood.Startup
             //{
             //    services.AddSingleton<IHoodCache, HoodCache>();
             //}
+            services.AddMemoryCache();
             services.AddSingleton<IHoodCache, HoodCache>();
-
             return services;
         }
         public static IServiceCollection ConfigureCacheProfiles(this IServiceCollection services)

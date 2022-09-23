@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <UserSecretsId>Hood.Web</UserSecretsId>
+    <Copyright>Hood Digital Limited</Copyright>
+    <TypeScriptToolsVersion>4.3</TypeScriptToolsVersion>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
+  </ItemGroup>
+  
+</Project>

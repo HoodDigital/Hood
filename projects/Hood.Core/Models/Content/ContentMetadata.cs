@@ -17,6 +17,8 @@ namespace Hood.Models
         public Content Content { get; set; }
 
         [NotMapped]
+        [JsonIgnore]
+        [IgnoreDataMember] 
         public ContentView ContentView { get; set; }
     }
 }
