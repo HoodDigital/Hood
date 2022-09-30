@@ -52,9 +52,9 @@ export class Editors {
             plugins: [
                 'advlist autolink lists link image charmap print preview anchor media',
                 'searchreplace visualblocks code fullscreen',
-                'insertdatetime media contextmenu paste code textcolor'
+                'insertdatetime media contextmenu paste textcolor'
             ],
-            toolbar: "fullscreen | styleselect forecolor backcolor | hoodimage link media image | bold italic | alignleft aligncenter alignright | bullist numlist | table | undo redo",
+            toolbar: "fullscreen code | styleselect forecolor backcolor | hoodimage link media image | bold italic | alignleft aligncenter alignright | bullist numlist | table | undo redo",
             link_class_list: this.options.linkClasses,
             image_class_list: this.options.imageClasses,
             setup: this.setupCommands.bind(this),
@@ -88,9 +88,9 @@ export class Editors {
             plugins: [
                 'advlist autolink lists link image charmap print preview anchor media',
                 'searchreplace visualblocks code fullscreen',
-                'insertdatetime media contextmenu paste code textcolor'
+                'insertdatetime media contextmenu paste textcolor'
             ],
-            toolbar: "fullscreen | styleselect forecolor backcolor | hoodimage link media image | bold italic | alignleft aligncenter alignright | bullist numlist | table | undo redo",
+            toolbar: "fullscreen code | styleselect forecolor backcolor | hoodimage link media image | bold italic | alignleft aligncenter alignright | bullist numlist | table | undo redo",
             link_class_list: this.options.linkClasses,
             image_class_list: this.options.imageClasses,
             setup: this.setupCommands.bind(this),
@@ -103,7 +103,7 @@ export class Editors {
             plugins: [
                 'advlist autolink lists link image charmap print preview anchor media',
                 'searchreplace visualblocks code fullscreen',
-                'insertdatetime media contextmenu paste code'
+                'insertdatetime media contextmenu paste'
             ],
             menubar: false,
             toolbar: 'fullscreen | bold italic | bullist numlist | undo redo | link',
