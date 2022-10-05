@@ -73,7 +73,7 @@ namespace Hood.Contexts
                 // b.HasOne<Auth0Role>().WithMany(u => u.Roles).HasForeignKey(u => u.UserId);
             });
 
-            builder.Entity<UserProfileView<Auth0Role>>().HasNoKey().ToView("HoodUserProfiles");
+            builder.Entity<UserProfileView<Auth0Role>>().HasNoKey().ToView("HoodAuth0UserProfiles");
         }
 
         public async Task<IHoodIdentity> GetSiteAdmin()
