@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.Models
 {
-    public class PropertyListingView : BasePropertyListing, IName
+    public class PropertyListingView : BasePropertyListing
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -18,7 +18,7 @@ namespace Hood.Models
             set { AvatarJson = JsonConvert.SerializeObject(value); }
         }
         public string AgentEmail { get; set; }
-        public bool Anonymous { get; set; }
+        public bool? Anonymous { get; set; }
         public string DisplayName { get; set; }
         public virtual string AuthorVars { get; set; }
         [NotMapped]

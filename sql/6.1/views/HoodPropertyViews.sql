@@ -68,7 +68,7 @@ SELECT
 	AspNetUsers.Email as AgentEmail, 
 	AspNetUsers.UserVars as AuthorVars
 FROM
-	HoodProperties JOIN
+	HoodProperties LEFT OUTER JOIN
 	AspNetUsers ON HoodProperties.AgentId = AspNetUsers.Id
 GO
 

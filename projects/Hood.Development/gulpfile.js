@@ -23,7 +23,6 @@ gulp.task('clean', function(cb) {
         .pipe(rimraf({ force: true }));
 });
 
-
 gulp.task('copy:src', function() {
     return gulp.src('./wwwroot/src/**/*.*')
         .pipe(gulp.dest('./src/'));

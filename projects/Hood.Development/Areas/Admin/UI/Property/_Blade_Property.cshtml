@@ -21,38 +21,40 @@
             <div class="modal-body">
                 <input asp-for="Latitude" type="hidden">
                 <input asp-for="Longitude" type="hidden">
-                <div class="form-group floating-label">
-                    <input asp-for="Title" class="form-control">
-                    <label asp-for="Title"></label>
+                <div class="mb-3 floating-label">
+                    <label asp-for="Title">Display Address</label>
                     <small asp-for="Title"></small>
+                    <input asp-for="Title" class="form-control" required>
                 </div>
                 <hr class="mt-2 mb-4" />
-                <div class="form-group floating-label">
-                    <input asp-for="Number" class="form-control" />
+                <div class="mb-3 floating-label">
                     <label asp-for="Number"></label>
                     <small asp-for="Number"></small>
+                    <input asp-for="Number" class="form-control" />
                 </div>
-                <div class="form-group floating-label">
-                    <input asp-for="Address1" class="form-control" />
+                <div class="mb-3 floating-label">
                     <label asp-for="Address1"></label>
                     <small asp-for="Address1"></small>
+                    <input asp-for="Address1" class="form-control"  required />
                 </div>
-                <div class="form-group floating-label">
-                    <input asp-for="Address2" class="form-control">
+                <div class="mb-3 floating-label">
                     <label asp-for="Address2"></label>
                     <small asp-for="Address2"></small>
+                    <input asp-for="Address2" class="form-control">
                 </div>
-                <div class="form-group floating-label">
-                    <input asp-for="City" class="form-control">
+                <div class="mb-3 floating-label">
                     <label asp-for="City"></label>
                     <small asp-for="City"></small>
+                    <input asp-for="City" class="form-control"  required>
                 </div>
-                <div class="form-group floating-label">
-                    <input asp-for="County" class="form-control">
+                <div class="mb-3 floating-label">
                     <label asp-for="County"></label>
                     <small asp-for="County"></small>
+                    <input asp-for="County" class="form-control"  required>
                 </div>
-                <div class="form-group floating-label">
+                <div class="mb-3 floating-label">
+                    <label asp-for="Country"></label>
+                    <small asp-for="Country"></small>
                     <select class="form-control" asp-for="Country">
                         <option value="">-- Choose a country --</option>
                         @foreach (var itm in Countries.All)
@@ -67,32 +69,30 @@
                             }
                         }
                     </select>
-                    <label asp-for="Country"></label>
-                    <small asp-for="Country"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <input asp-for="Postcode" class="form-control">
+                <div class="mb-3 floating-label">
                     <label asp-for="Postcode"></label>
                     <small asp-for="Postcode"></small>
+                    <input asp-for="Postcode" class="form-control"  required>
                 </div>
                 <hr class="mt-2 mb-4" />
-                <div class="form-group floating-label">
+                <div class="mb-3 floating-label">
+                    <label asp-for="Status"></label>
+                    <small asp-for="Status"></small>
                     <select asp-for="Status" class="form-control">
                         <option value="1">Draft</option>
                         <option value="2">Published</option>
                         <option value="3">Archived</option>
                     </select>
-                    <label asp-for="Status"></label>
-                    <small asp-for="Status"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <input asp-for="PublishDate" type="datetime-local" class="form-control" />
+                <div class="mb-3 floating-label">
                     <label asp-for="PublishDate"></label>
                     <small asp-for="PublishDate"></small>
+                    <input asp-for="PublishDate" type="datetime-local" class="form-control" />
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="property-create-submit" class="btn btn-success"><i class="fa fa-save"></i> Save</button>
+                <button type="submit" id="property-create-submit" class="btn btn-success"><i class="fa fa-save"></i> Save</button>
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-ban"></i> Cancel</button>
             </div>
         </form>
