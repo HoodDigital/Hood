@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 using Hood.Interfaces;
 using Newtonsoft.Json;
 
@@ -19,8 +20,11 @@ namespace Hood.Models
 
         public int ContentId { get; set; }
         [JsonIgnore]
+        [IgnoreDataMember]
         public Content Content { get; set; }
         [NotMapped]
+        [JsonIgnore]
+        [IgnoreDataMember]
         public ContentView ContentView { get; set; }
 
         public new static IMediaObject Blank => MediaBase.Blank;
