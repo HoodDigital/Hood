@@ -74,7 +74,7 @@ namespace Hood.Admin.BaseControllers
                 var updatedFields = Request.Form.Keys.ToHashSet();
                 modelToUpdate = modelToUpdate.UpdateFromFormModel(model, updatedFields);
 
-                modelToUpdate = await _property.ReloadReferences(modelToUpdate);
+                //modelToUpdate = await _property.ReloadReferences(modelToUpdate);
 
                 modelToUpdate.LastEditedBy = User.Identity.Name;
                 modelToUpdate.LastEditedOn = DateTime.UtcNow;
@@ -155,8 +155,11 @@ namespace Hood.Admin.BaseControllers
                         {
                             modelToUpdate.AddMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
                         }
+                        var meta = modelToUpdate.GetMeta(val.Key.Replace("Meta:", ""));
+                        _propertyDb.Entry(meta).State = EntityState.Modified;
                     }
                 }
+                await _propertyDb.SaveChangesAsync();
 
                 await _property.UpdateAsync(modelToUpdate);
 
