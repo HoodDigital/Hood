@@ -5,7 +5,7 @@
     <AssemblyName>Hood.Admin</AssemblyName>
     <PackageId>Hood.Admin</PackageId>
 
-    <Version>6.0.12</Version>
+    <Version>6.0.13</Version>
     <TargetFramework>net6.0</TargetFramework>
     <Authors>Hood Digital;George Whysall;</Authors>
     <OutputType>Library</OutputType>
