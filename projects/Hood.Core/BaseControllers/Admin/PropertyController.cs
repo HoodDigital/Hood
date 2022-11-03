@@ -69,15 +69,18 @@ namespace Hood.Admin.BaseControllers
         {
             try
             {
-                var modelToUpdate = await _property.GetPropertyByIdAsync(model.Id, true);
+                PropertyListing modelToUpdate = await _propertyDb.Properties
+                    .Include(p => p.Media)
+                    .Include(p => p.FloorPlans)
+                    .Include(p => p.Metadata)
+                    .FirstOrDefaultAsync(c => c.Id == model.Id);
 
                 var updatedFields = Request.Form.Keys.ToHashSet();
                 modelToUpdate = modelToUpdate.UpdateFromFormModel(model, updatedFields);
 
-                modelToUpdate = await _property.ReloadReferences(modelToUpdate);
-
                 modelToUpdate.LastEditedBy = User.Identity.Name;
                 modelToUpdate.LastEditedOn = DateTime.UtcNow;
+                modelToUpdate.Reference = model.Reference;
 
                 if (model.AutoGeocode)
                 {
@@ -158,7 +161,7 @@ namespace Hood.Admin.BaseControllers
                     }
                 }
 
-                await _property.UpdateAsync(modelToUpdate);
+                await _propertyDb.SaveChangesAsync();
 
                 SaveMessage = "Saved";
                 MessageType = AlertType.Success;
