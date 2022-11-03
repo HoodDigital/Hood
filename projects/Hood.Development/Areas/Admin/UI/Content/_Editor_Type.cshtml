@@ -12,7 +12,7 @@
     }
 }
 @{
-    var customFields = Model.Metadata.Where(c => (c.Name.StartsWith("Content.") && !c.Name.StartsWith("Content." + Model.Type.BaseName + ".")) || c.Name.StartsWith("Custom."));
+    var customFields = Model.Metadata.Where(c => (c.Name.StartsWith("Content.") && !c.Name.StartsWith("Content." + Model.Type.BaseName + ".")) || c.Name.StartsWith("Custom.") || c.Name == "DisplayOrder");
 }
 @if (customFields.Count() > 0 && typeFields.Count() > 0)
 {
@@ -22,7 +22,7 @@
 {
     @foreach (ContentMeta cm in customFields.OrderBy(cm => cm.Name))
     {
-            <partial name="_Editor_Metadata" model="cm" />
+        <partial name="_Editor_Metadata" model="cm" />
     }
 }
 else
