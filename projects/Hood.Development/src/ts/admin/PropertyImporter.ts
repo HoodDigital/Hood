@@ -77,7 +77,7 @@ export class PropertyImporter {
                 if (result.importer.running) {
                     this.showInfo();
                     clearInterval(this.updateInterval);
-                    this.updateInterval = window.setTimeout(this.update, 250);
+                    this.updateInterval = window.setTimeout(this.update.bind(this), 250);
                 } else {
                     clearInterval(this.updateInterval);
                     this.hideInfo();
