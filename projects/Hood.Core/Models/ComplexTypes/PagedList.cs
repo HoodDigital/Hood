@@ -3,6 +3,7 @@ using Hood.BaseTypes;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,6 +43,7 @@ namespace System.Collections.Generic
         /// Page index
         /// </summary>
         [FromQuery(Name = "page")]
+        [JsonProperty("page")]
         [Display(Name = "Current Page")]
         public virtual int PageIndex { get; set; }
 
@@ -49,6 +51,7 @@ namespace System.Collections.Generic
         /// Page size
         /// </summary>
         [FromQuery(Name = "pageSize")]
+        [JsonProperty("pageSize")]
         [Display(Name = "Page Size")]
         public virtual int PageSize { get; set; }
 
@@ -56,6 +59,7 @@ namespace System.Collections.Generic
         /// Total count
         /// </summary>
         [RouteIgnore]
+        [JsonProperty("totalCount")]
         [Display(Name = "Total Records", Description = "Total number of results returned from this set.")]
         public int TotalCount { get; set; }
 
@@ -63,6 +67,7 @@ namespace System.Collections.Generic
         /// Total pages
         /// </summary>
         [RouteIgnore]
+        [JsonProperty("totalPages")]
         [Display(Name = "Total Pages", Description = "Total number of pages.")]
         public int TotalPages { get; set; }
 
@@ -70,12 +75,14 @@ namespace System.Collections.Generic
         /// Sorting Order - Used with <see cref="Hood.Interfaces.IPageableModel"/> sorting functions.
         /// </summary>
         [FromQuery(Name = "sort")]
+        [JsonProperty("sort")]
         [Display(Name = "Sorting Order", Description = "The order for the results to be returned.")]
         public string Order { get; set; }
         /// <summary>
         /// Search filter - Used with <see cref="Hood.Interfaces.IPageableModel"/> sorting functions.
         /// </summary>
         [FromQuery(Name = "search")]
+        [JsonProperty("search")]
         [Display(Name = "Search", Description = "The search term to filter the results by.")]
         public string Search { get; set; }
 
@@ -83,11 +90,13 @@ namespace System.Collections.Generic
         /// Has previous page
         /// </summary>
         [RouteIgnore]
-        public bool HasPreviousPage => (PageIndex > 0);
+        [JsonProperty("hasPreviousPage")]
+        public bool HasPreviousPage => (PageIndex > 1);
         /// <summary>
         /// Has next page
         /// </summary>
         [RouteIgnore]
+        [JsonProperty("hasNextPage")]
         public bool HasNextPage => (PageIndex + 1 < TotalPages);
 
 
