@@ -97,7 +97,7 @@ namespace System.Collections.Generic
         /// </summary>
         [RouteIgnore]
         [JsonProperty("hasNextPage")]
-        public bool HasNextPage => (PageIndex + 1 < TotalPages);
+        public bool HasNextPage => (PageIndex < TotalPages);
 
 
         public List<T> List
