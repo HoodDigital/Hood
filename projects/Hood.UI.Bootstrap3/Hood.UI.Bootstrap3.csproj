@@ -1,39 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    
     <AssemblyName>Hood.UI.Bootstrap3</AssemblyName>
     <PackageId>Hood.UI.Bootstrap3</PackageId>
-
     <Version>6.0.13</Version>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Authors>Hood Digital;George Whysall;</Authors>
     <OutputType>Library</OutputType>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
-
     <PackageProjectUrl>https://github.com/HoodDigital/Hood</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/HoodDigital/Hood/blob/master/LICENSE</PackageLicenseUrl>
     <PackageIconUrl>https://hood.blob.core.windows.net/hood/nuget.png</PackageIconUrl>
-    <RepositoryUrl>https://github.com/HoodDigital/Hood</RepositoryUrl>    
-
+    <RepositoryUrl>https://github.com/HoodDigital/Hood</RepositoryUrl>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Areas\**\*.cshtml" />
     <EmbeddedResource Include="Areas\**\*.json" />
     <EmbeddedResource Include="UI\**\*.cshtml" />
     <EmbeddedResource Include="UI\**\*.json" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Remove="node_modules\**" />
     <EmbeddedResource Remove="node_modules\**" />
     <None Remove="node_modules\**" />
   </ItemGroup>
-
 </Project>
