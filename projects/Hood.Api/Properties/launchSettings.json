@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Hood.Api": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:56162;http://localhost:56163"
+    }
+  }
+}
