@@ -13,7 +13,6 @@ namespace Hood.Core
 
         public string SuperAdminEmail { get; set; }
         public bool InitializeOnStartup { get; set; }
-        public bool ApplyMigrationsAutomatically { get; set; }
         public LogLevel LogLevel { get; set; }
         public bool BypassCDN { get; set; }
         public string CdnPath { get; set; }

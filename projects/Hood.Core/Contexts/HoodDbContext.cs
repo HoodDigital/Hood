@@ -12,8 +12,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -55,19 +53,6 @@ namespace Hood.Models
             builder.Entity<MediaDirectory>().ToTable("HoodMediaDirectories");
             builder.Entity<MediaDirectory>().HasOne(m => m.Parent).WithMany(m => m.Children).HasForeignKey(m => m.ParentId).OnDelete(DeleteBehavior.Restrict);
             builder.Entity<MediaObject>().HasOne(m => m.Directory).WithMany(m => m.Media).HasForeignKey(m => m.DirectoryId).OnDelete(DeleteBehavior.Restrict);
-        }
-
-        public bool AllMigrationsApplied()
-        {
-            System.Collections.Generic.IEnumerable<string> applied = this.GetService<IHistoryRepository>()
-                .GetAppliedMigrations()
-                .Select(m => m.MigrationId);
-
-            System.Collections.Generic.IEnumerable<string> total = this.GetService<IMigrationsAssembly>()
-                .Migrations
-                .Select(m => m.Key);
-
-            return !total.Except(applied).Any();
         }
 
         public DbSet<TEntity> Set<TEntity, TKey>() where TEntity : BaseEntity<TKey>

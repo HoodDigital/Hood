@@ -1,0 +1,24 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/out/
+**/dist/
+**/build/
+
+# Tooling / IDE
+**/.vs/
+**/.vscode/
+**/.idea/
+**/.git/
+**/.github/
+**/.jb/
+
+# Node
+**/node_modules/
+
+# Local-only
+**/*.user
+**/*.suo
+**/.DS_Store
+**/Thumbs.db
+**/*.log
