@@ -3,15 +3,8 @@
     <AssemblyName>Hood</AssemblyName>
     <PackageId>Hood</PackageId>
     <Description>Complete Hood CMS Package, includes all default controllers for basic setup, packaged with the Bootstrap 4 default theme.</Description>
-    <Version>7.0.0</Version>
-    <TargetFramework>net9.0</TargetFramework>
-    <Authors>Hood Digital;George Whysall;</Authors>
     <OutputType>Library</OutputType>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-    <PackageProjectUrl>https://github.com/HoodDigital/Hood</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/HoodDigital/Hood/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageIconUrl>https://hood.blob.core.windows.net/hood/nuget.png</PackageIconUrl>
-    <RepositoryUrl>https://github.com/HoodDigital/Hood</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />

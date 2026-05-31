@@ -1,0 +1,35 @@
+<Project>
+
+  <!--
+    Central build + versioning foundation for the Hood solution (HOOD-51).
+    - Single source of truth for the target framework.
+    - Shared package metadata (per-project keeps only PackageId / AssemblyName / Description).
+    - MinVer derives the package version from git tags (prefix `v`), so no csproj hardcodes <Version>.
+      Untagged builds off a branch → 7.0.0-rc.<height>; a `v7.0.0` tag → 7.0.0.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+  </PropertyGroup>
+
+  <!-- Shared package metadata -->
+  <PropertyGroup>
+    <Authors>Hood Digital;George Whysall;</Authors>
+    <Company>Hood Digital</Company>
+    <PackageProjectUrl>https://github.com/HoodDigital/Hood</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/HoodDigital/Hood</RepositoryUrl>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <!-- MinVer: version from git tags, default pre-release phase `rc` -->
+  <PropertyGroup>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <MinVerMinimumMajorMinor>7.0</MinVerMinimumMajorMinor>
+    <MinVerDefaultPreReleaseIdentifiers>rc.0</MinVerDefaultPreReleaseIdentifiers>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MinVer" Version="7.0.0" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>
