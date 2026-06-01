@@ -2,7 +2,16 @@
 # Hood CMS — Docker build (local dev / containerised run)
 # Runs the Hood.Development web host (the runnable app; the rest are libraries).
 # Usage: docker compose up --build
-# Target framework: net9.0 (interim baseline — HOOD-57 takes this to net10).
+# Target framework: net10.0 (HOOD-57).
+# =============================================================================
+#
+# Frontend assets: Hood's core CSS/JS ship as the external `hoodcms` npm package
+# (normally served from jsDelivr, keyed by the backend assembly version). With the
+# backend now on 7.0.0-rc and `hoodcms` still published at 6.1.x, that CDN path
+# 404s — and the dev appsettings runs with "BypassCDN": true, which expects the
+# assets locally under wwwroot. So we pull the stable `hoodcms` package at build
+# time (frontend stage below) and bundle its src/ + dist/ into wwwroot, keeping
+# the dev rig fully self-contained. Bump HOODCMS_VERSION as the frontend releases.
 # =============================================================================
 
 # ---------------------------------------------------------------------------
@@ -34,13 +43,29 @@ RUN dotnet publish projects/Hood.Development/Hood.Development.csproj \
     -c Release -o /app/publish --no-restore /p:UseAppHost=false
 
 # ---------------------------------------------------------------------------
-# Stage 3: runtime image
+# Stage 3: frontend assets (the `hoodcms` npm package — Hood's core CSS/JS)
+# ---------------------------------------------------------------------------
+FROM node:20-alpine AS frontend
+ARG HOODCMS_VERSION=6.1.8
+WORKDIR /fe
+# `npm pack` downloads the published tarball without installing anything; extracting
+# it yields ./package/{src,dist,images,...} — the same paths the Razor views request.
+RUN npm pack hoodcms@${HOODCMS_VERSION} && tar -xzf hoodcms-*.tgz
+
+# ---------------------------------------------------------------------------
+# Stage 4: runtime image
 # ---------------------------------------------------------------------------
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 EXPOSE 8080
 
 COPY --from=build /app/publish .
+
+# Bundle the core frontend so the static-file middleware serves /src/** and /dist/**
+# locally (BypassCDN=true). The dev host keeps its own wwwroot/images, so only the
+# package's src/ and dist/ are layered in.
+COPY --from=frontend /fe/package/src  ./wwwroot/src
+COPY --from=frontend /fe/package/dist ./wwwroot/dist
 
 ENV ASPNETCORE_URLS=http://+:8080
 ENV ASPNETCORE_ENVIRONMENT=Development
