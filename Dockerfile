@@ -8,11 +8,13 @@
 # ---------------------------------------------------------------------------
 # Stage 1: restore (cached unless a .csproj or the .sln changes)
 # ---------------------------------------------------------------------------
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-# Copy solution + every live project file first so restore layers cache well.
-COPY Hood.sln ./
+# Copy solution + central build files + every project file first so restore layers cache well.
+# Directory.Build.props carries the TargetFramework and global.json pins the SDK — both are
+# required for `dotnet restore` to resolve, so they must be copied before it runs.
+COPY Hood.sln Directory.Build.props global.json ./
 COPY projects/Hood/Hood.csproj                             projects/Hood/
 COPY projects/Hood.Core/Hood.Core.csproj                   projects/Hood.Core/
 COPY projects/Hood.Admin/Hood.Admin.csproj                 projects/Hood.Admin/
@@ -34,7 +36,7 @@ RUN dotnet publish projects/Hood.Development/Hood.Development.csproj \
 # ---------------------------------------------------------------------------
 # Stage 3: runtime image
 # ---------------------------------------------------------------------------
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 EXPOSE 8080
 

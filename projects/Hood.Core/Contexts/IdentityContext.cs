@@ -120,7 +120,7 @@ namespace Hood.Contexts
         public IdentityContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<IdentityContext>();
-            optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=Hood.Web;Trusted_Connection=True;MultipleActiveResultSets=true;");
+            optionsBuilder.UseSqlServer(DesignTimeConnection.ConnectionString);
             return new IdentityContext(optionsBuilder.Options);
         }
     }

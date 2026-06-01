@@ -54,6 +54,8 @@ namespace Hood.Contexts
             builder.Entity<ContentCategoryJoin>().HasOne(pt => pt.Content).WithMany(t => t.Categories).HasForeignKey(pt => pt.ContentId);
 
             builder.Entity<ContentMeta>().ToTable("HoodContentMetadata");
+            // Alternate-key columns must be non-nullable under EF Core 9+ (HOOD-48 #12).
+            builder.Entity<ContentMeta>().Property(o => o.Name).IsRequired();
             builder.Entity<ContentMeta>().HasAlternateKey(ol => new { ol.ContentId, ol.Name });
             builder.Entity<ContentMeta>().HasOne(c => c.Content).WithMany(cc => cc.Metadata).HasForeignKey(au => au.ContentId);
             
@@ -73,7 +75,7 @@ namespace Hood.Contexts
         public ContentContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<ContentContext>();
-            optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=Hood.Web;Trusted_Connection=True;MultipleActiveResultSets=true;");
+            optionsBuilder.UseSqlServer(DesignTimeConnection.ConnectionString);
             return new ContentContext(optionsBuilder.Options);
         }
     }

@@ -40,10 +40,15 @@ namespace Hood.Contexts
             base.OnModelCreating(builder);            
         
             builder.Entity<PropertyListing>().ToTable("HoodProperties");
-            builder.Entity<PropertyListing>().Property(a => a.Latitude).HasDefaultValueSql("0.0");
-            builder.Entity<PropertyListing>().Property(a => a.Longitude).HasDefaultValueSql("0.0");
+            // HasSentinel(-1) so a real (0,0) coordinate is INSERTed explicitly instead of being
+            // treated as "unset" and omitted under the EF Core 8+ sentinel rules (HOOD-48 #4).
+            // The DB-side DEFAULT (0.0) is unchanged, so there is no schema delta.
+            builder.Entity<PropertyListing>().Property(a => a.Latitude).HasDefaultValueSql("0.0").HasSentinel(-1d);
+            builder.Entity<PropertyListing>().Property(a => a.Longitude).HasDefaultValueSql("0.0").HasSentinel(-1d);
 
             builder.Entity<PropertyMeta>().ToTable("HoodPropertyMetadata");
+            // Alternate-key columns must be non-nullable under EF Core 9+ (HOOD-48 #12).
+            builder.Entity<PropertyMeta>().Property(o => o.Name).IsRequired();
             builder.Entity<PropertyMeta>().HasAlternateKey(ol => new { ol.PropertyId, ol.Name });
             builder.Entity<PropertyMeta>().HasOne(c => c.Property).WithMany(cc => cc.Metadata).HasForeignKey(au => au.PropertyId).OnDelete(DeleteBehavior.Restrict);
 
@@ -71,7 +76,7 @@ namespace Hood.Contexts
         public PropertyContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<PropertyContext>();
-            optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=Hood.Web;Trusted_Connection=True;MultipleActiveResultSets=true;");
+            optionsBuilder.UseSqlServer(DesignTimeConnection.ConnectionString);
             return new PropertyContext(optionsBuilder.Options);
         }
     }

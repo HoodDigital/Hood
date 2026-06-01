@@ -269,14 +269,17 @@ namespace Hood.Services
                 string fileName = Path.GetFileNameWithoutExtension(media.Url);
                 string fileExt = Path.GetExtension(media.Url);
                 string thumbBlobReference = $"{media.Path}/{fileName}{prefix}{fileExt}";
-                IImageFormat format;
                 stream.Position = 0;
-                using (Image image = Image.Load(stream, out format))
+                using (Image image = Image.Load(stream))
                 {
+                    // ImageSharp 3.x: the out-format Load overload was removed — the decoded format
+                    // now lives on Metadata, and Save takes an encoder rather than a format (HOOD-57).
+                    IImageFormat format = image.Metadata.DecodedImageFormat;
                     image.Mutate(x => x.Resize(size, 0));
                     using (Stream outputStream = new System.IO.MemoryStream())
                     {
-                        image.Save(outputStream, format);
+                        IImageEncoder encoder = image.Configuration.ImageFormatsManager.GetEncoder(format);
+                        image.Save(outputStream, encoder);
                         outputStream.Position = 0;
                         var blob = await Upload(outputStream, thumbBlobReference);
                         url = blob.Uri.ToUrlString();
