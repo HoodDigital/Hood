@@ -1,4 +1,4 @@
-@model string
+@model Hood.ViewModels.InstallModel
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env
 @{
     bool production = _env.EnvironmentName == "Production";
@@ -33,6 +33,11 @@
         <div class="login-content" style="max-width:100%;">
             @{
                 bool previousError = false;
+                bool canSeed =
+                    !Engine.Services.GetStartupExceptionsByType(StartupError.NoConnectionString).Any() &&
+                    !Engine.Services.GetStartupExceptionsByType(StartupError.DatabaseConnectionFailed).Any() &&
+                    !Engine.Services.GetStartupExceptionsByType(StartupError.MigrationMissing).Any() &&
+                    !Engine.Services.GetStartupExceptionsByType(StartupError.MigrationNotApplied).Any();
             }
 
             @if (Engine.Services.Installed)
@@ -45,11 +50,39 @@
             }
             else
             {
-                <div class="header mb-5">
+                <div class="header mb-4">
                     <h2>Install</h2>
-                    <p>The CMS Setup is currently incomplete.</p>
-                    <p><strong>Once you have updated the settings, please restart the application for changes to take effect.</strong></p>
+                    @if (canSeed)
+                    {
+                        <p>Your database is connected and up to date. Create the administrator account below to finish setting up your site.</p>
+                    }
+                    else
+                    {
+                        <p>The CMS setup is currently incomplete. Resolve the issues below, then reload this page to continue.</p>
+                    }
                 </div>
+
+                @if (canSeed)
+                {
+                    <form method="post" action="/install" class="setup-form mb-5">
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+                        <div class="mb-3">
+                            <label for="Email" class="form-label">Administrator email</label>
+                            <input type="email" id="Email" name="Email" value="@Model?.Email" class="form-control" required autofocus />
+                        </div>
+                        <div class="mb-3">
+                            <label for="Password" class="form-label">Password</label>
+                            <input type="password" id="Password" name="Password" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="ConfirmPassword" class="form-label">Confirm password</label>
+                            <input type="password" id="ConfirmPassword" name="ConfirmPassword" class="form-control" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Set up Hood</button>
+                    </form>
+                }
+
                 <div class="accordion" id="startup-accordion">
 
                     <div class="accordion-item border-0 mb-3">
