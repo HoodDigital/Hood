@@ -291,23 +291,24 @@ namespace Hood.Models
                     {
                         SaveChanges();
 
-                        string commandText = "UPDATE HoodMedia SET DirectoryId = @DirectoryId WHERE DirectoryId IS NULL AND Directory = 'Property'";
-                        SqlParameter sqlParameter = new SqlParameter("@DirectoryId", propertyDir.Id);
-                        int affectedRows = Database.ExecuteSqlRaw(commandText, sqlParameter);
+                        // ExecuteSql (FormattableString) parameterises the interpolated values
+                        // automatically — replaces the deprecated ExecuteSqlRaw (HOOD-48 #3).
+                        int affectedRows = Database.ExecuteSql(
+                            $"UPDATE HoodMedia SET DirectoryId = {propertyDir.Id} WHERE DirectoryId IS NULL AND Directory = 'Property'");
 
                         Option option = Options.Find(typeof(ContentSettings).ToString());
                         var contentSettings = JsonConvert.DeserializeObject<ContentSettings>(option.Value);
                         foreach (var type in contentSettings.Types)
                         {
-                            commandText = "UPDATE HoodMedia SET DirectoryId = @DirectoryId WHERE DirectoryId IS NULL AND Directory = '@Directory'";
-                            sqlParameter = new SqlParameter("@DirectoryId", contentDir.Id);
-                            SqlParameter sqlParameterType = new SqlParameter("@Directory", type.TypeName);
-                            affectedRows = Database.ExecuteSqlRaw(commandText, sqlParameter, sqlParameterType);
+                            // Bug fix (HOOD-48 #3): the old raw SQL had '@Directory' quoted as a string
+                            // literal, so the parameter was never substituted and only 'Property' media
+                            // was ever re-pointed. Interpolation makes type.TypeName a real parameter.
+                            affectedRows = Database.ExecuteSql(
+                                $"UPDATE HoodMedia SET DirectoryId = {contentDir.Id} WHERE DirectoryId IS NULL AND Directory = {type.TypeName}");
                         }
 
-                        commandText = "UPDATE HoodMedia SET DirectoryId = @DirectoryId WHERE DirectoryId IS NULL";
-                        sqlParameter = new SqlParameter("@DirectoryId", defaultDir.Id);
-                        affectedRows = Database.ExecuteSqlRaw(commandText, sqlParameter);
+                        affectedRows = Database.ExecuteSql(
+                            $"UPDATE HoodMedia SET DirectoryId = {defaultDir.Id} WHERE DirectoryId IS NULL");
 
                     }
                 }
@@ -350,7 +351,7 @@ namespace Hood.Models
         public HoodDbContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<HoodDbContext>();
-            optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=Hood.Web;Trusted_Connection=True;MultipleActiveResultSets=true;");
+            optionsBuilder.UseSqlServer(DesignTimeConnection.ConnectionString);
             return new HoodDbContext(optionsBuilder.Options);
         }
     }

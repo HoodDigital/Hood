@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Globalization;
 using System.IO;
 using System.Linq;

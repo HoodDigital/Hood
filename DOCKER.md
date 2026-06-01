@@ -4,12 +4,12 @@ The repo ships a [`docker-compose.yml`](docker-compose.yml) that runs **SQL Serv
 
 This file covers **local dev only**. For repo basics see [readme.md](readme.md).
 
-> **Framework note:** Hood is on **net9.0** as an interim baseline. The current package set is a half-finished retarget that this rig pins to a clean, building state. The full **net10 + EF Core 10** modernisation is tracked separately (HOOD-57), the CI/CD pipeline in HOOD-52, and database schema seeding in HOOD-53.
+> **Framework note:** Hood targets **net10.0 + EF Core 10**. The .NET SDK is pinned via `global.json` and the target framework is centralised in `Directory.Build.props`. The CI/CD pipeline is tracked in HOOD-52 and database schema seeding in HOOD-53.
 
 ## Prerequisites
 
 - Docker Engine + Docker Compose v2 (`docker compose ...` — no hyphen).
-- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) — only needed to run the app natively (`make run`) rather than in a container.
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) — only needed to run the app natively (`make run`) rather than in a container. The exact SDK is pinned in `global.json`.
 
 ## What's in the compose file
 

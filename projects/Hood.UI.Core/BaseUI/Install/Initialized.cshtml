@@ -8,6 +8,8 @@
 
 <head>
     <title>@ViewData["Title"]</title>
+    <!-- The host restarts after setup; reload into the now-installed site shortly. -->
+    <meta http-equiv="refresh" content="8; url=/" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
 
     <environment exclude="Production">
@@ -34,19 +36,8 @@
                 <h4>
                     Your website is ready to roll!
                 </h4>
-                <p>You just need to disable initialization flags in your environment variables to start the site.</p>
-                <div class="card border-danger text-start p-3">
-                    <ul>
-                        @if (Engine.Configuration.InitializeOnStartup)
-                        {                            
-                            <li>Disable the <code>Hood:InitializeOnStartup</code> flag in your app settings.</li>
-                        } 
-                        @if (Engine.Auth0Configuration.SetupRemoteOnIntitialize)
-                        {                            
-                            <li>Disable the <code>Identity:Auth0:SetupRemoteOnIntitialize</code> flag in your app settings.</li>
-                        } 
-                    </ul>
-                </div>
+                <p>Setup is complete and the application is restarting. This page will take you to your site in a few seconds&hellip;</p>
+                <p><a href="/" class="btn btn-primary">Go to your site now</a></p>
             </div>
         </div>
 
