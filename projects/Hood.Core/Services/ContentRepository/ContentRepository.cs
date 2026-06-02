@@ -250,6 +250,7 @@ namespace Hood.Services
             content = await GetContentByIdAsync(content.Id);
             await RefreshMetasAsync(content);
             _eventService.TriggerContentChanged(this);
+            ClearPageCaches();
             return content;
         }
         public async Task<Content> UpdateAsync(Content content)
@@ -259,6 +260,7 @@ namespace Hood.Services
             await _db.SaveChangesAsync();
             _eventService.TriggerContentChanged(this);
             _cache.Add(cacheKey, content, TimeSpan.FromMinutes(60));
+            ClearPageCaches();
             return content;
         }
         public async Task DeleteAsync(int id)
@@ -266,6 +268,22 @@ namespace Hood.Services
             Content content = _db.Content.Where(p => p.Id == id).FirstOrDefault();
             _db.Entry(content).State = EntityState.Deleted;
             await _db.SaveChangesAsync();
+            _cache.Remove(typeof(Content).ToString() + ".Single." + id);
+            _eventService.TriggerContentChanged(this);
+            ClearPageCaches();
+        }
+
+        // The page list that backs the public route constraint (PagesRouteConstraint -> GetPages) is cached
+        // for 60 minutes. Without invalidation, a newly created/edited page isn't routable until the cache
+        // expires (HOOD-70: 404 when previewing a freshly created page). Clear every ".Pages" variant
+        // (base + per-category) on any content mutation so the route resolves immediately.
+        private void ClearPageCaches()
+        {
+            string prefix = typeof(Content).ToString();
+            foreach (string key in _cache.Keys.Keys.Where(k => k.StartsWith(prefix) && k.EndsWith(".Pages")).ToList())
+            {
+                _cache.Remove(key);
+            }
         }
         public async Task SetStatusAsync(int id, ContentStatus status)
         {
