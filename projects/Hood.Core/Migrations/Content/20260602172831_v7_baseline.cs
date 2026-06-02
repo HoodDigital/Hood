@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Hood.Core.Migrations.Content
 {
-    public partial class v61 : Migration
+    /// <inheritdoc />
+    public partial class v7_baseline : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -129,16 +131,16 @@ namespace Hood.Core.Migrations.Content
                 {
                     table.PrimaryKey("PK_HoodContentCategoryJoins", x => new { x.ContentId, x.CategoryId });
                     table.ForeignKey(
-                        name: "FK_HoodContentCategoryJoins_HoodContent_ContentId",
-                        column: x => x.ContentId,
-                        principalTable: "HoodContent",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_HoodContentCategoryJoins_HoodContentCategories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "HoodContentCategories",
                         principalColumn: "ContentCategoryId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_HoodContentCategoryJoins_HoodContent_ContentId",
+                        column: x => x.ContentId,
+                        principalTable: "HoodContent",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -158,6 +160,7 @@ namespace Hood.Core.Migrations.Content
                 column: "ContentId");
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

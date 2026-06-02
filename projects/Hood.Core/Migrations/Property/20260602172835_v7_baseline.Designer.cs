@@ -12,17 +12,18 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hood.Core.Migrations.Property
 {
     [DbContext(typeof(PropertyContext))]
-    [Migration("20220914145759_v6.1")]
-    partial class v61
+    [Migration("20260602172835_v7_baseline")]
+    partial class v7_baseline
     {
+        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.7")
+                .HasAnnotation("ProductVersion", "10.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Hood.Models.PropertyFloorplan", b =>
                 {
@@ -30,7 +31,7 @@ namespace Hood.Core.Migrations.Property
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BlobReference")
                         .HasColumnType("nvarchar(max)");
@@ -91,7 +92,7 @@ namespace Hood.Core.Migrations.Property
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Additional")
                         .HasColumnType("nvarchar(max)");
@@ -279,8 +280,6 @@ namespace Hood.Core.Migrations.Property
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<string>("Additional")
                         .HasColumnType("nvarchar(max)");
 
@@ -305,7 +304,7 @@ namespace Hood.Core.Migrations.Property
                     b.Property<bool>("AllowComments")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("Anonymous")
+                    b.Property<bool?>("Anonymous")
                         .HasColumnType("bit");
 
                     b.Property<string>("Areas")
@@ -475,7 +474,9 @@ namespace Hood.Core.Migrations.Property
 
                     b.HasKey("Id");
 
-                    b.ToView("HoodPropertyViews");
+                    b.ToTable((string)null);
+
+                    b.ToView("HoodPropertyViews", (string)null);
                 });
 
             modelBuilder.Entity("Hood.Models.PropertyMedia", b =>
@@ -484,7 +485,7 @@ namespace Hood.Core.Migrations.Property
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BlobReference")
                         .HasColumnType("nvarchar(max)");
@@ -545,7 +546,7 @@ namespace Hood.Core.Migrations.Property
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BaseValue")
                         .HasColumnType("nvarchar(max)");
