@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Hood.Core.Migrations.Auth0Identity
 {
-    public partial class v61 : Migration
+    /// <inheritdoc />
+    public partial class v7_baseline : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -120,6 +122,7 @@ namespace Hood.Core.Migrations.Auth0Identity
                 column: "RoleId");
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

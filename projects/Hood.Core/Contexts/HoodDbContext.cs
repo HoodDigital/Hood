@@ -37,8 +37,11 @@ namespace Hood.Models
         // Logs
         public DbSet<Log> Logs { get; set; }
 
-        // Auth0
-        public DbSet<UserProfile> UserProfiles { get; set; }
+        // NOTE: UserProfile is owned by the identity contexts (IdentityContext / Auth0IdentityContext),
+        // where it is mapped as a shared-table 1:1 onto AspNetUsers. HoodDbContext used to expose a
+        // DbSet<UserProfile> that mapped to a standalone "UserProfiles" table — that legacy mapping was
+        // unused (nothing read or wrote _hoodDb.UserProfiles) and is dropped in v7. AspNetUsers is the
+        // single authoritative store. The v6->v7 update script carries DROP TABLE UserProfiles for upgraders.
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -53,6 +56,12 @@ namespace Hood.Models
             builder.Entity<MediaDirectory>().ToTable("HoodMediaDirectories");
             builder.Entity<MediaDirectory>().HasOne(m => m.Parent).WithMany(m => m.Children).HasForeignKey(m => m.ParentId).OnDelete(DeleteBehavior.Restrict);
             builder.Entity<MediaObject>().HasOne(m => m.Directory).WithMany(m => m.Media).HasForeignKey(m => m.DirectoryId).OnDelete(DeleteBehavior.Restrict);
+
+            // Log.User is the only path that reaches the identity entities from HoodDbContext. The nav is
+            // unused (nothing .Include()s it) and pulling it in made EF generate standalone ApplicationUser
+            // + UserProfile tables that shadow the authoritative AspNetUsers. Ignore it so HoodDb owns only
+            // its own tables; Log.UserId stays as a plain column (logs intentionally don't hard-FK users).
+            builder.Entity<Log>().Ignore(l => l.User);
         }
 
         public DbSet<TEntity> Set<TEntity, TKey>() where TEntity : BaseEntity<TKey>

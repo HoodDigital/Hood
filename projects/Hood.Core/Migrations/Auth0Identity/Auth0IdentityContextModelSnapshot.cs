@@ -17,10 +17,10 @@ namespace Hood.Core.Migrations.Auth0Identity
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.7")
+                .HasAnnotation("ProductVersion", "10.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Hood.Models.Auth0Identity", b =>
                 {
@@ -269,7 +269,9 @@ namespace Hood.Core.Migrations.Auth0Identity
                     b.Property<string>("UserVars")
                         .HasColumnType("nvarchar(max)");
 
-                    b.ToView("HoodUserProfiles");
+                    b.ToTable((string)null);
+
+                    b.ToView("HoodAuth0UserProfiles", (string)null);
                 });
 
             modelBuilder.Entity("Hood.Models.Auth0Identity", b =>

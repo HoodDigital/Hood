@@ -47,19 +47,27 @@ or
 
 ## Database Installation/Update
 
-Ensure your database is up to date with the version of Hood CMS that you are using. 
+Hood's schema ships as plain, idempotent SQL scripts — run by hand or via a runner. EF Core
+migrations are only an authoring tool; nothing applies them at runtime. Full detail and the
+regeneration workflow are in [`sql/README.md`](sql/README.md).
+
 ### Fresh installation
 
-1. Create your database 
-2. Execute file `/sql/latest.sql`.
+1. Create your database.
+2. Execute file `/sql/latest.sql` (standard ASP.NET Identity backend).
 
-### Upgrading from previous versions < `v6.1.x`
+### Upgrading an existing database
 
-1. Update your code to the latest version of Hood `v6.0.x`
-2. Migrate your database to match the current code using ef core migrations.
-3. Run the script `/sql/6.0/migrate.sql` to migrate your database to script based migrations.
-4. Run the update scripts for each minor version, sequentially until you reach your desired version.
-   For example to update to `v6.2.x`, run the script `/sql/6.1/update.sql`, then run the script `/sql/6.2/update.sql`.
+Run the `update.sql` for each tier above your current version, in order:
+
+| You're on | Run, in order |
+|---|---|
+| `< 6.0.x` | migrate to `6.0.x` first, then `/sql/6.0/migrate.sql`, then follow the row below |
+| `6.0.x` | `/sql/6.1/update.sql` → `/sql/7.0/update.sql` |
+| `6.1.x` | `/sql/7.0/update.sql` |
+
+The `6.1.x → 7.0` delta is small and drops no data-bearing columns — see
+[`sql/README.md`](sql/README.md) for exactly what it changes.
 
 
 ## Full documentation
