@@ -10,6 +10,13 @@ namespace Hood.Services
 {
     public interface IMediaManager
     {
+        /// <summary>
+        /// True when media storage is configured (a storage connection string has been set in
+        /// Settings &gt; Media Settings). When false, uploads cannot proceed and callers should
+        /// surface a setup prompt rather than attempting storage operations.
+        /// </summary>
+        bool IsConfigured { get; }
+
         string GetBlobReference(string directory, string filename);
         /// <summary>
         /// Gets a safe filename for use with Azure storage. Unsafe characters will be removed.
