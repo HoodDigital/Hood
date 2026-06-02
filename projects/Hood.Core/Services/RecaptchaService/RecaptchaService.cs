@@ -16,8 +16,11 @@ namespace Hood.Services
             {
                 Models.IntegrationSettings settings = Engine.Settings.Integrations;
 
-                if (!Engine.Settings.Integrations.EnableGoogleRecaptcha)
-                    return new RecaptchaResponse() { Success = true };
+                // Only enforce recaptcha when it is fully configured (toggle on AND both keys set).
+                // Otherwise treat the check as passed so login / register / forms aren't blocked —
+                // callers gate on .Passed, so this must set Passed, not just Success.
+                if (!settings.IsGoogleRecaptchaEnabled)
+                    return new RecaptchaResponse() { Success = true, Passed = true };
 
                 if (!request.Form.ContainsKey("g-recaptcha-response")) // error if no reason to do anything, this is to alert developers they are calling it without reason.
                 {
