@@ -1,0 +1,37 @@
+@model RoleListModel<IdentityRole>
+@{
+    Layout = null;
+}
+@if (Model.TotalCount > 0)
+{
+    @foreach (var role in Model.List)
+    {
+        <div class="card hover mb-3 p-3">
+            <div class="row no-gutters align-items-center">
+                <div class="col">
+                    <div class="mb-2">
+                        <h3 class="card-title d-lg-inline">
+                            <a asp-action="EditRole" asp-route-roleName="@role.Name" class="text-decoration-none">@role.Name</a>
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-auto d-flex align-items-center">
+                    <button type="button" class="btn btn-lg shadow-none v-middle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" asp-action="EditRole" asp-route-roleName="@role.Name"><i class="fa fa-edit"></i> Edit</a>
+                        <a class="dropdown-item" asp-action="DeleteRole" asp-route-id="@role.Name"><i class="fa fa-trash-alt"></i> Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <partial name="_Pagination" />
+}
+else
+{
+    <alert type="Info" icon="fa-info" size="Epic" class="text-center m-0">
+        No roles found.
+    </alert>
+}

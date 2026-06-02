@@ -32,6 +32,7 @@ COPY projects/Hood.UI.Admin/Hood.UI.Admin.csproj           projects/Hood.UI.Admi
 COPY projects/Hood.UI.Bootstrap3/Hood.UI.Bootstrap3.csproj projects/Hood.UI.Bootstrap3/
 COPY projects/Hood.UI.Bootstrap4/Hood.UI.Bootstrap4.csproj projects/Hood.UI.Bootstrap4/
 COPY projects/Hood.Development/Hood.Development.csproj      projects/Hood.Development/
+COPY projects/Hood.Tests/Hood.Tests.csproj                 projects/Hood.Tests/
 
 RUN dotnet restore Hood.sln
 
