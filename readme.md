@@ -70,6 +70,26 @@ The `6.1.x → 7.0` delta is small and drops no data-bearing columns — see
 [`sql/README.md`](sql/README.md) for exactly what it changes.
 
 
+## Releases & branching
+
+Hood uses a trunk-based flow with automatic, git-derived versioning (MinVer) and GitHub Actions.
+
+**Branching.** Work happens on feature branches → PR → squash-merge to `master`. PRs run build + `dotnet test` and `npm run package` as gates; nothing merges red.
+
+**Versioning is automatic — never set a version by hand.** [MinVer](https://github.com/adamralph/minver) derives it from git:
+
+| Git state | Version | Published |
+|---|---|---|
+| A merge to `master` | `7.0.0-rc.N` (`N` = merges since the last tag) | NuGet.org **prerelease** + npm dist-tag **`next`** |
+| A GitHub Release tag `v7.0.0` | `7.0.0` (clean) | NuGet.org **stable** + npm dist-tag **`latest`** |
+
+So **every merge ships a prerelease automatically**, and **cutting a `v7.0.0` GitHub Release ships the stable**. To release a stable, draft a GitHub Release with the tag `v7.0.0` (matching the `MinVerMinimumMajorMinor` in [`Directory.Build.props`](Directory.Build.props)).
+
+**Pipelines** ([`.github/workflows`](.github/workflows)): `backend.yml` packs the 7 NuGet packages; `frontend.yml` builds + publishes the `hoodcms` npm package (its version is derived from the same MinVer value, so npm and NuGet stay in lockstep). They're path-filtered, so a backend-only change doesn't rebuild the frontend and vice versa.
+
+**Secrets** (GitHub repo settings → Secrets and variables → Actions): `NUGET_API_KEY` and `NPM_TOKEN`. Until they're set the workflows still build, test and pack — they just skip the publish step.
+
+
 ## Full documentation
 Documentation is a work in progress!
 

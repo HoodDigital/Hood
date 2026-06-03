@@ -1,0 +1,95 @@
+name: Frontend
+
+# Builds and publishes the `hoodcms` npm package (gulp build + view-copy).
+# The npm version is derived from the same MinVer value as the NuGet packages so
+# the two stay in lockstep:
+#   • merge to master  → 7.0.0-rc.N  → npm dist-tag `next`
+#   • GitHub Release v7.0.0 → 7.0.0   → npm dist-tag `latest`
+# PRs build only (the publish job is gated on push/release).
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'projects/Hood.Development/src/**'
+      - 'projects/Hood.Development/Views/**'
+      - 'projects/Hood.Development/Themes/**'
+      - 'projects/Hood.Development/gulpfile.js'
+      - 'projects/Hood.Development/package.json'
+      - 'projects/Hood.Development/yarn.lock'
+      - 'projects/Hood.Development/tsconfig*.json'
+      - '.github/workflows/frontend.yml'
+  pull_request:
+    paths:
+      - 'projects/Hood.Development/src/**'
+      - 'projects/Hood.Development/Views/**'
+      - 'projects/Hood.Development/Themes/**'
+      - 'projects/Hood.Development/gulpfile.js'
+      - 'projects/Hood.Development/package.json'
+      - 'projects/Hood.Development/yarn.lock'
+      - 'projects/Hood.Development/tsconfig*.json'
+      - '.github/workflows/frontend.yml'
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build (npm run package)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/Hood.Development
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: corepack enable
+      - run: yarn install --frozen-lockfile
+      - run: yarn run package
+
+  publish:
+    name: Publish to npm
+    needs: build
+    if: github.event_name == 'push' || github.event_name == 'release'
+    runs-on: ubuntu-latest
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # MinVer (minver-cli) needs full history + tags
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+      # Same MinVer config as Directory.Build.props, so npm == NuGet version.
+      - name: Compute version (MinVer)
+        id: minver
+        run: |
+          dotnet tool install --global minver-cli --version 7.0.0
+          VERSION="$("$HOME/.dotnet/tools/minver" --tag-prefix v --minimum-major-minor 7.0 --default-pre-release-identifiers rc)"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Resolved version: $VERSION"
+      - run: corepack enable
+        working-directory: projects/Hood.Development
+      - run: yarn install --frozen-lockfile
+        working-directory: projects/Hood.Development
+      - run: yarn run package
+        working-directory: projects/Hood.Development
+      - name: Set version + publish
+        if: env.NPM_TOKEN != ''
+        working-directory: projects/Hood.Development
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm version "${{ steps.minver.outputs.version }}" --no-git-tag-version --allow-same-version
+          if [ "${{ github.event_name }}" = "release" ]; then TAG=latest; else TAG=next; fi
+          echo "Publishing hoodcms@${{ steps.minver.outputs.version }} with dist-tag $TAG"
+          npm publish --tag "$TAG" --access public
+      - name: Skipped publish (no NPM_TOKEN secret)
+        if: env.NPM_TOKEN == ''
+        run: echo "NPM_TOKEN is not set — built but did not publish."

@@ -25,7 +25,7 @@
   <PropertyGroup>
     <MinVerTagPrefix>v</MinVerTagPrefix>
     <MinVerMinimumMajorMinor>7.0</MinVerMinimumMajorMinor>
-    <MinVerDefaultPreReleaseIdentifiers>rc.0</MinVerDefaultPreReleaseIdentifiers>
+    <MinVerDefaultPreReleaseIdentifiers>rc</MinVerDefaultPreReleaseIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>

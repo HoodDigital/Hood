@@ -1,0 +1,72 @@
+name: Backend
+
+# Builds, tests and publishes the 7 Hood NuGet packages.
+# Versioning is automatic via MinVer (git tags) — no version is set here:
+#   • merge to master  → 7.0.0-rc.N  → NuGet.org prerelease
+#   • GitHub Release v7.0.0 → 7.0.0   → NuGet.org stable
+# PRs build + test only (the publish job is gated on push/release).
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'projects/**'
+      - 'Hood.sln'
+      - 'Directory.Build.props'
+      - 'global.json'
+      - '.github/workflows/backend.yml'
+  pull_request:
+    paths:
+      - 'projects/**'
+      - 'Hood.sln'
+      - 'Directory.Build.props'
+      - 'global.json'
+      - '.github/workflows/backend.yml'
+  release:
+    types: [published]
+
+jobs:
+  build-test:
+    name: Build & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # MinVer needs full history + tags to derive the version
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet restore Hood.sln
+      - run: dotnet build Hood.sln -c Release --no-restore
+      - run: dotnet test Hood.sln -c Release --no-build --verbosity normal
+
+  publish:
+    name: Pack & publish to NuGet
+    needs: build-test
+    if: github.event_name == 'push' || github.event_name == 'release'
+    runs-on: ubuntu-latest
+    env:
+      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      # MinVer stamps the version from git: rc.N off master, clean off a v-tag.
+      - run: dotnet pack Hood.sln -c Release -o ./artifacts
+      - name: Push to NuGet.org
+        if: env.NUGET_API_KEY != ''
+        run: >
+          dotnet nuget push "./artifacts/*.nupkg"
+          --api-key "$NUGET_API_KEY"
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
+      - name: Skipped publish (no NUGET_API_KEY secret)
+        if: env.NUGET_API_KEY == ''
+        run: echo "NUGET_API_KEY is not set — built and packed but did not publish."
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: ./artifacts/*.nupkg
