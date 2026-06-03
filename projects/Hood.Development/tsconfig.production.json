@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./wwwroot/dist/js/",
+    "skipLibCheck": true,
     "noImplicitAny": true,
     "module": "es6",
     "target": "es5",
