@@ -314,6 +314,11 @@ namespace Hood.Admin.BaseControllers
         {
             try
             {
+                if (!_media.IsConfigured)
+                {
+                    return new Response("Media storage isn't set up yet. An administrator needs to configure a storage connection string in Settings > Media Settings before files can be uploaded.");
+                }
+
                 if (!directoryId.HasValue)
                 {
                     throw new Exception("You must select a directory to upload to.");

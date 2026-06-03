@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Specialized;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
@@ -34,6 +35,11 @@ namespace Hood.Services
             _env = env;
             _config = config;
         }
+
+        // Media storage is "configured" once a storage connection string (AzureKey) is set — ContainerName
+        // defaults to a generated value so it is never the deciding factor. Used to short-circuit uploads
+        // with a setup prompt instead of throwing when storage hasn't been wired up yet.
+        public bool IsConfigured => Engine.Settings?.Media?.AzureKey.IsSet() == true;
 
         private async Task<BlobContainerClient> GetClientAsync()
         {

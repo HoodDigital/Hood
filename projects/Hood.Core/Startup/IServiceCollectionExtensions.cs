@@ -5,6 +5,7 @@ using Hood.Filters;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Auth0.AspNetCore.Authentication;
@@ -136,6 +138,27 @@ namespace Hood.Startup
 
             services.ConfigureCache(config);
             services.ConfigureCacheProfiles();
+
+            services.ConfigureDataProtection(config);
+
+            return services;
+        }
+
+        // Persist the Data Protection key ring to a stable location when Hood:DataProtectionKeyPath is set,
+        // so antiforgery tokens / auth cookies survive app restarts, container rebuilds and multi-instance
+        // hosting. Without it the keys default to an ephemeral per-process/container location and reset on
+        // every rebuild (causing "The antiforgery token could not be decrypted"). The path is left unset by
+        // default — single-host installs work fine on the default key ring; containers/farms set the path.
+        private static IServiceCollection ConfigureDataProtection(this IServiceCollection services, IConfiguration config)
+        {
+            IDataProtectionBuilder dataProtection = services.AddDataProtection().SetApplicationName("Hood");
+
+            string keyPath = config["Hood:DataProtectionKeyPath"];
+            if (keyPath.IsSet())
+            {
+                Directory.CreateDirectory(keyPath);
+                dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keyPath));
+            }
 
             return services;
         }
@@ -307,7 +330,11 @@ namespace Hood.Startup
         }
         public static IServiceCollection ConfigureProperty(this IServiceCollection services, IConfiguration config)
         {
-            services.AddDbContext<PropertyContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]));
+            // PropertyListingView reads Include several collections (Media/FloorPlans/Metadata); split
+            // those into separate queries to avoid the cartesian-explosion single-query (EF Query[20504]).
+            services.AddDbContext<PropertyContext>(options => options.UseSqlServer(
+                config["ConnectionStrings:DefaultConnection"],
+                sql => sql.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
             services.AddSingleton<IFTPService, FTPService>();
             services.AddSingleton<IPropertyImporter, BlmFileImporter>();
             services.AddScoped<IPropertyRepository, PropertyRepository>();
@@ -315,7 +342,11 @@ namespace Hood.Startup
         }
         public static IServiceCollection ConfigureContent(this IServiceCollection services, IConfiguration config)
         {
-            services.AddDbContext<ContentContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]));
+            // ContentView reads Include several collections (Media/Metadata/Categories); split those into
+            // separate queries to avoid the cartesian-explosion single-query (EF Query[20504]).
+            services.AddDbContext<ContentContext>(options => options.UseSqlServer(
+                config["ConnectionStrings:DefaultConnection"],
+                sql => sql.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
             services.AddSingleton<ContentCategoryCache>();
             services.AddSingleton<ContentByTypeCache>();
             services.AddScoped<IContentRepository, ContentRepository>();
