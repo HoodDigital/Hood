@@ -1,39 +1,47 @@
-var autoprefixer = require('gulp-autoprefixer');
+var autoprefixer = require('autoprefixer');
+var cssnano = require('cssnano');
 var gulp = require('gulp');
-var cssnano = require('gulp-cssnano');
-var imagemin = require('gulp-imagemin');
 var less = require('gulp-less');
 var path = require('path');
+var postcss = require('gulp-postcss');
 var rename = require('gulp-rename');
-var rimraf = require('gulp-rimraf');
+var { rimraf } = require('rimraf');
 var sass = require('gulp-dart-sass');
-var sourcemaps = require('gulp-sourcemaps');
 var tilde = require('node-sass-tilde-importer');
 
-gulp.task('clean', function(cb) {
-    return gulp.src([
-            './wwwroot/src/',
-            './wwwroot/dist/',
-            './dist/',
-            './images/',
-            './src/js/',
-            './src/css/',
-            './src/ts/**/*.d.ts'
-        ], { read: false, allowEmpty: true })
-        .pipe(rimraf({ force: true }));
+// cssnano preset shared by the dist + theme minification tasks.
+var cssnanoOpts = cssnano({
+    preset: ['default', {
+        discardComments: {
+            removeAll: true
+        }
+    }]
 });
 
+gulp.task('clean', function() {
+    return rimraf([
+        './wwwroot/src/',
+        './wwwroot/dist/',
+        './dist/',
+        './images/',
+        './src/js/',
+        './src/css/',
+        './src/ts/**/*.d.ts'
+    ], { glob: true });
+});
+
+// Copies pass binaries (images, fonts) through untouched — gulp 5 re-encodes
+// stream contents as UTF-8 unless encoding is disabled.
 gulp.task('copy:src', function() {
-    return gulp.src('./wwwroot/src/**/*.*')
+    return gulp.src('./wwwroot/src/**/*.*', { encoding: false })
         .pipe(gulp.dest('./src/'));
 });
 gulp.task('copy:dist', function() {
-    return gulp.src('./wwwroot/dist/**/*.*')
+    return gulp.src('./wwwroot/dist/**/*.*', { encoding: false })
         .pipe(gulp.dest('./dist/'));
 });
 gulp.task('copy:images', function() {
-    return gulp.src('./wwwroot/images/**/*.+(png|jpg|gif|svg)')
-        .pipe(imagemin())
+    return gulp.src('./wwwroot/images/**/*.+(png|jpg|gif|svg)', { encoding: false })
         .pipe(gulp.dest('./images/'));
 });
 gulp.task('copy',
@@ -48,17 +56,15 @@ gulp.task('copy',
 gulp.task('scss', function() {
     return gulp.src([
             './src/scss/*.scss'
-        ])
-        .pipe(sourcemaps.init())
-        .pipe(autoprefixer())
+        ], { sourcemaps: true })
         .pipe(sass({
             outputStyle: 'expanded',
             indentType: 'tab',
             indentWidth: 1,
             importer: tilde
         }).on('error', sass.logError))
-        .pipe(sourcemaps.write(''))
-        .pipe(gulp.dest('./wwwroot/src/css/'));
+        .pipe(postcss([autoprefixer()]))
+        .pipe(gulp.dest('./wwwroot/src/css/', { sourcemaps: '.' }));
 });
 
 
@@ -66,39 +72,34 @@ gulp.task('cssnano', function() {
     return gulp.src([
             './wwwroot/src/css/*.css'
         ])
-        .pipe(cssnano({
-            discardComments: {
-                removeAll: true
-            }
-        }))
+        .pipe(postcss([cssnanoOpts]))
         //.pipe(rename({ suffix: '.min' }))
         .pipe(gulp.dest('./wwwroot/dist/css/'));
 });
 
 
-gulp.task('views:clean', function(cb) {
-    return gulp.src([
-            './../Hood.UI.Core/BaseUI/',
-            './../Hood.UI.Bootstrap3/UI/',
-            './../Hood.UI.Bootstrap4/UI/',
-            './../Hood.UI.Admin/Areas/Admin/UI/'
-        ], { read: false, allowEmpty: true })
-        .pipe(rimraf({ force: true }));
+gulp.task('views:clean', function() {
+    return rimraf([
+        './../Hood.UI.Core/BaseUI/',
+        './../Hood.UI.Bootstrap3/UI/',
+        './../Hood.UI.Bootstrap4/UI/',
+        './../Hood.UI.Admin/Areas/Admin/UI/'
+    ]);
 });
 gulp.task('views:core', function() {
-    return gulp.src('./Views/**/*.*')
+    return gulp.src('./Views/**/*.*', { encoding: false })
         .pipe(gulp.dest('./../Hood.UI.Core/BaseUI/'));
 });
 gulp.task('views:bootstrap3', function() {
-    return gulp.src('./Themes/bootstrap3/Views/**/*.*')
+    return gulp.src('./Themes/bootstrap3/Views/**/*.*', { encoding: false })
         .pipe(gulp.dest('./../Hood.UI.Bootstrap3/UI/'));
 });
 gulp.task('views:bootstrap4', function() {
-    return gulp.src('./Themes/bootstrap4/Views/**/*.*')
+    return gulp.src('./Themes/bootstrap4/Views/**/*.*', { encoding: false })
         .pipe(gulp.dest('./../Hood.UI.Bootstrap4/UI/'));
 });
 gulp.task('views:admin', function() {
-    return gulp.src('./Areas/Admin/UI/**/*.*')
+    return gulp.src('./Areas/Admin/UI/**/*.*', { encoding: false })
         .pipe(gulp.dest('./../Hood.UI.Admin/Areas/Admin/UI/'));
 });
 gulp.task('views',
@@ -114,24 +115,19 @@ gulp.task('views',
 );
 
 
-gulp.task('themes:clean', function(cb) {
-    return gulp.src([
-            './wwwroot/themes/*/css/'
-        ], { read: false, allowEmpty: true })
-        .pipe(rimraf({ force: true }));
+gulp.task('themes:clean', function() {
+    return rimraf('./wwwroot/themes/*/css/', { glob: true });
 });
 gulp.task('themes:scss', function() {
     return gulp.src([
             './wwwroot/themes/*/scss/*.scss'
-        ])
-        .pipe(sourcemaps.init())
+        ], { sourcemaps: true })
         .pipe(sass({ outputStyle: 'expanded', indentType: 'tab', indentWidth: 1 }).on('error', sass.logError))
-        .pipe(sourcemaps.write())
         .pipe(rename(function(filePath) {
             let parentFolder = path.dirname(filePath.dirname);
             filePath.dirname = path.join(parentFolder, 'css');
         }))
-        .pipe(gulp.dest('./wwwroot/themes/'));
+        .pipe(gulp.dest('./wwwroot/themes/', { sourcemaps: true }));
 });
 gulp.task('themes:less', function() {
     lss = less({ relativeUrls: true });
@@ -141,25 +137,19 @@ gulp.task('themes:less', function() {
     });
     return gulp.src([
             './wwwroot/themes/*/less/*.less'
-        ])
-        .pipe(sourcemaps.init())
+        ], { sourcemaps: true })
         .pipe(lss)
-        .pipe(sourcemaps.write())
         .pipe(rename(function(filePath) {
             let parentFolder = path.dirname(filePath.dirname);
             filePath.dirname = path.join(parentFolder, 'css');
         }))
-        .pipe(gulp.dest('./wwwroot/themes/'));
+        .pipe(gulp.dest('./wwwroot/themes/', { sourcemaps: true }));
 });
 gulp.task('themes:cssnano', function() {
     return gulp.src([
             './wwwroot/themes/*/css/*.css'
         ])
-        .pipe(cssnano({
-            discardComments: {
-                removeAll: true
-            }
-        }))
+        .pipe(postcss([cssnanoOpts]))
         .pipe(rename({ suffix: '.min' }))
         .pipe(gulp.dest('./wwwroot/themes/'));
 });
