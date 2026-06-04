@@ -87,7 +87,10 @@ So **every merge ships a prerelease automatically**, and **cutting a `v7.0.0` Gi
 
 **Pipelines** ([`.github/workflows`](.github/workflows)): `backend.yml` packs the 7 NuGet packages; `frontend.yml` builds + publishes the `hoodcms` npm package (its version is derived from the same MinVer value, so npm and NuGet stay in lockstep). They're path-filtered, so a backend-only change doesn't rebuild the frontend and vice versa.
 
-**Secrets** (GitHub repo settings → Secrets and variables → Actions): `NUGET_API_KEY` and `NPM_TOKEN`. Until they're set the workflows still build, test and pack — they just skip the publish step.
+**Publishing credentials.**
+
+- **npm** uses [trusted publishing](https://docs.npmjs.com/trusted-publishers) (OIDC) — no token. The `hoodcms` package on npmjs is configured with a trusted publisher pointing at this repo's `frontend.yml` workflow; the workflow mints a short-lived OIDC token (`id-token: write`) that npm exchanges at publish time, and provenance is attached automatically. Nothing to store in GitHub.
+- **NuGet** uses a `NUGET_API_KEY` repo secret (Settings → Secrets and variables → Actions). Until it's set the backend workflow builds, tests and packs but skips the push.
 
 
 ## Full documentation

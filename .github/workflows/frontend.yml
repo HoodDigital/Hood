@@ -53,8 +53,9 @@ jobs:
     needs: build
     if: github.event_name == 'push' || github.event_name == 'release'
     runs-on: ubuntu-latest
-    env:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    permissions:
+      contents: read
+      id-token: write # mint the OIDC token npm trusted publishing exchanges (no NPM_TOKEN)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -66,6 +67,8 @@ jobs:
         with:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
+      # Trusted publishing (OIDC) requires npm >= 11.5.1; Node 22 ships an older npm.
+      - run: npm install --global npm@latest
       # Same MinVer config as Directory.Build.props, so npm == NuGet version.
       - name: Compute version (MinVer)
         id: minver
@@ -80,16 +83,12 @@ jobs:
         working-directory: projects/Hood.Development
       - run: yarn run package
         working-directory: projects/Hood.Development
-      - name: Set version + publish
-        if: env.NPM_TOKEN != ''
+      # No token: npm detects the GitHub OIDC environment, matches the trusted-publisher
+      # config on npmjs, and publishes with provenance automatically.
+      - name: Publish to npm (trusted publishing / OIDC)
         working-directory: projects/Hood.Development
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           npm version "${{ steps.minver.outputs.version }}" --no-git-tag-version --allow-same-version
           if [ "${{ github.event_name }}" = "release" ]; then TAG=latest; else TAG=next; fi
           echo "Publishing hoodcms@${{ steps.minver.outputs.version }} with dist-tag $TAG"
           npm publish --tag "$TAG" --access public
-      - name: Skipped publish (no NPM_TOKEN secret)
-        if: env.NPM_TOKEN == ''
-        run: echo "NPM_TOKEN is not set — built but did not publish."
