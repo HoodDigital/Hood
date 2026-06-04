@@ -58,12 +58,12 @@
     "bootstrap": "^5.1.3",
     "chart.js": "^3.7.1",
     "dropzone": "^5.9.3",
+    "hugerte": "^1.0.10",
     "jquery": "^3.6.0",
     "jquery-slimscroll": "^1.3.8",
     "jquery-toast-plugin": "^1.3.2",
     "jquery-validation": "^1.19.4",
-    "sweetalert2": "^11.4.16",
-    "tinymce": "^5.10.3"
+    "sweetalert2": "^11.4.16"
   },
   "devDependencies": {
     "@lopatnov/rollup-plugin-uglify": "^2.1.2",

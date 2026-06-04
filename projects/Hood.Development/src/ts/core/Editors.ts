@@ -1,4 +1,4 @@
-import tinymce from 'tinymce/tinymce';
+import hugerte from 'hugerte/hugerte';
 
 import { MediaObject, MediaService } from './Media';
 import { ModalController } from './Modal';
@@ -44,17 +44,20 @@ export class Editors {
 
     richTextEditors() {
 
+        // HugeRTE (MIT fork of TinyMCE) — plugin/toolbar names updated for the v7-era API:
+        // dropped the v4-era 'print'/'contextmenu'/'paste'/'textcolor' (now built-in or removed),
+        // renamed 'styleselect' -> 'styles', and added the 'table' plugin the toolbar references.
+        const fullPlugins = 'advlist autolink lists link image charmap preview anchor media searchreplace visualblocks code fullscreen insertdatetime table';
+        const simplePlugins = 'advlist autolink lists link image charmap preview anchor media searchreplace visualblocks code fullscreen insertdatetime';
+        const fullToolbar = 'fullscreen code | styles forecolor backcolor | hoodimage link media image | bold italic | alignleft aligncenter alignright | bullist numlist | table | undo redo';
+        const simpleToolbar = 'fullscreen | bold italic | bullist numlist | undo redo | link';
 
-        tinymce.init({
+        hugerte.init({
             selector: '.tinymce-full',
             height: 150,
             menubar: false,
-            plugins: [
-                'advlist autolink lists link image charmap print preview anchor media',
-                'searchreplace visualblocks code fullscreen',
-                'insertdatetime media contextmenu paste textcolor'
-            ],
-            toolbar: "fullscreen code | styleselect forecolor backcolor | hoodimage link media image | bold italic | alignleft aligncenter alignright | bullist numlist | table | undo redo",
+            plugins: fullPlugins,
+            toolbar: fullToolbar,
             link_class_list: this.options.linkClasses,
             image_class_list: this.options.imageClasses,
             setup: this.setupCommands.bind(this),
@@ -62,51 +65,38 @@ export class Editors {
             content_css: [
                 '/dist/css/editor.css'
             ],
-
         });
 
-        tinymce.init({
+        hugerte.init({
             selector: '.tinymce-simple',
             height: 150,
-            plugins: [
-                'advlist autolink lists link image charmap print preview anchor media',
-                'searchreplace visualblocks code fullscreen',
-                'insertdatetime media contextmenu paste code'
-            ],
             menubar: false,
-            toolbar: 'fullscreen | bold italic | bullist numlist | undo redo | link',
+            plugins: simplePlugins,
+            toolbar: simpleToolbar,
             link_class_list: this.options.linkClasses,
             image_class_list: this.options.imageClasses,
             setup: this.setupCommands.bind(this),
             image_dimensions: false
         });
 
-        tinymce.init({
+        hugerte.init({
             selector: '.tinymce-full-content',
             height: 500,
             menubar: false,
-            plugins: [
-                'advlist autolink lists link image charmap print preview anchor media',
-                'searchreplace visualblocks code fullscreen',
-                'insertdatetime media contextmenu paste textcolor'
-            ],
-            toolbar: "fullscreen code | styleselect forecolor backcolor | hoodimage link media image | bold italic | alignleft aligncenter alignright | bullist numlist | table | undo redo",
+            plugins: fullPlugins,
+            toolbar: fullToolbar,
             link_class_list: this.options.linkClasses,
             image_class_list: this.options.imageClasses,
             setup: this.setupCommands.bind(this),
             image_dimensions: false
         });
 
-        tinymce.init({
+        hugerte.init({
             selector: '.tinymce-simple-content',
             height: 500,
-            plugins: [
-                'advlist autolink lists link image charmap print preview anchor media',
-                'searchreplace visualblocks code fullscreen',
-                'insertdatetime media contextmenu paste'
-            ],
             menubar: false,
-            toolbar: 'fullscreen | bold italic | bullist numlist | undo redo | link',
+            plugins: simplePlugins,
+            toolbar: simpleToolbar,
             link_class_list: this.options.linkClasses,
             image_class_list: this.options.imageClasses,
             image_dimensions: false

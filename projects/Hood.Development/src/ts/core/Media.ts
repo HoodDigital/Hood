@@ -6,7 +6,7 @@ import { DataList } from "./DataList";
 import { ModalController } from "./Modal";
 import { Validator } from "./Validator";
 import { Inline } from "./Inline";
-import { Editor } from "tinymce";
+import { Editor } from "hugerte";
 
 export declare interface MediaObject {
 
