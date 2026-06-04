@@ -1,27 +1,41 @@
-﻿using Hood.Interfaces;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Hood.Interfaces;
 
 namespace Hood.ViewModels
 {
     public class AdminCreateUserViewModel : RegisterViewModel
     {
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [StringLength(
+            100,
+            ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.",
+            MinimumLength = 6
+        )]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
 
-        [Display(Name = "Create Validated Account", Description = "Create the user, and mark the email address and phone number as valid. This will override the requirement for the user to validate their email when logging in. This is not recommended to maintain account security.")]
-        public bool CreateValidated { get; set; } = false;
+        [Display(
+            Name = "Create Validated Account",
+            Description = "Create the user, and mark the email address and phone number as valid. This will override the requirement for the user to validate their email when logging in. This is not recommended to maintain account security."
+        )]
+        public bool CreateValidated { get; set; }
 
-        [Display(Name = "Notify the user", Description = "Email the new account access information to the user.")]
+        [Display(
+            Name = "Notify the user",
+            Description = "Email the new account access information to the user."
+        )]
         public bool NotifyUser { get; set; }
     }
 
     public class PasswordRegisterViewModel : RegisterViewModel
     {
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [StringLength(
+            100,
+            ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.",
+            MinimumLength = 6
+        )]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
@@ -41,10 +55,9 @@ namespace Hood.ViewModels
         [Required]
         [Display(Name = "Last Name")]
         public override string LastName { get; set; }
-               
     }
 
-    public class RegisterViewModel : SpamPreventionModel, IName, IAddress, IPerson
+    public class RegisterViewModel : SpamPreventionModel, IPerson
     {
         [Required]
         [EmailAddress]
@@ -81,7 +94,11 @@ namespace Hood.ViewModels
         public virtual string JobTitle { get; set; }
 
         [Display(Name = "Contact Name")]
-        public virtual string ContactName { get => this.ToInternalName(); set { } }
+        public virtual string ContactName
+        {
+            get => this.ToInternalName();
+            set { }
+        }
 
         public virtual string Number { get; set; }
 

@@ -1,7 +1,7 @@
-﻿using Hood.BaseTypes;
-using Hood.Extensions;
 using System;
 using System.ComponentModel.DataAnnotations;
+using Hood.BaseTypes;
+using Hood.Extensions;
 
 namespace Hood.Models
 {
@@ -10,10 +10,13 @@ namespace Hood.Models
     {
         [NonSerialized]
         public const string PlainTemplate = "Areas/Admin/UI/Mail/Plain.cshtml";
+
         [NonSerialized]
         public const string SuccessTemplate = "Areas/Admin/UI/Mail/Success.cshtml";
+
         [NonSerialized]
         public const string WarningTemplate = "Areas/Admin/UI/Mail/Warning.cshtml";
+
         [NonSerialized]
         public const string DangerTemplate = "Areas/Admin/UI/Mail/Danger.cshtml";
 
@@ -29,16 +32,15 @@ namespace Hood.Models
         #region "Design"
         [Display(Name = "Background Colour")]
         public string BackgroundColour { get; set; }
+
         [Display(Name = "Logo")]
         public string Logo { get; set; }
+
         [Display(Name = "Hero Image")]
         public string HeroImage { get; set; }
         public bool IsSetup
         {
-            get
-            {
-                return SendGridKey.IsSet() && FromEmail.IsSet();
-            }
+            get { return SendGridKey.IsSet() && FromEmail.IsSet(); }
         }
         #endregion
 

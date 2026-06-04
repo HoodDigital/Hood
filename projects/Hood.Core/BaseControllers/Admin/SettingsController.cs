@@ -1,28 +1,18 @@
-﻿using Geocoding.Google;
-using Hood.BaseTypes;
+﻿using System;
+using Geocoding.Google;
 using Hood.BaseControllers;
+using Hood.BaseTypes;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
-using Hood.Services;
-using Hood.ViewModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Hood.Admin.BaseControllers
 {
     public abstract class BaseSettingsController : BaseController
     {
-        public BaseSettingsController()
-            : base()
-        {
-        }
+        public BaseSettingsController() { }
 
         [Route("admin/settings/basics/")]
         public virtual IActionResult Basics()
@@ -54,31 +44,36 @@ namespace Hood.Admin.BaseControllers
                     }
                     else
                     {
-                        SaveMessage = "Settings were saved, but because there was an error with the Google API, your address could not be located on the map. Check your Google API key in your Integration Settings, and ensure your API key has the Geocoding API enabled.";
+                        SaveMessage =
+                            "Settings were saved, but because there was an error with the Google API, your address could not be located on the map. Check your Google API key in your Integration Settings, and ensure your API key has the Geocoding API enabled.";
                         MessageType = AlertType.Warning;
                     }
                 }
                 else
                 {
-                    SaveMessage = "Settings were saved, but you did not set an address correctly, so the Google API could not locate your address on the map.";
+                    SaveMessage =
+                        "Settings were saved, but you did not set an address correctly, so the Google API could not locate your address on the map.";
                     MessageType = AlertType.Warning;
                 }
-
             }
             catch (GoogleGeocodingException ex)
             {
                 switch (ex.Status)
                 {
                     case GoogleStatus.RequestDenied:
-                        SaveMessage = "Settings were saved, but because there was an error with the Google API [Google returned a RequestDenied status] this means your API account is not activated for Geocoding Requests.";
+                        SaveMessage =
+                            "Settings were saved, but because there was an error with the Google API [Google returned a RequestDenied status] this means your API account is not activated for Geocoding Requests.";
                         MessageType = AlertType.Warning;
                         break;
                     case GoogleStatus.OverQueryLimit:
-                        SaveMessage = "Settings were saved, but because there was an error with the Google API [Google returned a OverQueryLimit status] this means your API account is has run out of Geocoding Requests.";
+                        SaveMessage =
+                            "Settings were saved, but because there was an error with the Google API [Google returned a OverQueryLimit status] this means your API account is has run out of Geocoding Requests.";
                         MessageType = AlertType.Warning;
                         break;
                     default:
-                        SaveMessage = "Settings were saved, but because there was an error with the Google API, your address could not be located on the map. Check your Google API key in your Integration Settings, and ensure your API key has the Geocoding API enabled. Google returned a status of " + ex.Status.ToString();
+                        SaveMessage =
+                            "Settings were saved, but because there was an error with the Google API, your address could not be located on the map. Check your Google API key in your Integration Settings, and ensure your API key has the Geocoding API enabled. Google returned a status of "
+                            + ex.Status.ToString();
                         MessageType = AlertType.Warning;
                         break;
                 }
@@ -135,7 +130,6 @@ namespace Hood.Admin.BaseControllers
             return RedirectWithResetMessage("Integrations");
         }
 
-
         [Route("admin/settings/contact/")]
         public virtual IActionResult Contact()
         {
@@ -172,7 +166,6 @@ namespace Hood.Admin.BaseControllers
             return RedirectWithResetMessage("Contact");
         }
 
-
         [Route("admin/settings/property/")]
         public virtual IActionResult Property()
         {
@@ -182,6 +175,7 @@ namespace Hood.Admin.BaseControllers
                 model = new PropertySettings();
             return View(model);
         }
+
         [HttpPost]
         [Route("admin/settings/property/")]
         public virtual IActionResult Property(PropertySettings model)
@@ -217,6 +211,7 @@ namespace Hood.Admin.BaseControllers
                 model = new AccountSettings();
             return View(model);
         }
+
         [HttpPost]
         [Route("admin/settings/account/")]
         public virtual IActionResult AccountSettings(AccountSettings model)
@@ -243,9 +238,7 @@ namespace Hood.Admin.BaseControllers
             return RedirectWithResetMessage("Account");
         }
 
-
         [Route("admin/settings/seo/")]
-
         public virtual IActionResult Seo()
         {
             _cache.Remove(typeof(SeoSettings).ToString());
@@ -254,6 +247,7 @@ namespace Hood.Admin.BaseControllers
                 model = new SeoSettings();
             return View(model);
         }
+
         [HttpPost]
         [Route("admin/settings/seo/")]
         public virtual IActionResult Seo(SeoSettings model)
@@ -280,7 +274,6 @@ namespace Hood.Admin.BaseControllers
             return RedirectWithResetMessage("Seo");
         }
 
-
         [Route("admin/settings/media/")]
         public virtual IActionResult Media()
         {
@@ -291,6 +284,7 @@ namespace Hood.Admin.BaseControllers
 
             return View(model);
         }
+
         [HttpPost]
         [Route("admin/settings/media/")]
         public virtual IActionResult Media(MediaSettings model)
@@ -318,7 +312,6 @@ namespace Hood.Admin.BaseControllers
             return RedirectWithResetMessage("Media");
         }
 
-
         [Route("admin/settings/mail/")]
         public virtual IActionResult Mail()
         {
@@ -328,6 +321,7 @@ namespace Hood.Admin.BaseControllers
                 model = new MailSettings();
             return View(model);
         }
+
         [HttpPost]
         [Route("admin/settings/mail/")]
         public virtual IActionResult Mail(MailSettings model)
@@ -354,14 +348,13 @@ namespace Hood.Admin.BaseControllers
             return RedirectWithResetMessage("Mail");
         }
 
-
         [Route("admin/settings/advanced/")]
         public virtual IActionResult Advanced()
         {
             return View(new SaveableModel());
         }
 
-        #region Caching 
+        #region Caching
         [Route("admin/settings/removecacheitem/")]
         public virtual IActionResult RemoveCacheItem(string key)
         {
@@ -370,6 +363,7 @@ namespace Hood.Admin.BaseControllers
             MessageType = AlertType.Success;
             return RedirectToAction("Advanced");
         }
+
         [Route("admin/settings/resetcache/")]
         public virtual IActionResult ResetCache()
         {
@@ -380,7 +374,7 @@ namespace Hood.Admin.BaseControllers
         }
         #endregion
 
-        #region Helpers 
+        #region Helpers
         public virtual IActionResult RedirectWithResetMessage(string actionName)
         {
             SaveMessage = $"The settings have been reset to their default values.";

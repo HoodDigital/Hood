@@ -1,13 +1,12 @@
-﻿using Hood.BaseTypes;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Hood.BaseTypes;
 
 namespace Hood.Entities
 {
-    public abstract partial class BaseEntity : BaseEntity<int>
-    { }
+    public abstract class BaseEntity : BaseEntity<int> { }
 
-    public abstract partial class BaseEntity<TKey> : SaveableModel, IBaseEntity<TKey>
+    public abstract class BaseEntity<TKey> : SaveableModel, IBaseEntity<TKey>
     {
         /// <summary>
         /// Gets or sets the entity identifier
@@ -57,14 +56,11 @@ namespace Hood.Entities
             if (ReferenceEquals(this, other))
                 return true;
 
-            if (!IsTransient(this) &&
-                !IsTransient(other) &&
-                Equals(Id, other.Id))
+            if (!IsTransient(this) && !IsTransient(other) && Equals(Id, other.Id))
             {
                 var otherType = other.GetUnproxiedType();
                 var thisType = GetUnproxiedType();
-                return thisType.IsAssignableFrom(otherType) ||
-                        otherType.IsAssignableFrom(thisType);
+                return thisType.IsAssignableFrom(otherType) || otherType.IsAssignableFrom(thisType);
             }
 
             return false;

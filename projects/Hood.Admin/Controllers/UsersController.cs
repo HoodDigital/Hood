@@ -1,6 +1,4 @@
-﻿using Hood.Admin.BaseControllers;
-using Hood.Constants.Identity;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.Areas.Admin.Controllers
@@ -11,9 +9,6 @@ namespace Hood.Areas.Admin.Controllers
     // standard base. Auth0 deployments substitute Hood.Admin.BaseControllers.Auth0UsersController.
     public class UsersController : Hood.Admin.BaseControllers.UsersController
     {
-        public UsersController()
-            : base()
-        {
-        }
+        public UsersController() { }
     }
 }

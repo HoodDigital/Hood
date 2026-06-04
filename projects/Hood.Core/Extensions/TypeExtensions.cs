@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Hood.Extensions
 {
@@ -15,12 +15,19 @@ namespace Hood.Extensions
             try
             {
                 var genericType = inherited.GetGenericTypeDefinition();
-                foreach (var implementedInterface in type.FindInterfaces((objType, objCriteria) => true, null))
+                foreach (
+                    var implementedInterface in type.FindInterfaces(
+                        (objType, objCriteria) => true,
+                        null
+                    )
+                )
                 {
                     if (!implementedInterface.IsGenericType)
                         continue;
 
-                    return genericType.IsAssignableFrom(implementedInterface.GetGenericTypeDefinition());
+                    return genericType.IsAssignableFrom(
+                        implementedInterface.GetGenericTypeDefinition()
+                    );
                 }
 
                 return false;
@@ -30,7 +37,5 @@ namespace Hood.Extensions
                 return false;
             }
         }
-
     }
-
 }

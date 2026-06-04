@@ -6,8 +6,13 @@ namespace Hood.Models
     {
         [JsonProperty("access_token")]
         public string Token { get; set; }
+
         [JsonProperty("token_type")]
         public string Type { get; set; }
-        public string ToAuthHeader() { return $"{Type} {Token}"; }
+
+        public string ToAuthHeader()
+        {
+            return $"{Type} {Token}";
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Hood.Extensions
+namespace Hood.Extensions
 {
     public static class IntegerExtensions
     {
@@ -10,11 +10,13 @@
         public static string ToPosition(this int number)
         {
             var outputNum = number % 100;
-            return number.ToString() + ((outputNum % 10 == 1 && outputNum != 11) ? "st"
+            return number.ToString()
+                + (
+                    (outputNum % 10 == 1 && outputNum != 11) ? "st"
                     : (outputNum % 10 == 2 && outputNum != 12) ? "nd"
                     : (outputNum % 10 == 3 && outputNum != 13) ? "rd"
-                    : "th");
+                    : "th"
+                );
         }
-
     }
 }

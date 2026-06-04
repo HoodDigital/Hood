@@ -1,27 +1,28 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using Hood.Extensions;
-using Hood.Interfaces;
-using Hood.Models;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Hood.Extensions;
+using Hood.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.ViewModels
 {
     public class UserListModel : UserListModel<IUserProfile>
     {
-        public UserListModel()
-        { }
+        public UserListModel() { }
     }
-    public class UserListModel<TUserProfile> : PagedList<TUserProfile>, IPageableModel
+
+    public class UserListModel<TUserProfile> : PagedList<TUserProfile>
     {
-        public UserListModel()
-        { }
+        public UserListModel() { }
 
         [FromQuery(Name = "role")]
         public string Role { get; set; }
 
         [FromQuery(Name = "unused")]
-        [Display(Name = "Unused Accounts", Description = "Accounts which do not have last log in infomation saved.")]
+        [Display(
+            Name = "Unused Accounts",
+            Description = "Accounts which do not have last log in infomation saved."
+        )]
         public bool Unused { get; set; }
 
         [FromQuery(Name = "inactive")]
@@ -42,8 +43,10 @@ namespace Hood.ViewModels
 
         [FromQuery(Name = "sub")]
         public string Subscription { get; set; }
+
         [FromQuery(Name = "roles")]
         public List<string> RoleIds { get; set; }
+
         [FromQuery(Name = "subs")]
         public List<string> SubscriptionIds { get; set; }
 
@@ -66,7 +69,6 @@ namespace Hood.ViewModels
             if (SubscriptionIds != null)
                 foreach (var subId in SubscriptionIds)
                     query += "&subs=" + subId;
-
 
             return query;
         }

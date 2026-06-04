@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using System.Threading.Tasks;
 
 namespace Hood.TagHelpers
 {
@@ -44,5 +43,4 @@ namespace Hood.TagHelpers
             }
         }
     }
-
 }

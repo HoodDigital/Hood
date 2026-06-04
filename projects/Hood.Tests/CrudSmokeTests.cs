@@ -72,7 +72,10 @@ namespace Hood.Tests
             var found = ctx.Content.Single(c => c.Id == content.Id);
             found.Title = "Updated Title";
             ctx.SaveChanges();
-            Assert.Equal("Updated Title", ctx.Content.AsNoTracking().Single(c => c.Id == content.Id).Title);
+            Assert.Equal(
+                "Updated Title",
+                ctx.Content.AsNoTracking().Single(c => c.Id == content.Id).Title
+            );
 
             ctx.Content.Remove(found);
             ctx.SaveChanges();

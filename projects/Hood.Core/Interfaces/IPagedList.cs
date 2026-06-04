@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Hood.Interfaces;
 
@@ -19,5 +19,4 @@ namespace System.Collections.Generic
         Task<IPagedList<T>> ReloadAsync(IQueryable<T> source, int pageIndex, int pageSize);
         Task<IPagedList<T>> ReloadAsync(IQueryable<T> source);
     }
-
 }

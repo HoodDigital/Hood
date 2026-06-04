@@ -4,7 +4,12 @@ namespace Hood.Models
 {
     public class UserStatistics
     {
-        public UserStatistics(int totalUsers, int totalAdmins, List<KeyValuePair<string, int>> days, List<KeyValuePair<string, int>> months)
+        public UserStatistics(
+            int totalUsers,
+            int totalAdmins,
+            List<KeyValuePair<string, int>> days,
+            List<KeyValuePair<string, int>> months
+        )
         {
             TotalUsers = totalUsers;
             TotalAdmins = totalAdmins;

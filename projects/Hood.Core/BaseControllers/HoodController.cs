@@ -1,24 +1,18 @@
-﻿using Hood.Core;
-using Hood.Extensions;
-using Hood.Models;
-using Hood.ViewModels;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Diagnostics;
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Unsplasharp;
+using Hood.Core;
+using Hood.Extensions;
+using Hood.Models;
+using Hood.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.BaseControllers
 {
     public abstract class HoodController : BaseController
     {
-        public HoodController()
-            : base()
-        { }
+        public HoodController() { }
 
         [HttpPost]
         [Route("hood/contact/send/")]
@@ -35,20 +29,26 @@ namespace Hood.BaseControllers
 
                 var recaptcha = await _recaptcha.Validate(Request);
                 if (!recaptcha.Passed)
-                    return new Response("You have failed to pass the reCaptcha check. Please refresh your page and try again.");
+                    return new Response(
+                        "You have failed to pass the reCaptcha check. Please refresh your page and try again."
+                    );
 
                 model.SendToRecipient = true;
                 model.NotifyRole = "ContactFormNotifications";
-                model.NotifyEmails = new System.Collections.Generic.List<SendGrid.Helpers.Mail.EmailAddress>()
-                {
-                    new SendGrid.Helpers.Mail.EmailAddress(Engine.Settings.Contact.Email, Engine.Settings.Basic.FullTitle)
-                };
+                model.NotifyEmails =
+                    new System.Collections.Generic.List<SendGrid.Helpers.Mail.EmailAddress>()
+                    {
+                        new SendGrid.Helpers.Mail.EmailAddress(
+                            Engine.Settings.Contact.Email,
+                            Engine.Settings.Basic.FullTitle
+                        ),
+                    };
 
                 return await _mailService.ProcessAndSend(model);
             }
             catch (Exception ex)
             {
-                return new Models.Response(ex);
+                return new Response(ex);
             }
         }
 
@@ -74,7 +74,5 @@ namespace Hood.BaseControllers
         {
             return Json(new { version = Engine.Version });
         }
-
-
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Hood.TagHelpers
 {
@@ -82,20 +82,40 @@ namespace Hood.TagHelpers
 
             if (Type != "textarea")
             {
-                string content = string.Format(@"
+                string content = string.Format(
+                    @"
 <label class='{0}' for='{3}'>{1}</label>
 <div class='{2}'>
     <input id='{3}' name='{3}' type='{4}' class='{5}' value='{6}' {7} />
-</div>", LabelClass, FieldName, FieldDivClass, Field, Type, InputClass, Value, Format);
+</div>",
+                    LabelClass,
+                    FieldName,
+                    FieldDivClass,
+                    Field,
+                    Type,
+                    InputClass,
+                    Value,
+                    Format
+                );
                 output.Content.AppendHtml(content);
             }
             else
             {
-                string content = string.Format(@"
+                string content = string.Format(
+                    @"
 <label class='{0}' for='{3}'>{1}</label>
 <div class='{2}'>
     <textarea id='{3}' name='{3}' type='{4}' class='{5}' value='{6}' {7}></textarea>
-</div>", LabelClass, FieldName, FieldDivClass, Field, Type, InputClass, Value, Format);
+</div>",
+                    LabelClass,
+                    FieldName,
+                    FieldDivClass,
+                    Field,
+                    Type,
+                    InputClass,
+                    Value,
+                    Format
+                );
                 output.Content.AppendHtml(content);
             }
         }

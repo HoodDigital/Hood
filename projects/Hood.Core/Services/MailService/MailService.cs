@@ -1,9 +1,7 @@
-﻿using System.Threading.Tasks;
-using System;
-using Hood.Models;
-using Hood.Extensions;
+﻿using System;
+using System.Threading.Tasks;
 using Hood.Interfaces;
-using SendGrid.Helpers.Mail;
+using Hood.Models;
 
 namespace Hood.Services
 {
@@ -47,11 +45,12 @@ namespace Hood.Services
             }
             catch (Exception sendEx)
             {
-                await _logService.AddExceptionAsync<MailService>("There was a problem sending the message: " + sendEx.Message, sendEx);
+                await _logService.AddExceptionAsync<MailService>(
+                    "There was a problem sending the message: " + sendEx.Message,
+                    sendEx
+                );
                 throw new Exception("There was a problem sending the message.", sendEx);
             }
         }
-
-
     }
 }

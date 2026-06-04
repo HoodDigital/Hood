@@ -1,5 +1,4 @@
-﻿using Hood.Models;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace Hood.Core
 {
@@ -25,14 +24,14 @@ namespace Hood.Core
         {
             TinyMCE = "no-api-key";
         }
+
         public string TinyMCE { get; set; }
     }
 
     public class Auth0Configuration
     {
-        public Auth0Configuration()
-        {
-        }
+        public Auth0Configuration() { }
+
         public string Domain { get; set; }
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }

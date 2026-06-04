@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Hood.Core
 {
     /// <summary>
-    /// A statically compiled "singleton" used to store objects throughout the 
-    /// lifetime of the app domain. Not so much singleton in the pattern's 
+    /// A statically compiled "singleton" used to store objects throughout the
+    /// lifetime of the app domain. Not so much singleton in the pattern's
     /// sense of the word as a standardized way to store single instances.
     /// </summary>
     /// <typeparam name="T">The type of object to store.</typeparam>
@@ -42,7 +42,7 @@ namespace Hood.Core
         /// <summary>
         /// The singleton instance for the specified type T. Only one instance (at the time) of this list for each type of T.
         /// </summary>
-        public new static IList<T> Instance
+        public static new IList<T> Instance
         {
             get { return Singleton<IList<T>>.Instance; }
         }
@@ -63,7 +63,7 @@ namespace Hood.Core
         /// <summary>
         /// The singleton instance for the specified type T. Only one instance (at the time) of this dictionary for each type of T.
         /// </summary>
-        public new static IDictionary<TKey, TValue> Instance
+        public static new IDictionary<TKey, TValue> Instance
         {
             get { return Singleton<Dictionary<TKey, TValue>>.Instance; }
         }

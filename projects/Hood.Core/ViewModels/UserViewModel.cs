@@ -1,14 +1,14 @@
-﻿using Hood.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Hood.Interfaces;
 using Hood.BaseTypes;
+using Hood.Interfaces;
+using Hood.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.ViewModels
 {
-    public class ManageAccountViewModel : SaveableModel, ISaveableModel
+    public class ManageAccountViewModel : SaveableModel
     {
         public string LocalUserId { get; set; }
         public bool IsEmailConfirmed { get; set; }

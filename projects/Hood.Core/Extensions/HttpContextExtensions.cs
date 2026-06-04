@@ -1,12 +1,6 @@
-﻿using Hood.Core;
-using Hood.Models;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace Hood.Extensions
 {
@@ -14,7 +8,6 @@ namespace Hood.Extensions
     {
         public static string GetSubdomain(this HttpContext httpContext)
         {
-
             string url = httpContext.Request.Headers["HOST"];
             var urlSegments = url.Split('.').ToList();
             switch (urlSegments.Count)
@@ -46,7 +39,11 @@ namespace Hood.Extensions
             return url.Contains("localhost");
         }
 
-        public static string GetSiteUrl(this HttpContext context, bool includePath = false, bool includeQuery = false)
+        public static string GetSiteUrl(
+            this HttpContext context,
+            bool includePath = false,
+            bool includeQuery = false
+        )
         {
             // Return variable declaration
             var appPath = string.Empty;
@@ -55,10 +52,12 @@ namespace Hood.Extensions
             if (context?.Request != null)
             {
                 //Formatting the fully qualified website url/name
-                appPath = string.Format("{0}://{1}{2}",
-                                        context.Request.Scheme,
-                                        context.Request.Host,
-                                        context.Request.PathBase);
+                appPath = string.Format(
+                    "{0}://{1}{2}",
+                    context.Request.Scheme,
+                    context.Request.Host,
+                    context.Request.PathBase
+                );
                 if (!appPath.EndsWith("/"))
                     appPath += "/";
 

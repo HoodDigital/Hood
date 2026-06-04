@@ -1,4 +1,4 @@
-﻿using Hood.Enums;
+using Hood.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 
@@ -11,10 +11,9 @@ namespace Hood.Extensions
         public static string GetFilename(this IFormFile file)
         {
             string filename = ContentDispositionHeaderValue
-                      .Parse(file.ContentDisposition)
-                      .FileName
-                      .ToString()
-                      .Trim('"');
+                .Parse(file.ContentDisposition)
+                .FileName.ToString()
+                .Trim('"');
             return filename;
         }
 

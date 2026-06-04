@@ -1,4 +1,4 @@
-﻿namespace Hood.ViewModels
+namespace Hood.ViewModels
 {
     public class RegisterSuccessModel
     {

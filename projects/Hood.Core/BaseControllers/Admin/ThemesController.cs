@@ -1,25 +1,21 @@
-﻿using Hood.Core;
-using Hood.BaseControllers;
-using Hood.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Hood.BaseControllers;
+using Hood.Core;
+using Hood.Models;
 using Hood.ViewModels;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 
 namespace Hood.Admin.BaseControllers
 {
     public abstract class BaseThemesController : BaseController
     {
-        public BaseThemesController()
-            : base()
-        {
-        }
+        public BaseThemesController() { }
 
         [Route("admin/theme/")]
         public virtual IActionResult Index(ThemeListView model) => List(model, "Index");
+
         [Route("admin/theme/list/")]
         public virtual IActionResult List(ThemeListView model, string viewName = "_List_Themes")
         {
@@ -36,13 +32,18 @@ namespace Hood.Admin.BaseControllers
                 var applicationLifetime = Engine.Services.Resolve<IHostApplicationLifetime>();
                 Engine.Settings.Set(name, "Hood.Settings.Theme");
                 applicationLifetime.StopApplication();
-                return new Response(true, $"The theme, {name}, has been activated successfully, the app will now restart, this may take a few seconds.");
+                return new Response(
+                    true,
+                    $"The theme, {name}, has been activated successfully, the app will now restart, this may take a few seconds."
+                );
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseThemesController>($"Error activating a theme.", ex);
+                return await ErrorResponseAsync<BaseThemesController>(
+                    $"Error activating a theme.",
+                    ex
+                );
             }
         }
-
     }
 }

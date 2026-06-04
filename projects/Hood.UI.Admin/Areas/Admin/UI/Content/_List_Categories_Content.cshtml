@@ -1,4 +1,4 @@
-@model Content
+﻿@model Content
 @inject ContentCategoryCache _categories
 @{
     Layout = null;
@@ -17,7 +17,7 @@
         <div class='list-group list-group-flush'>
             @if (_categories.Count(Model.ContentType) > 0)
             {
-                @_categories.AddToCategoryTree(categories, Model);
+                @_categories.AddToCategoryTree(categories, Model)
             }
             else
             {

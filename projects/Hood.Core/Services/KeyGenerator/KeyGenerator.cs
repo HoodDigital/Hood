@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -17,10 +17,12 @@ namespace Hood.Services
     /// </summary>
     public class KeyGenerator
     {
-        public KeyGenerator(bool UseUpperCaseCharacters = true,
-                                     bool UseLowerCaseCharacters = true,
-                                     bool UseNumericCharacters = true,
-                                     bool UseSpecialCharacters = true)
+        public KeyGenerator(
+            bool UseUpperCaseCharacters = true,
+            bool UseLowerCaseCharacters = true,
+            bool UseNumericCharacters = true,
+            bool UseSpecialCharacters = true
+        )
         {
             m_UseUpperCaseCharacters = UseUpperCaseCharacters;
             m_UseLowerCaseCharacters = UseLowerCaseCharacters;
@@ -31,7 +33,11 @@ namespace Hood.Services
             LowerCaseCharacters = "abcdefghijklmnopqrstuvwxyz".ToCharArray();
             NumericCharacters = "0123456789".ToCharArray();
             SpecialCharacters = ",.;:?!/@#$%^&()=+*-_{}[]<>|~".ToCharArray();
-            MinUpperCaseCharacters = MinLowerCaseCharacters = MinNumericCharacters = MinSpecialCharacters = 0;
+            MinUpperCaseCharacters =
+                MinLowerCaseCharacters =
+                MinNumericCharacters =
+                MinSpecialCharacters =
+                    0;
             RepeatCharacters = true;
             PatternDriven = false;
             Pattern = "";
@@ -54,16 +60,17 @@ namespace Hood.Services
         /// </summary>
         public bool UseUpperCaseCharacters
         {
-            get
-            {
-                return m_UseUpperCaseCharacters;
-            }
+            get { return m_UseUpperCaseCharacters; }
             set
             {
                 if (CurrentUpperCaseCharacters != null)
-                    CurrentGeneralCharacters = CurrentGeneralCharacters.Except(CurrentUpperCaseCharacters).ToArray();
+                    CurrentGeneralCharacters = CurrentGeneralCharacters
+                        .Except(CurrentUpperCaseCharacters)
+                        .ToArray();
                 if (value)
-                    CurrentGeneralCharacters = CurrentGeneralCharacters.Concat(CurrentUpperCaseCharacters).ToArray();
+                    CurrentGeneralCharacters = CurrentGeneralCharacters
+                        .Concat(CurrentUpperCaseCharacters)
+                        .ToArray();
                 m_UseUpperCaseCharacters = value;
             }
         }
@@ -73,16 +80,15 @@ namespace Hood.Services
         /// </summary>
         public char[] UpperCaseCharacters
         {
-            get
-            {
-                return CurrentUpperCaseCharacters;
-            }
+            get { return CurrentUpperCaseCharacters; }
             set
             {
                 if (UseUpperCaseCharacters)
                 {
                     if (CurrentUpperCaseCharacters != null)
-                        CurrentGeneralCharacters = CurrentGeneralCharacters.Except(CurrentUpperCaseCharacters).ToArray();
+                        CurrentGeneralCharacters = CurrentGeneralCharacters
+                            .Except(CurrentUpperCaseCharacters)
+                            .ToArray();
                     CurrentGeneralCharacters = CurrentGeneralCharacters.Concat(value).ToArray();
                 }
                 CurrentUpperCaseCharacters = value;
@@ -94,16 +100,17 @@ namespace Hood.Services
         /// </summary>
         public bool UseLowerCaseCharacters
         {
-            get
-            {
-                return m_UseLowerCaseCharacters;
-            }
+            get { return m_UseLowerCaseCharacters; }
             set
             {
                 if (CurrentLowerCaseCharacters != null)
-                    CurrentGeneralCharacters = CurrentGeneralCharacters.Except(CurrentLowerCaseCharacters).ToArray();
+                    CurrentGeneralCharacters = CurrentGeneralCharacters
+                        .Except(CurrentLowerCaseCharacters)
+                        .ToArray();
                 if (value)
-                    CurrentGeneralCharacters = CurrentGeneralCharacters.Concat(CurrentLowerCaseCharacters).ToArray();
+                    CurrentGeneralCharacters = CurrentGeneralCharacters
+                        .Concat(CurrentLowerCaseCharacters)
+                        .ToArray();
                 m_UseLowerCaseCharacters = value;
             }
         }
@@ -113,16 +120,15 @@ namespace Hood.Services
         /// </summary>
         public char[] LowerCaseCharacters
         {
-            get
-            {
-                return CurrentLowerCaseCharacters;
-            }
+            get { return CurrentLowerCaseCharacters; }
             set
             {
                 if (UseLowerCaseCharacters)
                 {
                     if (CurrentLowerCaseCharacters != null)
-                        CurrentGeneralCharacters = CurrentGeneralCharacters.Except(CurrentLowerCaseCharacters).ToArray();
+                        CurrentGeneralCharacters = CurrentGeneralCharacters
+                            .Except(CurrentLowerCaseCharacters)
+                            .ToArray();
                     CurrentGeneralCharacters = CurrentGeneralCharacters.Concat(value).ToArray();
                 }
                 CurrentLowerCaseCharacters = value;
@@ -134,16 +140,17 @@ namespace Hood.Services
         /// </summary>
         public bool UseNumericCharacters
         {
-            get
-            {
-                return m_UseNumericCharacters;
-            }
+            get { return m_UseNumericCharacters; }
             set
             {
                 if (CurrentNumericCharacters != null)
-                    CurrentGeneralCharacters = CurrentGeneralCharacters.Except(CurrentNumericCharacters).ToArray();
+                    CurrentGeneralCharacters = CurrentGeneralCharacters
+                        .Except(CurrentNumericCharacters)
+                        .ToArray();
                 if (value)
-                    CurrentGeneralCharacters = CurrentGeneralCharacters.Concat(CurrentNumericCharacters).ToArray();
+                    CurrentGeneralCharacters = CurrentGeneralCharacters
+                        .Concat(CurrentNumericCharacters)
+                        .ToArray();
                 m_UseNumericCharacters = value;
             }
         }
@@ -153,16 +160,15 @@ namespace Hood.Services
         /// </summary>
         public char[] NumericCharacters
         {
-            get
-            {
-                return CurrentNumericCharacters;
-            }
+            get { return CurrentNumericCharacters; }
             set
             {
                 if (UseNumericCharacters)
                 {
                     if (CurrentNumericCharacters != null)
-                        CurrentGeneralCharacters = CurrentGeneralCharacters.Except(CurrentNumericCharacters).ToArray();
+                        CurrentGeneralCharacters = CurrentGeneralCharacters
+                            .Except(CurrentNumericCharacters)
+                            .ToArray();
                     CurrentGeneralCharacters = CurrentGeneralCharacters.Concat(value).ToArray();
                 }
                 CurrentNumericCharacters = value;
@@ -174,16 +180,17 @@ namespace Hood.Services
         /// </summary>
         public bool UseSpecialCharacters
         {
-            get
-            {
-                return m_UseSpecialCharacters;
-            }
+            get { return m_UseSpecialCharacters; }
             set
             {
                 if (CurrentSpecialCharacters != null)
-                    CurrentGeneralCharacters = CurrentGeneralCharacters.Except(CurrentSpecialCharacters).ToArray();
+                    CurrentGeneralCharacters = CurrentGeneralCharacters
+                        .Except(CurrentSpecialCharacters)
+                        .ToArray();
                 if (value)
-                    CurrentGeneralCharacters = CurrentGeneralCharacters.Concat(CurrentSpecialCharacters).ToArray();
+                    CurrentGeneralCharacters = CurrentGeneralCharacters
+                        .Concat(CurrentSpecialCharacters)
+                        .ToArray();
                 m_UseSpecialCharacters = value;
             }
         }
@@ -193,16 +200,15 @@ namespace Hood.Services
         /// </summary>
         public char[] SpecialCharacters
         {
-            get
-            {
-                return CurrentSpecialCharacters;
-            }
+            get { return CurrentSpecialCharacters; }
             set
             {
                 if (UseSpecialCharacters)
                 {
                     if (CurrentSpecialCharacters != null)
-                        CurrentGeneralCharacters = CurrentGeneralCharacters.Except(CurrentSpecialCharacters).ToArray();
+                        CurrentGeneralCharacters = CurrentGeneralCharacters
+                            .Except(CurrentSpecialCharacters)
+                            .ToArray();
                     CurrentGeneralCharacters = CurrentGeneralCharacters.Concat(value).ToArray();
                 }
                 CurrentSpecialCharacters = value;
@@ -263,10 +269,7 @@ namespace Hood.Services
         /// </summary>
         private string Pattern
         {
-            get
-            {
-                return m_pattern;
-            }
+            get { return m_pattern; }
             set
             {
                 if (!value.Equals(String.Empty))
@@ -299,7 +302,7 @@ namespace Hood.Services
         }
 
         /// <summary>
-        /// Generate a string of a variable length from MinLength to MaxLength. The possible 
+        /// Generate a string of a variable length from MinLength to MaxLength. The possible
         /// character sets should be defined before calling this function.
         /// </summary>
         /// <param name="MinLength">Minimal length of a string</param>
@@ -314,7 +317,7 @@ namespace Hood.Services
         }
 
         /// <summary>
-        /// Generate a string of a fixed length. The possible 
+        /// Generate a string of a fixed length. The possible
         /// character sets should be defined before calling this function.
         /// </summary>
         /// <param name="FixedLength">The length of a string</param>
@@ -332,18 +335,29 @@ namespace Hood.Services
         {
             if (length == 0)
                 throw new ArgumentException("You can't generate a string of a zero length");
-            if (!UseUpperCaseCharacters && !UseLowerCaseCharacters && !UseNumericCharacters && !UseSpecialCharacters)
+            if (
+                !UseUpperCaseCharacters
+                && !UseLowerCaseCharacters
+                && !UseNumericCharacters
+                && !UseSpecialCharacters
+            )
                 throw new ArgumentException("There should be at least one character set in use");
             if (!RepeatCharacters && (CurrentGeneralCharacters.Length < length))
-                throw new ArgumentException("There is not enough characters to create a string without repeats");
+                throw new ArgumentException(
+                    "There is not enough characters to create a string without repeats"
+                );
             string result = ""; // This string will contain the result
             if (PatternDriven)
             {
                 // Using the pattern to generate a string
                 result = PatternDrivenAlgo(Pattern);
             }
-            else if (MinUpperCaseCharacters == 0 && MinLowerCaseCharacters == 0 &&
-                     MinNumericCharacters == 0 && MinSpecialCharacters == 0)
+            else if (
+                MinUpperCaseCharacters == 0
+                && MinLowerCaseCharacters == 0
+                && MinNumericCharacters == 0
+                && MinSpecialCharacters == 0
+            )
             {
                 // Using the simpliest algorithm in this case
                 result = SimpleGenerateAlgo(length);
@@ -374,34 +388,34 @@ namespace Hood.Services
                 switch (character)
                 {
                     case 'L':
-                        {
-                            newChar = GetRandomCharFromArray(CurrentUpperCaseCharacters, Characters);
-                            break;
-                        }
+                    {
+                        newChar = GetRandomCharFromArray(CurrentUpperCaseCharacters, Characters);
+                        break;
+                    }
                     case 'l':
-                        {
-                            newChar = GetRandomCharFromArray(CurrentLowerCaseCharacters, Characters);
-                            break;
-                        }
+                    {
+                        newChar = GetRandomCharFromArray(CurrentLowerCaseCharacters, Characters);
+                        break;
+                    }
                     case 'n':
-                        {
-                            newChar = GetRandomCharFromArray(CurrentNumericCharacters, Characters);
-                            break;
-                        }
+                    {
+                        newChar = GetRandomCharFromArray(CurrentNumericCharacters, Characters);
+                        break;
+                    }
                     case 's':
-                        {
-                            newChar = GetRandomCharFromArray(CurrentSpecialCharacters, Characters);
-                            break;
-                        }
+                    {
+                        newChar = GetRandomCharFromArray(CurrentSpecialCharacters, Characters);
+                        break;
+                    }
                     case '*':
-                        {
-                            newChar = GetRandomCharFromArray(CurrentGeneralCharacters, Characters);
-                            break;
-                        }
+                    {
+                        newChar = GetRandomCharFromArray(CurrentGeneralCharacters, Characters);
+                        break;
+                    }
                     default:
-                        {
-                            throw new Exception("The character '" + character + "' is not supported");
-                        }
+                    {
+                        throw new Exception("The character '" + character + "' is not supported");
+                    }
                 }
                 Characters.Add(newChar);
                 result += newChar;
@@ -419,12 +433,16 @@ namespace Hood.Services
             // No special limits
             for (int i = 0; i < length; i++)
             {
-                char newChar = CurrentGeneralCharacters[GetRandomInt() % CurrentGeneralCharacters.Length];
+                char newChar = CurrentGeneralCharacters[
+                    GetRandomInt() % CurrentGeneralCharacters.Length
+                ];
                 if (!RepeatCharacters && result.Contains(newChar))
                 {
                     do
                     {
-                        newChar = CurrentGeneralCharacters[GetRandomInt() % CurrentGeneralCharacters.Length];
+                        newChar = CurrentGeneralCharacters[
+                            GetRandomInt() % CurrentGeneralCharacters.Length
+                        ];
                     } while (result.Contains(newChar));
                 }
                 result += newChar;
@@ -438,22 +456,41 @@ namespace Hood.Services
         private string GenerateAlgoWithLimits(int length)
         {
             // exceptional situations
-            if (MinUpperCaseCharacters + MinLowerCaseCharacters +
-                MinNumericCharacters + MinSpecialCharacters > length)
+            if (
+                MinUpperCaseCharacters
+                    + MinLowerCaseCharacters
+                    + MinNumericCharacters
+                    + MinSpecialCharacters
+                > length
+            )
             {
-                throw new ArgumentException("Sum of MinUpperCaseCharacters, MinLowerCaseCharacters," +
-                    " MinNumericCharacters and MinSpecialCharacters is greater than length");
+                throw new ArgumentException(
+                    "Sum of MinUpperCaseCharacters, MinLowerCaseCharacters,"
+                        + " MinNumericCharacters and MinSpecialCharacters is greater than length"
+                );
             }
             if (!RepeatCharacters && (MinUpperCaseCharacters > CurrentUpperCaseCharacters.Length))
-                throw new ArgumentException("Can't generate a string with this number of MinUpperCaseCharacters");
+                throw new ArgumentException(
+                    "Can't generate a string with this number of MinUpperCaseCharacters"
+                );
             if (!RepeatCharacters && (MinLowerCaseCharacters > CurrentLowerCaseCharacters.Length))
-                throw new ArgumentException("Can't generate a string with this number of MinLowerCaseCharacters");
+                throw new ArgumentException(
+                    "Can't generate a string with this number of MinLowerCaseCharacters"
+                );
             if (!RepeatCharacters && (MinNumericCharacters > CurrentNumericCharacters.Length))
-                throw new ArgumentException("Can't generate a string with this number of MinNumericCharacters");
+                throw new ArgumentException(
+                    "Can't generate a string with this number of MinNumericCharacters"
+                );
             if (!RepeatCharacters && (MinSpecialCharacters > CurrentSpecialCharacters.Length))
-                throw new ArgumentException("Can't generate a string with this number of MinSpecialCharacters");
-            int AllowedNumberOfGeneralChatacters = length - MinUpperCaseCharacters - MinLowerCaseCharacters
-                - MinNumericCharacters - MinSpecialCharacters;
+                throw new ArgumentException(
+                    "Can't generate a string with this number of MinSpecialCharacters"
+                );
+            int AllowedNumberOfGeneralChatacters =
+                length
+                - MinUpperCaseCharacters
+                - MinLowerCaseCharacters
+                - MinNumericCharacters
+                - MinSpecialCharacters;
 
             string result = "";
             // generation character set in order to support unique characters
@@ -536,8 +573,14 @@ namespace Hood.Services
         #endregion
 
         #region internal state
-        private bool m_UseUpperCaseCharacters, m_UseLowerCaseCharacters, m_UseNumericCharacters, m_UseSpecialCharacters;
-        private int m_MinUpperCaseCharacters, m_MinLowerCaseCharacters, m_MinNumericCharacters, m_MinSpecialCharacters;
+        private bool m_UseUpperCaseCharacters,
+            m_UseLowerCaseCharacters,
+            m_UseNumericCharacters,
+            m_UseSpecialCharacters;
+        private int m_MinUpperCaseCharacters,
+            m_MinLowerCaseCharacters,
+            m_MinNumericCharacters,
+            m_MinSpecialCharacters;
         private bool PatternDriven;
         private char[] CurrentUpperCaseCharacters;
         private char[] CurrentLowerCaseCharacters;

@@ -1,23 +1,17 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Hood.Core;
 using Hood.Extensions;
-using Hood.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Unsplasharp;
 
 namespace Hood.BaseControllers
 {
     public class ImagesController : Controller
     {
+        public ImagesController() { }
 
-        public ImagesController()
-        { }
-
-
-        #region Login Page Backgrounds 
+        #region Login Page Backgrounds
 
         [HttpGet]
         [Route("hood/images/random/{query?}")]
@@ -27,13 +21,24 @@ namespace Hood.BaseControllers
             {
                 if (Engine.Settings.Integrations.UnsplashAccessKey.IsSet())
                 {
-                    var client = new UnsplasharpClient(Engine.Settings.Integrations.UnsplashAccessKey);
-                    var photosFound = await client.GetRandomPhoto(UnsplasharpClient.Orientation.Squarish, query: query);
+                    var client = new UnsplasharpClient(
+                        Engine.Settings.Integrations.UnsplashAccessKey
+                    );
+                    var photosFound = await client.GetRandomPhoto(
+                        UnsplasharpClient.Orientation.Squarish,
+                        query: query
+                    );
                     return Json(photosFound);
                 }
                 else
                 {
-                    return Content(Engine.Settings.Basic.LoginAreaSettings.BackgroundImages.Split(Environment.NewLine).PickRandom());
+                    return Content(
+                        Engine
+                            .Settings.Basic.LoginAreaSettings.BackgroundImages.Split(
+                                Environment.NewLine
+                            )
+                            .PickRandom()
+                    );
                 }
             }
             catch
@@ -43,6 +48,5 @@ namespace Hood.BaseControllers
         }
 
         #endregion
-
     }
 }

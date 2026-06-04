@@ -1,10 +1,10 @@
-﻿using Hood.BaseTypes;
+﻿using System.Collections.Generic;
+using Hood.BaseTypes;
 using Hood.Models;
-using System.Collections.Generic;
 
 namespace Hood.ViewModels
 {
-    public partial class EditContentModel : SaveableModel
+    public class EditContentModel : SaveableModel
     {
         public Content Content { get; set; }
         public ContentType ContentType { get; set; }

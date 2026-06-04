@@ -1,12 +1,8 @@
-﻿using Hood.Core;
-using Hood.Enums;
+﻿using System;
 using Hood.Extensions;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using System;
 
 namespace Hood.TagHelpers
 {
@@ -65,9 +61,11 @@ namespace Hood.TagHelpers
                 fieldName = For.ModelExplorer.Metadata.DisplayName;
             }
 
-
             if (output.Attributes.ContainsName("class"))
-                output.Attributes.SetAttribute("class", $"{output.Attributes["class"].Value} row align-items-center mb-3");
+                output.Attributes.SetAttribute(
+                    "class",
+                    $"{output.Attributes["class"].Value} row align-items-center mb-3"
+                );
             else
                 output.Attributes.SetAttribute("class", $"row align-items-center mb-3");
 
@@ -80,7 +78,8 @@ namespace Hood.TagHelpers
                 }
             }
 
-            output.Content.SetHtmlContent($@"
+            output.Content.SetHtmlContent(
+                $@"
                 <div class='col-auto' style='width:75px;'>
                     <div class='img img-full img-square img-circle color-picker shadow' 
                          data-target='#{fieldId}' {customAttributes}>
@@ -97,7 +96,8 @@ namespace Hood.TagHelpers
                         <label for='{fieldId}'>{fieldName}</label>
                     </div>
                 </div>
-            ");
+            "
+            );
         }
     }
 }

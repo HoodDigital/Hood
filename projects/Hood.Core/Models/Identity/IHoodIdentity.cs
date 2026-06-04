@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using Hood.Interfaces;
-
-namespace Hood.Models
+﻿namespace Hood.Models
 {
-    public interface IHoodIdentity 
+    public interface IHoodIdentity
     {
         string Id { get; set; }
         string UserName { get; set; }

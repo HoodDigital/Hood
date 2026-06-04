@@ -1,14 +1,14 @@
-﻿using Hood.Caching;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Hood.Caching;
 using Hood.Extensions;
 using Hood.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
-using System.Linq;
 
 namespace Hood.Services
 {
@@ -18,17 +18,14 @@ namespace Hood.Services
         private readonly IConfiguration _config;
         private readonly IHoodCache _cache;
 
-        public SettingsRepository(
-            HoodDbContext db,
-            IConfiguration config,
-            IHoodCache cache)
+        public SettingsRepository(HoodDbContext db, IConfiguration config, IHoodCache cache)
         {
             _db = db;
             _config = config;
             _cache = cache;
         }
 
-        #region Private Accessors 
+        #region Private Accessors
         private string Get(string key)
         {
             try
@@ -57,6 +54,7 @@ namespace Hood.Services
                 return null;
             }
         }
+
         private void Set(string key, string value)
         {
             try
@@ -64,11 +62,7 @@ namespace Hood.Services
                 Option option = _db.Options.Where(o => o.Id == key).FirstOrDefault();
                 if (option == null)
                 {
-                    option = new Option()
-                    {
-                        Id = key,
-                        Value = value
-                    };
+                    option = new Option() { Id = key, Value = value };
                     _db.Options.Add(option);
                 }
                 else
@@ -80,9 +74,15 @@ namespace Hood.Services
             }
             catch (DbUpdateException ex)
             {
-                if (ex.InnerException is SqlException innerException && innerException.Number == 2627)
+                if (
+                    ex.InnerException is SqlException innerException
+                    && innerException.Number == 2627
+                )
                 {
-                    throw new Exception("There is already an option with that key in the database.", ex);
+                    throw new Exception(
+                        "There is already an option with that key in the database.",
+                        ex
+                    );
                 }
                 else
                 {
@@ -90,6 +90,7 @@ namespace Hood.Services
                 }
             }
         }
+
         private void Remove(string key)
         {
             _cache.Remove(key);
@@ -108,6 +109,7 @@ namespace Hood.Services
             get => Get<string>(key);
             set => Set<string>(value, key);
         }
+
         public T Get<T>(string key = null)
         {
             if (!key.IsSet())
@@ -125,6 +127,7 @@ namespace Hood.Services
                 return default;
             }
         }
+
         public void Set<T>(T value, string key = null)
         {
             if (!key.IsSet())
@@ -141,6 +144,7 @@ namespace Hood.Services
                 throw new Exception($"There was an error serializing option with key: {key}", ex);
             }
         }
+
         public void Remove<T>(string key = null)
         {
             if (!key.IsSet())

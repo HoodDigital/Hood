@@ -1,4 +1,5 @@
-﻿using Hood.Caching;
+﻿using System.Threading.Tasks;
+using Hood.Caching;
 using Hood.Contexts;
 using Hood.Core;
 using Hood.Enums;
@@ -6,14 +7,7 @@ using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Hood.BaseControllers
 {
@@ -24,13 +18,11 @@ namespace Hood.BaseControllers
         protected readonly ContentCategoryCache _contentCategoryCache;
 
         public HomeController()
-            : base()
         {
             _contentDb = Engine.Services.Resolve<ContentContext>();
             _content = Engine.Services.Resolve<IContentRepository>();
             _contentCategoryCache = Engine.Services.Resolve<ContentCategoryCache>();
         }
-
 
         [Route("/")]
         public virtual async Task<IActionResult> Index()
@@ -56,7 +48,6 @@ namespace Hood.BaseControllers
             model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
             if (!model.ContentType.Enabled || !model.ContentType.IsPublic)
                 return NotFound();
-
 
             model.Status = ContentStatus.Published;
             model = await _content.GetContentAsync(model);
@@ -104,7 +95,7 @@ namespace Hood.BaseControllers
             ContentModel model = new ContentModel()
             {
                 EditMode = editMode,
-                Content = await _content.GetContentViewByIdAsync(id)
+                Content = await _content.GetContentViewByIdAsync(id),
             };
             if (model.Content == null)
                 return NotFound();
@@ -115,7 +106,10 @@ namespace Hood.BaseControllers
             if (model.Type == null || !model.ContentType.Enabled || !model.ContentType.HasPage)
                 return NotFound();
 
-            ContentNeighbours cn = await _content.GetNeighbourContentAsync(id, model.ContentType.Type);
+            ContentNeighbours cn = await _content.GetNeighbourContentAsync(
+                id,
+                model.ContentType.Type
+            );
             model.Previous = cn.Previous;
             model.Next = cn.Next;
 
@@ -127,12 +121,18 @@ namespace Hood.BaseControllers
             {
                 // if admin only, and not logged in as admin hide.
                 if (model.Content.GetMeta("Settings.Security.AdminOnly") != null)
-                    if (!User.IsAdminOrBetter() && model.Content.GetMetaValue<bool>("Settings.Security.AdminOnly") == true)
+                    if (
+                        !User.IsAdminOrBetter()
+                        && model.Content.GetMetaValue<bool>("Settings.Security.AdminOnly") == true
+                    )
                         return NotFound();
 
                 // if not public, and not logged in hide.
                 if (model.Content.GetMeta("Settings.Security.Public") != null)
-                    if (!User.Identity.IsAuthenticated && model.Content.GetMetaValue<bool>("Settings.Security.Public") == false)
+                    if (
+                        !User.Identity.IsAuthenticated
+                        && model.Content.GetMetaValue<bool>("Settings.Security.Public") == false
+                    )
                         return NotFound();
             }
 

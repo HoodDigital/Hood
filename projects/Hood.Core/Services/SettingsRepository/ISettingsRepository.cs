@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using Hood.Models;
+﻿using Hood.Models;
 using Microsoft.Extensions.Configuration;
 
 namespace Hood.Services
 {
     public interface ISettingsRepository : IConfiguration
     {
-
         #region Get/Set/Delete
         T Get<T>(string key = null);
         void Set<T>(T value, string key = null);

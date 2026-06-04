@@ -1,4 +1,4 @@
-﻿namespace Hood.Enums
+namespace Hood.Enums
 {
     public enum GenericFileType
     {
@@ -11,14 +11,14 @@
         Directory,
         Audio,
         Video,
-        Unknown
+        Unknown,
     }
 
     public enum MediaWindowAction
     {
-        View, 
+        View,
         Select,
         Attach,
-        Insert
+        Insert,
     }
 }

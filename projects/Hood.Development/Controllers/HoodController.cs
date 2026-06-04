@@ -2,8 +2,6 @@
 {
     public class HoodController : Hood.BaseControllers.HoodController
     {
-        public HoodController()
-            : base()
-        { }
+        public HoodController() { }
     }
 }

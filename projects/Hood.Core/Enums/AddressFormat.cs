@@ -1,10 +1,9 @@
-﻿namespace Hood.Enums
+namespace Hood.Enums
 {
     public enum AddressFormat
     {
         Short,
         SingleLine,
-        MultiLine
+        MultiLine,
     }
 }
-

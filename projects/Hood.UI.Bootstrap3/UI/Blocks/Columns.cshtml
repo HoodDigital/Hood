@@ -1,4 +1,4 @@
-@{
+﻿@{
     Layout = null;
     bool fullwidth = true;
     bool.TryParse(Context.Request.Query["fullwidth"], out fullwidth);
@@ -25,7 +25,7 @@
             <div class="row @align">
                 @for (int j = 0; j < cols; j++)
                 {
-                    var colWidth = Math.Round((double)12 / (double)cols);
+                    var colWidth = Math.Round((double)12 / cols);
                     if (colWidth < 0) { colWidth = 0; }
                     if (colWidth > 12) { colWidth = 12; }
                     string colWidthLg = "col-md-" + colWidth;

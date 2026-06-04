@@ -1,8 +1,8 @@
-﻿using Hood.Core;
+using System;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Interfaces;
 using Hood.Models;
-using System;
 
 namespace Hood.Extensions
 {
@@ -18,6 +18,7 @@ namespace Hood.Extensions
             target.UniqueId = source.UniqueId;
             return target;
         }
+
         public static IMediaObject UpdateHostName(this IMediaObject mediaObject, string hostname)
         {
             mediaObject.LargeUrl = new Uri(mediaObject.LargeUrl).ToUrlString(hostname);
@@ -27,6 +28,7 @@ namespace Hood.Extensions
             mediaObject.Url = new Uri(mediaObject.Url).ToUrlString(hostname);
             return mediaObject;
         }
+
         public static string ToIcon(this IMediaObject mediaObject)
         {
             string output;
@@ -59,10 +61,10 @@ namespace Hood.Extensions
             }
             return output;
         }
+
         public static string ToJson(this IMediaObject mediaObject)
         {
             return Newtonsoft.Json.JsonConvert.SerializeObject(mediaObject);
         }
     }
-
 }

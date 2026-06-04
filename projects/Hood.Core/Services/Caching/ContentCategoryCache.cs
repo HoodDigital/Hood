@@ -1,4 +1,7 @@
-﻿using Hood.Contexts;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Hood.Contexts;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
@@ -7,9 +10,6 @@ using Hood.Services;
 using Microsoft.AspNetCore.Html;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Hood.Caching
 {
@@ -20,9 +20,7 @@ namespace Hood.Caching
         private Dictionary<string, Lazy<Dictionary<string, ContentCategory>>> bySlug;
         private Lazy<ContentCategory[]> topLevel;
 
-        public ContentCategoryCache(
-            IConfiguration config,
-            IEventsService events)
+        public ContentCategoryCache(IConfiguration config, IEventsService events)
         {
             _config = config;
             EventHandler<EventArgs> resetContentByTypeCache = (sender, eventArgs) =>
@@ -37,6 +35,7 @@ namespace Hood.Caching
         {
             return byKey.Value[categoryId];
         }
+
         public ContentCategory FromSlug(string contentType, string slug)
         {
             if (!bySlug.ContainsKey(contentType))
@@ -56,7 +55,8 @@ namespace Hood.Caching
 
         public void ResetCache()
         {
-            if (!Engine.Services.Installed) {
+            if (!Engine.Services.Installed)
+            {
                 return;
             }
             var options = new DbContextOptionsBuilder<ContentContext>();
@@ -64,18 +64,21 @@ namespace Hood.Caching
             var db = new ContentContext(options.Options);
             byKey = new Lazy<Dictionary<int, ContentCategory>>(() =>
             {
-                var q = from d in db.ContentCategories
-                        select new ContentCategory
-                        {
-                            Id = d.Id,
-                            DisplayName = d.DisplayName,
-                            Slug = d.Slug,
-                            ContentType = d.ContentType,
-                            ParentCategoryId = d.ParentCategoryId,
-                            ParentCategory = d.ParentCategory,
-                            Children = d.Children,
-                            Count = d.Content.Where(c => c.Content.Status == ContentStatus.Published).Count(),
-                        };
+                var q =
+                    from d in db.ContentCategories
+                    select new ContentCategory
+                    {
+                        Id = d.Id,
+                        DisplayName = d.DisplayName,
+                        Slug = d.Slug,
+                        ContentType = d.ContentType,
+                        ParentCategoryId = d.ParentCategoryId,
+                        ParentCategory = d.ParentCategory,
+                        Children = d.Children,
+                        Count = d
+                            .Content.Where(c => c.Content.Status == ContentStatus.Published)
+                            .Count(),
+                    };
                 return q.ToDictionary(c => c.Id);
             });
 
@@ -87,29 +90,38 @@ namespace Hood.Caching
                     type.Type,
                     new Lazy<Dictionary<string, ContentCategory>>(() =>
                     {
-                        var q = from d in db.ContentCategories
-                                where d.ContentType == type.Type
-                                select new ContentCategory
-                                {
-                                    Id = d.Id,
-                                    DisplayName = d.DisplayName,
-                                    Slug = d.Slug,
-                                    ContentType = d.ContentType,
-                                    ParentCategoryId = d.ParentCategoryId,
-                                    ParentCategory = d.ParentCategory,
-                                    Children = d.Children,
-                                    Count = d.Content.Where(c => c.Content.Status == ContentStatus.Published).Count(),
-                                };
+                        var q =
+                            from d in db.ContentCategories
+                            where d.ContentType == type.Type
+                            select new ContentCategory
+                            {
+                                Id = d.Id,
+                                DisplayName = d.DisplayName,
+                                Slug = d.Slug,
+                                ContentType = d.ContentType,
+                                ParentCategoryId = d.ParentCategoryId,
+                                ParentCategory = d.ParentCategory,
+                                Children = d.Children,
+                                Count = d
+                                    .Content.Where(c => c.Content.Status == ContentStatus.Published)
+                                    .Count(),
+                            };
                         return q.ToDictionary(c => c.Slug);
                     })
                 );
             }
-            topLevel = new Lazy<ContentCategory[]>(() => byKey.Value.Values.Where(c => c.ParentCategoryId == null).ToArray());
+            topLevel = new Lazy<ContentCategory[]>(() =>
+                byKey.Value.Values.Where(c => c.ParentCategoryId == null).ToArray()
+            );
         }
 
         public IEnumerable<ContentCategory> TopLevel(string type)
         {
-            topLevel = new Lazy<ContentCategory[]>(() => byKey.Value.Values.Where(c => c.ParentCategoryId == null && c.ContentType == type).ToArray());
+            topLevel = new Lazy<ContentCategory[]>(() =>
+                byKey
+                    .Value.Values.Where(c => c.ParentCategoryId == null && c.ContentType == type)
+                    .ToArray()
+            );
             return topLevel.Value;
         }
 
@@ -131,12 +143,15 @@ namespace Hood.Caching
             return GetAllCategoriesIncludingChildren(new ContentCategory[] { FromKey(categoryId) });
         }
 
-        private static IEnumerable<ContentCategory> GetAllCategoriesIncludingChildren(IEnumerable<ContentCategory> categories)
+        private static IEnumerable<ContentCategory> GetAllCategoriesIncludingChildren(
+            IEnumerable<ContentCategory> categories
+        )
         {
-            return categories
-                .Union(categories
+            return categories.Union(
+                categories
                     .Where(c => c.Children != null)
-                    .SelectMany(c => GetAllCategoriesIncludingChildren(c.Children)));
+                    .SelectMany(c => GetAllCategoriesIncludingChildren(c.Children))
+            );
         }
 
         public IEnumerable<ContentCategory> GetSuggestions(string type)
@@ -145,7 +160,12 @@ namespace Hood.Caching
         }
 
         // Html
-        public IHtmlContent ContentCategoryTree(IEnumerable<ContentCategory> startLevel, string contentSlug, string listClass = "list-unstyled", string itemClass = "")
+        public IHtmlContent ContentCategoryTree(
+            IEnumerable<ContentCategory> startLevel,
+            string contentSlug,
+            string listClass = "list-unstyled",
+            string itemClass = ""
+        )
         {
             string htmlOutput = string.Empty;
 
@@ -158,8 +178,16 @@ namespace Hood.Caching
                     var category = FromKey(key);
 
                     htmlOutput += $"<li class='{itemClass}'>";
-                    htmlOutput += string.Format("<a href=\"/{0}/category/{1}/\" class=\"content-categories\">", contentSlug, category.Slug);
-                    htmlOutput += string.Format("{0} <span>{1}</span>", category.DisplayName, category.Count);
+                    htmlOutput += string.Format(
+                        "<a href=\"/{0}/category/{1}/\" class=\"content-categories\">",
+                        contentSlug,
+                        category.Slug
+                    );
+                    htmlOutput += string.Format(
+                        "{0} <span>{1}</span>",
+                        category.DisplayName,
+                        category.Count
+                    );
                     htmlOutput += "</a>";
                     htmlOutput += ContentCategoryTree(category.Children, contentSlug);
                     htmlOutput += "</li>";
@@ -170,7 +198,12 @@ namespace Hood.Caching
             var builder = new HtmlString(htmlOutput);
             return builder;
         }
-        public IHtmlContent CategorySelectOptions(IEnumerable<ContentCategory> startLevel, int? selectedValue, int startingLevel = 0)
+
+        public IHtmlContent CategorySelectOptions(
+            IEnumerable<ContentCategory> startLevel,
+            int? selectedValue,
+            int startingLevel = 0
+        )
         {
             string htmlOutput = string.Empty;
             if (startLevel != null && startLevel.Count() > 0)
@@ -180,21 +213,36 @@ namespace Hood.Caching
                     // Have to reload from the cache to use the count.
                     var category = FromKey(key);
 
-                    htmlOutput += "<option value=\"" + category.Id + "\"" + (selectedValue == category.Id ? " selected" : "") + ">";
+                    htmlOutput +=
+                        "<option value=\""
+                        + category.Id
+                        + "\""
+                        + (selectedValue == category.Id ? " selected" : "")
+                        + ">";
                     for (int i = 0; i < startingLevel; i++)
                     {
                         htmlOutput += "- ";
                     }
                     htmlOutput += string.Format("{0} ({1})", category.DisplayName, category.Count);
                     htmlOutput += "</option>";
-                    htmlOutput += CategorySelectOptions(category.Children, selectedValue, startingLevel + 1);
+                    htmlOutput += CategorySelectOptions(
+                        category.Children,
+                        selectedValue,
+                        startingLevel + 1
+                    );
                 }
             }
 
             var builder = new HtmlString(htmlOutput);
             return builder;
         }
-        public IHtmlContent AdminContentCategoryTree(IEnumerable<ContentCategory> startLevel, string contentType, List<string> categoriesSelected, int startingLevel = 0)
+
+        public IHtmlContent AdminContentCategoryTree(
+            IEnumerable<ContentCategory> startLevel,
+            string contentType,
+            List<string> categoriesSelected,
+            int startingLevel = 0
+        )
         {
             string htmlOutput = string.Empty;
 
@@ -211,9 +259,13 @@ namespace Hood.Caching
                         carets += "<i class='fa fa-angle-double-right me-1'></i>";
                     }
 
-                    var currentChecked = categoriesSelected != null && categoriesSelected.Contains(category.Slug) ? "checked" : "";
+                    var currentChecked =
+                        categoriesSelected != null && categoriesSelected.Contains(category.Slug)
+                            ? "checked"
+                            : "";
 
-                    htmlOutput += $@"
+                    htmlOutput +=
+                        $@"
                         <div class='list-group-item list-group-item-action d-flex align-items-center p-2'>
                             <div class='col form-check'>
                                 <input class='form-check-input submit-on-change'
@@ -239,15 +291,24 @@ namespace Hood.Caching
                             </div>
                         </div>";
 
-                    htmlOutput += AdminContentCategoryTree(category.Children, contentType, categoriesSelected, startingLevel + 1);
-
+                    htmlOutput += AdminContentCategoryTree(
+                        category.Children,
+                        contentType,
+                        categoriesSelected,
+                        startingLevel + 1
+                    );
                 }
             }
 
             var builder = new HtmlString(htmlOutput);
             return builder;
         }
-        public IHtmlContent AddToCategoryTree(IEnumerable<ContentCategory> startLevel, Content content, int startingLevel = 0)
+
+        public IHtmlContent AddToCategoryTree(
+            IEnumerable<ContentCategory> startLevel,
+            Content content,
+            int startingLevel = 0
+        )
         {
             string htmlOutput = string.Empty;
 
@@ -264,9 +325,12 @@ namespace Hood.Caching
                         carets += "<i class='fa fa-caret-right mr-1'></i>";
                     }
 
-                    string check = content.Categories.Any(c => c.CategoryId == category.Id) ? "checked" : "";
+                    string check = content.Categories.Any(c => c.CategoryId == category.Id)
+                        ? "checked"
+                        : "";
 
-                    htmlOutput += $@"
+                    htmlOutput +=
+                        $@"
                         <div class='list-group-item list-group-item-action d-flex align-items-center p-2'>
                             <div class='col form-check'>
                                 <input class='form-check-input content-categories-check'
@@ -301,6 +365,5 @@ namespace Hood.Caching
             var builder = new HtmlString(htmlOutput);
             return builder;
         }
-
     }
 }

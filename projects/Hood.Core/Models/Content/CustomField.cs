@@ -1,4 +1,4 @@
-﻿namespace Hood.Models
+namespace Hood.Models
 {
     public class CustomField
     {
@@ -8,4 +8,3 @@
         public bool System { get; set; }
     }
 }
-

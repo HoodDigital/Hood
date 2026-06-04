@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using StackExchange.Redis;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using StackExchange.Redis;
 
 namespace Hood.Caching
 {
@@ -14,6 +14,7 @@ namespace Hood.Caching
         {
             _connectionMultiplexer = connectionMultiplexer;
         }
+
         protected IDatabase Database => _connectionMultiplexer.GetDatabase();
 
         public ConcurrentDictionary<string, DateTime> Keys { get; }
@@ -55,10 +56,7 @@ namespace Hood.Caching
                 string json = JsonConvert.SerializeObject(cacheItem);
                 Database.StringSet(key, json, expiry);
             }
-            catch (JsonSerializationException)
-            {
-                return;
-            }
+            catch (JsonSerializationException) { }
         }
 
         public async Task AddAsync<T>(string key, T cacheItem, TimeSpan? expiry = null)
@@ -68,10 +66,7 @@ namespace Hood.Caching
                 string json = JsonConvert.SerializeObject(cacheItem);
                 await Database.StringSetAsync(key, json, expiry);
             }
-            catch (JsonSerializationException)
-            {
-                return;
-            }
+            catch (JsonSerializationException) { }
         }
 
         public void Remove(string key)

@@ -1,18 +1,14 @@
-﻿using Hood.Caching;
-using Hood.Extensions;
-using Hood.Interfaces;
-using Hood.Models;
-using Hood.Services;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using System;
-using Microsoft.Data.SqlClient;
+﻿using System;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
+using Hood.Caching;
+using Hood.Extensions;
+using Hood.Interfaces;
+using Hood.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
 namespace Hood.Core
 {
@@ -62,8 +58,10 @@ namespace Hood.Core
             var dependencies = typeFinder.FindClassesOfType<IHoodComponent>();
 
             var instances = dependencies
-                                .Select(dependencyRegistrar => (IHoodComponent)Activator.CreateInstance(dependencyRegistrar))
-                                .OrderBy(dependencyRegistrar => dependencyRegistrar.ServiceConfigurationOrder);
+                .Select(dependencyRegistrar =>
+                    (IHoodComponent)Activator.CreateInstance(dependencyRegistrar)
+                )
+                .OrderBy(dependencyRegistrar => dependencyRegistrar.ServiceConfigurationOrder);
 
             foreach (var dependency in instances)
             {
@@ -73,6 +71,7 @@ namespace Hood.Core
 
             return null;
         }
+
         public static bool Auth0Enabled
         {
             get
@@ -112,36 +111,31 @@ namespace Hood.Core
                     return null;
             }
         }
+
         /// <summary>
         /// Gets the current resolvable version of the ISettingsRepository.
         /// </summary>
         public static ISettingsRepository Settings
         {
-            get
-            {
-                return Services.Resolve<ISettingsRepository>();
-            }
+            get { return Services.Resolve<ISettingsRepository>(); }
         }
+
         /// <summary>
         /// Gets the current resolvable version of the IHoodCache.
         /// </summary>
         public static IHoodCache Cache
         {
-            get
-            {
-                return Services.Resolve<IHoodCache>();
-            }
+            get { return Services.Resolve<IHoodCache>(); }
         }
+
         /// <summary>
         /// Gets the current resolvable version of the ILogService.
         /// </summary>
         public static ILogService Logs
         {
-            get
-            {
-                return Services.Resolve<ILogService>();
-            }
+            get { return Services.Resolve<ILogService>(); }
         }
+
         /// <summary>
         /// Gets the current user's account, from context, cache or datastore.
         /// </summary>
@@ -153,9 +147,11 @@ namespace Hood.Core
                 {
                     var _contextAccessor = Services.Resolve<IHttpContextAccessor>();
 
-                    if (_contextAccessor == null ||
-                        _contextAccessor.HttpContext == null ||
-                        _contextAccessor.HttpContext.Session == null)
+                    if (
+                        _contextAccessor == null
+                        || _contextAccessor.HttpContext == null
+                        || _contextAccessor.HttpContext.Session == null
+                    )
                         return null;
 
                     return _contextAccessor.HttpContext.User;
@@ -166,25 +162,21 @@ namespace Hood.Core
                 }
             }
         }
+
         /// <summary>
         /// Gets the current resolvable version of the IMediaManager<MediaObject>.
         /// </summary>
         public static IMediaManager Media
         {
-            get
-            {
-                return Services.Resolve<IMediaManager>();
-            }
+            get { return Services.Resolve<IMediaManager>(); }
         }
+
         /// <summary>
         /// Gets the current resolvable version of the IAccountRepository.
         /// </summary>
         public static IThemesService Themes
         {
-            get
-            {
-                return Services.Resolve<IThemesService>();
-            }
+            get { return Services.Resolve<IThemesService>(); }
         }
 
         /// <summary>
@@ -192,10 +184,7 @@ namespace Hood.Core
         /// </summary>
         public static IEventsService Events
         {
-            get
-            {
-                return Services.Resolve<IEventsService>();
-            }
+            get { return Services.Resolve<IEventsService>(); }
         }
 
         /// <summary>
@@ -221,8 +210,7 @@ namespace Hood.Core
                         return Configuration.CdnPath;
                     }
                 }
-                catch (Exception)
-                { }
+                catch (Exception) { }
                 return "https://cdn.jsdelivr.net/npm/hoodcms";
             }
         }
@@ -254,7 +242,7 @@ namespace Hood.Core
             {
                 if (Settings["Hood.SiteUrl"] != null)
                 {
-                    return Settings["Hood.SiteUrl"].ToString();
+                    return Settings["Hood.SiteUrl"];
                 }
                 return null;
             }
@@ -266,7 +254,7 @@ namespace Hood.Core
             {
                 if (Settings["Hood.Api.SystemPrivateKey"] != null)
                 {
-                    return Settings["Hood.Api.SystemPrivateKey"].ToString();
+                    return Settings["Hood.Api.SystemPrivateKey"];
                 }
                 return null;
             }

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
-using Hood.Core;
 
 namespace Hood.Extensions
 {
@@ -28,7 +27,13 @@ namespace Hood.Extensions
             try
             {
                 // Normalize the domain
-                email = Regex.Replace(email, @"(@)(.+)$", DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
+                email = Regex.Replace(
+                    email,
+                    @"(@)(.+)$",
+                    DomainMapper,
+                    RegexOptions.None,
+                    TimeSpan.FromMilliseconds(200)
+                );
 
                 // Examines the domain part of the email and normalizes it.
                 string DomainMapper(Match match)
@@ -53,10 +58,13 @@ namespace Hood.Extensions
 
             try
             {
-                return Regex.IsMatch(email,
-                    @"^(?("")("".+?(?<!\\)""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))" +
-                    @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-0-9a-z]*[0-9a-z]*\.)+[a-z0-9][\-a-z0-9]{0,22}[a-z0-9]))$",
-                    RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+                return Regex.IsMatch(
+                    email,
+                    @"^(?("")("".+?(?<!\\)""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))"
+                        + @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-0-9a-z]*[0-9a-z]*\.)+[a-z0-9][\-a-z0-9]{0,22}[a-z0-9]))$",
+                    RegexOptions.IgnoreCase,
+                    TimeSpan.FromMilliseconds(250)
+                );
             }
             catch (RegexMatchTimeoutException)
             {
@@ -78,13 +86,17 @@ namespace Hood.Extensions
             }
             catch (UriFormatException)
             {
-                if (Uri.TryCreate(url, UriKind.Absolute, out Uri uri) || Uri.TryCreate("http://" + url, UriKind.Absolute, out uri))
+                if (
+                    Uri.TryCreate(url, UriKind.Absolute, out Uri uri)
+                    || Uri.TryCreate("http://" + url, UriKind.Absolute, out uri)
+                )
                 {
                     return uri.ToString();
                 }
             }
             return url;
         }
+
         public static string ToTwitterUrl(this string url)
         {
             if (url.ToLower().Contains("twitter.com"))
@@ -99,6 +111,7 @@ namespace Hood.Extensions
 
             return ("https://twitter.com/" + url).ToUrl();
         }
+
         public static string ToInstagramUrl(this string url)
         {
             if (url.ToLower().Contains("instagram.com"))
@@ -113,6 +126,7 @@ namespace Hood.Extensions
 
             return ("https://www.instagram.com/" + url).ToUrl();
         }
+
         public static string ToFacebookUrl(this string url)
         {
             if (url.ToLower().Contains("facebook.com"))
@@ -122,6 +136,7 @@ namespace Hood.Extensions
 
             return ("https://www.facebook.com/" + url).ToUrl();
         }
+
         public static string ToGooglePlusUrl(this string url)
         {
             if (url.ToLower().Contains("plus.google.com"))
@@ -137,7 +152,6 @@ namespace Hood.Extensions
             return ("https://plus.google.com/+" + url).ToUrl();
         }
 
-
         #endregion
         /// <summary>
         /// Adds HTML style line breaks. <br /> in place of newlines.
@@ -150,8 +164,12 @@ namespace Hood.Extensions
             {
                 return str;
             }
-            return str.Replace(Environment.NewLine, "<br />").Replace("\r\n", "<br />").Replace("\r", "<br />").Replace("\n", "<br />");
+            return str.Replace(Environment.NewLine, "<br />")
+                .Replace("\r\n", "<br />")
+                .Replace("\r", "<br />")
+                .Replace("\n", "<br />");
         }
+
         public static string EncodeHtml(this string content)
         {
             string encoded = HtmlEncoder.Default.Encode(content);
@@ -165,8 +183,11 @@ namespace Hood.Extensions
 
         public static bool IsSet(this string str)
         {
-            return !string.IsNullOrEmpty(str) && !string.Equals("null", str) && !string.Equals("\"null\"", str);
+            return !string.IsNullOrEmpty(str)
+                && !string.Equals("null", str)
+                && !string.Equals("\"null\"", str);
         }
+
         /// <summary>
         /// Use the current thread's culture info for conversion
         /// </summary>
@@ -175,7 +196,6 @@ namespace Hood.Extensions
             string asTitleCase = new string(CharsToTitleCaseArry(str).ToArray());
             return asTitleCase;
         }
-
 
         /// <summary>
         /// Overload which uses the culture info with the specified name
@@ -205,7 +225,11 @@ namespace Hood.Extensions
 
         public static string ToSentenceCase(this string str)
         {
-            return Regex.Replace(str, "[a-z][A-Z][0-9]", m => m.Value[0] + " " + char.ToLower(m.Value[1]));
+            return Regex.Replace(
+                str,
+                "[a-z][A-Z][0-9]",
+                m => m.Value[0] + " " + char.ToLower(m.Value[1])
+            );
         }
 
         public static string CamelCaseToString(this string str, bool titleCase = true)
@@ -220,7 +244,10 @@ namespace Hood.Extensions
             retVal.Append(char.ToUpper(str[0]));
             for (int i = 1; i < str.Length; i++)
             {
-                if ((char.IsUpper(str[i]) && !char.IsUpper(str[i - 1])) || (char.IsNumber(str[i]) && !char.IsNumber(str[i - 1])))
+                if (
+                    (char.IsUpper(str[i]) && !char.IsUpper(str[i - 1]))
+                    || (char.IsNumber(str[i]) && !char.IsNumber(str[i - 1]))
+                )
                 {
                     retVal.Append(" ");
                     if (titleCase)
@@ -240,6 +267,7 @@ namespace Hood.Extensions
 
             return retVal.ToString();
         }
+
         public static string StripLineBreaks(this string value)
         {
             if (string.IsNullOrEmpty(value))
@@ -249,7 +277,12 @@ namespace Hood.Extensions
             string lineSeparator = ((char)0x2028).ToString();
             string paragraphSeparator = ((char)0x2029).ToString();
 
-            return value.Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty).Replace(lineSeparator, string.Empty).Replace(paragraphSeparator, string.Empty);
+            return value
+                .Replace("\r\n", string.Empty)
+                .Replace("\n", string.Empty)
+                .Replace("\r", string.Empty)
+                .Replace(lineSeparator, string.Empty)
+                .Replace(paragraphSeparator, string.Empty);
         }
 
         public static string StripDoubleSpaces(this string value)
@@ -290,6 +323,7 @@ namespace Hood.Extensions
 
             return encodedUrl;
         }
+
         public static string ToAzureFilename(this string url)
         {
             // make the url lowercase
@@ -341,7 +375,11 @@ namespace Hood.Extensions
             bool newWord = true;
             foreach (char c in s)
             {
-                if (newWord) { yield return char.ToUpper(c); newWord = false; }
+                if (newWord)
+                {
+                    yield return char.ToUpper(c);
+                    newWord = false;
+                }
                 else
                 {
                     yield return char.ToLower(c);
@@ -465,7 +503,12 @@ namespace Hood.Extensions
             }
             return sb.ToString();
         }
-        public static string ExtractTextBetween(this string theString, string startMarker, string endMarker)
+
+        public static string ExtractTextBetween(
+            this string theString,
+            string startMarker,
+            string endMarker
+        )
         {
             int startIndex = theString.IndexOf(startMarker) + startMarker.Length;
             int endIndex = theString.IndexOf(endMarker, startIndex);
@@ -476,30 +519,40 @@ namespace Hood.Extensions
         {
             return string.Format("<a href=\"{0}\" target=\"_blank\">{1}</a>", url, s);
         }
+
         public static string ParseURL(this string s)
         {
-            return Regex.Replace(s, @"(http(s)?://)?([\w-]+\.)+[\w-]+(/\S\w[\w- ;,./?%&=]\S*)?", new MatchEvaluator(URL));
+            return Regex.Replace(
+                s,
+                @"(http(s)?://)?([\w-]+\.)+[\w-]+(/\S\w[\w- ;,./?%&=]\S*)?",
+                (URL)
+            );
         }
+
         public static string ParseUsername(this string s)
         {
-            return Regex.Replace(s, "(@)((?:[A-Za-z0-9-_]*))", new MatchEvaluator(Username));
+            return Regex.Replace(s, "(@)((?:[A-Za-z0-9-_]*))", (Username));
         }
+
         public static string ParseHashtag(this string s)
         {
-            return Regex.Replace(s, "(#)((?:[A-Za-z0-9-_]*))", new MatchEvaluator(Hashtag));
+            return Regex.Replace(s, "(#)((?:[A-Za-z0-9-_]*))", (Hashtag));
         }
+
         private static string Hashtag(Match m)
         {
             string x = m.ToString();
             string tag = x.Replace("#", "%23");
             return x.Link("http://twitter.com/search?q=" + tag);
         }
+
         private static string Username(Match m)
         {
             string x = m.ToString();
             string username = x.Replace("@", "");
             return x.Link("http://twitter.com/" + username);
         }
+
         private static string URL(Match m)
         {
             string x = m.ToString();
@@ -516,6 +569,7 @@ namespace Hood.Extensions
             List<string> names = fullName.Split(' ').ToList();
             return names.First();
         }
+
         public static string ToLastName(this string fullName)
         {
             if (!fullName.IsSet())

@@ -1,7 +1,6 @@
-﻿using Hood.BaseTypes;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Hood.BaseTypes;
 
 namespace Hood.Models
 {
@@ -16,11 +15,18 @@ namespace Hood.Models
 
         public ContentType GetContentType(string slug)
         {
-            var type = Types.Where(t => t.Slug.ToLower() == slug || t.Type.ToLower() == slug || t.TypeNamePlural.ToLower() == slug).FirstOrDefault();
+            var type = Types
+                .Where(t =>
+                    t.Slug.ToLower() == slug
+                    || t.Type.ToLower() == slug
+                    || t.TypeNamePlural.ToLower() == slug
+                )
+                .FirstOrDefault();
             if (type != null)
                 return type;
             return ContentType.Null;
         }
+
         public List<ContentType> AllowedTypes
         {
             get => Types.Where(t => t.Enabled).ToList();
@@ -52,20 +58,26 @@ namespace Hood.Models
                             if (Types[i].CustomFields.Find(f => f.Name == systemField.Name) == null)
                             {
                                 var fieldsTemp = Types[i].CustomFields;
-                                fieldsTemp.Add(new CustomField()
-                                {
-                                    System = systemField.System,
-                                    Default = systemField.Default,
-                                    Name = systemField.Name,
-                                    Type = systemField.Type
-                                });
+                                fieldsTemp.Add(
+                                    new CustomField()
+                                    {
+                                        System = systemField.System,
+                                        Default = systemField.Default,
+                                        Name = systemField.Name,
+                                        Type = systemField.Type,
+                                    }
+                                );
                                 Types[i].CustomFields = fieldsTemp;
                             }
                             else
                             {
-                                Types[i].CustomFields.Find(f => f.Name == systemField.Name).Type = systemField.Type;
-                                Types[i].CustomFields.Find(f => f.Name == systemField.Name).Default = systemField.Default;
-                                Types[i].CustomFields.Find(f => f.Name == systemField.Name).System = systemField.System;
+                                Types[i].CustomFields.Find(f => f.Name == systemField.Name).Type =
+                                    systemField.Type;
+                                Types[i]
+                                    .CustomFields.Find(f => f.Name == systemField.Name)
+                                    .Default = systemField.Default;
+                                Types[i].CustomFields.Find(f => f.Name == systemField.Name).System =
+                                    systemField.System;
                             }
                         }
                     }

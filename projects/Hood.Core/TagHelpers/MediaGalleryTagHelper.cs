@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using System.Threading.Tasks;
 
 namespace Hood.TagHelpers
 {
@@ -44,10 +43,11 @@ namespace Hood.TagHelpers
             if (!List.IsSet())
             {
                 var _urlHelperFactory = Engine.Services.Resolve<IUrlHelperFactory>();
-                List = _urlHelperFactory.GetUrlHelper(ViewContext).Action("Action", "Media", new { area = "Admin" });
+                List = _urlHelperFactory
+                    .GetUrlHelper(ViewContext)
+                    .Action("Action", "Media", new { area = "Admin" });
             }
             output.Attributes.Add("data-hood-media-list", List);
-
 
             if (Refresh.IsSet())
             {
@@ -55,5 +55,4 @@ namespace Hood.TagHelpers
             }
         }
     }
-
 }

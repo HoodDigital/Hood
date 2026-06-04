@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Hood.BaseTypes;
+﻿using Hood.BaseTypes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.ViewModels
@@ -12,6 +11,7 @@ namespace Hood.ViewModels
         [FromForm(Name = "returnUrl")]
         public string ReturnUrl { get; set; }
     }
+
     public class DisconnectAccountModel : SaveableModel
     {
         public string LocalPicture { get; set; }

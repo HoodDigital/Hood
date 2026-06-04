@@ -1,33 +1,18 @@
-﻿using Auth0.AspNetCore.Authentication;
-using Auth0.AuthenticationApi;
-using Auth0.AuthenticationApi.Models;
-using Auth0.Core.Exceptions;
-using Hood.Attributes;
+﻿using System;
+using System.Threading.Tasks;
 using Hood.BaseTypes;
 using Hood.Constants.Identity;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Identity;
-using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Unsplasharp;
 
 namespace Hood.BaseControllers
 {
@@ -35,6 +20,7 @@ namespace Hood.BaseControllers
     {
         protected readonly UserManager<ApplicationUser> _userManager;
         protected readonly IPasswordAccountRepository _account;
+
         public AccountController()
         {
             _userManager = Engine.Services.Resolve<UserManager<ApplicationUser>>();
@@ -57,7 +43,7 @@ namespace Hood.BaseControllers
                 Avatar = user.UserProfile.Avatar,
                 Profile = await _account.GetUserProfileByIdAsync(user.Id),
                 ReturnUrl = returnUrl,
-                NewAccountCreated = created
+                NewAccountCreated = created,
             };
             return View(model);
         }
@@ -65,7 +51,11 @@ namespace Hood.BaseControllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("account/")]
-        public virtual async Task<IActionResult> Index(ManageAccountViewModel model, string returnUrl, bool created = false)
+        public virtual async Task<IActionResult> Index(
+            ManageAccountViewModel model,
+            string returnUrl,
+            bool created = false
+        )
         {
             try
             {
@@ -85,7 +75,6 @@ namespace Hood.BaseControllers
                 SaveMessage = "Your profile has been updated.";
                 MessageType = AlertType.Success;
                 return RedirectToAction(nameof(Index));
-
             }
             catch (Exception ex)
             {
@@ -95,7 +84,6 @@ namespace Hood.BaseControllers
                 model.NewAccountCreated = created;
                 return View(model);
             }
-
         }
 
         // [Route("account/avatar")]
@@ -137,7 +125,7 @@ namespace Hood.BaseControllers
 
         // #endregion
 
-        #region Login 
+        #region Login
 
         [HttpGet]
         [AllowAnonymous]
@@ -152,31 +140,46 @@ namespace Hood.BaseControllers
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         [Route("account/login")]
-        public virtual async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+        public virtual async Task<IActionResult> Login(
+            LoginViewModel model,
+            string returnUrl = null
+        )
         {
             AccountSettings accountSettings = Engine.Settings.Account;
             ViewData["ReturnUrl"] = returnUrl;
 
             if (ModelState.IsValid)
             {
-
                 Services.RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
                 if (!recaptcha.Passed)
                 {
-                    ModelState.AddModelError(string.Empty, "You have failed to pass the reCaptcha check. Please refresh your page and try again.");
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "You have failed to pass the reCaptcha check. Please refresh your page and try again."
+                    );
                     return View(model);
                 }
 
                 // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true                
+                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
-                Microsoft.AspNetCore.Identity.SignInResult result = await signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
+                Microsoft.AspNetCore.Identity.SignInResult result =
+                    await signInManager.PasswordSignInAsync(
+                        model.Username,
+                        model.Password,
+                        model.RememberMe,
+                        lockoutOnFailure: false
+                    );
                 if (result.Succeeded)
                 {
                     ApplicationUser user = await _userManager.FindByNameAsync(model.Username);
                     if (Engine.Settings.Account.RequireEmailConfirmation && !user.EmailConfirmed)
                     {
-                        await SendVerificationEmail(user, User.GetUserId(), Url.AbsoluteAction("Login", "Account"));
+                        await SendVerificationEmail(
+                            user,
+                            User.GetUserId(),
+                            Url.AbsoluteAction("Login", "Account")
+                        );
                         return RedirectToAction(nameof(ConfirmRequired), new { user = user.Id });
                     }
 
@@ -185,7 +188,9 @@ namespace Hood.BaseControllers
                     user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
                     await _account.UpdateUserAsync(user);
 
-                    await _logService.AddLogAsync<AccountController>($"User ({model.Username}) logged in.");
+                    await _logService.AddLogAsync<AccountController>(
+                        $"User ({model.Username}) logged in."
+                    );
 
                     return RedirectToLocal(returnUrl);
                 }
@@ -226,7 +231,10 @@ namespace Hood.BaseControllers
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         [Route("account/register")]
-        public virtual async Task<IActionResult> Register(PasswordRegisterViewModel model, string returnUrl = null)
+        public virtual async Task<IActionResult> Register(
+            PasswordRegisterViewModel model,
+            string returnUrl = null
+        )
         {
             AccountSettings accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
@@ -238,16 +246,21 @@ namespace Hood.BaseControllers
 
             if (!model.Consent)
             {
-                ModelState.AddModelError(string.Empty, "You did not give consent for us to store your data, therefore we cannot complete the signup process.");
+                ModelState.AddModelError(
+                    string.Empty,
+                    "You did not give consent for us to store your data, therefore we cannot complete the signup process."
+                );
             }
 
             if (ModelState.IsValid)
             {
-
                 Services.RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
                 if (!recaptcha.Passed)
                 {
-                    ModelState.AddModelError(string.Empty, "You have failed to pass the reCaptcha check. Please refresh your page and try again.");
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "You have failed to pass the reCaptcha check. Please refresh your page and try again."
+                    );
                     return View(model);
                 }
 
@@ -270,8 +283,8 @@ namespace Hood.BaseControllers
                         LastName = model.LastName,
                         DisplayName = model.DisplayName,
                         JobTitle = model.JobTitle,
-                        Anonymous = model.Anonymous
-                    }
+                        Anonymous = model.Anonymous,
+                    },
                 };
                 IdentityResult result = await _account.CreateAsync(user, model.Password);
                 if (result.Succeeded)
@@ -289,11 +302,17 @@ namespace Hood.BaseControllers
                     var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
                     await signInManager.SignInAsync(user, isPersistent: false);
 
-
                     if (Engine.Settings.Account.RequireEmailConfirmation)
                     {
-                        await SendVerificationEmail(user, User.GetUserId(), Url.AbsoluteAction("Login", "Account"));
-                        return RedirectToAction(nameof(AccountController.ConfirmRequired), "Account");
+                        await SendVerificationEmail(
+                            user,
+                            User.GetUserId(),
+                            Url.AbsoluteAction("Login", "Account")
+                        );
+                        return RedirectToAction(
+                            nameof(AccountController.ConfirmRequired),
+                            "Account"
+                        );
                     }
                     return RedirectToLocal(returnUrl);
                 }
@@ -388,7 +407,9 @@ namespace Hood.BaseControllers
             IdentityResult result = await _account.ConfirmEmailAsync(user, code);
             if (!result.Succeeded)
             {
-                throw new Exception("Your email address could not be confirmed, the link you have clicked is invalid, perhaps it has expired. You can log in to resend a new verification email.");
+                throw new Exception(
+                    "Your email address could not be confirmed, the link you have clicked is invalid, perhaps it has expired. You can log in to resend a new verification email."
+                );
             }
 
             if (user.Active)
@@ -414,18 +435,23 @@ namespace Hood.BaseControllers
         {
             try
             {
-
                 var user = await GetCurrentUserOrThrow();
-                await SendVerificationEmail((ApplicationUser)user, User.GetUserId(), Url.AbsoluteAction("Login", "Account"));
+                await SendVerificationEmail(
+                    user,
+                    User.GetUserId(),
+                    Url.AbsoluteAction("Login", "Account")
+                );
                 SaveMessage = $"Email verification has been resent.";
                 MessageType = AlertType.Success;
-
             }
             catch (Exception ex)
             {
                 SaveMessage = $"Error sending an email verification: {ex.Message}";
                 MessageType = AlertType.Danger;
-                await _logService.AddExceptionAsync<AccountController>($"Error when sending an email verification.", ex);
+                await _logService.AddExceptionAsync<AccountController>(
+                    $"Error when sending an email verification.",
+                    ex
+                );
             }
 
             return RedirectToAction(nameof(ConfirmRequired));
@@ -455,7 +481,11 @@ namespace Hood.BaseControllers
             }
 
             var user = await GetCurrentUserOrThrow();
-            var changePasswordResult = await _account.ChangePassword(user, model.OldPassword, model.NewPassword);
+            var changePasswordResult = await _account.ChangePassword(
+                user,
+                model.OldPassword,
+                model.NewPassword
+            );
             if (!changePasswordResult.Succeeded)
             {
                 foreach (var error in changePasswordResult.Errors)
@@ -468,7 +498,9 @@ namespace Hood.BaseControllers
             var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
             await signInManager.SignInAsync(user, isPersistent: false);
 
-            await _logService.AddLogAsync<AccountController>($"User ({user.UserName}) changed their password successfully.");
+            await _logService.AddLogAsync<AccountController>(
+                $"User ({user.UserName}) changed their password successfully."
+            );
 
             MessageType = AlertType.Success;
             SaveMessage = "Your password has been changed.";
@@ -549,7 +581,11 @@ namespace Hood.BaseControllers
                 // Don't reveal that the user does not exist
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
             }
-            IdentityResult result = await _account.ResetPasswordAsync(user, model.Code, model.Password);
+            IdentityResult result = await _account.ResetPasswordAsync(
+                user,
+                model.Code,
+                model.Password
+            );
             if (result.Succeeded)
             {
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
@@ -586,21 +622,25 @@ namespace Hood.BaseControllers
         {
             try
             {
-
                 var user = await GetCurrentUserOrThrow();
                 await _account.DeleteUserAsync(user.Id, User);
 
                 var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
                 await signInManager.SignOutAsync();
 
-                await _logService.AddLogAsync<AccountController>($"User with Id {user.Id} has deleted their account.");
+                await _logService.AddLogAsync<AccountController>(
+                    $"User with Id {user.Id} has deleted their account."
+                );
                 return RedirectToAction(nameof(Deleted));
             }
             catch (Exception ex)
             {
                 SaveMessage = $"Error deleting your account: {ex.Message}";
                 MessageType = AlertType.Danger;
-                await _logService.AddExceptionAsync<AccountController>($"Error when user attemted to delete their account.", ex);
+                await _logService.AddExceptionAsync<AccountController>(
+                    $"Error when user attemted to delete their account.",
+                    ex
+                );
             }
             return RedirectToAction(nameof(Delete));
         }
@@ -621,12 +661,18 @@ namespace Hood.BaseControllers
             var user = await _account.GetUserByIdAsync(User.GetLocalUserId());
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with email '{User.GetEmail()}'.");
+                throw new ApplicationException(
+                    $"Unable to load user with email '{User.GetEmail()}'."
+                );
             }
             return user;
         }
 
-        protected virtual async Task SendVerificationEmail(ApplicationUser localUser, string userId, string returnUrl)
+        protected virtual async Task SendVerificationEmail(
+            ApplicationUser localUser,
+            string userId,
+            string returnUrl
+        )
         {
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(localUser);
             var contextAccessor = Engine.Services.Resolve<IHttpContextAccessor>();
@@ -639,10 +685,20 @@ namespace Hood.BaseControllers
             {
                 return;
             }
-            var callbackUrl = linkGenerator.GetUriByAction(contextAccessor.HttpContext, "ConfirmEmail", "Account", new { userId = localUser.Id, code, returnUrl });
+            var callbackUrl = linkGenerator.GetUriByAction(
+                contextAccessor.HttpContext,
+                "ConfirmEmail",
+                "Account",
+                new
+                {
+                    userId = localUser.Id,
+                    code,
+                    returnUrl,
+                }
+            );
             var verifyModel = new VerifyEmailModel(localUser.UserProfile, callbackUrl)
             {
-                SendToRecipient = true
+                SendToRecipient = true,
             };
             await _mailService.ProcessAndSend(verifyModel);
         }
@@ -662,13 +718,18 @@ namespace Hood.BaseControllers
                 return;
             }
 
-            string callbackUrl = linkGenerator.GetUriByAction(contextAccessor.HttpContext, "ResetPassword", "Account", new { userId = user.Id, code });
+            string callbackUrl = linkGenerator.GetUriByAction(
+                contextAccessor.HttpContext,
+                "ResetPassword",
+                "Account",
+                new { userId = user.Id, code }
+            );
 
             MailObject message = new MailObject()
             {
                 To = new SendGrid.Helpers.Mail.EmailAddress(user.Email),
                 PreHeader = "Reset your password.",
-                Subject = "Reset your password."
+                Subject = "Reset your password.",
             };
             message.AddParagraph($"Please reset your password by clicking here:");
             message.AddCallToAction("Reset your password", callbackUrl);
@@ -678,11 +739,18 @@ namespace Hood.BaseControllers
 
         protected virtual async Task SendWelcomeEmail(ApplicationUser user)
         {
-            string loginLink = Url.Action("Login", "Account", null, protocol: HttpContext.Request.Scheme);
+            string loginLink = Url.Action(
+                "Login",
+                "Account",
+                null,
+                protocol: HttpContext.Request.Scheme
+            );
             WelcomeEmailModel welcomeModel = new WelcomeEmailModel(user.UserProfile, loginLink)
             {
                 SendToRecipient = true,
-                NotifyRole = Engine.Settings.Account.NotifyNewAccount ? "NewAccountNotifications" : null
+                NotifyRole = Engine.Settings.Account.NotifyNewAccount
+                    ? "NewAccountNotifications"
+                    : null,
             };
             await _mailService.ProcessAndSend(welcomeModel);
         }

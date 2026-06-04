@@ -1,5 +1,5 @@
-﻿using Hood.Core;
 using System.ComponentModel.DataAnnotations;
+using Hood.Core;
 
 namespace Hood.Models
 {
@@ -14,7 +14,10 @@ namespace Hood.Models
         [Display(Name = "Admin Area Logo", Description = "Add a custom logo to your admin areas.")]
         public string Logo { get; set; }
 
-        [Display(Name = "Admin Area Title", Description = "Change the default title for your admin areas.")]
+        [Display(
+            Name = "Admin Area Title",
+            Description = "Change the default title for your admin areas."
+        )]
         public string Title { get; set; }
     }
 }

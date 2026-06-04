@@ -1,4 +1,4 @@
-﻿namespace Hood.Enums
+namespace Hood.Enums
 {
     public enum SitemapFrequency
     {
@@ -8,6 +8,6 @@
         Weekly,
         Daily,
         Hourly,
-        Always
+        Always,
     }
 }

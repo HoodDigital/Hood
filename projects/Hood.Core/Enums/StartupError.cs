@@ -13,6 +13,6 @@ namespace Hood.Enums
         DatabaseViewsNotInstalled,
         StartupError,
         Auth0Issue,
-        DatabaseNotSeeded
+        DatabaseNotSeeded,
     }
 }

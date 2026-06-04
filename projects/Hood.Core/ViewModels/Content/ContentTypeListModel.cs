@@ -1,26 +1,25 @@
-﻿using Hood.Interfaces;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Hood.ViewModels
 {
-    public class ContentTypeListModel : PagedList<ContentType>, IPageableModel
+    public class ContentTypeListModel : PagedList<ContentType>
     {
         [FromQuery(Name = "active")]
-        [Display(Name = "Hide Disabled?", Description = "Check this to only show the active content types on the site")]
+        [Display(
+            Name = "Hide Disabled?",
+            Description = "Check this to only show the active content types on the site"
+        )]
         public bool HideDisabled { get; set; }
 
-        public ContentTypeListModel() : base()
-        {
-        }
+        public ContentTypeListModel() { }
 
         public override string GetPageUrl(int pageIndex)
         {
             var query = base.GetPageUrl(pageIndex);
             return query;
         }
-
     }
 }

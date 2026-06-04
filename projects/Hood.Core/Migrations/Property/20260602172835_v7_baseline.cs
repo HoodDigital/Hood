@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -15,7 +15,8 @@ namespace Hood.Core.Migrations.Property
                 name: "HoodProperties",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table
+                        .Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Reference = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -28,8 +29,16 @@ namespace Hood.Core.Migrations.Property
                     County = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Postcode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Latitude = table.Column<double>(type: "float", nullable: false, defaultValueSql: "0.0"),
-                    Longitude = table.Column<double>(type: "float", nullable: false, defaultValueSql: "0.0"),
+                    Latitude = table.Column<double>(
+                        type: "float",
+                        nullable: false,
+                        defaultValueSql: "0.0"
+                    ),
+                    Longitude = table.Column<double>(
+                        type: "float",
+                        nullable: false,
+                        defaultValueSql: "0.0"
+                    ),
                     Status = table.Column<int>(type: "int", nullable: false),
                     PublishDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -65,7 +74,10 @@ namespace Hood.Core.Migrations.Property
                     Premium = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Fees = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     RentDisplay = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AskingPriceDisplay = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AskingPriceDisplay = table.Column<string>(
+                        type: "nvarchar(max)",
+                        nullable: true
+                    ),
                     PremiumDisplay = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FeesDisplay = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -73,18 +85,20 @@ namespace Hood.Core.Migrations.Property
                     Addressee = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AgentId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Floors = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Floors = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_HoodProperties", x => x.Id);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "HoodPropertyFloorplans",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table
+                        .Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PropertyId = table.Column<int>(type: "int", nullable: false),
                     FileSize = table.Column<long>(type: "bigint", nullable: false),
@@ -100,7 +114,7 @@ namespace Hood.Core.Migrations.Property
                     LargeUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UniqueId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Directory = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    GenericFileType = table.Column<int>(type: "int", nullable: false)
+                    GenericFileType = table.Column<int>(type: "int", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -110,14 +124,17 @@ namespace Hood.Core.Migrations.Property
                         column: x => x.PropertyId,
                         principalTable: "HoodProperties",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
+                        onDelete: ReferentialAction.Restrict
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "HoodPropertyMedia",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table
+                        .Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PropertyId = table.Column<int>(type: "int", nullable: false),
                     FileSize = table.Column<long>(type: "bigint", nullable: false),
@@ -133,7 +150,7 @@ namespace Hood.Core.Migrations.Property
                     LargeUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UniqueId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Directory = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    GenericFileType = table.Column<int>(type: "int", nullable: false)
+                    GenericFileType = table.Column<int>(type: "int", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -143,57 +160,63 @@ namespace Hood.Core.Migrations.Property
                         column: x => x.PropertyId,
                         principalTable: "HoodProperties",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
+                        onDelete: ReferentialAction.Restrict
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "HoodPropertyMetadata",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table
+                        .Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PropertyId = table.Column<int>(type: "int", nullable: false),
                     BaseValue = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_HoodPropertyMetadata", x => x.Id);
-                    table.UniqueConstraint("AK_HoodPropertyMetadata_PropertyId_Name", x => new { x.PropertyId, x.Name });
+                    table.UniqueConstraint(
+                        "AK_HoodPropertyMetadata_PropertyId_Name",
+                        x => new { x.PropertyId, x.Name }
+                    );
                     table.ForeignKey(
                         name: "FK_HoodPropertyMetadata_HoodProperties_PropertyId",
                         column: x => x.PropertyId,
                         principalTable: "HoodProperties",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
+                        onDelete: ReferentialAction.Restrict
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_HoodPropertyFloorplans_PropertyId",
                 table: "HoodPropertyFloorplans",
-                column: "PropertyId");
+                column: "PropertyId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_HoodPropertyMedia_PropertyId",
                 table: "HoodPropertyMedia",
-                column: "PropertyId");
+                column: "PropertyId"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "HoodPropertyFloorplans");
+            migrationBuilder.DropTable(name: "HoodPropertyFloorplans");
 
-            migrationBuilder.DropTable(
-                name: "HoodPropertyMedia");
+            migrationBuilder.DropTable(name: "HoodPropertyMedia");
 
-            migrationBuilder.DropTable(
-                name: "HoodPropertyMetadata");
+            migrationBuilder.DropTable(name: "HoodPropertyMetadata");
 
-            migrationBuilder.DropTable(
-                name: "HoodProperties");
+            migrationBuilder.DropTable(name: "HoodProperties");
         }
     }
 }

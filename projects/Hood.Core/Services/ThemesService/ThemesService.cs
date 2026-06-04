@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
 using System.Linq;
-using Microsoft.AspNetCore.Hosting;
 using Hood.Core;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 
 namespace Hood.Services
 {
@@ -24,14 +24,18 @@ namespace Hood.Services
             _configs = new Dictionary<string, IConfiguration>();
             string[] themeDirs = { };
             if (System.IO.Directory.Exists(_env.ContentRootPath + "\\Themes\\"))
-                themeDirs = themeDirs.Concat(System.IO.Directory.GetDirectories(_env.ContentRootPath + "\\Themes\\")).ToArray();
+                themeDirs = themeDirs
+                    .Concat(System.IO.Directory.GetDirectories(_env.ContentRootPath + "\\Themes\\"))
+                    .ToArray();
 
             foreach (string theme in themeDirs)
             {
                 if (System.IO.File.Exists(theme + "/config.json"))
                 {
                     var name = theme.Remove(0, theme.LastIndexOf('\\') + 1).ToLower();
-                    var builder = new ConfigurationBuilder().SetBasePath(_env.ContentRootPath + "\\themes\\" + name).AddJsonFile("config.json");
+                    var builder = new ConfigurationBuilder()
+                        .SetBasePath(_env.ContentRootPath + "\\themes\\" + name)
+                        .AddJsonFile("config.json");
                     var configBuilt = builder.Build();
                     _configs.Add(name, configBuilt);
                 }
@@ -49,7 +53,10 @@ namespace Hood.Services
                     ["PreviewImage"] = "https://hood.azureedge.net/hood/hood-theme.jpg",
                     ["Public"] = "true",
                 };
-                _configs.Add("default", new ConfigurationBuilder().AddInMemoryCollection(defaultConfig).Build());
+                _configs.Add(
+                    "default",
+                    new ConfigurationBuilder().AddInMemoryCollection(defaultConfig).Build()
+                );
             }
             if (!_configs.ContainsKey("bootstrap3"))
             {
@@ -62,9 +69,12 @@ namespace Hood.Services
                     ["Description"] = "The default site theme, uses the default Bootstrap3 UI.",
                     ["PreviewImage"] = "https://hood.azureedge.net/hood/hood-theme.jpg",
                     ["Public"] = "true",
-                    ["UI"] = "Bootstrap3"
+                    ["UI"] = "Bootstrap3",
                 };
-                _configs.Add("bootstrap3", new ConfigurationBuilder().AddInMemoryCollection(defaultConfig).Build());
+                _configs.Add(
+                    "bootstrap3",
+                    new ConfigurationBuilder().AddInMemoryCollection(defaultConfig).Build()
+                );
             }
             if (!_configs.ContainsKey("bootstrap4"))
             {
@@ -77,9 +87,12 @@ namespace Hood.Services
                     ["Description"] = "The default site theme, uses the default Bootstrap4 UI.",
                     ["PreviewImage"] = "https://hood.azureedge.net/hood/hood-theme.jpg",
                     ["Public"] = "true",
-                    ["UI"] = "Bootstrap4"
+                    ["UI"] = "Bootstrap4",
                 };
-                _configs.Add("bootstrap4", new ConfigurationBuilder().AddInMemoryCollection(defaultConfig).Build());
+                _configs.Add(
+                    "bootstrap4",
+                    new ConfigurationBuilder().AddInMemoryCollection(defaultConfig).Build()
+                );
             }
         }
 
@@ -116,9 +129,11 @@ namespace Hood.Services
                     ["BaseColour"] = "#C33610",
                     ["Author"] = "Hood - Digital Architects.",
                     ["PreviewImage"] = "https://hood.azureedge.net/hood/hood-theme.jpg",
-                    ["Public"] = "true"
+                    ["Public"] = "true",
                 };
-                return new Theme(new ConfigurationBuilder().AddInMemoryCollection(defaultConfig).Build());
+                return new Theme(
+                    new ConfigurationBuilder().AddInMemoryCollection(defaultConfig).Build()
+                );
             }
         }
 
@@ -153,6 +168,9 @@ namespace Hood.Services
             }
         }
 
-        public bool IsDefault { get { return CurrentTheme != "default"; } }
+        public bool IsDefault
+        {
+            get { return CurrentTheme != "default"; }
+        }
     }
 }

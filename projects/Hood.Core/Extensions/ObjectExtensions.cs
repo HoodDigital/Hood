@@ -1,13 +1,13 @@
-﻿using Hood.Attributes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Hood.Attributes;
 using Hood.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace Hood.Extensions
 {
@@ -18,7 +18,11 @@ namespace Hood.Extensions
         /// </summary>
         /// <param name="source">The source.</param>
         /// <param name="destination">The destination.</param>
-        public static T UpdateFromFormModel<T, TSource>(this T destination, TSource source, HashSet<string> allowedKeys)
+        public static T UpdateFromFormModel<T, TSource>(
+            this T destination,
+            TSource source,
+            HashSet<string> allowedKeys
+        )
         {
             // If any this null throw an exception
             if (source == null || destination == null)
@@ -27,8 +31,8 @@ namespace Hood.Extensions
             Type typeDest = destination.GetType();
             Type typeSrc = source.GetType();
 
-            // Iterate the Properties of the source instance and  
-            // populate them from their desination counterparts  
+            // Iterate the Properties of the source instance and
+            // populate them from their desination counterparts
             PropertyInfo[] srcProps = typeSrc.GetProperties();
             foreach (PropertyInfo srcProp in srcProps)
             {
@@ -45,7 +49,10 @@ namespace Hood.Extensions
                 {
                     continue;
                 }
-                if (targetProperty.GetSetMethod(true) != null && targetProperty.GetSetMethod(true).IsPrivate)
+                if (
+                    targetProperty.GetSetMethod(true) != null
+                    && targetProperty.GetSetMethod(true).IsPrivate
+                )
                 {
                     continue;
                 }
@@ -76,7 +83,6 @@ namespace Hood.Extensions
             return destination;
         }
 
-
         /// <summary>
         /// Will return a string representation of the object and all it's child members. In JSON format.
         /// </summary>
@@ -89,13 +95,16 @@ namespace Hood.Extensions
             {
                 DefaultContractResolver contractResolver = new DefaultContractResolver
                 {
-                    NamingStrategy = new CamelCaseNamingStrategy()
+                    NamingStrategy = new CamelCaseNamingStrategy(),
                 };
-                return JsonConvert.SerializeObject(element, new JsonSerializerSettings
-                {
-                    ContractResolver = contractResolver,
-                    Formatting = Formatting.None
-                });
+                return JsonConvert.SerializeObject(
+                    element,
+                    new JsonSerializerSettings
+                    {
+                        ContractResolver = contractResolver,
+                        Formatting = Formatting.None,
+                    }
+                );
             }
             catch (Exception ex)
             {
@@ -126,7 +135,11 @@ namespace Hood.Extensions
         /// </summary>
         /// <param name="source">The source.</param>
         /// <param name="destination">The destination.</param>
-        public static void CopyProperties(this object source, object destination, bool updateOnly = false)
+        public static void CopyProperties(
+            this object source,
+            object destination,
+            bool updateOnly = false
+        )
         {
             // If any this null throw an exception
             if (source == null || destination == null)
@@ -135,8 +148,8 @@ namespace Hood.Extensions
             Type typeDest = destination.GetType();
             Type typeSrc = source.GetType();
 
-            // Iterate the Properties of the source instance and  
-            // populate them from their desination counterparts  
+            // Iterate the Properties of the source instance and
+            // populate them from their desination counterparts
             PropertyInfo[] srcProps = typeSrc.GetProperties();
             foreach (PropertyInfo srcProp in srcProps)
             {
@@ -153,7 +166,10 @@ namespace Hood.Extensions
                 {
                     continue;
                 }
-                if (targetProperty.GetSetMethod(true) != null && targetProperty.GetSetMethod(true).IsPrivate)
+                if (
+                    targetProperty.GetSetMethod(true) != null
+                    && targetProperty.GetSetMethod(true).IsPrivate
+                )
                 {
                     continue;
                 }
@@ -191,12 +207,16 @@ namespace Hood.Extensions
                 if (!p.GetCustomAttributes(typeof(RouteIgnoreAttribute), false).Any())
                 {
                     var name = p.Name;
-                    var queryAttr = p.GetCustomAttributes(typeof(FromQueryAttribute), false).FirstOrDefault() as FromQueryAttribute;
+                    var queryAttr =
+                        p.GetCustomAttributes(typeof(FromQueryAttribute), false).FirstOrDefault()
+                        as FromQueryAttribute;
                     if (queryAttr != null)
                     {
                         name = queryAttr.Name;
                     }
-                    var routeAttr = p.GetCustomAttributes(typeof(FromRouteAttribute), false).FirstOrDefault() as FromRouteAttribute;
+                    var routeAttr =
+                        p.GetCustomAttributes(typeof(FromRouteAttribute), false).FirstOrDefault()
+                        as FromRouteAttribute;
                     if (routeAttr != null)
                     {
                         name = routeAttr.Name;

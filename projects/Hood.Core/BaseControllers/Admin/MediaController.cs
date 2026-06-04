@@ -1,29 +1,28 @@
-﻿using Hood.BaseControllers;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Hood.BaseControllers;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Hood.Admin.BaseControllers
 {
     public abstract class BaseMediaController : BaseController
     {
-        public BaseMediaController()
-            : base()
-        {
-        }
+        public BaseMediaController() { }
 
         [Route("admin/media/list/")]
-        public virtual async Task<IActionResult> List(MediaListModel model, string viewName = "_List_Media")
+        public virtual async Task<IActionResult> List(
+            MediaListModel model,
+            string viewName = "_List_Media"
+        )
         {
             IQueryable<MediaObject> media = _db.Media.AsQueryable();
 
@@ -43,8 +42,12 @@ namespace Hood.Admin.BaseControllers
             else
             {
                 IEnumerable<MediaDirectory> userDirs = GetDirectoriesForCurrentUser();
-                IEnumerable<int> tree = _directoryManager.GetAllCategoriesIncludingChildren(userDirs).Select(d => d.Id);
-                media = media.Where(n => n.DirectoryId.HasValue && tree.Contains(n.DirectoryId.Value));
+                IEnumerable<int> tree = _directoryManager
+                    .GetAllCategoriesIncludingChildren(userDirs)
+                    .Select(d => d.Id);
+                media = media.Where(n =>
+                    n.DirectoryId.HasValue && tree.Contains(n.DirectoryId.Value)
+                );
             }
 
             if (model.UserId.IsSet())
@@ -55,9 +58,8 @@ namespace Hood.Admin.BaseControllers
             if (model.Search.IsSet())
             {
                 media = media.Where(m =>
-                  m.Filename.Contains(model.Search) ||
-                  m.FileType.Contains(model.Search)
-              );
+                    m.Filename.Contains(model.Search) || m.FileType.Contains(model.Search)
+                );
             }
 
             switch (model.Order)
@@ -107,7 +109,9 @@ namespace Hood.Admin.BaseControllers
         [Route("admin/media/blade/")]
         public virtual async Task<IActionResult> Blade(int id)
         {
-            MediaObject media = await _db.Media.Include(m => m.Directory).SingleOrDefaultAsync(u => u.Id == id);
+            MediaObject media = await _db
+                .Media.Include(m => m.Directory)
+                .SingleOrDefaultAsync(u => u.Id == id);
             return View("_Blade_Media", media);
         }
 
@@ -118,7 +122,11 @@ namespace Hood.Admin.BaseControllers
             try
             {
                 MediaObject media = _db.Media.SingleOrDefault(m => m.Id == id);
-                try { await _media.DeleteStoredMedia(media); } catch (Exception) { }
+                try
+                {
+                    await _media.DeleteStoredMedia(media);
+                }
+                catch (Exception) { }
                 _db.Media.Remove(media);
                 await _db.SaveChangesAsync();
                 _directoryManager.ResetCache();
@@ -126,7 +134,10 @@ namespace Hood.Admin.BaseControllers
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseMediaController>($"Error deleting a media object.", ex);
+                return await ErrorResponseAsync<BaseMediaController>(
+                    $"Error deleting a media object.",
+                    ex
+                );
             }
         }
 
@@ -159,7 +170,9 @@ namespace Hood.Admin.BaseControllers
         {
             try
             {
-                MediaDirectory parentDirectory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.Id == id);
+                MediaDirectory parentDirectory = await _db.MediaDirectories.SingleOrDefaultAsync(
+                    md => md.Id == id
+                );
                 if (parentDirectory == null)
                 {
                     throw new Exception($"The parent directory could not be found.");
@@ -169,24 +182,30 @@ namespace Hood.Admin.BaseControllers
 
                 if (!User.IsEditorOrBetter())
                 {
-                    if (root.Type != DirectoryType.System || root.Slug != MediaManager.UserDirectorySlug)
+                    if (
+                        root.Type != DirectoryType.System
+                        || root.Slug != MediaManager.UserDirectorySlug
+                    )
                     {
-                        throw new Exception("You cannot create directories outside the user folders folders.");
+                        throw new Exception(
+                            "You cannot create directories outside the user folders folders."
+                        );
                     }
 
                     if (parentDirectory.OwnerId != User.GetLocalUserId())
                     {
-                        throw new Exception("You cannot create directories outside your own folder.");
+                        throw new Exception(
+                            "You cannot create directories outside your own folder."
+                        );
                     }
                 }
 
                 MediaDirectory model = new MediaDirectory
                 {
                     TopLevelDirectories = GetDirectoriesForCurrentUser(),
-                    ParentId = id
+                    ParentId = id,
                 };
                 return View("_Blade_Directory", model);
-
             }
             catch (Exception ex)
             {
@@ -202,19 +221,27 @@ namespace Hood.Admin.BaseControllers
             {
                 if (!model.ParentId.HasValue)
                 {
-                    throw new Exception("You must select a parent directory to create your directory in.");
+                    throw new Exception(
+                        "You must select a parent directory to create your directory in."
+                    );
                 }
 
-                MediaDirectory parentDirectory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.Id == model.ParentId.Value);
+                MediaDirectory parentDirectory = await _db.MediaDirectories.SingleOrDefaultAsync(
+                    md => md.Id == model.ParentId.Value
+                );
                 if (parentDirectory == null)
                 {
-                    throw new Exception($"The parent directory with id {model.ParentId} could not be found.");
+                    throw new Exception(
+                        $"The parent directory with id {model.ParentId} could not be found."
+                    );
                 }
 
                 MediaDirectory root = _directoryManager.GetTopLevelDirectory(parentDirectory.Id);
                 if (!User.IsEditorOrBetter() && root.Slug != MediaManager.UserDirectorySlug)
                 {
-                    throw new Exception("You cannot create directories outside the user folders folders.");
+                    throw new Exception(
+                        "You cannot create directories outside the user folders folders."
+                    );
                 }
 
                 if (!User.IsEditorOrBetter() && parentDirectory.OwnerId != User.GetLocalUserId())
@@ -229,13 +256,15 @@ namespace Hood.Admin.BaseControllers
                 _db.MediaDirectories.Add(model);
                 await _db.SaveChangesAsync();
                 _directoryManager.ResetCache();
-                return new Response(true, "The directory has been created and you can add files to it right away.");
+                return new Response(
+                    true,
+                    "The directory has been created and you can add files to it right away."
+                );
             }
             catch (Exception ex)
             {
                 return new Response(ex.Message);
             }
-
         }
 
         [HttpPost]
@@ -244,8 +273,8 @@ namespace Hood.Admin.BaseControllers
         {
             try
             {
-                MediaDirectory directory = await _db.MediaDirectories
-                    .Include(md => md.Children)
+                MediaDirectory directory = await _db
+                    .MediaDirectories.Include(md => md.Children)
                     .Include(md => md.Media)
                     .SingleOrDefaultAsync(md => md.Id == id);
 
@@ -271,7 +300,10 @@ namespace Hood.Admin.BaseControllers
                     throw new Exception("You cannot delete a non-empty directory.");
                 }
 
-                IEnumerable<MediaDirectory> directories = _directoryManager.GetAllCategoriesIncludingChildren(new List<MediaDirectory>() { directory });
+                IEnumerable<MediaDirectory> directories =
+                    _directoryManager.GetAllCategoriesIncludingChildren(
+                        new List<MediaDirectory>() { directory }
+                    );
 
                 foreach (MediaDirectory dir in directories)
                 {
@@ -280,7 +312,11 @@ namespace Hood.Admin.BaseControllers
 
                     foreach (MediaObject media in directoryList)
                     {
-                        try { await _media.DeleteStoredMedia(media); } catch (Exception) { }
+                        try
+                        {
+                            await _media.DeleteStoredMedia(media);
+                        }
+                        catch (Exception) { }
                         _db.Entry(media).State = EntityState.Deleted;
                     }
                 }
@@ -307,16 +343,21 @@ namespace Hood.Admin.BaseControllers
         }
         #endregion
 
-        #region Uploads 
+        #region Uploads
         [HttpPost]
         [Route("admin/media/upload/simple/")]
-        public virtual async Task<Response> UploadToDirectory(IEnumerable<IFormFile> files, int? directoryId)
+        public virtual async Task<Response> UploadToDirectory(
+            IEnumerable<IFormFile> files,
+            int? directoryId
+        )
         {
             try
             {
                 if (!_media.IsConfigured)
                 {
-                    return new Response("Media storage isn't set up yet. An administrator needs to configure a storage connection string in Settings > Media Settings before files can be uploaded.");
+                    return new Response(
+                        "Media storage isn't set up yet. An administrator needs to configure a storage connection string in Settings > Media Settings before files can be uploaded."
+                    );
                 }
 
                 if (!directoryId.HasValue)
@@ -324,7 +365,9 @@ namespace Hood.Admin.BaseControllers
                     throw new Exception("You must select a directory to upload to.");
                 }
 
-                MediaDirectory directory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.Id == directoryId.Value);
+                MediaDirectory directory = await _db.MediaDirectories.SingleOrDefaultAsync(md =>
+                    md.Id == directoryId.Value
+                );
                 if (directory == null)
                 {
                     throw new Exception($"The directory with id {directoryId} could not be found.");
@@ -340,14 +383,21 @@ namespace Hood.Admin.BaseControllers
                     {
                         // if the user is an editor, they can only upload to directories in the media folder.
                         MediaDirectory root = _directoryManager.GetTopLevelDirectory(directory.Id);
-                        if (root.Type != DirectoryType.System || root.Slug != MediaManager.SiteDirectorySlug)
+                        if (
+                            root.Type != DirectoryType.System
+                            || root.Slug != MediaManager.SiteDirectorySlug
+                        )
                         {
-                            throw new Exception("You do not have permission to upload to this directory.");
+                            throw new Exception(
+                                "You do not have permission to upload to this directory."
+                            );
                         }
                     }
                     else // otherwise throw
                     {
-                        throw new Exception("You do not have permission to upload to this directory.");
+                        throw new Exception(
+                            "You do not have permission to upload to this directory."
+                        );
                     }
                 }
 
@@ -355,13 +405,21 @@ namespace Hood.Admin.BaseControllers
                 {
                     foreach (IFormFile file in files)
                     {
-                        MediaObject mediaResult = await _media.ProcessUpload(file, _directoryManager.GetPath(directory.Id)) as MediaObject;
+                        MediaObject mediaResult =
+                            await _media.ProcessUpload(
+                                file,
+                                _directoryManager.GetPath(directory.Id)
+                            ) as MediaObject;
                         mediaResult.DirectoryId = directoryId;
                         _db.Media.Add(mediaResult);
                         _db.SaveChanges();
                     }
                     _directoryManager.ResetCache();
-                    return new Response(true, MediaObject.Blank, "The files have been uploaded successfully.");
+                    return new Response(
+                        true,
+                        MediaObject.Blank,
+                        "The files have been uploaded successfully."
+                    );
                 }
                 else
                 {
@@ -370,7 +428,10 @@ namespace Hood.Admin.BaseControllers
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseMediaController>($"Error uploading multiple files.", ex);
+                return await ErrorResponseAsync<BaseMediaController>(
+                    $"Error uploading multiple files.",
+                    ex
+                );
             }
         }
         #endregion

@@ -1,18 +1,16 @@
-﻿using System.Threading;
+﻿using Hood.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Hood.Models;
 
 namespace Hood.Api.BaseControllers
 {
     [ApiController]
     public abstract class HomeController : ControllerBase
     {
-        public HomeController() : base()
-        { }
+        public HomeController() { }
 
-        private const string publicMessage = "The API doesn't require an access token to share this message.";
+        private const string publicMessage =
+            "The API doesn't require an access token to share this message.";
         private const string protectedMessage = "The API successfully validated your access token.";
         private const string adminMessage = "The API successfully recognized you as an admin.";
 
@@ -41,6 +39,5 @@ namespace Hood.Api.BaseControllers
         {
             return new ApiResponse(adminMessage);
         }
-
     }
 }

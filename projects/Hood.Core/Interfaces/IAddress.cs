@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Interfaces
 {
@@ -23,4 +23,3 @@ namespace Hood.Interfaces
         double Longitude { get; set; }
     }
 }
-

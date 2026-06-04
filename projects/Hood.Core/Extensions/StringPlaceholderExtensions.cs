@@ -1,4 +1,4 @@
-﻿using Hood.Core;
+using Hood.Core;
 using Hood.Interfaces;
 using Hood.Models;
 
@@ -12,25 +12,27 @@ namespace Hood.Extensions
                 return text;
 
             var settings = Engine.Settings.Basic;
-            return text
-                .Replace("{Site.Title}", settings.FullTitle)
+            return text.Replace("{Site.Title}", settings.FullTitle)
                 .Replace("{SITETITLE}", settings.FullTitle) // Backwards Compat Removed-v3.0.0
                 .Replace("{Site.CompanyName}", settings.CompanyName)
                 .Replace("{Site.Phone}", settings.Phone)
                 .Replace("{Site.Logo}", settings.Logo)
                 .Replace("{Site.LogoLight}", settings.LogoLight)
-                .Replace("{Site.Address}", settings.Address.ToFormat(Enums.AddressFormat.SingleLine))
+                .Replace(
+                    "{Site.Address}",
+                    settings.Address.ToFormat(Enums.AddressFormat.SingleLine)
+                )
                 .Replace("{Site.Owner.Name}", settings.Owner.ToInternalName())
                 .Replace("{Site.Owner.Phone}", settings.Owner.Phone)
                 .Replace("{Site.Owner.Email}", settings.Owner.Email);
         }
+
         public static string ReplaceUserVariables(this string text, IUserProfile user)
         {
             if (!text.IsSet() || user == null)
                 return text;
 
-            return text
-                .Replace("{User.Username}", user.UserName)
+            return text.Replace("{User.Username}", user.UserName)
                 .Replace("{User.Email}", user.Email)
                 .Replace("{User.PhoneNumber}", user.PhoneNumber)
                 .Replace("{User.Facebook}", user.Facebook)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Hood.Core;
@@ -22,7 +22,8 @@ namespace Hood.Services
         public RazorViewRenderer(
             IRazorViewEngine viewEngine,
             ITempDataProvider tempDataProvider,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider
+        )
         {
             _viewEngine = viewEngine;
             _tempDataProvider = tempDataProvider;
@@ -43,7 +44,9 @@ namespace Hood.Services
 
             if (!viewEngineResult.Success)
             {
-                throw new InvalidOperationException(string.Format("Couldn't find view '{0}'", name));
+                throw new InvalidOperationException(
+                    string.Format("Couldn't find view '{0}'", name)
+                );
             }
 
             var view = viewEngineResult.View;
@@ -55,15 +58,15 @@ namespace Hood.Services
                     view,
                     new ViewDataDictionary<TModel>(
                         metadataProvider: new EmptyModelMetadataProvider(),
-                        modelState: new ModelStateDictionary())
+                        modelState: new ModelStateDictionary()
+                    )
                     {
-                        Model = model
+                        Model = model,
                     },
-                    new TempDataDictionary(
-                        actionContext.HttpContext,
-                        _tempDataProvider),
+                    new TempDataDictionary(actionContext.HttpContext, _tempDataProvider),
                     output,
-                    new HtmlHelperOptions());
+                    new HtmlHelperOptions()
+                );
 
                 await view.RenderAsync(viewContext);
 
@@ -75,7 +78,7 @@ namespace Hood.Services
         {
             var httpContext = new DefaultHttpContext()
             {
-                RequestServices = Engine.Services.Resolve<IServiceProvider>()
+                RequestServices = Engine.Services.Resolve<IServiceProvider>(),
             };
             return new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
         }

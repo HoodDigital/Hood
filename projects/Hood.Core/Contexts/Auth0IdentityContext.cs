@@ -1,21 +1,19 @@
-﻿using Hood.Core;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Hood.Contexts
 {
     public class Auth0IdentityContext : DbContext, IHoodIdentityContext
     {
         public Auth0IdentityContext(DbContextOptions<Auth0IdentityContext> options)
-            : base(options)
-        {
-        }
+            : base(options) { }
 
         public DbSet<Auth0User> Users { get; set; } = default!;
         public DbSet<UserProfile> UserProfiles { get; set; } = default!;
@@ -28,29 +26,38 @@ namespace Hood.Contexts
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<Auth0User>(
-                typeBuilder =>
-                {
-                    typeBuilder.ToTable("AspNetUsers");
-                    typeBuilder.Property(o => o.UserName).HasColumnName("UserName");
-                    typeBuilder.Property(o => o.Email).HasColumnName("Email");
-                    typeBuilder.Property(o => o.PhoneNumber).HasColumnName("PhoneNumber");
+            builder.Entity<Auth0User>(typeBuilder =>
+            {
+                typeBuilder.ToTable("AspNetUsers");
+                typeBuilder.Property(o => o.UserName).HasColumnName("UserName");
+                typeBuilder.Property(o => o.Email).HasColumnName("Email");
+                typeBuilder.Property(o => o.PhoneNumber).HasColumnName("PhoneNumber");
 
-                    typeBuilder.HasOne(o => o.UserProfile).WithOne().HasForeignKey<UserProfile>(o => o.Id);
-                    typeBuilder.HasMany<Auth0UserRole>().WithOne().HasForeignKey(ur => ur.UserId).IsRequired();
-                });
+                typeBuilder
+                    .HasOne(o => o.UserProfile)
+                    .WithOne()
+                    .HasForeignKey<UserProfile>(o => o.Id);
+                typeBuilder
+                    .HasMany<Auth0UserRole>()
+                    .WithOne()
+                    .HasForeignKey(ur => ur.UserId)
+                    .IsRequired();
+            });
 
-            builder.Entity<UserProfile>(
-                typeBuilder =>
-                {
-                    typeBuilder.ToTable("AspNetUsers");
-                    typeBuilder.Property(o => o.UserName).HasColumnName("UserName");
-                    typeBuilder.Property(o => o.Email).HasColumnName("Email");
-                    typeBuilder.Property(o => o.PhoneNumber).HasColumnName("PhoneNumber");
-                });
+            builder.Entity<UserProfile>(typeBuilder =>
+            {
+                typeBuilder.ToTable("AspNetUsers");
+                typeBuilder.Property(o => o.UserName).HasColumnName("UserName");
+                typeBuilder.Property(o => o.Email).HasColumnName("Email");
+                typeBuilder.Property(o => o.PhoneNumber).HasColumnName("PhoneNumber");
+            });
             builder.Entity<Auth0Identity>().ToTable("AspNetAuth0Identities");
-            builder.Entity<Auth0Identity>().HasOne(m => m.User).WithMany(m => m.ConnectedAuth0Accounts).HasForeignKey(m => m.LocalUserId).OnDelete(DeleteBehavior.Cascade);
-
+            builder
+                .Entity<Auth0Identity>()
+                .HasOne(m => m.User)
+                .WithMany(m => m.ConnectedAuth0Accounts)
+                .HasForeignKey(m => m.LocalUserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Auth0Role>(b =>
             {
@@ -104,8 +111,8 @@ namespace Hood.Contexts
                             FirstName = "Website",
                             LastName = "Administrator",
                             JobTitle = "Website Administrator",
-                            Anonymous = false
-                        }
+                            Anonymous = false,
+                        },
                     };
                     Users.Add(userToInsert);
                     await SaveChangesAsync();
@@ -113,16 +120,18 @@ namespace Hood.Contexts
 
                 Auth0User siteAdmin = await repo.GetUserByEmailAsync(Engine.SiteOwnerEmail);
                 return siteAdmin;
-
             }
             catch (Exception ex)
             {
-                throw new StartupException("An error occurred while loading or creating the admin user.", ex, StartupError.AdminUserSetupError);
+                throw new StartupException(
+                    "An error occurred while loading or creating the admin user.",
+                    ex,
+                    StartupError.AdminUserSetupError
+                );
             }
         }
-
     }
-    
+
     /// <summary>
     /// Factory for creating the Auth0IdentityContext, only used for script creation.
     /// </summary>

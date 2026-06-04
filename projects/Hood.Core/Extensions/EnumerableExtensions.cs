@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -30,10 +30,11 @@ namespace Hood.Extensions
         }
 
         private delegate Func<A, R> Recursive<A, R>(Recursive<A, R> r);
+
         private static Func<A, R> Y<A, R>(Func<Func<A, R>, Func<A, R>> f)
         {
-            Recursive<A, R> rec = r => a => f(r(r))(a); return rec(rec);
+            Recursive<A, R> rec = r => a => f(r(r))(a);
+            return rec(rec);
         }
-
     }
 }

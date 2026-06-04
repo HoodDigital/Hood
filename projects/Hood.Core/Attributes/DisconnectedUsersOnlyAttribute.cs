@@ -2,11 +2,9 @@
 using System.Threading.Tasks;
 using Hood.Core;
 using Hood.Extensions;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 
 namespace Hood.Attributes
 {
@@ -15,9 +13,8 @@ namespace Hood.Attributes
     /// </summary>
     public class DisconnectedUsersOnlyAttribute : TypeFilterAttribute
     {
-        public DisconnectedUsersOnlyAttribute() : base(typeof(DisconnectedUsersOnlyFilter))
-        { }
-
+        public DisconnectedUsersOnlyAttribute()
+            : base(typeof(DisconnectedUsersOnlyFilter)) { }
     }
 
     public class DisconnectedUsersOnlyFilter : Attribute, IAsyncAuthorizationFilter
@@ -25,7 +22,10 @@ namespace Hood.Attributes
         public Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
-            if (!context.HttpContext.User.Identity.IsAuthenticated || !context.HttpContext.User.RequiresConnection())
+            if (
+                !context.HttpContext.User.Identity.IsAuthenticated
+                || !context.HttpContext.User.RequiresConnection()
+            )
             {
                 context.Result = new RedirectToActionResult("AccessDenied", "Account", new { });
             }

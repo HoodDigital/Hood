@@ -1,12 +1,11 @@
-using Hood.Extensions;
-using Hood.Interfaces;
+﻿using Hood.Extensions;
 using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
 namespace Hood.ViewModels
 {
-    public class LogListModel : PagedList<Log>, IPageableModel
+    public class LogListModel : PagedList<Log>
     {
         public LogListModel()
         {

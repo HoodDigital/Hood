@@ -1,6 +1,5 @@
 ﻿using Hood.Extensions;
 using Newtonsoft.Json;
-using System;
 
 namespace Hood.Models
 {
@@ -51,10 +50,11 @@ namespace Hood.Models
                 }
                 else
                 {
-                    return JsonConvert.DeserializeObject<string>(JsonConvert.SerializeObject(meta.BaseValue));
+                    return JsonConvert.DeserializeObject<string>(
+                        JsonConvert.SerializeObject(meta.BaseValue)
+                    );
                 }
             }
         }
-
     }
 }

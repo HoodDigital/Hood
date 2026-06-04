@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -15,7 +15,8 @@ namespace Hood.Core.Migrations.Content
                 name: "HoodContent",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table
+                        .Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Excerpt = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -36,23 +37,25 @@ namespace Hood.Core.Migrations.Content
                     Featured = table.Column<bool>(type: "bit", nullable: false),
                     AuthorId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FeaturedImageJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ShareImageJson = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ShareImageJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_HoodContent", x => x.Id);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "HoodContentCategories",
                 columns: table => new
                 {
-                    ContentCategoryId = table.Column<int>(type: "int", nullable: false)
+                    ContentCategoryId = table
+                        .Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Slug = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ContentType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ParentCategoryId = table.Column<int>(type: "int", nullable: true)
+                    ParentCategoryId = table.Column<int>(type: "int", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -61,14 +64,17 @@ namespace Hood.Core.Migrations.Content
                         name: "FK_HoodContentCategories_HoodContentCategories_ParentCategoryId",
                         column: x => x.ParentCategoryId,
                         principalTable: "HoodContentCategories",
-                        principalColumn: "ContentCategoryId");
-                });
+                        principalColumn: "ContentCategoryId"
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "HoodContentMedia",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table
+                        .Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ContentId = table.Column<int>(type: "int", nullable: false),
                     FileSize = table.Column<long>(type: "bigint", nullable: false),
@@ -84,7 +90,7 @@ namespace Hood.Core.Migrations.Content
                     LargeUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UniqueId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Directory = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    GenericFileType = table.Column<int>(type: "int", nullable: false)
+                    GenericFileType = table.Column<int>(type: "int", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -94,89 +100,101 @@ namespace Hood.Core.Migrations.Content
                         column: x => x.ContentId,
                         principalTable: "HoodContent",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
+                        onDelete: ReferentialAction.Restrict
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "HoodContentMetadata",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table
+                        .Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ContentId = table.Column<int>(type: "int", nullable: false),
                     BaseValue = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_HoodContentMetadata", x => x.Id);
-                    table.UniqueConstraint("AK_HoodContentMetadata_ContentId_Name", x => new { x.ContentId, x.Name });
+                    table.UniqueConstraint(
+                        "AK_HoodContentMetadata_ContentId_Name",
+                        x => new { x.ContentId, x.Name }
+                    );
                     table.ForeignKey(
                         name: "FK_HoodContentMetadata_HoodContent_ContentId",
                         column: x => x.ContentId,
                         principalTable: "HoodContent",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "HoodContentCategoryJoins",
                 columns: table => new
                 {
                     CategoryId = table.Column<int>(type: "int", nullable: false),
-                    ContentId = table.Column<int>(type: "int", nullable: false)
+                    ContentId = table.Column<int>(type: "int", nullable: false),
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_HoodContentCategoryJoins", x => new { x.ContentId, x.CategoryId });
+                    table.PrimaryKey(
+                        "PK_HoodContentCategoryJoins",
+                        x => new { x.ContentId, x.CategoryId }
+                    );
                     table.ForeignKey(
                         name: "FK_HoodContentCategoryJoins_HoodContentCategories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "HoodContentCategories",
                         principalColumn: "ContentCategoryId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade
+                    );
                     table.ForeignKey(
                         name: "FK_HoodContentCategoryJoins_HoodContent_ContentId",
                         column: x => x.ContentId,
                         principalTable: "HoodContent",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_HoodContentCategories_ParentCategoryId",
                 table: "HoodContentCategories",
-                column: "ParentCategoryId");
+                column: "ParentCategoryId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_HoodContentCategoryJoins_CategoryId",
                 table: "HoodContentCategoryJoins",
-                column: "CategoryId");
+                column: "CategoryId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_HoodContentMedia_ContentId",
                 table: "HoodContentMedia",
-                column: "ContentId");
+                column: "ContentId"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "HoodContentCategoryJoins");
+            migrationBuilder.DropTable(name: "HoodContentCategoryJoins");
 
-            migrationBuilder.DropTable(
-                name: "HoodContentMedia");
+            migrationBuilder.DropTable(name: "HoodContentMedia");
 
-            migrationBuilder.DropTable(
-                name: "HoodContentMetadata");
+            migrationBuilder.DropTable(name: "HoodContentMetadata");
 
-            migrationBuilder.DropTable(
-                name: "HoodContentCategories");
+            migrationBuilder.DropTable(name: "HoodContentCategories");
 
-            migrationBuilder.DropTable(
-                name: "HoodContent");
+            migrationBuilder.DropTable(name: "HoodContent");
         }
     }
 }

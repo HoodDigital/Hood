@@ -2,11 +2,10 @@
 
 namespace Hood.Models
 {
-    public partial class Option
+    public class Option
     {
         [Key]
         public string Id { get; set; }
         public string Value { get; set; }
     }
 }
-

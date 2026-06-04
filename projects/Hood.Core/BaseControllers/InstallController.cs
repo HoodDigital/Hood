@@ -1,6 +1,8 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Hood.Contexts;
 using Hood.Core;
-using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
@@ -8,9 +10,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Hood.BaseControllers
 {
@@ -19,7 +18,10 @@ namespace Hood.BaseControllers
         private readonly IHostApplicationLifetime _applicationLifetime;
         private readonly IConfiguration _config;
 
-        public InstallController(IHostApplicationLifetime applicationLifetime, IConfiguration config)
+        public InstallController(
+            IHostApplicationLifetime applicationLifetime,
+            IConfiguration config
+        )
         {
             _applicationLifetime = applicationLifetime;
             _config = config;
@@ -65,7 +67,8 @@ namespace Hood.BaseControllers
                     Engine.Configuration.SuperAdminEmail = model.Email;
                 }
 
-                IPasswordAccountRepository accounts = Engine.Services.Resolve<IPasswordAccountRepository>();
+                IPasswordAccountRepository accounts =
+                    Engine.Services.Resolve<IPasswordAccountRepository>();
 
                 // Ensure all Hood system roles exist.
                 await accounts.SetupRolesAsync();
@@ -96,8 +99,8 @@ namespace Hood.BaseControllers
                             FirstName = "Website",
                             LastName = "Administrator",
                             JobTitle = "Website Administrator",
-                            Anonymous = false
-                        }
+                            Anonymous = false,
+                        },
                     };
 
                     IdentityResult created = await accounts.CreateAsync(admin, model.Password);
@@ -115,7 +118,8 @@ namespace Hood.BaseControllers
                 List<IdentityRole> ownerRoles = new List<IdentityRole>();
                 foreach (string role in new[] { "SuperUser", "Admin" })
                 {
-                    IdentityRole roleObject = await accounts.GetRoleAsync(role) ?? await accounts.CreateRoleAsync(role);
+                    IdentityRole roleObject =
+                        await accounts.GetRoleAsync(role) ?? await accounts.CreateRoleAsync(role);
                     ownerRoles.Add(roleObject);
                 }
                 await accounts.AddUserToRolesAsync(admin, ownerRoles.ToArray());
@@ -147,6 +151,5 @@ namespace Hood.BaseControllers
         {
             return View();
         }
-
     }
 }

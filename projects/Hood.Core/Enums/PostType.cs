@@ -1,11 +1,10 @@
-﻿namespace Hood.Enums
+namespace Hood.Enums
 {
-
     public enum PostType
     {
         Page,
         Blog,
         Slider,
-        Widget
+        Widget,
     }
 }

@@ -7,12 +7,14 @@ namespace Hood.Core
     {
         public StartupError Error { get; set; }
 
-        public StartupException(string message, StartupError error) : base(message)
+        public StartupException(string message, StartupError error)
+            : base(message)
         {
             ProcessError(error);
         }
 
-        public StartupException(string message, Exception innerException, StartupError error) : base(message, innerException)
+        public StartupException(string message, Exception innerException, StartupError error)
+            : base(message, innerException)
         {
             ProcessError(error);
         }

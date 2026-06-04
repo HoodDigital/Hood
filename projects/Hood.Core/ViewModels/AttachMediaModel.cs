@@ -1,6 +1,6 @@
-﻿using Hood.Extensions;
-using Microsoft.AspNetCore.Mvc;
 using System;
+using Hood.Extensions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.ViewModels
 {

@@ -4,22 +4,19 @@ using Newtonsoft.Json;
 
 namespace Hood.Models
 {
-    public partial class ContentMeta : MetadataBase, IMetadata
+    public class ContentMeta : MetadataBase
     {
-        public ContentMeta()
-        {
-        }
+        public ContentMeta() { }
 
         public int ContentId { get; set; }
 
         [JsonIgnore]
-        [IgnoreDataMember] 
+        [IgnoreDataMember]
         public Content Content { get; set; }
 
         [NotMapped]
         [JsonIgnore]
-        [IgnoreDataMember] 
+        [IgnoreDataMember]
         public ContentView ContentView { get; set; }
     }
 }
-

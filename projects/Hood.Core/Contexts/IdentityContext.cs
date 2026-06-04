@@ -1,4 +1,8 @@
-﻿using Hood.Core;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Models;
 using Hood.Services;
@@ -7,19 +11,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Hood.Contexts
 {
-
-    public class IdentityContext : IdentityDbContext<ApplicationUser, IdentityRole, string>, IHoodIdentityContext
+    public class IdentityContext
+        : IdentityDbContext<ApplicationUser, IdentityRole, string>,
+            IHoodIdentityContext
     {
         public IdentityContext(DbContextOptions<IdentityContext> options)
-            : base(options)
-        { }
+            : base(options) { }
 
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<UserProfileView<IdentityRole>> UserProfileViews { get; set; }
@@ -28,25 +28,26 @@ namespace Hood.Contexts
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<ApplicationUser>(
-                typeBuilder =>
-                {
-                    typeBuilder.ToTable("AspNetUsers");
-                    typeBuilder.Property(o => o.UserName).HasColumnName("UserName");
-                    typeBuilder.Property(o => o.Email).HasColumnName("Email");
-                    typeBuilder.Property(o => o.PhoneNumber).HasColumnName("PhoneNumber");
+            builder.Entity<ApplicationUser>(typeBuilder =>
+            {
+                typeBuilder.ToTable("AspNetUsers");
+                typeBuilder.Property(o => o.UserName).HasColumnName("UserName");
+                typeBuilder.Property(o => o.Email).HasColumnName("Email");
+                typeBuilder.Property(o => o.PhoneNumber).HasColumnName("PhoneNumber");
 
-                    typeBuilder.HasOne(o => o.UserProfile).WithOne().HasForeignKey<UserProfile>(o => o.Id);
-                });
+                typeBuilder
+                    .HasOne(o => o.UserProfile)
+                    .WithOne()
+                    .HasForeignKey<UserProfile>(o => o.Id);
+            });
 
-            builder.Entity<UserProfile>(
-                typeBuilder =>
-                {
-                    typeBuilder.ToTable("AspNetUsers");
-                    typeBuilder.Property(o => o.UserName).HasColumnName("UserName");
-                    typeBuilder.Property(o => o.Email).HasColumnName("Email");
-                    typeBuilder.Property(o => o.PhoneNumber).HasColumnName("PhoneNumber");
-                });
+            builder.Entity<UserProfile>(typeBuilder =>
+            {
+                typeBuilder.ToTable("AspNetUsers");
+                typeBuilder.Property(o => o.UserName).HasColumnName("UserName");
+                typeBuilder.Property(o => o.Email).HasColumnName("Email");
+                typeBuilder.Property(o => o.PhoneNumber).HasColumnName("PhoneNumber");
+            });
 
             builder.Entity<UserProfileView<IdentityRole>>().ToView("HoodUserProfiles");
         }
@@ -55,7 +56,8 @@ namespace Hood.Contexts
         {
             try
             {
-                IPasswordAccountRepository repo = Engine.Services.Resolve<IPasswordAccountRepository>();
+                IPasswordAccountRepository repo =
+                    Engine.Services.Resolve<IPasswordAccountRepository>();
 
                 string ownerEmail = Engine.SiteOwnerEmail;
                 if (!Users.Any(u => u.UserName == ownerEmail))
@@ -76,20 +78,21 @@ namespace Hood.Contexts
                             Email = ownerEmail,
                             UserName = ownerEmail,
                             PhoneNumber = "",
-                            
+
                             FirstName = "Website",
                             LastName = "Administrator",
                             JobTitle = "Website Administrator",
-                            Anonymous = false
-                        }
+                            Anonymous = false,
+                        },
                     };
                     var keygen = new KeyGenerator();
                     var password = keygen.Generate(16);
 
-
                     IdentityResult ir = await repo.CreateAsync(userToInsert, password);
 
-                    var tempPasswordFile = Engine.Services.Resolve<IWebHostEnvironment>().ContentRootPath + "/temp.txt";
+                    var tempPasswordFile =
+                        Engine.Services.Resolve<IWebHostEnvironment>().ContentRootPath
+                        + "/temp.txt";
                     if (File.Exists(tempPasswordFile))
                     {
                         File.Delete(tempPasswordFile);
@@ -102,16 +105,18 @@ namespace Hood.Contexts
 
                 ApplicationUser siteAdmin = await repo.GetUserByEmailAsync(Engine.SiteOwnerEmail);
                 return siteAdmin;
-
             }
             catch (Exception ex)
             {
-                throw new StartupException("An error occurred while loading or creating the admin user.", ex, StartupError.AdminUserSetupError);
+                throw new StartupException(
+                    "An error occurred while loading or creating the admin user.",
+                    ex,
+                    StartupError.AdminUserSetupError
+                );
             }
         }
-
     }
-    
+
     /// <summary>
     /// Factory for creating the IdentityContext, only used for script creation.
     /// </summary>

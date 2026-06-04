@@ -1,12 +1,11 @@
-﻿using Hood.Interfaces;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Hood.Interfaces;
 
 namespace Hood.Models
 {
     public interface IUserProfile : IName, IJsonMetadata, IAvatar, ISaveableModel, IHoodIdentity
     {
-        #region Socials 
+        #region Socials
         string WebsiteUrl { get; set; }
         string Twitter { get; set; }
         string TwitterHandle { get; set; }
@@ -21,7 +20,7 @@ namespace Hood.Models
         string JobTitle { get; set; }
         #endregion
 
-        #region Notes 
+        #region Notes
         List<UserNote> Notes { get; set; }
         void AddUserNote(UserNote note);
         string ToAdminName();

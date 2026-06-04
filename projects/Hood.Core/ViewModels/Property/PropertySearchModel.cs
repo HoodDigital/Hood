@@ -1,16 +1,15 @@
-﻿using Hood.Core;
+﻿using System.Collections.Generic;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Interfaces;
 using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace Hood.ViewModels
 {
-    public class PropertyListModel : PagedList<PropertyListingView>, IPageableModel
+    public class PropertyListModel : PagedList<PropertyListingView>
     {
-        public PropertyListModel() : base()
+        public PropertyListModel()
         {
             PageSize = Engine.Settings.Property.DefaultPageSize;
             if (PageSize <= 0)
@@ -24,7 +23,7 @@ namespace Hood.ViewModels
         }
 
         /// <summary>
-        /// Specify the exact filter term for listing type - cannot be used in conjunction with Transaction, which specifies generally. 
+        /// Specify the exact filter term for listing type - cannot be used in conjunction with Transaction, which specifies generally.
         /// </summary>
         [FromQuery(Name = "type")]
         public List<string> Type { get; set; } = new List<string>();
@@ -39,7 +38,7 @@ namespace Hood.ViewModels
         /// for internal use only, forces loading of images in the search, not recommended.
         /// </summary>
         [FromQuery(Name = "img")]
-        public bool LoadImages { get; set; } = false;
+        public bool LoadImages { get; set; }
 
         /// <summary>
         /// Filter by planning type.
@@ -51,33 +50,41 @@ namespace Hood.ViewModels
         public string Location { get; set; }
 
         /// <summary>
-        /// Set this as -1 in order to use MaxBedrooms as a high filter.  
+        /// Set this as -1 in order to use MaxBedrooms as a high filter.
         /// </summary>
         [FromQuery(Name = "beds")]
         public int? Bedrooms { get; set; }
 
         /// <summary>
-        /// Set this as -1 in order to use Bedrooms as a low filter.  
+        /// Set this as -1 in order to use Bedrooms as a low filter.
         /// </summary>
         [FromQuery(Name = "beds-min")]
         public int? MinBedrooms { get; set; }
+
         /// <summary>
-        /// Set this as -1 in order to use Bedrooms as a low filter.  
+        /// Set this as -1 in order to use Bedrooms as a low filter.
         /// </summary>
         [FromQuery(Name = "beds-max")]
         public int? MaxBedrooms { get; set; }
+
         [FromQuery(Name = "rent-max")]
         public int? MaxRent { get; set; }
+
         [FromQuery(Name = "rent-min")]
         public int? MinRent { get; set; }
+
         [FromQuery(Name = "price-min")]
         public int? MaxPrice { get; set; }
+
         [FromQuery(Name = "price-max")]
         public int? MinPrice { get; set; }
+
         [FromQuery(Name = "prem-min")]
         public int? MaxPremium { get; set; }
+
         [FromQuery(Name = "prem-max")]
         public int? MinPremium { get; set; }
+
         [FromQuery(Name = "agent")]
         public string Agent { get; set; }
 
@@ -112,12 +119,18 @@ namespace Hood.ViewModels
             {
                 query += "&status=" + System.Net.WebUtility.UrlEncode(status);
             }
-            query += PlanningType.IsSet() ? "&planning=" + System.Net.WebUtility.UrlEncode(PlanningType) : "";
+            query += PlanningType.IsSet()
+                ? "&planning=" + System.Net.WebUtility.UrlEncode(PlanningType)
+                : "";
             query += LoadImages ? "&img=true" : "";
             query += Featured ? "&featured=true" : "";
-            query += Location.IsSet() ? "&location=" + System.Net.WebUtility.UrlEncode(Location) : "";
+            query += Location.IsSet()
+                ? "&location=" + System.Net.WebUtility.UrlEncode(Location)
+                : "";
             query += Agent.IsSet() ? "&agent=" + System.Net.WebUtility.UrlEncode(Agent) : "";
-            query += PlanningType.IsSet() ? "&planning=" + System.Net.WebUtility.UrlEncode(PlanningType) : "";
+            query += PlanningType.IsSet()
+                ? "&planning=" + System.Net.WebUtility.UrlEncode(PlanningType)
+                : "";
             query += Bedrooms.HasValue ? "&beds=" + Bedrooms : "";
             query += MinBedrooms.HasValue ? "&beds-min=" + MinBedrooms : "";
             query += MaxBedrooms.HasValue ? "&beds-max=" + MaxBedrooms : "";

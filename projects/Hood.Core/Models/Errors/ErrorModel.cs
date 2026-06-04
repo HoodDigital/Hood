@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Hood.Models
 {
@@ -11,5 +11,4 @@ namespace Hood.Models
         public int Code { get; set; }
         public string ErrorMessage { get; set; }
     }
-
 }

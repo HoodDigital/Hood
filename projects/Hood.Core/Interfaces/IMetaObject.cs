@@ -1,5 +1,5 @@
-﻿using Hood.Models;
 using System.Collections.Generic;
+using Hood.Models;
 
 namespace Hood.Interfaces
 {
@@ -8,5 +8,4 @@ namespace Hood.Interfaces
     {
         List<TMetadata> Metadata { get; set; }
     }
-
 }

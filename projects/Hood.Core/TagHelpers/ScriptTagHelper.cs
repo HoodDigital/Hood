@@ -1,11 +1,11 @@
-﻿using Hood.Enums;
+using System;
+using Hood.Enums;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using System;
 
 namespace Hood.TagHelpers
 {
@@ -20,6 +20,7 @@ namespace Hood.TagHelpers
         /// </summary>
         [HtmlAttributeName("asp-location")]
         public ResourceLocation Location { set; get; }
+
         /// <summary>
         /// Indicates where the script should be rendered
         /// </summary>
@@ -80,7 +81,13 @@ namespace Hood.TagHelpers
             if (context.AllAttributes.ContainsName("src"))
             {
                 var src = context.AllAttributes["src"].Value.ToString();
-                _htmlHelper.AddScript(Location, src, Bundle, context.AllAttributes.ContainsName("async"), context.AllAttributes.ContainsName("defer"));
+                _htmlHelper.AddScript(
+                    Location,
+                    src,
+                    Bundle,
+                    context.AllAttributes.ContainsName("async"),
+                    context.AllAttributes.ContainsName("defer")
+                );
             }
             else
             {
@@ -91,6 +98,4 @@ namespace Hood.TagHelpers
             output.SuppressOutput();
         }
     }
-
-
 }

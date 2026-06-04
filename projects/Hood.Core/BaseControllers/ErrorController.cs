@@ -1,20 +1,16 @@
-﻿using Hood.Core;
+﻿using System.Diagnostics;
+using Hood.Core;
 using Hood.Extensions;
 using Hood.Models;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 
 namespace Hood.BaseControllers
 {
     [Route("error")]
     public abstract class ErrorController : BaseController
     {
-        public ErrorController() : base() { }
+        public ErrorController() { }
 
         [Route("500")]
         public virtual async System.Threading.Tasks.Task<IActionResult> AppError()
@@ -27,7 +23,10 @@ namespace Hood.BaseControllers
                 model.OriginalUrl += HttpContext.Items["originalPath"] as string;
             }
 
-            await _logService.AddExceptionAsync<ErrorController>($"500 - Application Error: {model.OriginalUrl}", model.Error);
+            await _logService.AddExceptionAsync<ErrorController>(
+                $"500 - Application Error: {model.OriginalUrl}",
+                model.Error
+            );
 
             return View("Index", model);
         }
@@ -37,11 +36,7 @@ namespace Hood.BaseControllers
         {
             BasicSettings basicSettings = Engine.Settings.Basic;
 
-            ErrorModel model = new ErrorModel
-            {
-                OriginalUrl = "unknown",
-                Code = 404
-            };
+            ErrorModel model = new ErrorModel { OriginalUrl = "unknown", Code = 404 };
 
             model.OriginalUrl = HttpContext.GetSiteUrl().TrimEnd('/');
             if (HttpContext.Items.ContainsKey("originalPath"))
@@ -49,7 +44,10 @@ namespace Hood.BaseControllers
                 model.OriginalUrl += HttpContext.Items["originalPath"] as string;
             }
 
-            await _logService.AddLogAsync<ErrorController>($"404 - Page not found: {model.OriginalUrl}", type: LogType.Error404);
+            await _logService.AddLogAsync<ErrorController>(
+                $"404 - Page not found: {model.OriginalUrl}",
+                type: LogType.Error404
+            );
 
             return View("Index", model);
         }

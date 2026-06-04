@@ -1,58 +1,72 @@
-﻿using Hood.Attributes;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using Hood.Attributes;
 using Hood.Core;
 using Hood.Entities;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace Hood.Models
 {
-    public class PropertyListing : BasePropertyListing
-    {
+    public class PropertyListing : BasePropertyListing { }
 
-    }
-
-    public partial class BasePropertyListing : BaseEntity, IAddress, IMetaObect<PropertyMeta>
+    public class BasePropertyListing : BaseEntity, IAddress, IMetaObect<PropertyMeta>
     {
         // Content
         [FormUpdatable]
         public string Title { get; set; }
+
         [FormUpdatable]
         public string Reference { get; set; }
+
         [FormUpdatable]
         public string Tags { get; set; }
 
         // IAddress
         [FormUpdatable]
         public string ContactName { get; set; }
+
         [FormUpdatable]
         [Display(Name = "Building Name/Number")]
         public string Number { get; set; }
+
         [FormUpdatable]
         [Display(Name = "Address 1")]
         public string Address1 { get; set; }
+
         [FormUpdatable]
         [Display(Name = "Address 2")]
         public string Address2 { get; set; }
+
         [FormUpdatable]
         public string City { get; set; }
+
         [FormUpdatable]
         public string County { get; set; }
+
         [FormUpdatable]
         public string Postcode { get; set; }
+
         [FormUpdatable]
         public string Country { get; set; }
-        [Display(Name = "Latitude", Description = "This is used for mapping your property listing, you can automatically look it up with Geocoding setup correctly. Or enter it manually.")]
+
+        [Display(
+            Name = "Latitude",
+            Description = "This is used for mapping your property listing, you can automatically look it up with Geocoding setup correctly. Or enter it manually."
+        )]
         [FormUpdatable]
         public double Latitude { get; set; }
+
         [FormUpdatable]
-        [Display(Name = "Longitude", Description = "This is used for mapping your property listing, you can automatically look it up with Geocoding setup correctly. Or enter it manually.")]
+        [Display(
+            Name = "Longitude",
+            Description = "This is used for mapping your property listing, you can automatically look it up with Geocoding setup correctly. Or enter it manually."
+        )]
         public double Longitude { get; set; }
 
         // Publish Status
@@ -69,10 +83,10 @@ namespace Hood.Models
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddTHH:mm}")]
         public DateTime CreatedOn { get; set; }
         public string CreatedBy { get; set; }
+
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddTHH:mm}")]
         public DateTime LastEditedOn { get; set; }
         public string LastEditedBy { get; set; }
-
 
         // Logs and notes
         public string UserVars { get; set; }
@@ -81,6 +95,7 @@ namespace Hood.Models
 
         // Content Setting
         public bool AllowComments { get; set; }
+
         [FormUpdatable]
         public bool Public { get; set; }
         public int Views { get; set; }
@@ -88,19 +103,27 @@ namespace Hood.Models
 
         // Featured Images
         public string FeaturedImageJson { get; set; }
+
         [NotMapped]
         public IMediaObject FeaturedImage
         {
-            get => FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(FeaturedImageJson) : MediaObject.Blank;
+            get =>
+                FeaturedImageJson.IsSet()
+                    ? JsonConvert.DeserializeObject<MediaObject>(FeaturedImageJson)
+                    : MediaObject.Blank;
             set => FeaturedImageJson = JsonConvert.SerializeObject(value);
         }
 
         // Media
         public string InfoDownloadJson { get; set; }
+
         [NotMapped]
         public IMediaObject InfoDownload
         {
-            get => InfoDownloadJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(InfoDownloadJson) : MediaObject.Blank;
+            get =>
+                InfoDownloadJson.IsSet()
+                    ? JsonConvert.DeserializeObject<MediaObject>(InfoDownloadJson)
+                    : MediaObject.Blank;
             set => InfoDownloadJson = JsonConvert.SerializeObject(value);
         }
 
@@ -108,26 +131,35 @@ namespace Hood.Models
         /// The type of listing - Sale/Rental/Student/Short Term/Long Term/Sub-Lease/Commercial etc.
         /// </summary>
         [FormUpdatable]
-        [Display(Name = "Listing Type", Description = "The type of listing - Sale/Rental/Student/Short Term/Long Term/Sub-Lease/Commercial etc.")]
+        [Display(
+            Name = "Listing Type",
+            Description = "The type of listing - Sale/Rental/Student/Short Term/Long Term/Sub-Lease/Commercial etc."
+        )]
         public string ListingType { get; set; }
 
         /// <summary>
         /// Availability flag for the lease or listing - Available/Sold/Sold STC/Reserved/Let etc.
         /// </summary>
         [FormUpdatable]
-        [Display(Name = "Lease/Listing Status", Description = "Availability flag for the lease or listing - Available/Sold/Sold STC/Reserved/Let etc.")]
+        [Display(
+            Name = "Lease/Listing Status",
+            Description = "Availability flag for the lease or listing - Available/Sold/Sold STC/Reserved/Let etc."
+        )]
         public string LeaseStatus { get; set; }
 
         /// <summary>
         /// The property type according to RightMove. House/Terraced/Bungalow etc.
         /// </summary>
         [FormUpdatable]
-        [Display(Name = "Property Type", Description = "The property type according to RightMove specification. House/Terraced/Bungalow etc.")]
+        [Display(
+            Name = "Property Type",
+            Description = "The property type according to RightMove specification. House/Terraced/Bungalow etc."
+        )]
         public string PropertyType { get; set; }
 
         /// <summary>
         /// (Deprecated) Size of property. Currently unused.
-        /// </summary> 
+        /// </summary>
         [FormUpdatable]
         public string Size { get; set; }
 
@@ -142,105 +174,158 @@ namespace Hood.Models
         /// Confidential flag, can be used to show confidentiality agreement, or restric to certain areas of the site.
         /// </summary>
         [FormUpdatable]
-        [Display(Name = "Confidential Listing", Description = "Use this option to hide confidential details about the listing, use the template to hide custom details.")]
+        [Display(
+            Name = "Confidential Listing",
+            Description = "Use this option to hide confidential details about the listing, use the template to hide custom details."
+        )]
         public bool Confidential { get; set; }
 
         /// <summary>
         /// Featured flag, can be used to show on featured areas of the site.
         /// </summary>
         [FormUpdatable]
-        [Display(Name = "Featured Property", Description = "This will appear in the 'featured' lists on the homepage and other areas of the site.")]
+        [Display(
+            Name = "Featured Property",
+            Description = "This will appear in the 'featured' lists on the homepage and other areas of the site."
+        )]
         public bool Featured { get; set; }
-
 
         /// <summary>
         /// Quick description of the property.
         /// </summary>
         [FormUpdatable]
-        [Display(Name = "Short Description", Description = "A quick description, used in listings and at the top of listing pages in default templates..")]
+        [Display(
+            Name = "Short Description",
+            Description = "A quick description, used in listings and at the top of listing pages in default templates.."
+        )]
         public string ShortDescription { get; set; }
+
         /// <summary>
         /// Detailed HTML description of the property.
         /// </summary>
         [FormUpdatable]
-        [Display(Name = "Full Description", Description = "Full description, can include images and lots of detail.")]
+        [Display(
+            Name = "Full Description",
+            Description = "Full description, can include images and lots of detail."
+        )]
         public string Description { get; set; }
+
         /// <summary>
-        /// (Optional) Additional information about the property in general. 
+        /// (Optional) Additional information about the property in general.
         /// </summary>
         [FormUpdatable]
-        [Display(Name = "Additional", Description = "Additional information about the property in general. ")]
+        [Display(
+            Name = "Additional",
+            Description = "Additional information about the property in general. "
+        )]
         public string Additional { get; set; }
+
         /// <summary>
-        /// (Optional) Additional information about the lease. 
+        /// (Optional) Additional information about the lease.
         /// </summary>
         [FormUpdatable]
-        [Display(Name = "Lease Description", Description = "Additional information about the lease/sale.")]
+        [Display(
+            Name = "Lease Description",
+            Description = "Additional information about the lease/sale."
+        )]
         public string Lease { get; set; }
+
         /// <summary>
-        /// (Optional) Additional information about the area. 
+        /// (Optional) Additional information about the area.
         /// </summary>
         [FormUpdatable]
         [Display(Name = "Area Description", Description = "Additional information about the area.")]
         public string Areas { get; set; }
+
         /// <summary>
-        /// (Optional) Additional information about the location. 
+        /// (Optional) Additional information about the location.
         /// </summary>
         [FormUpdatable]
-        [Display(Name = "Location Description", Description = "Additional information about the location.")]
+        [Display(
+            Name = "Location Description",
+            Description = "Additional information about the location."
+        )]
         public string Location { get; set; }
+
         /// <summary>
-        /// (Optional) Additional information about or for the agent. 
+        /// (Optional) Additional information about or for the agent.
         /// </summary>
         [FormUpdatable]
-        [Display(Name = "Agent Info", Description = "Additional information about or for the agent.")]
+        [Display(
+            Name = "Agent Info",
+            Description = "Additional information about or for the agent."
+        )]
         public string AgentInfo { get; set; }
 
         /// <summary>
         /// Planning Classifcation A1/A2/A3 etc.
         /// </summary>
         [FormUpdatable]
-        [Display(Name = "Planning Classifcation", Description = "Planning Classifcation A1/A2/A3 etc.")]
+        [Display(
+            Name = "Planning Classifcation",
+            Description = "Planning Classifcation A1/A2/A3 etc."
+        )]
         public string Planning { get; set; }
 
         // Prices
         [FormUpdatable]
         [Display(Name = "Rent", Description = "Numeric value for rent.")]
         public decimal? Rent { get; set; }
+
         [FormUpdatable]
         [Display(Name = "Asking Price", Description = "Numeric value for asking price.")]
         public decimal? AskingPrice { get; set; }
+
         [FormUpdatable]
         [Display(Name = "Premium", Description = "Numeric value for premium.")]
         public decimal? Premium { get; set; }
+
         [FormUpdatable]
         [Display(Name = "Fees", Description = "Numeric value for fees.")]
         public decimal? Fees { get; set; }
 
         [FormUpdatable]
-        [Display(Name = "Rent Display", Description = "How the rent is displayed {0} represents the value.")]
+        [Display(
+            Name = "Rent Display",
+            Description = "How the rent is displayed {0} represents the value."
+        )]
         public string RentDisplay { get; set; }
+
         [FormUpdatable]
-        [Display(Name = "Asking Price Display", Description = "How the asking price is displayed {0} represents the value.")]
+        [Display(
+            Name = "Asking Price Display",
+            Description = "How the asking price is displayed {0} represents the value."
+        )]
         public string AskingPriceDisplay { get; set; }
+
         [FormUpdatable]
-        [Display(Name = "Premium Display", Description = "How the premium is displayed {0} represents the value.")]
+        [Display(
+            Name = "Premium Display",
+            Description = "How the premium is displayed {0} represents the value."
+        )]
         public string PremiumDisplay { get; set; }
+
         [FormUpdatable]
-        [Display(Name = "Fees Display", Description = "How the fees are displayed {0} represents the value.")]
+        [Display(
+            Name = "Fees Display",
+            Description = "How the fees are displayed {0} represents the value."
+        )]
         public string FeesDisplay { get; set; }
 
         [FormUpdatable]
         public string Email { get; set; }
+
         [FormUpdatable]
         public string QuickName { get; set; }
+
         [FormUpdatable]
         public string Addressee { get; set; }
+
         [FormUpdatable]
         public string Phone { get; set; }
         public string SingleLineAddress => this.ToFormat(AddressFormat.SingleLine);
 
-        // Agent 
+        // Agent
         [FormUpdatable]
         [Display(Name = "Agent/Owner", Description = "The agent or creator of this property.")]
         public string AgentId { get; set; }
@@ -266,7 +351,15 @@ namespace Hood.Models
         }
 
         [NotMapped]
-        public string Url => string.Format("/{0}/{1}/{2}/{3}/{4}", Engine.Settings.Property.Slug, Id, Address2.IsSet() ? Address2.ToSeoUrl() : City.ToSeoUrl(), Postcode.IsSet() ? Postcode.Split(' ').First().ToSeoUrl() : "unknown", Title.ToSeoUrl());
+        public string Url =>
+            string.Format(
+                "/{0}/{1}/{2}/{3}/{4}",
+                Engine.Settings.Property.Slug,
+                Id,
+                Address2.IsSet() ? Address2.ToSeoUrl() : City.ToSeoUrl(),
+                Postcode.IsSet() ? Postcode.Split(' ').First().ToSeoUrl() : "unknown",
+                Title.ToSeoUrl()
+            );
 
         [NotMapped]
         public string FormattedRent
@@ -296,7 +389,9 @@ namespace Hood.Models
                     ap = AskingPrice.Value;
                 }
 
-                return propertySettings.ShowAskingPriceDecimals ? ap.ToString("C") : ap.ToString("C0");
+                return propertySettings.ShowAskingPriceDecimals
+                    ? ap.ToString("C")
+                    : ap.ToString("C0");
             }
         }
 
@@ -312,7 +407,9 @@ namespace Hood.Models
                     premium = Premium.Value;
                 }
 
-                return propertySettings.ShowPremiumDecimals ? premium.ToString("C") : premium.ToString("C0");
+                return propertySettings.ShowPremiumDecimals
+                    ? premium.ToString("C")
+                    : premium.ToString("C0");
             }
         }
 
@@ -332,7 +429,6 @@ namespace Hood.Models
             }
         }
 
-
         /// <summary>
         /// Restricted field, used for JSON floor areas.
         /// </summary>
@@ -341,7 +437,10 @@ namespace Hood.Models
         [NotMapped]
         public List<FloorArea> FloorAreas
         {
-            get => Floors.IsSet() ? JsonConvert.DeserializeObject<List<FloorArea>>(Floors) : new List<FloorArea>();
+            get =>
+                Floors.IsSet()
+                    ? JsonConvert.DeserializeObject<List<FloorArea>>(Floors)
+                    : new List<FloorArea>();
             set => Floors = JsonConvert.SerializeObject(value);
         }
 
@@ -363,6 +462,7 @@ namespace Hood.Models
                 return FloorAreas.Select(f => f.SquareMetres).Sum();
             }
         }
+
         [NotMapped]
         public decimal TotalFloorAreaFeet
         {
@@ -393,11 +493,17 @@ namespace Hood.Models
                     case ContentStatus.Published:
                         if (PublishDate > DateTime.UtcNow)
                         {
-                            return "Will publish on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
+                            return "Will publish on: "
+                                + PublishDate.ToShortDateString()
+                                + " at "
+                                + PublishDate.ToShortTimeString();
                         }
                         else
                         {
-                            return "Published on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
+                            return "Published on: "
+                                + PublishDate.ToShortDateString()
+                                + " at "
+                                + PublishDate.ToShortTimeString();
                         }
 
                     case ContentStatus.Draft:
@@ -410,10 +516,15 @@ namespace Hood.Models
                 }
             }
         }
+
         [NotMapped]
         public bool PublishPending { get; set; }
+
         [NotMapped]
-        [Display(Name = "Auto locate address", Description = "Use the Google Address Service to lookup your address from the postcode/address information provided, and get a map Latitude/Longitude reference to use with Google Maps.")]
+        [Display(
+            Name = "Auto locate address",
+            Description = "Use the Google Address Service to lookup your address from the postcode/address information provided, and get a map Latitude/Longitude reference to use with Google Maps."
+        )]
         public bool AutoGeocode { get; set; }
         public string QuickInfo
         {
@@ -451,12 +562,13 @@ namespace Hood.Models
                 {
                     BaseValue = null,
                     Name = name,
-                    Type = null
+                    Type = null,
                 };
             }
 
             return cm;
         }
+
         public void UpdateMeta(string name, string value)
         {
             if (Metadata != null)
@@ -468,14 +580,14 @@ namespace Hood.Models
                 }
             }
         }
+
         public void AddMeta(string name, string value, string metaType = "System.String")
         {
-
             var newMeta = new PropertyMeta()
             {
                 Name = name,
                 Type = metaType,
-                PropertyId = Id
+                PropertyId = Id,
             };
             newMeta.SetValue(value);
             if (Metadata != null)
@@ -483,6 +595,7 @@ namespace Hood.Models
                 Metadata.Add(newMeta);
             }
         }
+
         public void RemoveMeta(string name)
         {
             if (HasMeta(name))
@@ -491,6 +604,7 @@ namespace Hood.Models
                 Metadata.Remove(meta);
             }
         }
+
         public bool HasMeta(string name)
         {
             if (Metadata != null)
@@ -503,6 +617,7 @@ namespace Hood.Models
             }
             return false;
         }
+
         public bool BillIncludes(string type)
         {
             PropertyMeta meta = Metadata.SingleOrDefault(m => m.Name == "Bill.Includes." + type);
@@ -519,8 +634,5 @@ namespace Hood.Models
 
             return false;
         }
-
     }
-
 }
-

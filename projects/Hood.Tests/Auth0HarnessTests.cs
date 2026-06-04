@@ -22,10 +22,14 @@ namespace Hood.Tests
         {
             using var ctx = NewContext();
 
-            bool hasAuth0Identities = ctx.Model.GetEntityTypes()
+            bool hasAuth0Identities = ctx
+                .Model.GetEntityTypes()
                 .Any(e => e.GetTableName() == "AspNetAuth0Identities");
 
-            Assert.True(hasAuth0Identities, "Auth0IdentityContext should map the AspNetAuth0Identities table.");
+            Assert.True(
+                hasAuth0Identities,
+                "Auth0IdentityContext should map the AspNetAuth0Identities table."
+            );
         }
 
         [Fact]

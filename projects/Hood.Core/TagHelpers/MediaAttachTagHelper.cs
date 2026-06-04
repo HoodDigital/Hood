@@ -1,13 +1,11 @@
-﻿using Hood.Core;
-using Hood.Enums;
+﻿using System;
+using Hood.Core;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using System;
-using System.Threading.Tasks;
 
 namespace Hood.TagHelpers
 {
@@ -43,7 +41,6 @@ namespace Hood.TagHelpers
         [ViewContext]
         public ViewContext ViewContext { get; set; }
 
-
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             output.Attributes.Add("data-hood-media", "attach");
@@ -53,7 +50,9 @@ namespace Hood.TagHelpers
             if (!List.IsSet())
             {
                 var _urlHelperFactory = Engine.Services.Resolve<IUrlHelperFactory>();
-                List = _urlHelperFactory.GetUrlHelper(ViewContext).Action("Action", "Media", new{ area = "Admin" });
+                List = _urlHelperFactory
+                    .GetUrlHelper(ViewContext)
+                    .Action("Action", "Media", new { area = "Admin" });
             }
             output.Attributes.Add("data-hood-media-list", List);
 
@@ -98,10 +97,8 @@ namespace Hood.TagHelpers
         [ViewContext]
         public ViewContext ViewContext { get; set; }
 
-
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-
             string fieldName = For.Name;
 
             string fieldDisplayName = For.Name;
@@ -110,7 +107,8 @@ namespace Hood.TagHelpers
 
             string fieldDescription;
             if (For.ModelExplorer.Metadata.Description.IsSet())
-                fieldDescription = $"<small class='form-text text-info'>{For.ModelExplorer.Metadata.Description}</small>";
+                fieldDescription =
+                    $"<small class='form-text text-info'>{For.ModelExplorer.Metadata.Description}</small>";
 
             string fieldId = Guid.NewGuid().ToString();
 
@@ -119,10 +117,13 @@ namespace Hood.TagHelpers
             if (!List.IsSet())
             {
                 var _urlHelperFactory = Engine.Services.Resolve<IUrlHelperFactory>();
-                List = _urlHelperFactory.GetUrlHelper(ViewContext).Action("Action", "Media", new { area = "Admin" });
+                List = _urlHelperFactory
+                    .GetUrlHelper(ViewContext)
+                    .Action("Action", "Media", new { area = "Admin" });
             }
 
-            var template = $@"
+            var template =
+                $@"
 <div class='image-editor mb-3'>
     <div class='row align-items-center'>
         <div class='col-auto' style='width:75px;'>
@@ -154,8 +155,6 @@ namespace Hood.TagHelpers
 </div>";
 
             output.Content.SetHtmlContent(template);
-
         }
     }
-
 }

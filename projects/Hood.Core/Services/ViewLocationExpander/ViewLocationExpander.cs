@@ -1,8 +1,8 @@
+using System.Collections.Generic;
+using System.Linq;
 using Hood.Core;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Mvc.Razor;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Hood.Services
 {
@@ -10,13 +10,14 @@ namespace Hood.Services
     {
         private IEnumerable<string> locs;
 
-        public ViewLocationExpander()
-        {
-        }
+        public ViewLocationExpander() { }
 
         public void PopulateValues(ViewLocationExpanderContext context)
         {
-            string theme = Engine.Services.Installed && Engine.Settings != null ? Engine.Settings["Hood.Settings.Theme"] : null;
+            string theme =
+                Engine.Services.Installed && Engine.Settings != null
+                    ? Engine.Settings["Hood.Settings.Theme"]
+                    : null;
             var temp = new List<string>();
             // Add Themed Area views first.
             if (theme.IsSet())
@@ -58,11 +59,14 @@ namespace Hood.Services
                 baseLocation + "/Shared/{0}.cshtml",
                 baseLocation + "/Templates/{0}.cshtml",
                 baseLocation + "/Components/{1}/{0}.cshtml",
-                baseLocation + "/Components/{0}.cshtml"
+                baseLocation + "/Components/{0}.cshtml",
             };
         }
 
-        public virtual IEnumerable<string> ExpandViewLocations(ViewLocationExpanderContext context, IEnumerable<string> viewLocations)
+        public virtual IEnumerable<string> ExpandViewLocations(
+            ViewLocationExpanderContext context,
+            IEnumerable<string> viewLocations
+        )
         {
             return locs;
         }

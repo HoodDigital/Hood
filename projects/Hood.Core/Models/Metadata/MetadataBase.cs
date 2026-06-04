@@ -1,17 +1,14 @@
-﻿using Hood.Entities;
-using Hood.Extensions;
-using Microsoft.AspNetCore.Html;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Linq;
+using Hood.Entities;
+using Hood.Extensions;
+using Newtonsoft.Json;
 
 namespace Hood.Models
 {
     public abstract class MetadataBase : BaseEntity, IMetadata
     {
-        public MetadataBase()
-        {
-        }
+        public MetadataBase() { }
 
         public string BaseValue { get; internal set; }
         public string Name { get; set; }
@@ -25,7 +22,10 @@ namespace Hood.Models
             {
                 if (IsTemplate)
                 {
-                    string name = Name.Split('.')[Name.Split('.').Length - 2].Replace("-", " ").CamelCaseToString().ToTitleCase();
+                    string name = Name.Split('.')[Name.Split('.').Length - 2]
+                        .Replace("-", " ")
+                        .CamelCaseToString()
+                        .ToTitleCase();
                     return $"{name} - {InputType}";
                 }
 
@@ -44,6 +44,7 @@ namespace Hood.Models
                 return Type;
             }
         }
+
         public void SetValue(string value)
         {
             switch (Type)
@@ -90,15 +91,13 @@ namespace Hood.Models
                         BaseValue = JsonConvert.SerializeObject(0);
                     }
                     break;
-                case "System.String":
-                case "Hood.WYSIWYG":
-                case "Hood.ImageUrl":
-                case "Hood.MultiLineString":
+
                 default:
                     BaseValue = JsonConvert.SerializeObject(value);
                     break;
             }
         }
+
         public override string ToString()
         {
             try
@@ -113,10 +112,13 @@ namespace Hood.Models
                 }
                 else
                 {
-                    return JsonConvert.DeserializeObject<string>(JsonConvert.SerializeObject(BaseValue));
+                    return JsonConvert.DeserializeObject<string>(
+                        JsonConvert.SerializeObject(BaseValue)
+                    );
                 }
             }
         }
+
         public T GetValue<T>()
         {
             try
@@ -132,6 +134,7 @@ namespace Hood.Models
                 return default;
             }
         }
+
         public bool IsTemplate => Name.StartsWith("Template.");
         public bool IsImageSetting => Name.StartsWith("Settings.Image.");
     }

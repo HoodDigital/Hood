@@ -7,26 +7,31 @@ namespace Hood.Models
 {
     public class ContentMedia : MediaBase
     {
-        public ContentMedia() : base()
-        { }
+        public ContentMedia() { }
 
-        public ContentMedia(IMediaObject mediaResult) : base(mediaResult)
-        { }
+        public ContentMedia(IMediaObject mediaResult)
+            : base(mediaResult) { }
 
-        public ContentMedia(string url, string smallUrl = null, string mediumUrl = null, string largeUrl = null, string thumbUrl = null)
-            : base(url, smallUrl, mediumUrl, largeUrl, thumbUrl)
-        {
-        }
+        public ContentMedia(
+            string url,
+            string smallUrl = null,
+            string mediumUrl = null,
+            string largeUrl = null,
+            string thumbUrl = null
+        )
+            : base(url, smallUrl, mediumUrl, largeUrl, thumbUrl) { }
 
         public int ContentId { get; set; }
+
         [JsonIgnore]
         [IgnoreDataMember]
         public Content Content { get; set; }
+
         [NotMapped]
         [JsonIgnore]
         [IgnoreDataMember]
         public ContentView ContentView { get; set; }
 
-        public new static IMediaObject Blank => MediaBase.Blank;
+        public static new IMediaObject Blank => MediaBase.Blank;
     }
 }

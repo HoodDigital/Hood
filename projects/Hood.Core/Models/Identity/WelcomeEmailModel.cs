@@ -1,8 +1,8 @@
-﻿using Hood.Extensions;
-using Hood.Core;
-using SendGrid.Helpers.Mail;
 using System.Collections.Generic;
+using Hood.Core;
+using Hood.Extensions;
 using Hood.Interfaces;
+using SendGrid.Helpers.Mail;
 
 namespace Hood.Models
 {
@@ -23,10 +23,7 @@ namespace Hood.Models
 
         public EmailAddress To
         {
-            get
-            {
-                return new EmailAddress(User.Email, User.ToInternalName());
-            }
+            get { return new EmailAddress(User.Email, User.ToInternalName()); }
         }
 
         public string NotificationTitle { get; set; }
@@ -40,23 +37,39 @@ namespace Hood.Models
             var _accountSettings = Engine.Settings.Account;
 
             if (_accountSettings.WelcomeSubject.IsSet())
-                message.Subject = _accountSettings.WelcomeSubject.ReplaceUserVariables(User).ReplaceSiteVariables();
+                message.Subject = _accountSettings
+                    .WelcomeSubject.ReplaceUserVariables(User)
+                    .ReplaceSiteVariables();
             else
-                message.Subject = "Your new account on {Site.Title}.".ReplaceUserVariables(User).ReplaceSiteVariables();
+                message.Subject = "Your new account on {Site.Title}."
+                    .ReplaceUserVariables(User)
+                    .ReplaceSiteVariables();
 
             if (_accountSettings.WelcomeTitle.IsSet())
-                message.PreHeader = _accountSettings.WelcomeTitle.ReplaceUserVariables(User).ReplaceSiteVariables();
+                message.PreHeader = _accountSettings
+                    .WelcomeTitle.ReplaceUserVariables(User)
+                    .ReplaceSiteVariables();
             else
                 message.PreHeader = "Your new account.";
 
             if (_accountSettings.WelcomeMessage.IsSet())
-                message.AddDiv(_accountSettings.WelcomeMessage.ReplaceUserVariables(User).ReplaceSiteVariables());
+                message.AddDiv(
+                    _accountSettings
+                        .WelcomeMessage.ReplaceUserVariables(User)
+                        .ReplaceSiteVariables()
+                );
             else
-                message.AddParagraph("Thank you for creating an account on {Site.Title}".ReplaceUserVariables(User).ReplaceSiteVariables());
+                message.AddParagraph(
+                    "Thank you for creating an account on {Site.Title}"
+                        .ReplaceUserVariables(User)
+                        .ReplaceSiteVariables()
+                );
 
             message.AddParagraph("Your username: <strong>" + User.UserName + "</strong>");
 
-            message.AddParagraph("You can log in and access your account by clicking the link below.");
+            message.AddParagraph(
+                "You can log in and access your account by clicking the link below."
+            );
             message.AddCallToAction("Access your account", LoginLink);
 
             return message;

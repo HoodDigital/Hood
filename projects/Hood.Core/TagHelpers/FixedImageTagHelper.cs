@@ -1,4 +1,4 @@
-﻿using Hood.Core;
+using Hood.Core;
 using Hood.Extensions;
 using Hood.Models;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -23,9 +23,7 @@ namespace Hood.TagHelpers
         [HtmlAttributeName("color")]
         public string Colour { get; set; }
 
-        public FixedImageTagHelper()
-        {
-        }
+        public FixedImageTagHelper() { }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
@@ -60,7 +58,10 @@ namespace Hood.TagHelpers
             output.Attributes.SetAttribute("style", styleValue);
 
             if (output.Attributes.ContainsName("class"))
-                output.Attributes.SetAttribute("class", $"{output.Attributes["class"].Value} hood-image");
+                output.Attributes.SetAttribute(
+                    "class",
+                    $"{output.Attributes["class"].Value} hood-image"
+                );
             else
                 output.Attributes.SetAttribute("class", $"hood-image");
 

@@ -2,9 +2,6 @@
 {
     public class PropertyController : Hood.BaseControllers.PropertyController
     {
-        public PropertyController()
-            : base()
-        { }
-
+        public PropertyController() { }
     }
 }

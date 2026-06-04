@@ -1,6 +1,5 @@
-﻿using Hood.Core;
+﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Data.SqlClient;
 
 namespace Hood.Extensions
 {
@@ -8,12 +7,16 @@ namespace Hood.Extensions
     {
         public static bool IsDatabaseConnected(this IConfiguration config)
         {
-            return config.CheckConfiguration("ConnectionString", "ConnectionStrings:DefaultConnection");
+            return config.CheckConfiguration(
+                "ConnectionString",
+                "ConnectionStrings:DefaultConnection"
+            );
         }
 
         public static SqlConnectionStringBuilder GetConnectionSettings(this IConfiguration config)
         {
-            string conString = "SERVER=localhost;DATABASE=tree;UID=root;PASSWORD=branch;Min Pool Size = 0;Max Pool Size=200";
+            string conString =
+                "SERVER=localhost;DATABASE=tree;UID=root;PASSWORD=branch;Min Pool Size = 0;Max Pool Size=200";
             if (config.IsDatabaseConnected())
             {
                 conString = config["ConnectionStrings:DefaultConnection"];
@@ -22,7 +25,11 @@ namespace Hood.Extensions
             return new SqlConnectionStringBuilder(conString);
         }
 
-        private static bool CheckConfiguration(this IConfiguration config, string flag, params string[] keys)
+        private static bool CheckConfiguration(
+            this IConfiguration config,
+            string flag,
+            params string[] keys
+        )
         {
             foreach (string key in keys)
             {
@@ -44,6 +51,5 @@ namespace Hood.Extensions
 
             return false;
         }
-
     }
 }

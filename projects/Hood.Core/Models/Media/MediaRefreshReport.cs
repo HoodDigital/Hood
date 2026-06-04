@@ -1,4 +1,4 @@
-﻿namespace Hood.Models
+namespace Hood.Models
 {
     public class MediaRefreshReport
     {
@@ -10,5 +10,4 @@
         public bool Succeeded { get; internal set; }
         public bool HasRun { get; internal set; }
     }
-
 }

@@ -14,6 +14,7 @@ namespace Hood.Services
         {
             GenerateSalt();
         }
+
         public PasswordHasher(string base64Salt)
         {
             DecodeSalt(base64Salt);
@@ -28,6 +29,7 @@ namespace Hood.Services
             }
             Base64Salt = Convert.ToBase64String(Salt);
         }
+
         private void DecodeSalt(string base64Salt)
         {
             Base64Salt = base64Salt;
@@ -36,12 +38,15 @@ namespace Hood.Services
 
         public PasswordHasher HashPasswordWithSalt(string password)
         {
-            HashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: password,
-                salt: Salt,
-                prf: KeyDerivationPrf.HMACSHA256,
-                iterationCount: 100000,
-                numBytesRequested: 256 / 8));
+            HashedPassword = Convert.ToBase64String(
+                KeyDerivation.Pbkdf2(
+                    password: password,
+                    salt: Salt,
+                    prf: KeyDerivationPrf.HMACSHA256,
+                    iterationCount: 100000,
+                    numBytesRequested: 256 / 8
+                )
+            );
             return this;
         }
     }

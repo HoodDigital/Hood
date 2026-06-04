@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Razor.TagHelpers;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Reflection;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Hood.TagHelpers
 {
@@ -20,9 +19,7 @@ namespace Hood.TagHelpers
         {
             base.Process(context, output);
 
-            var property = For.Metadata
-                            .ContainerType
-                            .GetProperty(For.Metadata.Name);
+            var property = For.Metadata.ContainerType.GetProperty(For.Metadata.Name);
 
             var required = Attribute.IsDefined(property, typeof(RequiredAttribute));
 
@@ -36,7 +33,7 @@ namespace Hood.TagHelpers
                 {
                     output.Attributes.SetAttribute("required", "required");
                 }
-            } 
+            }
             else
             {
                 if (output.Attributes.ContainsName("required"))

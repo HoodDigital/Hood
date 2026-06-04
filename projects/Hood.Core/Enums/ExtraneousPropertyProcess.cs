@@ -1,10 +1,10 @@
-﻿namespace Hood.Enums
+namespace Hood.Enums
 {
     public enum ExtraneousPropertyProcess
     {
         StatusDelete,
         StatusArchive,
         LeaseStatusLetSold,
-        Delete
+        Delete,
     }
 }

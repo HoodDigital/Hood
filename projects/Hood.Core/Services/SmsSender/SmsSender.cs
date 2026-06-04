@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 
 namespace Hood.Services
@@ -15,7 +15,6 @@ namespace Hood.Services
             return null;
         }
 
-        public SmsSenderOptions Options { get; }  // set only via Secret Manager
-
+        public SmsSenderOptions Options { get; } // set only via Secret Manager
     }
 }

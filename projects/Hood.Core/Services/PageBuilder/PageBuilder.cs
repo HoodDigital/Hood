@@ -1,4 +1,10 @@
-﻿using BundlerMinifier;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using BundlerMinifier;
 using Hood.Caching;
 using Hood.Enums;
 using Hood.Extensions;
@@ -6,12 +12,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Hood.Services
 {
@@ -35,7 +35,13 @@ namespace Hood.Services
             _bundleFileProcessor = new BundleFileProcessor();
         }
 
-        public virtual void AddScript(ResourceLocation location, string src, bool bundle, bool isAsync, bool isDefer)
+        public virtual void AddScript(
+            ResourceLocation location,
+            string src,
+            bool bundle,
+            bool isAsync,
+            bool isDefer
+        )
         {
             if (!_scripts.ContainsKey(location))
                 _scripts.Add(location, new List<FileReferenceMetadata>());
@@ -43,14 +49,18 @@ namespace Hood.Services
             if (string.IsNullOrEmpty(src))
                 return;
 
-            _scripts[location].Add(new FileReferenceMetadata
-            {
-                Bundle = bundle,
-                IsAsync = isAsync,
-                IsDefer = isDefer,
-                Src = src
-            });
+            _scripts[location]
+                .Add(
+                    new FileReferenceMetadata
+                    {
+                        Bundle = bundle,
+                        IsAsync = isAsync,
+                        IsDefer = isDefer,
+                        Src = src,
+                    }
+                );
         }
+
         public virtual void AddInlineScript(ResourceLocation location, string script)
         {
             if (!_inlineScripts.ContainsKey(location))
@@ -61,9 +71,14 @@ namespace Hood.Services
 
             _inlineScripts[location].Add(script);
         }
+
         private static readonly object accessLock = new object();
 
-        public virtual string GenerateScripts(IUrlHelper urlHelper, ResourceLocation location, bool bundleScripts = true)
+        public virtual string GenerateScripts(
+            IUrlHelper urlHelper,
+            ResourceLocation location,
+            bool bundleScripts = true
+        )
         {
             if (!_scripts.ContainsKey(location) || _scripts[location] == null)
                 return "";
@@ -73,10 +88,7 @@ namespace Hood.Services
 
             if (bundleScripts && _hostingEnvironment.EnvironmentName != "Development")
             {
-                var partsToBundle = _scripts[location]
-                    .Where(x => x.Bundle)
-                    .Distinct()
-                    .ToArray();
+                var partsToBundle = _scripts[location].Where(x => x.Bundle).Distinct().ToArray();
                 var partsToDontBundle = _scripts[location]
                     .Where(x => !x.Bundle)
                     .Distinct()
@@ -99,7 +111,10 @@ namespace Hood.Services
                             continue;
                         }
 
-                        new PathString(urlHelper.Content(item.Src)).StartsWithSegments(urlHelper.ActionContext.HttpContext.Request.PathBase, out PathString path);
+                        new PathString(urlHelper.Content(item.Src)).StartsWithSegments(
+                            urlHelper.ActionContext.HttpContext.Request.PathBase,
+                            out PathString path
+                        );
 
                         var src = path.Value.TrimStart('/');
                         if (!File.Exists(_hostingEnvironment.WebRootPath + src))
@@ -111,7 +126,8 @@ namespace Hood.Services
                     var bundleSha256 = GetBundleSha256(partsToBundle.Select(x => x.Src).ToArray());
                     bundle.OutputFileName = $"wwwroot/bundles/" + bundleSha256 + ".js";
 
-                    bundle.FileName = _hostingEnvironment.ContentRootPath + "\\" + bundleSha256 + ".json";
+                    bundle.FileName =
+                        _hostingEnvironment.ContentRootPath + "\\" + bundleSha256 + ".json";
                     bool minified = true;
                     lock (accessLock)
                     {
@@ -121,17 +137,31 @@ namespace Hood.Services
                         {
                             BundleMinifier.ErrorMinifyingFile += BundleMinifier_ErrorMinifyingFile;
 
-                            minified = _bundleFileProcessor.Process(bundle.FileName, new List<Bundle> { bundle });
+                            minified = _bundleFileProcessor.Process(
+                                bundle.FileName,
+                                new List<Bundle> { bundle }
+                            );
                             _cache.Add(cacheKey, false, new TimeSpan(2, 0, 0));
                         }
                     }
 
-                    result.AppendFormat("<script id=\"hood-{1}\" src=\"{0}\"></script>", urlHelper.Content("~/bundles/" + bundleSha256 + (minified ? ".min.js" : ".js")), location.ToString().ToSentenceCase().ToSeoUrl());
+                    result.AppendFormat(
+                        "<script id=\"hood-{1}\" src=\"{0}\"></script>",
+                        urlHelper.Content(
+                            "~/bundles/" + bundleSha256 + (minified ? ".min.js" : ".js")
+                        ),
+                        location.ToString().ToSentenceCase().ToSeoUrl()
+                    );
                     result.Append(Environment.NewLine);
                 }
                 foreach (var item in partsToDontBundle)
                 {
-                    result.AppendFormat("<script {1}{2}src=\"{0}\"></script>", urlHelper.Content(item.Src), item.IsAsync ? "async " : "", item.IsDefer ? "defer " : "");
+                    result.AppendFormat(
+                        "<script {1}{2}src=\"{0}\"></script>",
+                        urlHelper.Content(item.Src),
+                        item.IsAsync ? "async " : "",
+                        item.IsDefer ? "defer " : ""
+                    );
                     result.Append(Environment.NewLine);
                 }
                 return result.ToString();
@@ -142,7 +172,12 @@ namespace Hood.Services
                 var result = new StringBuilder();
                 foreach (var item in _scripts[location].Distinct())
                 {
-                    result.AppendFormat("<script {1}{2}src=\"{0}\"></script>", urlHelper.Content(item.Src), item.IsAsync ? "async " : "", item.IsDefer ? "defer " : "");
+                    result.AppendFormat(
+                        "<script {1}{2}src=\"{0}\"></script>",
+                        urlHelper.Content(item.Src),
+                        item.IsAsync ? "async " : "",
+                        item.IsDefer ? "defer " : ""
+                    );
                     result.Append(Environment.NewLine);
                 }
                 return result.ToString();
@@ -151,14 +186,22 @@ namespace Hood.Services
 
         private void BundleMinifier_ErrorMinifyingFile(object sender, MinifyFileEventArgs e)
         {
-            var logger = Hood.Core.Engine.Services.Resolve<ILogService>();
-            var logWriter = new System.IO.StringWriter();
-            logWriter.WriteLine($"Bundle errors from {e.Result.FileName} - {DateTime.UtcNow.ToDisplay()}");
+            var logger = Core.Engine.Services.Resolve<ILogService>();
+            var logWriter = new StringWriter();
+            logWriter.WriteLine(
+                $"Bundle errors from {e.Result.FileName} - {DateTime.UtcNow.ToDisplay()}"
+            );
             foreach (var error in e.Result.Errors)
             {
-                logWriter.WriteLine($"Line {error.LineNumber} and column {error.ColumnNumber}: {error.Message}");
+                logWriter.WriteLine(
+                    $"Line {error.LineNumber} and column {error.ColumnNumber}: {error.Message}"
+                );
             }
-            logger.AddLogAsync<PageBuilder>($"Bundle errors from {e.Result.FileName}", logWriter.ToString(), Models.LogType.Error);
+            logger.AddLogAsync<PageBuilder>(
+                $"Bundle errors from {e.Result.FileName}",
+                logWriter.ToString(),
+                Models.LogType.Error
+            );
             logWriter.Dispose();
         }
 
@@ -198,5 +241,4 @@ namespace Hood.Services
             return hash.ToSeoUrl();
         }
     }
-
 }

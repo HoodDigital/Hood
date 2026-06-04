@@ -1,17 +1,15 @@
-﻿using Hood.Caching;
+﻿using System;
+using System.Threading.Tasks;
+using Hood.Caching;
 using Hood.Core;
 using Hood.Enums;
-using Hood.Extensions;
 using Hood.Filters;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Threading.Tasks;
 
 namespace Hood.BaseControllers
 {
@@ -35,6 +33,7 @@ namespace Hood.BaseControllers
 
         [TempData]
         public string SaveMessage { get; set; }
+
         [TempData]
         public AlertType MessageType { get; set; }
 
@@ -66,6 +65,7 @@ namespace Hood.BaseControllers
             SaveMessage = null;
             return base.View(model);
         }
+
         protected virtual ViewResult View(string viewName, ISaveableModel model)
         {
             model.MessageType = MessageType;
@@ -74,22 +74,43 @@ namespace Hood.BaseControllers
             return base.View(viewName, model);
         }
 
-        protected virtual async Task<Response> SuccessResponseAsync<TSource>(string successMessage, string title = null)
+        protected virtual async Task<Response> SuccessResponseAsync<TSource>(
+            string successMessage,
+            string title = null
+        )
         {
             await _logService.AddLogAsync<TSource>(successMessage, type: LogType.Success);
             return new Response(true, successMessage, title);
         }
-        protected virtual async Task<Response> SuccessResponseAsync<TSource>(string successMessage, object logObject, string title = null)
+
+        protected virtual async Task<Response> SuccessResponseAsync<TSource>(
+            string successMessage,
+            object logObject,
+            string title = null
+        )
         {
-            await _logService.AddLogAsync<TSource>(successMessage, logObject, type: LogType.Success);
+            await _logService.AddLogAsync<TSource>(
+                successMessage,
+                logObject,
+                type: LogType.Success
+            );
             return new Response(true, successMessage, title);
         }
-        protected virtual async Task<Response> ErrorResponseAsync<TSource>(string errorMessage, Exception ex)
+
+        protected virtual async Task<Response> ErrorResponseAsync<TSource>(
+            string errorMessage,
+            Exception ex
+        )
         {
             await _logService.AddExceptionAsync<TSource>(errorMessage, ex);
             return new Response(ex, errorMessage);
         }
-        protected virtual async Task<Response> ErrorResponseAsync<TSource>(string errorMessage, Exception ex, object logObject)
+
+        protected virtual async Task<Response> ErrorResponseAsync<TSource>(
+            string errorMessage,
+            Exception ex,
+            object logObject
+        )
         {
             await _logService.AddExceptionAsync<TSource>(errorMessage, logObject, ex);
             return new Response(ex, errorMessage);

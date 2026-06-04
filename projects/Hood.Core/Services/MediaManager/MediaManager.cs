@@ -1,4 +1,9 @@
-﻿using Azure.Storage.Blobs;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Specialized;
 using Hood.Core;
 using Hood.Enums;
@@ -13,12 +18,6 @@ using Newtonsoft.Json;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Processing;
-using System;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace Hood.Services
 {
@@ -48,20 +47,26 @@ namespace Hood.Services
                 DbContextOptionsBuilder<HoodDbContext> options = new();
                 options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
                 HoodDbContext db = new(options.Options);
-                Option option = db.Options.SingleOrDefault(o => o.Id == typeof(MediaSettings).ToString());
+                Option option = db.Options.SingleOrDefault(o =>
+                    o.Id == typeof(MediaSettings).ToString()
+                );
                 _mediaSettings = JsonConvert.DeserializeObject<MediaSettings>(option.Value);
             }
 
             _container = _mediaSettings.ContainerName.ToSeoUrl();
             if (!_container.IsSet())
             {
-                throw new Exception("Storage account is not set up, please go to your administration panel, and visit Settings > Media Settings, and ensure you have set a storage connection string.");
+                throw new Exception(
+                    "Storage account is not set up, please go to your administration panel, and visit Settings > Media Settings, and ensure you have set a storage connection string."
+                );
             }
 
             _key = _mediaSettings.AzureKey;
             if (!_key.IsSet())
             {
-                throw new Exception("Storage account is not set up, please go to your administration panel, and visit Settings > Media Settings, and ensure you have set a valid container name.");
+                throw new Exception(
+                    "Storage account is not set up, please go to your administration panel, and visit Settings > Media Settings, and ensure you have set a valid container name."
+                );
             }
 
             BlobContainerClient blobContainerClient = new(_key, _container);
@@ -69,11 +74,12 @@ namespace Hood.Services
             if (!await blobContainerClient.ExistsAsync())
             {
                 await blobContainerClient.CreateIfNotExistsAsync();
-                await blobContainerClient.SetAccessPolicyAsync(Azure.Storage.Blobs.Models.PublicAccessType.BlobContainer);
+                await blobContainerClient.SetAccessPolicyAsync(
+                    Azure.Storage.Blobs.Models.PublicAccessType.BlobContainer
+                );
             }
 
             return blobContainerClient;
-
         }
 
         #region "Helpers"
@@ -110,7 +116,9 @@ namespace Hood.Services
             filename = filename.Trim(Path.GetInvalidFileNameChars());
             filename = filename.Trim(Path.GetInvalidPathChars());
             filename = filename.Replace("%", "");
-            filename = Path.GetFileNameWithoutExtension(filename).ToAzureFilename() + Path.GetExtension(filename);
+            filename =
+                Path.GetFileNameWithoutExtension(filename).ToAzureFilename()
+                + Path.GetExtension(filename);
             return filename;
         }
 
@@ -128,7 +136,6 @@ namespace Hood.Services
             }
         }
 
-
         public async Task<bool> Exists(string directory, string filename)
         {
             return await Exists(GetBlobReference(directory, filename));
@@ -140,10 +147,12 @@ namespace Hood.Services
             BlockBlobClient blockBlob = client.GetBlockBlobClient(blobReference);
             return await blockBlob.DeleteIfExistsAsync();
         }
+
         public async Task<bool> Delete(string directory, string filename)
         {
             return await Delete(GetBlobReference(directory, filename));
         }
+
         public async Task<bool> Remove(string blobReference)
         {
             // if there is an old file
@@ -153,7 +162,11 @@ namespace Hood.Services
             }
 
             // check if it is a full url - if so strip the bollocks.
-            bool result = Uri.TryCreate(blobReference, UriKind.Absolute, out Uri uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+            bool result =
+                Uri.TryCreate(blobReference, UriKind.Absolute, out Uri uriResult)
+                && (
+                    uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps
+                );
             if (result)
             {
                 blobReference = uriResult.PathAndQuery.Replace("/" + _container, "").TrimStart('/');
@@ -192,12 +205,15 @@ namespace Hood.Services
             IMediaObject media = new MediaObject
             {
                 Filename = file.GetFilename(),
-                BlobReference = GetBlobReference(directoryPath, await GetSafeFilename(directoryPath, file.GetFilename())),
+                BlobReference = GetBlobReference(
+                    directoryPath,
+                    await GetSafeFilename(directoryPath, file.GetFilename())
+                ),
                 UniqueId = Guid.NewGuid().ToString(),
                 CreatedOn = DateTime.UtcNow,
                 FileSize = file.Length,
                 FileType = file.ContentType,
-                Path = directoryPath
+                Path = directoryPath,
             };
             media.GenericFileType = media.FileType.ToFileType();
 
@@ -218,14 +234,24 @@ namespace Hood.Services
 
             return media;
         }
-        public async Task<IMediaObject> ProcessUpload(Stream file, string filename, string filetype, long size, string directoryPath)
+
+        public async Task<IMediaObject> ProcessUpload(
+            Stream file,
+            string filename,
+            string filetype,
+            long size,
+            string directoryPath
+        )
         {
             IMediaObject media = new MediaObject
             {
                 Filename = filename,
-                BlobReference = GetBlobReference(directoryPath, await GetSafeFilename(directoryPath, filename)),
+                BlobReference = GetBlobReference(
+                    directoryPath,
+                    await GetSafeFilename(directoryPath, filename)
+                ),
                 UniqueId = Guid.NewGuid().ToString(),
-                Path = directoryPath
+                Path = directoryPath,
             };
 
             // Upload the media, filename as the name, check it doesn't already exist first.
@@ -255,7 +281,7 @@ namespace Hood.Services
         {
             HttpClient client = new HttpClient();
             var response = await client.GetAsync(media.Url);
-            using (var fs = new System.IO.MemoryStream())
+            using (var fs = new MemoryStream())
             {
                 await response.Content.CopyToAsync(fs);
                 media.ThumbUrl = await GenerateThumb(media, fs, ".xs", 250);
@@ -266,7 +292,12 @@ namespace Hood.Services
             return media;
         }
 
-        private async Task<string> GenerateThumb(IMediaObject media, Stream stream, string prefix, int size)
+        private async Task<string> GenerateThumb(
+            IMediaObject media,
+            Stream stream,
+            string prefix,
+            int size
+        )
         {
             try
             {
@@ -282,9 +313,11 @@ namespace Hood.Services
                     // now lives on Metadata, and Save takes an encoder rather than a format (HOOD-57).
                     IImageFormat format = image.Metadata.DecodedImageFormat;
                     image.Mutate(x => x.Resize(size, 0));
-                    using (Stream outputStream = new System.IO.MemoryStream())
+                    using (Stream outputStream = new MemoryStream())
                     {
-                        IImageEncoder encoder = image.Configuration.ImageFormatsManager.GetEncoder(format);
+                        IImageEncoder encoder = image.Configuration.ImageFormatsManager.GetEncoder(
+                            format
+                        );
                         image.Save(outputStream, encoder);
                         outputStream.Position = 0;
                         var blob = await Upload(outputStream, thumbBlobReference);
@@ -305,11 +338,31 @@ namespace Hood.Services
         {
             if (media != null)
             {
-                try { await Delete(media.BlobReference); } catch (Exception) { }
-                try { await Remove(media.SmallUrl); } catch (Exception) { }
-                try { await Remove(media.MediumUrl); } catch (Exception) { }
-                try { await Remove(media.LargeUrl); } catch (Exception) { }
-                try { await Remove(media.ThumbUrl); } catch (Exception) { }
+                try
+                {
+                    await Delete(media.BlobReference);
+                }
+                catch (Exception) { }
+                try
+                {
+                    await Remove(media.SmallUrl);
+                }
+                catch (Exception) { }
+                try
+                {
+                    await Remove(media.MediumUrl);
+                }
+                catch (Exception) { }
+                try
+                {
+                    await Remove(media.LargeUrl);
+                }
+                catch (Exception) { }
+                try
+                {
+                    await Remove(media.ThumbUrl);
+                }
+                catch (Exception) { }
             }
         }
 

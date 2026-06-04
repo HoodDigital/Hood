@@ -1,9 +1,8 @@
-﻿namespace Hood.Models
+namespace Hood.Models
 {
     public enum PropertyImporterMethod
     {
         FtpBlm,
-        Directory
+        Directory,
     }
 }
-

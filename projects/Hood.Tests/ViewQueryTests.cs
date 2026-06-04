@@ -23,8 +23,8 @@ namespace Hood.Tests
             Skip.IfNot(_db.Available, _db.UnavailableReason);
 
             using var ctx = _db.NewContent();
-            var rows = ctx.ContentViews
-                .Include(c => c.Metadata)
+            var rows = ctx
+                .ContentViews.Include(c => c.Metadata)
                 .Include(c => c.Categories)
                 .Include(c => c.Media)
                 .Take(5)
@@ -39,8 +39,8 @@ namespace Hood.Tests
             Skip.IfNot(_db.Available, _db.UnavailableReason);
 
             using var ctx = _db.NewProperty();
-            var rows = ctx.PropertyViews
-                .Include(p => p.Metadata)
+            var rows = ctx
+                .PropertyViews.Include(p => p.Metadata)
                 .Include(p => p.Media)
                 .Include(p => p.FloorPlans)
                 .Take(5)

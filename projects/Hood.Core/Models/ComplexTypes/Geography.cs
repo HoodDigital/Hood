@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,7 +14,10 @@ namespace Hood.Models
 
         public double Latitude { get; set; }
         public double Longitude { get; set; }
-        public bool IsVald { get { return !((Latitude == 0) || (Longitude == 0)); } } 
+        public bool IsVald
+        {
+            get { return !((Latitude == 0) || (Longitude == 0)); }
+        }
     }
 
     public static class GeoCalculations
@@ -29,13 +32,20 @@ namespace Hood.Models
 
         public static double CalcDistance(GeoCoordinate from, GeoCoordinate to, GeoMeasurement unit)
         {
-            double dist = (Math.Acos(
-                Math.Sin(to.Latitude * Math.PI / 180.0) *
-                Math.Sin(from.Latitude * Math.PI / 180.0) +
-                Math.Cos(to.Latitude * Math.PI / 180.0) *
-                Math.Cos(from.Latitude * Math.PI / 180.0) *
-                Math.Cos((to.Longitude - from.Longitude) * Math.PI / 180.0)
-            ) / Math.PI * 180.0) * 60 * 1.1515;
+            double dist =
+                (
+                    Math.Acos(
+                        Math.Sin(to.Latitude * Math.PI / 180.0)
+                            * Math.Sin(from.Latitude * Math.PI / 180.0)
+                            + Math.Cos(to.Latitude * Math.PI / 180.0)
+                                * Math.Cos(from.Latitude * Math.PI / 180.0)
+                                * Math.Cos((to.Longitude - from.Longitude) * Math.PI / 180.0)
+                    )
+                    / Math.PI
+                    * 180.0
+                )
+                * 60
+                * 1.1515;
             if (unit == GeoMeasurement.Kilometers)
             {
                 dist = dist * 1.609344;
@@ -47,7 +57,9 @@ namespace Hood.Models
             return (dist);
         }
 
-        public static GeoCoordinate GetCentralGeoCoordinate(IEnumerable<GeoCoordinate> geoCoordinates)
+        public static GeoCoordinate GetCentralGeoCoordinate(
+            IEnumerable<GeoCoordinate> geoCoordinates
+        )
         {
             if (geoCoordinates.Count() == 1)
             {
@@ -78,7 +90,10 @@ namespace Hood.Models
             var centralSquareRoot = Math.Sqrt(x * x + y * y);
             var centralLatitude = Math.Atan2(z, centralSquareRoot);
 
-            return new GeoCoordinate(centralLatitude * 180 / Math.PI, centralLongitude * 180 / Math.PI);
+            return new GeoCoordinate(
+                centralLatitude * 180 / Math.PI,
+                centralLongitude * 180 / Math.PI
+            );
         }
     }
 
@@ -86,8 +101,6 @@ namespace Hood.Models
     {
         Miles = 0,
         Kilometers = 1,
-        NauticalMiles = 2
+        NauticalMiles = 2,
     }
-
-
 }

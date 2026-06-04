@@ -1,16 +1,15 @@
-﻿using Hood.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Hood.Extensions;
 
 namespace Hood.Core
 {
     public class TypeFinder : ITypeFinder
     {
-        public TypeFinder()
-        { }
+        public TypeFinder() { }
 
         #region Methods
 
@@ -34,16 +33,20 @@ namespace Hood.Core
                     {
                         types = a.GetTypes();
                     }
-                    catch
-                    {
-                    }
+                    catch { }
 
                     if (types == null)
                         continue;
 
                     foreach (var t in types)
                     {
-                        if (!assignTypeFrom.IsAssignableFrom(t) && (!assignTypeFrom.IsGenericTypeDefinition || !t.Implements(assignTypeFrom)))
+                        if (
+                            !assignTypeFrom.IsAssignableFrom(t)
+                            && (
+                                !assignTypeFrom.IsGenericTypeDefinition
+                                || !t.Implements(assignTypeFrom)
+                            )
+                        )
                             continue;
 
                         if (t.IsInterface)
@@ -88,7 +91,13 @@ namespace Hood.Core
             var assemblies = new List<Assembly>();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                if (Regex.IsMatch(assembly.FullName, IngoreAssemblies, RegexOptions.IgnoreCase | RegexOptions.Compiled))
+                if (
+                    Regex.IsMatch(
+                        assembly.FullName,
+                        IngoreAssemblies,
+                        RegexOptions.IgnoreCase | RegexOptions.Compiled
+                    )
+                )
                     continue;
 
                 if (added.Contains(assembly.FullName))
@@ -105,7 +114,8 @@ namespace Hood.Core
         #region Properties
 
         /// <summary>Gets the pattern for dlls that we know don't need to be investigated.</summary>
-        public string IngoreAssemblies { get; set; } = "^System|^mscorlib|^Microsoft|^AjaxControlToolkit|^Antlr3|^Autofac|^AutoMapper|^Castle|^ComponentArt|^CppCodeProvider|^DotNetOpenAuth|^EntityFramework|^EPPlus|^FluentValidation|^ImageResizer|^itextsharp|^log4net|^MaxMind|^MbUnit|^MiniProfiler|^Mono.Math|^MvcContrib|^Newtonsoft|^NHibernate|^nunit|^Org.Mentalis|^PerlRegex|^QuickGraph|^Recaptcha|^Remotion|^RestSharp|^Rhino|^Telerik|^Iesi|^TestDriven|^TestFu|^UserAgentStringLibrary|^VJSharpCodeProvider|^WebActivator|^WebDev|^WebGrease";
+        public string IngoreAssemblies { get; set; } =
+            "^System|^mscorlib|^Microsoft|^AjaxControlToolkit|^Antlr3|^Autofac|^AutoMapper|^Castle|^ComponentArt|^CppCodeProvider|^DotNetOpenAuth|^EntityFramework|^EPPlus|^FluentValidation|^ImageResizer|^itextsharp|^log4net|^MaxMind|^MbUnit|^MiniProfiler|^Mono.Math|^MvcContrib|^Newtonsoft|^NHibernate|^nunit|^Org.Mentalis|^PerlRegex|^QuickGraph|^Recaptcha|^Remotion|^RestSharp|^Rhino|^Telerik|^Iesi|^TestDriven|^TestFu|^UserAgentStringLibrary|^VJSharpCodeProvider|^WebActivator|^WebDev|^WebGrease";
 
         #endregion
     }

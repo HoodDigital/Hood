@@ -1,4 +1,4 @@
-﻿using Hood.Extensions;
+using Hood.Extensions;
 
 namespace Hood.Interfaces
 {
@@ -29,6 +29,7 @@ namespace Hood.Interfaces
                 return name.DisplayName;
             return name.ToInternalName();
         }
+
         public static string ToInternalName(this IName name)
         {
             if (name.FirstName.IsSet() && name.LastName.IsSet())
@@ -37,7 +38,8 @@ namespace Hood.Interfaces
                 return name.FirstName;
             else if (!name.FirstName.IsSet() && name.LastName.IsSet())
                 return name.LastName;
-            else return "";
+            else
+                return "";
         }
     }
 }

@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Hood.Models
 {
-
     public class ContentBlockSettings
     {
         public string Description { get; set; }
@@ -18,5 +17,4 @@ namespace Hood.Models
         public KeyValuePair<string, string>[] Values { get; set; }
         public string Value { get; set; }
     }
-
 }

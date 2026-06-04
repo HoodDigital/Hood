@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using Hood.Interfaces;
+﻿using System.Collections.Generic;
 
 namespace Hood.ViewModels
 {
-    public class RoleListModel<TRole> : PagedList<TRole>, IPageableModel
-    {        
-        public RoleListModel()
-        { }
+    public class RoleListModel<TRole> : PagedList<TRole>
+    {
+        public RoleListModel() { }
     }
 }

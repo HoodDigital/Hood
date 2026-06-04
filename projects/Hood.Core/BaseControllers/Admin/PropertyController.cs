@@ -1,21 +1,18 @@
-﻿using Geocoding.Google;
-using Hood.Contexts;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Geocoding.Google;
 using Hood.BaseControllers;
+using Hood.Contexts;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Hood.Admin.BaseControllers
 {
@@ -27,7 +24,6 @@ namespace Hood.Admin.BaseControllers
         protected readonly IHoodAccountRepository _account;
 
         public BasePropertyController()
-            : base()
         {
             _property = Engine.Services.Resolve<IPropertyRepository>();
             _propertyDb = Engine.Services.Resolve<PropertyContext>();
@@ -42,7 +38,10 @@ namespace Hood.Admin.BaseControllers
         }
 
         [Route("admin/property/list/")]
-        public virtual async Task<IActionResult> List(PropertyListModel model, string viewName = "_List_Property")
+        public virtual async Task<IActionResult> List(
+            PropertyListModel model,
+            string viewName = "_List_Property"
+        )
         {
             PropertySettings propertySettings = Engine.Settings.Property;
             if (!propertySettings.Enabled || !propertySettings.ShowList)
@@ -69,8 +68,8 @@ namespace Hood.Admin.BaseControllers
         {
             try
             {
-                PropertyListing modelToUpdate = await _propertyDb.Properties
-                    .Include(p => p.Media)
+                PropertyListing modelToUpdate = await _propertyDb
+                    .Properties.Include(p => p.Media)
                     .Include(p => p.FloorPlans)
                     .Include(p => p.Metadata)
                     .FirstOrDefaultAsync(c => c.Id == model.Id);
@@ -87,7 +86,6 @@ namespace Hood.Admin.BaseControllers
                     var StatusMessage = "";
                     try
                     {
-
                         try
                         {
                             GoogleAddress address = _address.GeocodeAddress(modelToUpdate);
@@ -104,7 +102,11 @@ namespace Hood.Admin.BaseControllers
                             }
                             StatusMessage = "There was an error GeoLocating the property.";
                             ModelState.AddModelError("GeoCoding", StatusMessage);
-                            await _logService.AddExceptionAsync<BasePropertyController>(StatusMessage, ex, LogType.Warning);
+                            await _logService.AddExceptionAsync<BasePropertyController>(
+                                StatusMessage,
+                                ex,
+                                LogType.Warning
+                            );
                         }
                     }
                     catch (GoogleGeocodingException ex)
@@ -112,23 +114,40 @@ namespace Hood.Admin.BaseControllers
                         switch (ex.Status)
                         {
                             case GoogleStatus.RequestDenied:
-                                StatusMessage = "There was an error with the Google API [RequestDenied] this means your API account is not activated for Geocoding Requests.";
+                                StatusMessage =
+                                    "There was an error with the Google API [RequestDenied] this means your API account is not activated for Geocoding Requests.";
                                 ModelState.AddModelError("GeoCoding", StatusMessage);
-                                await _logService.AddExceptionAsync<BasePropertyController>(StatusMessage, ex, LogType.Warning);
+                                await _logService.AddExceptionAsync<BasePropertyController>(
+                                    StatusMessage,
+                                    ex,
+                                    LogType.Warning
+                                );
                                 break;
                             case GoogleStatus.OverQueryLimit:
-                                StatusMessage = "There was an error with the Google API [OverQueryLimit] this means your API account is has run out of Geocoding Requests.";
+                                StatusMessage =
+                                    "There was an error with the Google API [OverQueryLimit] this means your API account is has run out of Geocoding Requests.";
                                 ModelState.AddModelError("GeoCoding", StatusMessage);
-                                await _logService.AddExceptionAsync<BasePropertyController>(StatusMessage, ex, LogType.Warning);
+                                await _logService.AddExceptionAsync<BasePropertyController>(
+                                    StatusMessage,
+                                    ex,
+                                    LogType.Warning
+                                );
                                 break;
                             default:
-                                StatusMessage = "There was an error with the Google API [" + ex.Status.ToString() + "]: " + ex.Message;
+                                StatusMessage =
+                                    "There was an error with the Google API ["
+                                    + ex.Status.ToString()
+                                    + "]: "
+                                    + ex.Message;
                                 ModelState.AddModelError("GeoCoding", StatusMessage);
-                                await _logService.AddExceptionAsync<BasePropertyController>(StatusMessage, ex, LogType.Warning);
+                                await _logService.AddExceptionAsync<BasePropertyController>(
+                                    StatusMessage,
+                                    ex,
+                                    LogType.Warning
+                                );
                                 break;
                         }
                     }
-
                 }
 
                 string type = Engine.Settings.Property.GetPlanningFromType(modelToUpdate.Planning);
@@ -146,17 +165,28 @@ namespace Hood.Admin.BaseControllers
                     modelToUpdate.AddMeta("PlanningDescription", type);
                 }
 
-                foreach (KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues> val in Request.Form)
+                foreach (
+                    KeyValuePair<
+                        string,
+                        Microsoft.Extensions.Primitives.StringValues
+                    > val in Request.Form
+                )
                 {
                     if (val.Key.StartsWith("Meta:"))
                     {
                         if (modelToUpdate.HasMeta(val.Key.Replace("Meta:", "")))
                         {
-                            modelToUpdate.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
+                            modelToUpdate.UpdateMeta(
+                                val.Key.Replace("Meta:", ""),
+                                val.Value.ToString()
+                            );
                         }
                         else
                         {
-                            modelToUpdate.AddMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
+                            modelToUpdate.AddMeta(
+                                val.Key.Replace("Meta:", ""),
+                                val.Value.ToString()
+                            );
                         }
                     }
                 }
@@ -169,11 +199,13 @@ namespace Hood.Admin.BaseControllers
                 modelToUpdate = await LoadAgents(modelToUpdate);
 
                 return View(modelToUpdate);
-
             }
             catch (Exception ex)
             {
-                await _logService.AddExceptionAsync<BasePropertyController>("Error saving a property listing.", ex);
+                await _logService.AddExceptionAsync<BasePropertyController>(
+                    "Error saving a property listing.",
+                    ex
+                );
 
                 SaveMessage = "An error occurred: " + ex.Message;
                 MessageType = AlertType.Danger;
@@ -183,13 +215,18 @@ namespace Hood.Admin.BaseControllers
 
                 return View(model);
             }
-
         }
+
         protected virtual async Task<PropertyListing> LoadAgents(PropertyListing listing)
         {
             IList<IUserProfile> admins = await _account.GetUsersInRole("Admin");
             IList<IUserProfile> editors = await _account.GetUsersInRole("Editor");
-            listing.AvailableAgents = editors.Concat(admins).Distinct().OrderBy(u => u.FirstName).ThenBy(u => u.Email).ToList();
+            listing.AvailableAgents = editors
+                .Concat(admins)
+                .Distinct()
+                .OrderBy(u => u.FirstName)
+                .ThenBy(u => u.Email)
+                .ToList();
             return listing;
         }
 
@@ -202,10 +239,11 @@ namespace Hood.Admin.BaseControllers
             PropertyListing model = new PropertyListing()
             {
                 PublishDate = DateTime.UtcNow,
-                AgentId = User.GetLocalUserId()
+                AgentId = User.GetLocalUserId(),
             };
             return View("_Blade_Property", model);
         }
+
         [HttpPost]
         [Route("admin/property/create/")]
         public virtual async Task<Response> Create(PropertyListing model)
@@ -261,7 +299,7 @@ namespace Hood.Admin.BaseControllers
                 }
 
                 // Geocode
-                Geocoding.Google.GoogleAddress address = _address.GeocodeAddress(model);
+                GoogleAddress address = _address.GeocodeAddress(model);
                 if (address != null)
                 {
                     model.SetLocation(address.Coordinates);
@@ -273,19 +311,25 @@ namespace Hood.Admin.BaseControllers
                     model.Metadata = new List<PropertyMeta>();
                 }
 
-                model.UpdateMeta("PlanningDescription", Engine.Settings.Property.GetPlanningTypes().FirstOrDefault().Value);
+                model.UpdateMeta(
+                    "PlanningDescription",
+                    Engine.Settings.Property.GetPlanningTypes().FirstOrDefault().Value
+                );
 
                 for (int i = 0; i < 11; i++)
                 {
-                    model.AddMeta("Feature" + i.ToString(), "", "System.String");
+                    model.AddMeta("Feature" + i.ToString(), "");
                 }
 
                 await _property.UpdateAsync(model);
-                return new Response(true, "Created successfully."); ;
+                return new Response(true, "Created successfully.");
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BasePropertyController>($"Error creating a new property.", ex);
+                return await ErrorResponseAsync<BasePropertyController>(
+                    $"Error creating a new property.",
+                    ex
+                );
             }
         }
 
@@ -303,7 +347,10 @@ namespace Hood.Admin.BaseControllers
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BasePropertyController>($"Error deleting a property.", ex);
+                return await ErrorResponseAsync<BasePropertyController>(
+                    $"Error deleting a property.",
+                    ex
+                );
             }
         }
         #endregion
@@ -319,7 +366,10 @@ namespace Hood.Admin.BaseControllers
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BasePropertyController>($"Error publishing/archiving property with Id: {id}", ex);
+                return await ErrorResponseAsync<BasePropertyController>(
+                    $"Error publishing/archiving property with Id: {id}",
+                    ex
+                );
             }
         }
 
@@ -336,7 +386,9 @@ namespace Hood.Admin.BaseControllers
                 model.ValidateOrThrow();
 
                 // load the media object.
-                PropertyListing property = await _propertyDb.Properties.Where(p => p.Id == id).FirstOrDefaultAsync();
+                PropertyListing property = await _propertyDb
+                    .Properties.Where(p => p.Id == id)
+                    .FirstOrDefaultAsync();
                 if (property == null)
                 {
                     throw new Exception("Could not load property to attach media.");
@@ -350,24 +402,27 @@ namespace Hood.Admin.BaseControllers
 
                 switch (model.FieldName)
                 {
-                    case nameof(Models.PropertyListing.FeaturedImage):
+                    case nameof(PropertyListing.FeaturedImage):
                         property.FeaturedImage = new PropertyMedia(media);
                         break;
-                    case nameof(Models.PropertyListing.InfoDownload):
+                    case nameof(PropertyListing.InfoDownload):
                         property.InfoDownload = new PropertyMedia(media);
                         break;
                 }
 
                 await _propertyDb.SaveChangesAsync();
 
-                string cacheKey = typeof(Content).ToString() + ".Single." + id;
+                string cacheKey = typeof(Content) + ".Single." + id;
                 _cache.Remove(cacheKey);
 
                 return new Response(true, media, $"The media has been attached successfully.");
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BasePropertyController>($"Error attaching a media file to an entity.", ex);
+                return await ErrorResponseAsync<BasePropertyController>(
+                    $"Error attaching a media file to an entity.",
+                    ex
+                );
             }
         }
 
@@ -381,7 +436,9 @@ namespace Hood.Admin.BaseControllers
             try
             {
                 // load the media object.
-                PropertyListing property = await _propertyDb.Properties.Where(p => p.Id == id).FirstOrDefaultAsync();
+                PropertyListing property = await _propertyDb
+                    .Properties.Where(p => p.Id == id)
+                    .FirstOrDefaultAsync();
                 if (property == null)
                 {
                     throw new Exception("Could not load property to remove media.");
@@ -391,25 +448,31 @@ namespace Hood.Admin.BaseControllers
 
                 switch (model.FieldName)
                 {
-                    case nameof(Models.PropertyListing.FeaturedImage):
+                    case nameof(PropertyListing.FeaturedImage):
                         property.FeaturedImageJson = null;
                         break;
-                    case nameof(Models.PropertyListing.InfoDownload):
+                    case nameof(PropertyListing.InfoDownload):
                         property.InfoDownload = null;
                         break;
                 }
 
                 await _propertyDb.SaveChangesAsync();
 
-                string cacheKey = typeof(PropertyListing).ToString() + ".Single." + id;
+                string cacheKey = typeof(PropertyListing) + ".Single." + id;
                 _cache.Remove(cacheKey);
 
-                return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
-
+                return new Response(
+                    true,
+                    MediaObject.Blank,
+                    $"The media file has been removed successfully."
+                );
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BasePropertyController>($"Error removing a media file from an entity.", ex);
+                return await ErrorResponseAsync<BasePropertyController>(
+                    $"Error removing a media file from an entity.",
+                    ex
+                );
             }
         }
         #endregion
@@ -428,9 +491,9 @@ namespace Hood.Admin.BaseControllers
         {
             try
             {
-                PropertyListing property = await _propertyDb.Properties
-                        .Include(p => p.Media)
-                        .FirstOrDefaultAsync(c => c.Id == id);
+                PropertyListing property = await _propertyDb
+                    .Properties.Include(p => p.Media)
+                    .FirstOrDefaultAsync(c => c.Id == id);
 
                 if (property == null)
                 {
@@ -448,7 +511,9 @@ namespace Hood.Admin.BaseControllers
                     foreach (int mediaId in media)
                     {
                         // load the media object from db
-                        MediaObject mediaObject = _db.Media.AsNoTracking().SingleOrDefault(m => m.Id == mediaId);
+                        MediaObject mediaObject = _db
+                            .Media.AsNoTracking()
+                            .SingleOrDefault(m => m.Id == mediaId);
                         if (media == null)
                         {
                             throw new Exception("Could not load media to attach.");
@@ -458,14 +523,16 @@ namespace Hood.Admin.BaseControllers
                         propertyMedia.Id = 0;
                         _propertyDb.PropertyMedia.Add(propertyMedia);
                         await _propertyDb.SaveChangesAsync();
-
                     }
                 }
                 return new Response(true, "The media has been attached successfully.");
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BasePropertyController>($"Error attaching media to the gallery.", ex);
+                return await ErrorResponseAsync<BasePropertyController>(
+                    $"Error attaching media to the gallery.",
+                    ex
+                );
             }
         }
 
@@ -475,14 +542,19 @@ namespace Hood.Admin.BaseControllers
         {
             try
             {
-                PropertyMedia media = await _propertyDb.PropertyMedia.SingleOrDefaultAsync(m => m.Id == mediaId);
+                PropertyMedia media = await _propertyDb.PropertyMedia.SingleOrDefaultAsync(m =>
+                    m.Id == mediaId
+                );
                 _propertyDb.Entry(media).State = EntityState.Deleted;
                 await _propertyDb.SaveChangesAsync();
                 return new Response(true, $"The media has been removed.");
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BasePropertyController>($"Error removing media from property.", ex);
+                return await ErrorResponseAsync<BasePropertyController>(
+                    $"Error removing media from property.",
+                    ex
+                );
             }
         }
 
@@ -501,9 +573,9 @@ namespace Hood.Admin.BaseControllers
         {
             try
             {
-                PropertyListing property = await _propertyDb.Properties
-                        .Include(p => p.FloorPlans)
-                        .FirstOrDefaultAsync(c => c.Id == id);
+                PropertyListing property = await _propertyDb
+                    .Properties.Include(p => p.FloorPlans)
+                    .FirstOrDefaultAsync(c => c.Id == id);
 
                 if (property == null)
                 {
@@ -521,7 +593,9 @@ namespace Hood.Admin.BaseControllers
                     foreach (int mediaId in media)
                     {
                         // load the media object from db
-                        MediaObject mediaObject = _db.Media.AsNoTracking().SingleOrDefault(m => m.Id == mediaId);
+                        MediaObject mediaObject = _db
+                            .Media.AsNoTracking()
+                            .SingleOrDefault(m => m.Id == mediaId);
                         if (media == null)
                         {
                             throw new Exception("Could not load media to attach.");
@@ -531,30 +605,38 @@ namespace Hood.Admin.BaseControllers
                         propertyMedia.Id = 0;
                         _propertyDb.PropertyFloorplans.Add(propertyMedia);
                         await _propertyDb.SaveChangesAsync();
-
                     }
                 }
                 return new Response(true, "The media has been attached successfully.");
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BasePropertyController>($"Error uploading a floorplan.", ex);
+                return await ErrorResponseAsync<BasePropertyController>(
+                    $"Error uploading a floorplan.",
+                    ex
+                );
             }
         }
+
         [HttpPost]
         [Route("admin/property/{id}/floorplans/remove/{mediaId}")]
         public virtual async Task<Response> RemoveFloorplan(int id, int mediaId)
         {
             try
             {
-                PropertyFloorplan media = await _propertyDb.PropertyFloorplans.SingleOrDefaultAsync(m => m.Id == mediaId);
+                PropertyFloorplan media = await _propertyDb.PropertyFloorplans.SingleOrDefaultAsync(
+                    m => m.Id == mediaId
+                );
                 _propertyDb.Entry(media).State = EntityState.Deleted;
                 await _propertyDb.SaveChangesAsync();
                 return new Response(true, $"The floorplan has been removed.");
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BasePropertyController>($"Error removing floorplan from property.", ex);
+                return await ErrorResponseAsync<BasePropertyController>(
+                    $"Error removing floorplan from property.",
+                    ex
+                );
             }
         }
         #endregion
@@ -565,13 +647,17 @@ namespace Hood.Admin.BaseControllers
         {
             try
             {
-                PropertyListing property = await _propertyDb.Properties.AsNoTracking().SingleOrDefaultAsync(p => p.Id == id);
+                PropertyListing property = await _propertyDb
+                    .Properties.AsNoTracking()
+                    .SingleOrDefaultAsync(p => p.Id == id);
                 if (property == null)
                 {
                     throw new Exception("Property not found.");
                 }
 
-                int? count = await _propertyDb.PropertyMetadata.Where(m => m.Name.Contains($"{name}")).CountAsync();
+                int? count = await _propertyDb
+                    .PropertyMetadata.Where(m => m.Name.Contains($"{name}"))
+                    .CountAsync();
                 if (!count.HasValue)
                 {
                     count = 0;
@@ -581,7 +667,7 @@ namespace Hood.Admin.BaseControllers
                 {
                     PropertyId = property.Id,
                     Name = name,
-                    Type = "System.String"
+                    Type = "System.String",
                 };
                 meta.SetValue("");
                 _propertyDb.Add(meta);
@@ -598,13 +684,14 @@ namespace Hood.Admin.BaseControllers
 
             return RedirectToAction(nameof(Edit), new { id });
         }
+
         [Route("admin/property/{id}/delete-meta/")]
         public virtual async Task<IActionResult> DeleteMeta(int id, int metaId)
         {
             try
             {
                 PropertyMeta meta = await _propertyDb.PropertyMetadata.FindAsync(metaId);
-                _propertyDb.Entry(meta).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+                _propertyDb.Entry(meta).State = EntityState.Deleted;
                 SaveMessage = $"Successfully deleted {meta.Name}.";
                 MessageType = AlertType.Success;
                 await _propertyDb.SaveChangesAsync();
@@ -618,8 +705,5 @@ namespace Hood.Admin.BaseControllers
             return RedirectToAction(nameof(Edit), new { id });
         }
         #endregion
-
     }
 }
-
-

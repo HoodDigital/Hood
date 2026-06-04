@@ -14,11 +14,20 @@
     <PackageReference Include="Geocoding.Core" Version="4.0.1" />
     <PackageReference Include="Geocoding.Google" Version="4.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.8" />
+    <PackageReference
+      Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore"
+      Version="10.0.8"
+    />
+    <PackageReference
+      Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore"
+      Version="10.0.8"
+    />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="10.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="10.0.8" />
+    <PackageReference
+      Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation"
+      Version="10.0.8"
+    />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.8" />
     <!-- Pin Design explicitly: Tools 10.0.8 only floors Design at 8.0.0 transitively, which
          loads an EF 8 design assembly against the EF 10 runtime and breaks `dotnet ef`. -->
@@ -39,15 +48,16 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="unsplasharp.api" Version="0.7.0" />
   </ItemGroup>
-
   <!-- The repo-root sql tier scripts are embedded so the Hood.Core NuGet carries its own schema.
        One glob; DbUp runs them in LogicalName (= path) order, and the tier/folder names already sort
        into apply order (6.1 -> 7.0; within 7.0: contexts -> update -> views). Excluded: latest.sql
        (the assembled fresh-install convenience file), the 6.0 baseline install scripts (the runner
        upgrades *from* 6.0, it doesn't install it), and the Auth0 backend (alternative, not standard). -->
   <ItemGroup>
-    <EmbeddedResource Include="$(MSBuildThisFileDirectory)../../sql/**/*.sql"
-                      Exclude="$(MSBuildThisFileDirectory)../../sql/latest.sql;$(MSBuildThisFileDirectory)../../sql/6.0/**/*.sql;$(MSBuildThisFileDirectory)../../sql/7.0/contexts/Auth0.sql;$(MSBuildThisFileDirectory)../../sql/7.0/views/HoodAuth0UserProfiles.sql">
+    <EmbeddedResource
+      Include="$(MSBuildThisFileDirectory)../../sql/**/*.sql"
+      Exclude="$(MSBuildThisFileDirectory)../../sql/latest.sql;$(MSBuildThisFileDirectory)../../sql/6.0/**/*.sql;$(MSBuildThisFileDirectory)../../sql/7.0/contexts/Auth0.sql;$(MSBuildThisFileDirectory)../../sql/7.0/views/HoodAuth0UserProfiles.sql"
+    >
       <LogicalName>Hood.Core.SchemaScripts.%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
   </ItemGroup>

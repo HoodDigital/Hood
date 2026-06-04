@@ -1,5 +1,5 @@
-﻿using Hood.Enums;
 using System;
+using Hood.Enums;
 
 namespace Hood.Interfaces
 {
@@ -26,5 +26,4 @@ namespace Hood.Interfaces
         string FormattedSize { get; }
         string Path { get; }
     }
-
 }
