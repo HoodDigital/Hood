@@ -70,6 +70,29 @@ The `6.1.x → 7.0` delta is small and drops no data-bearing columns — see
 [`sql/README.md`](sql/README.md) for exactly what it changes.
 
 
+## Releases & branching
+
+Hood uses a trunk-based flow with automatic, git-derived versioning (MinVer) and GitHub Actions.
+
+**Branching.** Work happens on feature branches → PR → squash-merge to `master`. PRs run build + `dotnet test` and `npm run package` as gates; nothing merges red.
+
+**Versioning is automatic — never set a version by hand.** [MinVer](https://github.com/adamralph/minver) derives it from git:
+
+| Git state | Version | Published |
+|---|---|---|
+| A merge to `master` | `7.0.0-rc.N` (`N` = merges since the last tag) | NuGet.org **prerelease** + npm dist-tag **`next`** |
+| A GitHub Release tag `v7.0.0` | `7.0.0` (clean) | NuGet.org **stable** + npm dist-tag **`latest`** |
+
+So **every merge ships a prerelease automatically**, and **cutting a `v7.0.0` GitHub Release ships the stable**. To release a stable, draft a GitHub Release with the tag `v7.0.0` (matching the `MinVerMinimumMajorMinor` in [`Directory.Build.props`](Directory.Build.props)).
+
+**Pipelines** ([`.github/workflows`](.github/workflows)): `backend.yml` packs the 7 NuGet packages; `frontend.yml` builds + publishes the `hoodcms` npm package (its version is derived from the same MinVer value, so npm and NuGet stay in lockstep). They're path-filtered, so a backend-only change doesn't rebuild the frontend and vice versa.
+
+**Publishing — no tokens.** Both registries use OIDC **trusted publishing**: GitHub mints a short-lived identity token (`id-token: write`) that the registry exchanges for a temporary credential at publish time. Nothing long-lived is stored in GitHub. Both publish jobs run in the **`release`** GitHub environment (the trusted-publisher configs require it), and provenance is attached automatically.
+
+- **npm** — [trusted publisher](https://docs.npmjs.com/trusted-publishers) on the `hoodcms` package pointing at `frontend.yml` + environment `release`. `npm publish` (npm ≥ 11.5.1) does the exchange.
+- **NuGet** — [trusted publisher](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing) on the packages pointing at `backend.yml` + environment `release`. The `NuGet/login` action exchanges the OIDC token for a temporary key; it reads your nuget.org username from the `NUGET_USER` repo variable. (`NuGet/login` isn't a GitHub-authored action, so it must be added to the repo's allowed-actions list.)
+
+
 ## Full documentation
 Documentation is a work in progress!
 

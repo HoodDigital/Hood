@@ -1,0 +1,95 @@
+name: Frontend
+
+# Builds and publishes the `hoodcms` npm package (gulp build + view-copy).
+# The npm version is derived from the same MinVer value as the NuGet packages so
+# the two stay in lockstep:
+#   • merge to master  → 7.0.0-rc.N  → npm dist-tag `next`
+#   • GitHub Release v7.0.0 → 7.0.0   → npm dist-tag `latest`
+# PRs build only (the publish job is gated on push/release).
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'projects/Hood.Development/src/**'
+      - 'projects/Hood.Development/Views/**'
+      - 'projects/Hood.Development/Themes/**'
+      - 'projects/Hood.Development/gulpfile.js'
+      - 'projects/Hood.Development/package.json'
+      - 'projects/Hood.Development/yarn.lock'
+      - 'projects/Hood.Development/tsconfig*.json'
+      - '.github/workflows/frontend.yml'
+  pull_request:
+    paths:
+      - 'projects/Hood.Development/src/**'
+      - 'projects/Hood.Development/Views/**'
+      - 'projects/Hood.Development/Themes/**'
+      - 'projects/Hood.Development/gulpfile.js'
+      - 'projects/Hood.Development/package.json'
+      - 'projects/Hood.Development/yarn.lock'
+      - 'projects/Hood.Development/tsconfig*.json'
+      - '.github/workflows/frontend.yml'
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build (npm run package)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/Hood.Development
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+      - run: corepack enable
+      - run: yarn install --frozen-lockfile
+      - run: yarn run package
+
+  publish:
+    name: Publish to npm
+    needs: build
+    if: github.event_name == 'push' || github.event_name == 'release'
+    runs-on: ubuntu-latest
+    environment: release # required by the npm trusted-publisher config
+    permissions:
+      contents: read
+      id-token: write # mint the OIDC token npm trusted publishing exchanges (no NPM_TOKEN)
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0 # MinVer (minver-cli) needs full history + tags
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+      # Trusted publishing (OIDC) requires npm >= 11.5.1; Node 22 ships an older npm.
+      - run: npm install --global npm@latest
+      # Same MinVer config as Directory.Build.props, so npm == NuGet version.
+      - name: Compute version (MinVer)
+        id: minver
+        run: |
+          dotnet tool install --global minver-cli --version 7.0.0
+          VERSION="$("$HOME/.dotnet/tools/minver" --tag-prefix v --minimum-major-minor 7.0 --default-pre-release-identifiers rc)"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Resolved version: $VERSION"
+      - run: corepack enable
+        working-directory: projects/Hood.Development
+      - run: yarn install --frozen-lockfile
+        working-directory: projects/Hood.Development
+      - run: yarn run package
+        working-directory: projects/Hood.Development
+      # No token: npm detects the GitHub OIDC environment, matches the trusted-publisher
+      # config on npmjs, and publishes with provenance automatically.
+      - name: Publish to npm (trusted publishing / OIDC)
+        working-directory: projects/Hood.Development
+        run: |
+          npm version "${{ steps.minver.outputs.version }}" --no-git-tag-version --allow-same-version
+          if [ "${{ github.event_name }}" = "release" ]; then TAG=latest; else TAG=next; fi
+          echo "Publishing hoodcms@${{ steps.minver.outputs.version }} with dist-tag $TAG"
+          npm publish --tag "$TAG" --access public

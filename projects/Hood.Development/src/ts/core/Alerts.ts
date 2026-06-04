@@ -127,7 +127,7 @@ export class Alerts {
             cancelButtonText:'Cancel'
         };
 
-        Alerts.sweetAlert({...baseOptions, ...options}, callback);
+        Alerts.sweetAlert({...baseOptions, ...options} as SweetAlertOptions, callback);
     }
 
     static prompt(options: SweetAlertOptions, callback: (result: SweetAlertResult<any>) => void) {
@@ -144,7 +144,7 @@ export class Alerts {
             cancelButtonText: 'Cancel'
         };
 
-        Alerts.sweetAlert({...baseOptions, ...options}, callback);
+        Alerts.sweetAlert({...baseOptions, ...options} as SweetAlertOptions, callback);
     }
 
     log(message: string, type: 'message' | 'error' | 'warning' | 'info' = 'message') {

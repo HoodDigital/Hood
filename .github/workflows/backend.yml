@@ -1,0 +1,76 @@
+name: Backend
+
+# Builds, tests and publishes the 7 Hood NuGet packages.
+# Versioning is automatic via MinVer (git tags) — no version is set here:
+#   • merge to master  → 7.0.0-rc.N  → NuGet.org prerelease
+#   • GitHub Release v7.0.0 → 7.0.0   → NuGet.org stable
+# PRs build + test only (the publish job is gated on push/release).
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'projects/**'
+      - 'Hood.sln'
+      - 'Directory.Build.props'
+      - 'global.json'
+      - '.github/workflows/backend.yml'
+  pull_request:
+    paths:
+      - 'projects/**'
+      - 'Hood.sln'
+      - 'Directory.Build.props'
+      - 'global.json'
+      - '.github/workflows/backend.yml'
+  release:
+    types: [published]
+
+jobs:
+  build-test:
+    name: Build & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0 # MinVer needs full history + tags to derive the version
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          global-json-file: global.json
+      - run: dotnet restore Hood.sln
+      - run: dotnet build Hood.sln -c Release --no-restore
+      - run: dotnet test Hood.sln -c Release --no-build --verbosity normal
+
+  publish:
+    name: Pack & publish to NuGet
+    needs: build-test
+    if: github.event_name == 'push' || github.event_name == 'release'
+    runs-on: ubuntu-latest
+    environment: release # required by the NuGet trusted-publisher config
+    permissions:
+      contents: read
+      id-token: write # OIDC token for NuGet trusted publishing (no API key)
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          global-json-file: global.json
+      # MinVer stamps the version from git: rc.N off master, clean off a v-tag.
+      - run: dotnet pack Hood.sln -c Release -o ./artifacts
+      # Exchange the GitHub OIDC token for a short-lived NuGet API key (trusted publishing).
+      # NuGet/login is not a GitHub-authored action, so it must be added to the repo's
+      # allowed-actions list. NUGET_USER is a repo variable (your nuget.org username).
+      - uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1
+        id: nuget-login
+        with:
+          user: ${{ vars.NUGET_USER }}
+      - run: >
+          dotnet nuget push "./artifacts/*.nupkg"
+          --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}"
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: nuget-packages
+          path: ./artifacts/*.nupkg

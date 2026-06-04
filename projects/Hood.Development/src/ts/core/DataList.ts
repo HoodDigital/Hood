@@ -62,7 +62,7 @@ export class DataList {
             } else {
                 pageUrl = new URL(window.location.origin + this.element.dataset.url);
             }
-            if ('URLSearchParams' in window) {
+            if (typeof URLSearchParams !== 'undefined') {
                 var searchParams = new URLSearchParams(window.location.search);
                 var urlParams = new URLSearchParams(pageUrl.search);
                 searchParams.forEach((value, key, parent) => {
