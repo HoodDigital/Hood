@@ -18,7 +18,7 @@ This file covers **local dev only**. For repo basics see [readme.md](readme.md).
 | `sqlserver` | `hood-sqlserver` | `14331` → 1433 | SQL Server 2022 Express. Data persists in the `sqlserver-data` named volume. |
 | `app` | `hood-app` | `5070` → 8080 | The `Hood.Development` ASP.NET Core host, built from [`Dockerfile`](Dockerfile). |
 
-Host port `14331` avoids clashes with a native SQL Server (`1433`) or other local dev stacks (bma-live uses `14330`). The SA password defaults to `Hood_Dev_Passw0rd!` — fine for throwaway local use; change it for anything exposed.
+Host port `14331` avoids clashes with a native SQL Server (`1433`) or other local dev stacks. The SA password defaults to `Hood_Dev_Passw0rd!` — fine for throwaway local use; change it for anything exposed.
 
 The app's **Data Protection keys** persist in the `hood-keys` named volume (mounted at `/keys`, set via `Hood__DataProtectionKeyPath`). This keeps antiforgery tokens and auth cookies valid across container rebuilds — without it the key ring resets on every rebuild and you'd hit *"The antiforgery token could not be decrypted"* until you cleared cookies.
 

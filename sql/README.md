@@ -65,7 +65,7 @@ The v7 delta is small and **drops no data-bearing base-table columns**:
 
 (The reporting views are applied separately — the `sql/7.0/views/*` scripts, idempotent DROP/CREATE — so they're shared by fresh installs, upgrades and the runner.)
 
-Consumers on the 6.1.x golden-DB baseline (e.g. bma-live) take a **clean, zero-data-loss** upgrade — verified that nothing reads any removed field.
+Consumers on the 6.1.x baseline take a **clean, zero-data-loss** upgrade — verified that nothing reads any removed field.
 
 ## Regenerating the SQL after a model change
 
