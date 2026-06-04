@@ -87,10 +87,10 @@ So **every merge ships a prerelease automatically**, and **cutting a `v7.0.0` Gi
 
 **Pipelines** ([`.github/workflows`](.github/workflows)): `backend.yml` packs the 7 NuGet packages; `frontend.yml` builds + publishes the `hoodcms` npm package (its version is derived from the same MinVer value, so npm and NuGet stay in lockstep). They're path-filtered, so a backend-only change doesn't rebuild the frontend and vice versa.
 
-**Publishing credentials.**
+**Publishing — no tokens.** Both registries use OIDC **trusted publishing**: GitHub mints a short-lived identity token (`id-token: write`) that the registry exchanges for a temporary credential at publish time. Nothing long-lived is stored in GitHub. Both publish jobs run in the **`release`** GitHub environment (the trusted-publisher configs require it), and provenance is attached automatically.
 
-- **npm** uses [trusted publishing](https://docs.npmjs.com/trusted-publishers) (OIDC) — no token. The `hoodcms` package on npmjs is configured with a trusted publisher pointing at this repo's `frontend.yml` workflow; the workflow mints a short-lived OIDC token (`id-token: write`) that npm exchanges at publish time, and provenance is attached automatically. Nothing to store in GitHub.
-- **NuGet** uses a `NUGET_API_KEY` repo secret (Settings → Secrets and variables → Actions). Until it's set the backend workflow builds, tests and packs but skips the push.
+- **npm** — [trusted publisher](https://docs.npmjs.com/trusted-publishers) on the `hoodcms` package pointing at `frontend.yml` + environment `release`. `npm publish` (npm ≥ 11.5.1) does the exchange.
+- **NuGet** — [trusted publisher](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing) on the packages pointing at `backend.yml` + environment `release`. The `NuGet/login` action exchanges the OIDC token for a temporary key; it reads your nuget.org username from the `NUGET_USER` repo variable. (`NuGet/login` isn't a GitHub-authored action, so it must be added to the repo's allowed-actions list.)
 
 
 ## Full documentation

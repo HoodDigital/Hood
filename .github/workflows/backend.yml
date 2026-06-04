@@ -45,8 +45,10 @@ jobs:
     needs: build-test
     if: github.event_name == 'push' || github.event_name == 'release'
     runs-on: ubuntu-latest
-    env:
-      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+    environment: release # required by the NuGet trusted-publisher config
+    permissions:
+      contents: read
+      id-token: write # OIDC token for NuGet trusted publishing (no API key)
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
@@ -56,16 +58,18 @@ jobs:
           global-json-file: global.json
       # MinVer stamps the version from git: rc.N off master, clean off a v-tag.
       - run: dotnet pack Hood.sln -c Release -o ./artifacts
-      - name: Push to NuGet.org
-        if: env.NUGET_API_KEY != ''
-        run: >
+      # Exchange the GitHub OIDC token for a short-lived NuGet API key (trusted publishing).
+      # NuGet/login is not a GitHub-authored action, so it must be added to the repo's
+      # allowed-actions list. NUGET_USER is a repo variable (your nuget.org username).
+      - uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1
+        id: nuget-login
+        with:
+          user: ${{ vars.NUGET_USER }}
+      - run: >
           dotnet nuget push "./artifacts/*.nupkg"
-          --api-key "$NUGET_API_KEY"
+          --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}"
           --source https://api.nuget.org/v3/index.json
           --skip-duplicate
-      - name: Skipped publish (no NUGET_API_KEY secret)
-        if: env.NUGET_API_KEY == ''
-        run: echo "NUGET_API_KEY is not set — built and packed but did not publish."
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: nuget-packages
