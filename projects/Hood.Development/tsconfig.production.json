@@ -1,13 +1,16 @@
 {
   "compilerOptions": {
     "outDir": "./wwwroot/dist/js/",
+    "rootDir": "./src/ts",
     "skipLibCheck": true,
+    "types": ["bootstrap", "dropzone", "google.maps", "jquery", "jquery-toast-plugin", "jquery.slimscroll", "jquery.validation"],
+    "strict": false,
     "noImplicitAny": true,
     "module": "es6",
-    "target": "es5",
+    "target": "ES2017",
     "jsx": "react",
     "allowJs": false,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "sourceMap": false,
     "noEmit": true
   }

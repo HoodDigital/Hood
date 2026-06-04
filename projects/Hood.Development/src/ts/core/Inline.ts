@@ -97,7 +97,7 @@ export class Inline {
             Alerts.error("The content could not be found.", "Error " + xhr.status, 10000);
         } else if (xhr.status === 401) {
             Alerts.error("You are not allowed to view this resource, are you logged in correctly?", "Error " + xhr.status, 10000);
-            window.location = window.location;
+            window.location.reload();
         }
     }
 }

@@ -1,11 +1,13 @@
 ﻿import typescript from '@rollup/plugin-typescript';
 import resolve from '@rollup/plugin-node-resolve';
-import uglify from "@lopatnov/rollup-plugin-uglify";
+import terser from "@rollup/plugin-terser";
 import commonjs from "@rollup/plugin-commonjs";
 
 const d = new Date();
 let year = d.getFullYear();
-const packageJson = require('./package.json')
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const packageJson = require('./package.json');
 const version = process.env.VERSION || packageJson.version
 
 let license = 'Proprietary and confidential. Unauthorized copying of this file, via any medium is strictly prohibited.';
@@ -53,19 +55,23 @@ export default commandLineArgs => {
 
     if (commandLineArgs.debug !== true) {
 
-        plugins.push(uglify());
-        plugins.push(typescript({
-            tsconfig: "tsconfig.production.json"
-        }));
-
         sourcemaps = false;
         compact = true;
         destination = 'wwwroot/dist/';
 
+        plugins.push(terser());
+        plugins.push(typescript({
+            tsconfig: "tsconfig.production.json",
+            outDir: destination + 'js',
+            noEmit: false
+        }));
+
     } else {
 
         plugins.push(typescript({
-            tsconfig: "tsconfig.rollup.json"
+            tsconfig: "tsconfig.rollup.json",
+            outDir: destination + 'js',
+            noEmit: false
         }));
 
     }
