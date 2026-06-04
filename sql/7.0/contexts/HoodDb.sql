@@ -1,18 +1,6 @@
-IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
-BEGIN
-    CREATE TABLE [__EFMigrationsHistory] (
-        [MigrationId] nvarchar(150) NOT NULL,
-        [ProductVersion] nvarchar(32) NOT NULL,
-        CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
-    );
-END;
-GO
-
-BEGIN TRANSACTION;
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602173244_v7_baseline'
-)
+-- HoodDb tables — idempotent: the whole block runs only on a database that doesn't
+-- already have it. DbUp journals this script; no EF migration-history table is used.
+IF OBJECT_ID(N'[HoodOptions]', 'U') IS NULL
 BEGIN
     CREATE TABLE [HoodLogs] (
         [Id] bigint NOT NULL IDENTITY,
@@ -25,13 +13,7 @@ BEGIN
         [SourceUrl] nvarchar(max) NULL,
         CONSTRAINT [PK_HoodLogs] PRIMARY KEY ([Id])
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602173244_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodMediaDirectories] (
         [Id] int NOT NULL IDENTITY,
         [DisplayName] nvarchar(max) NULL,
@@ -42,25 +24,13 @@ BEGIN
         CONSTRAINT [PK_HoodMediaDirectories] PRIMARY KEY ([Id]),
         CONSTRAINT [FK_HoodMediaDirectories_HoodMediaDirectories_ParentId] FOREIGN KEY ([ParentId]) REFERENCES [HoodMediaDirectories] ([Id]) ON DELETE NO ACTION
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602173244_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodOptions] (
         [Id] nvarchar(450) NOT NULL,
         [Value] nvarchar(max) NULL,
         CONSTRAINT [PK_HoodOptions] PRIMARY KEY ([Id])
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602173244_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodMedia] (
         [Id] int NOT NULL IDENTITY,
         [DirectoryId] int NULL,
@@ -81,33 +51,8 @@ BEGIN
         CONSTRAINT [PK_HoodMedia] PRIMARY KEY ([Id]),
         CONSTRAINT [FK_HoodMedia_HoodMediaDirectories_DirectoryId] FOREIGN KEY ([DirectoryId]) REFERENCES [HoodMediaDirectories] ([Id]) ON DELETE NO ACTION
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602173244_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_HoodMedia_DirectoryId] ON [HoodMedia] ([DirectoryId]);
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602173244_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_HoodMediaDirectories_ParentId] ON [HoodMediaDirectories] ([ParentId]);
 END;
-
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602173244_v7_baseline'
-)
-BEGIN
-    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20260602173244_v7_baseline', N'10.0.8');
-END;
-
-COMMIT;
-GO
-

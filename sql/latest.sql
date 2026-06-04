@@ -1,39 +1,21 @@
 -- =============================================================================
 -- Hood CMS — v7.0 full schema (fresh install)
 -- =============================================================================
--- Idempotent. Safe to run against an empty database or to re-run.
--- GENERATED from the EF Core 10 baseline migrations (projects/Hood.Core/Migrations)
--- via `dotnet ef migrations script --idempotent`, then the SQL views appended.
--- Do not hand-edit table DDL here — change the C# models, regenerate (see sql/README.md).
---
--- Standard ASP.NET Identity backend. The alternative Auth0 backend lives in
--- sql/7.0/contexts/Auth0.sql + sql/7.0/views/HoodAuth0UserProfiles.sql (not part
--- of this install — it recreates AspNetUsers and is mutually exclusive with Identity).
+-- Idempotent (guarded per object) and forward-only. Safe to run repeatedly.
+-- Applied by the Hood schema runner (DbUp, journalled in SchemaVersions) — or by
+-- hand via sqlcmd. No EF migration-history table is used.
+-- GENERATED from the EF Core 10 baseline migrations, then stripped of EF history
+-- and re-guarded. Change the C# models, regenerate, re-strip (see sql/README.md).
+-- Standard ASP.NET Identity backend (Auth0 is the alternative module — not here).
 -- =============================================================================
 
--- Required for the Identity filtered unique indexes and the views.
 SET QUOTED_IDENTIFIER ON;
 SET ANSI_NULLS ON;
 GO
 
--- ---------------------------------------------------------------------------
--- Identity tables
--- ---------------------------------------------------------------------------
-IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
-BEGIN
-    CREATE TABLE [__EFMigrationsHistory] (
-        [MigrationId] nvarchar(150) NOT NULL,
-        [ProductVersion] nvarchar(32) NOT NULL,
-        CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
-    );
-END;
-GO
-
-BEGIN TRANSACTION;
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172828_v7_baseline'
-)
+-- Identity tables — idempotent: the whole block runs only on a database that doesn't
+-- already have it. DbUp journals this script; no EF migration-history table is used.
+IF OBJECT_ID(N'[AspNetRoles]', 'U') IS NULL
 BEGIN
     CREATE TABLE [AspNetRoles] (
         [Id] nvarchar(450) NOT NULL,
@@ -42,13 +24,7 @@ BEGIN
         [ConcurrencyStamp] nvarchar(max) NULL,
         CONSTRAINT [PK_AspNetRoles] PRIMARY KEY ([Id])
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172828_v7_baseline'
-)
-BEGIN
     CREATE TABLE [AspNetUsers] (
         [Id] nvarchar(450) NOT NULL,
         [UserName] nvarchar(256) NULL,
@@ -80,13 +56,7 @@ BEGIN
         [AccessFailedCount] int NOT NULL,
         CONSTRAINT [PK_AspNetUsers] PRIMARY KEY ([Id])
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172828_v7_baseline'
-)
-BEGIN
     CREATE TABLE [AspNetRoleClaims] (
         [Id] int NOT NULL IDENTITY,
         [RoleId] nvarchar(450) NOT NULL,
@@ -95,13 +65,7 @@ BEGIN
         CONSTRAINT [PK_AspNetRoleClaims] PRIMARY KEY ([Id]),
         CONSTRAINT [FK_AspNetRoleClaims_AspNetRoles_RoleId] FOREIGN KEY ([RoleId]) REFERENCES [AspNetRoles] ([Id]) ON DELETE CASCADE
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172828_v7_baseline'
-)
-BEGIN
     CREATE TABLE [AspNetUserClaims] (
         [Id] int NOT NULL IDENTITY,
         [UserId] nvarchar(450) NOT NULL,
@@ -110,13 +74,7 @@ BEGIN
         CONSTRAINT [PK_AspNetUserClaims] PRIMARY KEY ([Id]),
         CONSTRAINT [FK_AspNetUserClaims_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172828_v7_baseline'
-)
-BEGIN
     CREATE TABLE [AspNetUserLogins] (
         [LoginProvider] nvarchar(450) NOT NULL,
         [ProviderKey] nvarchar(450) NOT NULL,
@@ -125,13 +83,7 @@ BEGIN
         CONSTRAINT [PK_AspNetUserLogins] PRIMARY KEY ([LoginProvider], [ProviderKey]),
         CONSTRAINT [FK_AspNetUserLogins_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172828_v7_baseline'
-)
-BEGIN
     CREATE TABLE [AspNetUserRoles] (
         [UserId] nvarchar(450) NOT NULL,
         [RoleId] nvarchar(450) NOT NULL,
@@ -139,13 +91,7 @@ BEGIN
         CONSTRAINT [FK_AspNetUserRoles_AspNetRoles_RoleId] FOREIGN KEY ([RoleId]) REFERENCES [AspNetRoles] ([Id]) ON DELETE CASCADE,
         CONSTRAINT [FK_AspNetUserRoles_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172828_v7_baseline'
-)
-BEGIN
     CREATE TABLE [AspNetUserTokens] (
         [UserId] nvarchar(450) NOT NULL,
         [LoginProvider] nvarchar(450) NOT NULL,
@@ -154,95 +100,25 @@ BEGIN
         CONSTRAINT [PK_AspNetUserTokens] PRIMARY KEY ([UserId], [LoginProvider], [Name]),
         CONSTRAINT [FK_AspNetUserTokens_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172828_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_AspNetRoleClaims_RoleId] ON [AspNetRoleClaims] ([RoleId]);
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172828_v7_baseline'
-)
-BEGIN
     EXEC(N'CREATE UNIQUE INDEX [RoleNameIndex] ON [AspNetRoles] ([NormalizedName]) WHERE [NormalizedName] IS NOT NULL');
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172828_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_AspNetUserClaims_UserId] ON [AspNetUserClaims] ([UserId]);
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172828_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_AspNetUserLogins_UserId] ON [AspNetUserLogins] ([UserId]);
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172828_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_AspNetUserRoles_RoleId] ON [AspNetUserRoles] ([RoleId]);
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172828_v7_baseline'
-)
-BEGIN
     CREATE INDEX [EmailIndex] ON [AspNetUsers] ([NormalizedEmail]);
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172828_v7_baseline'
-)
-BEGIN
     EXEC(N'CREATE UNIQUE INDEX [UserNameIndex] ON [AspNetUsers] ([NormalizedUserName]) WHERE [NormalizedUserName] IS NOT NULL');
 END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172828_v7_baseline'
-)
-BEGIN
-    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20260602172828_v7_baseline', N'10.0.8');
-END;
-
-COMMIT;
-GO
-
-
--- ---------------------------------------------------------------------------
--- HoodDb tables
--- ---------------------------------------------------------------------------
-IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
-BEGIN
-    CREATE TABLE [__EFMigrationsHistory] (
-        [MigrationId] nvarchar(150) NOT NULL,
-        [ProductVersion] nvarchar(32) NOT NULL,
-        CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
-    );
-END;
-GO
-
-BEGIN TRANSACTION;
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602173244_v7_baseline'
-)
+-- HoodDb tables — idempotent: the whole block runs only on a database that doesn't
+-- already have it. DbUp journals this script; no EF migration-history table is used.
+IF OBJECT_ID(N'[HoodOptions]', 'U') IS NULL
 BEGIN
     CREATE TABLE [HoodLogs] (
         [Id] bigint NOT NULL IDENTITY,
@@ -255,13 +131,7 @@ BEGIN
         [SourceUrl] nvarchar(max) NULL,
         CONSTRAINT [PK_HoodLogs] PRIMARY KEY ([Id])
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602173244_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodMediaDirectories] (
         [Id] int NOT NULL IDENTITY,
         [DisplayName] nvarchar(max) NULL,
@@ -272,25 +142,13 @@ BEGIN
         CONSTRAINT [PK_HoodMediaDirectories] PRIMARY KEY ([Id]),
         CONSTRAINT [FK_HoodMediaDirectories_HoodMediaDirectories_ParentId] FOREIGN KEY ([ParentId]) REFERENCES [HoodMediaDirectories] ([Id]) ON DELETE NO ACTION
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602173244_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodOptions] (
         [Id] nvarchar(450) NOT NULL,
         [Value] nvarchar(max) NULL,
         CONSTRAINT [PK_HoodOptions] PRIMARY KEY ([Id])
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602173244_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodMedia] (
         [Id] int NOT NULL IDENTITY,
         [DirectoryId] int NULL,
@@ -311,55 +169,15 @@ BEGIN
         CONSTRAINT [PK_HoodMedia] PRIMARY KEY ([Id]),
         CONSTRAINT [FK_HoodMedia_HoodMediaDirectories_DirectoryId] FOREIGN KEY ([DirectoryId]) REFERENCES [HoodMediaDirectories] ([Id]) ON DELETE NO ACTION
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602173244_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_HoodMedia_DirectoryId] ON [HoodMedia] ([DirectoryId]);
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602173244_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_HoodMediaDirectories_ParentId] ON [HoodMediaDirectories] ([ParentId]);
 END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602173244_v7_baseline'
-)
-BEGIN
-    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20260602173244_v7_baseline', N'10.0.8');
-END;
-
-COMMIT;
-GO
-
-
--- ---------------------------------------------------------------------------
--- Content tables
--- ---------------------------------------------------------------------------
-IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
-BEGIN
-    CREATE TABLE [__EFMigrationsHistory] (
-        [MigrationId] nvarchar(150) NOT NULL,
-        [ProductVersion] nvarchar(32) NOT NULL,
-        CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
-    );
-END;
-GO
-
-BEGIN TRANSACTION;
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
+-- Content tables — idempotent: the whole block runs only on a database that doesn't
+-- already have it. DbUp journals this script; no EF migration-history table is used.
+IF OBJECT_ID(N'[HoodContent]', 'U') IS NULL
 BEGIN
     CREATE TABLE [HoodContent] (
         [Id] int NOT NULL IDENTITY,
@@ -385,13 +203,7 @@ BEGIN
         [ShareImageJson] nvarchar(max) NULL,
         CONSTRAINT [PK_HoodContent] PRIMARY KEY ([Id])
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodContentCategories] (
         [ContentCategoryId] int NOT NULL IDENTITY,
         [DisplayName] nvarchar(max) NOT NULL,
@@ -401,13 +213,7 @@ BEGIN
         CONSTRAINT [PK_HoodContentCategories] PRIMARY KEY ([ContentCategoryId]),
         CONSTRAINT [FK_HoodContentCategories_HoodContentCategories_ParentCategoryId] FOREIGN KEY ([ParentCategoryId]) REFERENCES [HoodContentCategories] ([ContentCategoryId])
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodContentMedia] (
         [Id] int NOT NULL IDENTITY,
         [ContentId] int NOT NULL,
@@ -428,13 +234,7 @@ BEGIN
         CONSTRAINT [PK_HoodContentMedia] PRIMARY KEY ([Id]),
         CONSTRAINT [FK_HoodContentMedia_HoodContent_ContentId] FOREIGN KEY ([ContentId]) REFERENCES [HoodContent] ([Id]) ON DELETE NO ACTION
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodContentMetadata] (
         [Id] int NOT NULL IDENTITY,
         [ContentId] int NOT NULL,
@@ -445,13 +245,7 @@ BEGIN
         CONSTRAINT [AK_HoodContentMetadata_ContentId_Name] UNIQUE ([ContentId], [Name]),
         CONSTRAINT [FK_HoodContentMetadata_HoodContent_ContentId] FOREIGN KEY ([ContentId]) REFERENCES [HoodContent] ([Id]) ON DELETE CASCADE
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodContentCategoryJoins] (
         [CategoryId] int NOT NULL,
         [ContentId] int NOT NULL,
@@ -459,63 +253,17 @@ BEGIN
         CONSTRAINT [FK_HoodContentCategoryJoins_HoodContentCategories_CategoryId] FOREIGN KEY ([CategoryId]) REFERENCES [HoodContentCategories] ([ContentCategoryId]) ON DELETE CASCADE,
         CONSTRAINT [FK_HoodContentCategoryJoins_HoodContent_ContentId] FOREIGN KEY ([ContentId]) REFERENCES [HoodContent] ([Id]) ON DELETE CASCADE
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_HoodContentCategories_ParentCategoryId] ON [HoodContentCategories] ([ParentCategoryId]);
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_HoodContentCategoryJoins_CategoryId] ON [HoodContentCategoryJoins] ([CategoryId]);
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_HoodContentMedia_ContentId] ON [HoodContentMedia] ([ContentId]);
 END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
-BEGIN
-    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20260602172831_v7_baseline', N'10.0.8');
-END;
-
-COMMIT;
-GO
-
-
--- ---------------------------------------------------------------------------
--- Property tables
--- ---------------------------------------------------------------------------
-IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
-BEGIN
-    CREATE TABLE [__EFMigrationsHistory] (
-        [MigrationId] nvarchar(150) NOT NULL,
-        [ProductVersion] nvarchar(32) NOT NULL,
-        CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
-    );
-END;
-GO
-
-BEGIN TRANSACTION;
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172835_v7_baseline'
-)
+-- Property tables — idempotent: the whole block runs only on a database that doesn't
+-- already have it. DbUp journals this script; no EF migration-history table is used.
+IF OBJECT_ID(N'[HoodProperties]', 'U') IS NULL
 BEGIN
     CREATE TABLE [HoodProperties] (
         [Id] int NOT NULL IDENTITY,
@@ -578,13 +326,7 @@ BEGIN
         [Floors] nvarchar(max) NULL,
         CONSTRAINT [PK_HoodProperties] PRIMARY KEY ([Id])
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172835_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodPropertyFloorplans] (
         [Id] int NOT NULL IDENTITY,
         [PropertyId] int NOT NULL,
@@ -605,13 +347,7 @@ BEGIN
         CONSTRAINT [PK_HoodPropertyFloorplans] PRIMARY KEY ([Id]),
         CONSTRAINT [FK_HoodPropertyFloorplans_HoodProperties_PropertyId] FOREIGN KEY ([PropertyId]) REFERENCES [HoodProperties] ([Id]) ON DELETE NO ACTION
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172835_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodPropertyMedia] (
         [Id] int NOT NULL IDENTITY,
         [PropertyId] int NOT NULL,
@@ -632,13 +368,7 @@ BEGIN
         CONSTRAINT [PK_HoodPropertyMedia] PRIMARY KEY ([Id]),
         CONSTRAINT [FK_HoodPropertyMedia_HoodProperties_PropertyId] FOREIGN KEY ([PropertyId]) REFERENCES [HoodProperties] ([Id]) ON DELETE NO ACTION
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172835_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodPropertyMetadata] (
         [Id] int NOT NULL IDENTITY,
         [PropertyId] int NOT NULL,
@@ -649,39 +379,14 @@ BEGIN
         CONSTRAINT [AK_HoodPropertyMetadata_PropertyId_Name] UNIQUE ([PropertyId], [Name]),
         CONSTRAINT [FK_HoodPropertyMetadata_HoodProperties_PropertyId] FOREIGN KEY ([PropertyId]) REFERENCES [HoodProperties] ([Id]) ON DELETE NO ACTION
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172835_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_HoodPropertyFloorplans_PropertyId] ON [HoodPropertyFloorplans] ([PropertyId]);
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172835_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_HoodPropertyMedia_PropertyId] ON [HoodPropertyMedia] ([PropertyId]);
 END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172835_v7_baseline'
-)
-BEGIN
-    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20260602172835_v7_baseline', N'10.0.8');
-END;
-
-COMMIT;
-GO
-
-
 -- ===========================================================================
--- Views (idempotent DROP/CREATE; applied after tables)
+-- Views (idempotent DROP/CREATE)
 -- ===========================================================================
 
 IF EXISTS(select * FROM sys.views where name = 'HoodContentViews') DROP VIEW HoodContentViews
