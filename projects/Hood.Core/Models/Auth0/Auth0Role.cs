@@ -16,7 +16,8 @@ namespace Hood.Models
         /// Initializes a new instance of <see cref="Auth0Role"/>.
         /// </summary>
         /// <param name="roleName">The role name.</param>
-        public Auth0Role(string roleName) : this()
+        public Auth0Role(string roleName)
+            : this()
         {
             Name = roleName;
         }
@@ -57,9 +58,5 @@ namespace Hood.Models
         {
             return Name ?? string.Empty;
         }
-
-
     }
-
-
 }

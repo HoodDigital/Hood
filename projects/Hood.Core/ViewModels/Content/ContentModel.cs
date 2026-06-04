@@ -1,17 +1,16 @@
-﻿using Hood.Enums;
+﻿using System.Collections.Generic;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace Hood.ViewModels
 {
     public class ContentModel : PagedList<ContentView>, IPageableModel
     {
-        public ContentModel() : base()
-        {
-        }
+        public ContentModel()
+            : base() { }
 
         public override int PageSize
         {
@@ -30,18 +29,25 @@ namespace Hood.ViewModels
         // Params
         [FromQuery(Name = "category")]
         public string Category { get; set; }
+
         [FromRoute(Name = "type")]
         public string Type { get; set; }
+
         [FromQuery(Name = "filter")]
         public string Filter { get; set; }
+
         [FromQuery(Name = "author")]
         public string AuthorName { get; set; }
+
         [FromQuery(Name = "status")]
         public ContentStatus? Status { get; set; }
+
         [FromQuery(Name = "filter")]
         public bool Featured { get; set; }
+
         [FromQuery(Name = "inline")]
         public bool Inline { get; set; }
+
         [FromQuery(Name = "categories")]
         public List<string> Categories { get; set; }
 
@@ -66,10 +72,14 @@ namespace Hood.ViewModels
                 {
                     query += "&categories=" + cat;
                 }
-            query += Category.IsSet() ? "&category=" + System.Net.WebUtility.UrlEncode(Category) : "";
+            query += Category.IsSet()
+                ? "&category=" + System.Net.WebUtility.UrlEncode(Category)
+                : "";
             query += Type.IsSet() ? "&type=" + System.Net.WebUtility.UrlEncode(Type) : "";
             query += Filter.IsSet() ? "&filter=" + System.Net.WebUtility.UrlEncode(Filter) : "";
-            query += AuthorName.IsSet() ? "&author=" + System.Net.WebUtility.UrlEncode(AuthorName) : "";
+            query += AuthorName.IsSet()
+                ? "&author=" + System.Net.WebUtility.UrlEncode(AuthorName)
+                : "";
             query += Status.HasValue ? "&status=" + Status : "";
             query += Inline ? "&inline=" + Inline : "";
             return query;

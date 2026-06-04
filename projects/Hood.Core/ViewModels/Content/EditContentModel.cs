@@ -1,6 +1,6 @@
-﻿using Hood.BaseTypes;
+﻿using System.Collections.Generic;
+using Hood.BaseTypes;
 using Hood.Models;
-using System.Collections.Generic;
 
 namespace Hood.ViewModels
 {

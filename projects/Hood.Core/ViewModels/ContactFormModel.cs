@@ -35,10 +35,7 @@ namespace Hood.ViewModels
 
         public EmailAddress To
         {
-            get
-            {
-                return new EmailAddress(Email, Name);
-            }
+            get { return new EmailAddress(Email, Name); }
         }
 
         public bool ShowValidationMessage { get; set; }
@@ -57,9 +54,7 @@ namespace Hood.ViewModels
         public List<EmailAddress> NotifyEmails { get; set; }
         public string NotifyRole { get; set; }
 
-        public ContactFormModel()
-        {
-        }
+        public ContactFormModel() { }
 
         public ContactFormModel(bool showValidationMessage, bool showValidationIndividualMessages)
         {
@@ -71,9 +66,17 @@ namespace Hood.ViewModels
         {
             var contactSettings = Engine.Settings.Contact;
 
-            message.PreHeader = NotificationTitle.IsSet() ? NotificationTitle.ReplaceSiteVariables() : contactSettings.Title.ReplaceSiteVariables();
-            message.Subject = NotificationSubject.IsSet() ? NotificationSubject.ReplaceSiteVariables() : contactSettings.Subject.ReplaceSiteVariables();
-            message.AddParagraph(NotificationMessage.IsSet() ? NotificationMessage.ReplaceSiteVariables() : contactSettings.Message.ReplaceSiteVariables());
+            message.PreHeader = NotificationTitle.IsSet()
+                ? NotificationTitle.ReplaceSiteVariables()
+                : contactSettings.Title.ReplaceSiteVariables();
+            message.Subject = NotificationSubject.IsSet()
+                ? NotificationSubject.ReplaceSiteVariables()
+                : contactSettings.Subject.ReplaceSiteVariables();
+            message.AddParagraph(
+                NotificationMessage.IsSet()
+                    ? NotificationMessage.ReplaceSiteVariables()
+                    : contactSettings.Message.ReplaceSiteVariables()
+            );
             message.AddParagraph("Name: <strong>" + Name + "</strong>");
             message.AddParagraph("Email: <strong>" + Email + "</strong>");
             message.AddParagraph("Phone: <strong>" + PhoneNumber + "</strong>");
@@ -83,13 +86,20 @@ namespace Hood.ViewModels
             return message;
         }
 
-
         public MailObject WriteNotificationToMailObject(MailObject message)
         {
             var contactSettings = Engine.Settings.Contact;
-            message.PreHeader = AdminNotificationTitle.IsSet() ? AdminNotificationTitle.ReplaceSiteVariables() : contactSettings.AdminNoficationTitle.ReplaceSiteVariables();
-            message.Subject = AdminNotificationSubject.IsSet() ? AdminNotificationSubject.ReplaceSiteVariables() : contactSettings.AdminNoficationSubject.ReplaceSiteVariables();
-            message.AddParagraph(AdminNotificationMessage.IsSet() ? AdminNotificationMessage.ReplaceSiteVariables() : contactSettings.AdminNoficationMessage.ReplaceSiteVariables());
+            message.PreHeader = AdminNotificationTitle.IsSet()
+                ? AdminNotificationTitle.ReplaceSiteVariables()
+                : contactSettings.AdminNoficationTitle.ReplaceSiteVariables();
+            message.Subject = AdminNotificationSubject.IsSet()
+                ? AdminNotificationSubject.ReplaceSiteVariables()
+                : contactSettings.AdminNoficationSubject.ReplaceSiteVariables();
+            message.AddParagraph(
+                AdminNotificationMessage.IsSet()
+                    ? AdminNotificationMessage.ReplaceSiteVariables()
+                    : contactSettings.AdminNoficationMessage.ReplaceSiteVariables()
+            );
             message.AddParagraph("Name: <strong>" + Name + "</strong>");
             message.AddParagraph("Email: <strong>" + Email + "</strong>");
             message.AddParagraph("Phone: <strong>" + PhoneNumber + "</strong>");

@@ -3,7 +3,6 @@
     public enum PropertyImporterMethod
     {
         FtpBlm,
-        Directory
+        Directory,
     }
 }
-

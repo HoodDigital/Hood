@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Identity;
-using Hood.Interfaces;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using Hood.Extensions;
+using Hood.Interfaces;
+using Microsoft.AspNetCore.Identity;
 
 namespace Hood.Models
 {
@@ -17,7 +17,10 @@ namespace Hood.Models
         public string Url { get; set; }
         public Dictionary<string, string> Exception { get; set; }
         public IMediaObject Media { get; set; }
-        public string MediaJson { get { return Media.ToJson(); } }
+        public string MediaJson
+        {
+            get { return Media.ToJson(); }
+        }
 
         public Response(Array data, int count, string message = "", string title = "Succeeded!")
         {
@@ -40,19 +43,30 @@ namespace Hood.Models
         {
             Success = success;
             Message = message;
-            Title = title.IsSet() ? title : success ? "Succeeded" : "Failed";
+            Title =
+                title.IsSet() ? title
+                : success ? "Succeeded"
+                : "Failed";
             Errors = message;
         }
+
         public Response(bool success, IMediaObject media, string message = "", string title = null)
         {
             Success = success;
             Message = message;
             Errors = message;
-            Title = title.IsSet() ? title : success ? "Succeeded" : "Failed";
+            Title =
+                title.IsSet() ? title
+                : success ? "Succeeded"
+                : "Failed";
             Media = media;
         }
 
-        public Response(IEnumerable<IdentityError> errors, string message = "", string title = "An error occurred!")
+        public Response(
+            IEnumerable<IdentityError> errors,
+            string message = "",
+            string title = "An error occurred!"
+        )
         {
             Success = false;
             Message = message;
@@ -61,10 +75,14 @@ namespace Hood.Models
             foreach (IdentityError err in errors)
             {
                 Errors += err.Description + "<br />";
-
             }
         }
-        public Response(IEnumerable<string> errors, string message = "", string title = "An error occurred!")
+
+        public Response(
+            IEnumerable<string> errors,
+            string message = "",
+            string title = "An error occurred!"
+        )
         {
             Success = false;
             Message = message;
@@ -73,9 +91,9 @@ namespace Hood.Models
             foreach (string err in errors)
             {
                 Errors += err + "<br />";
-
             }
         }
+
         public Response(Exception ex, string message = "", string title = "An error occurred!")
         {
             Success = false;

@@ -1,7 +1,7 @@
-﻿using Hood.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using Hood.Entities;
 using Hood.Interfaces;
 using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Models
 {
@@ -22,10 +22,13 @@ namespace Hood.Models
 
         [Required]
         public string City { get; set; }
+
         [Required]
         public string County { get; set; }
+
         [Required]
         public string Country { get; set; }
+
         [Required]
         public string Postcode { get; set; }
         public double Latitude { get; set; }

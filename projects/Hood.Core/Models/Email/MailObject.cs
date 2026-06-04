@@ -1,9 +1,9 @@
-﻿using Hood.Core;
-using Hood.Extensions;
-using SendGrid.Helpers.Mail;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Hood.Core;
+using Hood.Extensions;
+using SendGrid.Helpers.Mail;
 
 namespace Hood.Models
 {
@@ -49,13 +49,11 @@ namespace Hood.Models
             if (!Logo.IsSet())
                 if (mailSettings.Logo.IsSet())
                     Logo = mailSettings.Logo;
-                else
-                    if (basicSettings.Logo.IsSet())
+                else if (basicSettings.Logo.IsSet())
                     Logo = basicSettings.Logo;
 
             if (Logo.IsSet())
-                return
-                @$"<tr>
+                return @$"<tr>
                     <td style='background-color:{TextAreaColour};padding:{MailPadding};text-align:{LogoAlign}'>
                         <h1 class='align-{LogoAlign}' style='color:#222222;margin:0;margin-bottom:0px;text-align:{LogoAlign};text-decoration:none;'>
                             <img src='{Logo}' alt='{Title}' align='center' style='border:none;-ms-interpolation-mode:bicubic;max-height:50px;height:auto;width:auto;' height='50'>
@@ -63,8 +61,7 @@ namespace Hood.Models
                     </td>
                 </tr>";
             else
-                return
-                @$"<tr>
+                return @$"<tr>
                     <td style='background-color:{TextAreaColour};padding:{MailPadding};text-align:{LogoAlign}'>
                         <h1 class='align-{LogoAlign}' style='color:#222222;{GetFontStyles(2.5)}margin-bottom:0px;text-align:{LogoAlign};text-decoration:none;'>
                             {Title}
@@ -82,8 +79,7 @@ namespace Hood.Models
                     HeroImage = mailSettings.HeroImage;
 
             if (HeroImage.IsSet())
-                return
-                @$"<tr>
+                return @$"<tr>
                     <td style='background-color:{TextAreaColour};'>
                         <img src='{HeroImage}' width='680' height='' alt='alt_text' border='0'
                             style='width:100%;max-width:680px;height:auto;background:#dddddd;margin:auto;display:block;' class='g-img'>
@@ -92,7 +88,11 @@ namespace Hood.Models
             else
                 return $"";
         }
-        public string GetFontStyles(double fontSizeMultiplier = 1, double lineHeightMultiplier = 1.25)
+
+        public string GetFontStyles(
+            double fontSizeMultiplier = 1,
+            double lineHeightMultiplier = 1.25
+        )
         {
             double size = BaseFontSize * fontSizeMultiplier;
             double lineHeight = BaseFontSize * fontSizeMultiplier * lineHeightMultiplier;
@@ -113,10 +113,7 @@ namespace Hood.Models
         private StringWriter _body;
         public string Html
         {
-            get
-            {
-                return _body.ToString();
-            }
+            get { return _body.ToString(); }
             set
             {
                 _body.Close();
@@ -128,10 +125,7 @@ namespace Hood.Models
         private StringWriter _textBody;
         public string Text
         {
-            get
-            {
-                return _textBody.ToString();
-            }
+            get { return _textBody.ToString(); }
             set
             {
                 _textBody.Close();
@@ -139,12 +133,14 @@ namespace Hood.Models
                 _textBody.Write(value);
             }
         }
+
         public void AddCustomHtml(string htmlContent, string textContent)
         {
             if (textContent.IsSet())
                 _textBody.WriteLine(textContent);
             _body.WriteLine(htmlContent);
         }
+
         public void AddHorizontalRule()
         {
             _textBody.WriteLine();
@@ -152,58 +148,118 @@ namespace Hood.Models
             _textBody.WriteLine();
             _body.WriteLine(string.Format(@"<hr />"));
         }
+
         public void AddLineBreak()
         {
             _textBody.WriteLine();
             _textBody.WriteLine();
             _body.WriteLine(string.Format(@"<br />"));
         }
-        public void AddH1(string content, string colour = "#222222", string align = "left", double fontSizeMultiplier = 2.5, double lineHeightMultiplier = 1)
+
+        public void AddH1(
+            string content,
+            string colour = "#222222",
+            string align = "left",
+            double fontSizeMultiplier = 2.5,
+            double lineHeightMultiplier = 1
+        )
         {
             _textBody.WriteLine();
             _textBody.WriteLine(content);
             _textBody.WriteLine();
             _textBody.WriteLine();
-            _body.WriteLine($"<h1 class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</h1>");
-        }
-        public void AddH2(string content, string colour = "#222222", string align = "left", double fontSizeMultiplier = 2, double lineHeightMultiplier = 1.1)
-        {
-            _textBody.WriteLine();
-            _textBody.WriteLine(content);
-            _textBody.WriteLine();
-            _textBody.WriteLine();
-            _body.WriteLine($"<h2 class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</h2>");
-        }
-        public void AddH3(string content, string colour = "#222222", string align = "left", double fontSizeMultiplier = 1.75, double lineHeightMultiplier = 1.25)
-        {
-            _textBody.WriteLine();
-            _textBody.WriteLine(content);
-            _textBody.WriteLine();
-            _textBody.WriteLine();
-            _body.WriteLine($"<h3 class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</h3>");
+            _body.WriteLine(
+                $"<h1 class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</h1>"
+            );
         }
 
-        public void AddH4(string content, string colour = "#222222", string align = "left", double fontSizeMultiplier = 1.3, double lineHeightMultiplier = 1.25)
+        public void AddH2(
+            string content,
+            string colour = "#222222",
+            string align = "left",
+            double fontSizeMultiplier = 2,
+            double lineHeightMultiplier = 1.1
+        )
         {
             _textBody.WriteLine();
             _textBody.WriteLine(content);
             _textBody.WriteLine();
             _textBody.WriteLine();
-            _body.WriteLine($"<h4 class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</h4>");
+            _body.WriteLine(
+                $"<h2 class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</h2>"
+            );
         }
-        public void AddParagraph(string content, string colour = "#222222", string align = "left", double fontSizeMultiplier = 1, double lineHeightMultiplier = 1.5)
+
+        public void AddH3(
+            string content,
+            string colour = "#222222",
+            string align = "left",
+            double fontSizeMultiplier = 1.75,
+            double lineHeightMultiplier = 1.25
+        )
+        {
+            _textBody.WriteLine();
+            _textBody.WriteLine(content);
+            _textBody.WriteLine();
+            _textBody.WriteLine();
+            _body.WriteLine(
+                $"<h3 class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</h3>"
+            );
+        }
+
+        public void AddH4(
+            string content,
+            string colour = "#222222",
+            string align = "left",
+            double fontSizeMultiplier = 1.3,
+            double lineHeightMultiplier = 1.25
+        )
+        {
+            _textBody.WriteLine();
+            _textBody.WriteLine(content);
+            _textBody.WriteLine();
+            _textBody.WriteLine();
+            _body.WriteLine(
+                $"<h4 class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</h4>"
+            );
+        }
+
+        public void AddParagraph(
+            string content,
+            string colour = "#222222",
+            string align = "left",
+            double fontSizeMultiplier = 1,
+            double lineHeightMultiplier = 1.5
+        )
         {
             _textBody.WriteLine(content);
             _textBody.WriteLine();
-            _body.WriteLine($"<p class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</p>");
+            _body.WriteLine(
+                $"<p class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</p>"
+            );
         }
-        public void AddDiv(string content, string colour = "#222222", string align = "left", double fontSizeMultiplier = 1, double lineHeightMultiplier = 1.25)
+
+        public void AddDiv(
+            string content,
+            string colour = "#222222",
+            string align = "left",
+            double fontSizeMultiplier = 1,
+            double lineHeightMultiplier = 1.25
+        )
         {
             _textBody.WriteLine(content);
             _textBody.WriteLine();
-            _body.WriteLine($"<div class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</div>");
+            _body.WriteLine(
+                $"<div class='align-{align}' style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}text-align:{align};'>{content}</div>"
+            );
         }
-        public void AddUnorderedList(List<string> items, string colour = "#222222", double fontSizeMultiplier = 1, double lineHeightMultiplier = 1.25)
+
+        public void AddUnorderedList(
+            List<string> items,
+            string colour = "#222222",
+            double fontSizeMultiplier = 1,
+            double lineHeightMultiplier = 1.25
+        )
         {
             foreach (string item in items)
             {
@@ -211,14 +267,24 @@ namespace Hood.Models
             }
             _textBody.WriteLine();
 
-            _body.WriteLine($"<ul style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}'>");
+            _body.WriteLine(
+                $"<ul style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}'>"
+            );
             foreach (string item in items)
             {
-                _body.WriteLine($"<li style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)};margin-bottom:.5em;'>{item}</li>");
+                _body.WriteLine(
+                    $"<li style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)};margin-bottom:.5em;'>{item}</li>"
+                );
             }
             _body.WriteLine("</ul>");
         }
-        public void AddOrderedList(List<string> items, string colour = "#222222", double fontSizeMultiplier = 1, double lineHeightMultiplier = 1.25)
+
+        public void AddOrderedList(
+            List<string> items,
+            string colour = "#222222",
+            double fontSizeMultiplier = 1,
+            double lineHeightMultiplier = 1.25
+        )
         {
             foreach (string item in items)
             {
@@ -226,22 +292,36 @@ namespace Hood.Models
             }
             _textBody.WriteLine();
 
-            _body.WriteLine($"<ol style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}'>");
+            _body.WriteLine(
+                $"<ol style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)}'>"
+            );
             foreach (string item in items)
             {
-                _body.WriteLine($"<li style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)};margin-bottom:.5em;'>{item}</li>");
+                _body.WriteLine(
+                    $"<li style='color:{colour};{GetFontStyles(fontSizeMultiplier, lineHeightMultiplier)};margin-bottom:.5em;'>{item}</li>"
+                );
             }
             _body.WriteLine("</ol>");
         }
+
         public void AddImage(string url, string altText)
         {
             _textBody.WriteLine("Image: " + url + "(" + altText + ")");
-            _body.WriteLine($"<p style='{GetFontStyles(1)}margin: 0;margin-bottom: 1em;'><img src='{url}' alt='{altText}' width='520' class='img-responsive img-block' style='border:none;-ms-interpolation-mode:bicubic;max-width:100%;display:block;'></p>");
+            _body.WriteLine(
+                $"<p style='{GetFontStyles(1)}margin: 0;margin-bottom: 1em;'><img src='{url}' alt='{altText}' width='520' class='img-responsive img-block' style='border:none;-ms-interpolation-mode:bicubic;max-width:100%;display:block;'></p>"
+            );
         }
-        public void AddCallToAction(string content, string url, string colour = "#3498db", string align = "left")
+
+        public void AddCallToAction(
+            string content,
+            string url,
+            string colour = "#3498db",
+            string align = "left"
+        )
         {
             _textBody.WriteLine(content + ": " + url);
-            _body.WriteLine($@"<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='margin-bottom:{BaseFontSize}px;border-collapse:separate;mso-table-lspace:0pt;mso-table-rspace:0pt;width;100%;box-sizing:border-box;min-width:100%!important;' width='100%'>
+            _body.WriteLine(
+                $@"<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='margin-bottom:{BaseFontSize}px;border-collapse:separate;mso-table-lspace:0pt;mso-table-rspace:0pt;width;100%;box-sizing:border-box;min-width:100%!important;' width='100%'>
     <tbody>
         <tr>
             <td align='{align}' style='{GetFontStyles(1)};vertical-align:top;text-align:{align}' valign='top'>
@@ -260,15 +340,18 @@ namespace Hood.Models
         </tr>
     </tbody>
 </table>
-");
+"
+            );
         }
 
         public void AddSpacer(int pixelHeight = 0)
         {
-            if (pixelHeight == 0){
+            if (pixelHeight == 0)
+            {
                 pixelHeight = BaseFontSize;
             }
-            _body.WriteLine($@"<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='height:{pixelHeight};width:100%;' height='{pixelHeight}' width='100%'>
+            _body.WriteLine(
+                $@"<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='height:{pixelHeight};width:100%;' height='{pixelHeight}' width='100%'>
     <tbody>
         <tr>
             <td style='height:{pixelHeight};width:100%;' height='{pixelHeight}'>                
@@ -276,7 +359,8 @@ namespace Hood.Models
         </tr>
     </tbody>
 </table>
-");
+"
+            );
         }
     }
 }

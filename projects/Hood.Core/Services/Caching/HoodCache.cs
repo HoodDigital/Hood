@@ -1,13 +1,13 @@
-﻿using Hood.Core;
-using Hood.Extensions;
-using Hood.Models;
-using Microsoft.Extensions.Caching.Memory;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Hood.Core;
+using Hood.Extensions;
+using Hood.Models;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Hood.Caching
 {
@@ -15,18 +15,16 @@ namespace Hood.Caching
     {
         private readonly ConcurrentDictionary<string, DateTime> _entryKeys;
         private readonly IMemoryCache _cache;
+
         public HoodCache(IMemoryCache cache)
         {
             _entryKeys = new ConcurrentDictionary<string, DateTime>();
             _cache = cache;
         }
 
-        public ConcurrentDictionary<string, DateTime> Keys 
-        { 
-            get
-            {
-                return _entryKeys;
-            }                
+        public ConcurrentDictionary<string, DateTime> Keys
+        {
+            get { return _entryKeys; }
         }
 
         public bool Exists(string key)
@@ -84,7 +82,7 @@ namespace Hood.Caching
         }
 
         public Task RemoveAsync(string key)
-        {            
+        {
             Remove(key);
             return Task.CompletedTask;
         }
@@ -145,9 +143,7 @@ namespace Hood.Caching
         {
             if (!_entryKeys.ContainsKey(key))
                 return;
-            if (_entryKeys.TryRemove(key, out _))
-            {
-            }
+            if (_entryKeys.TryRemove(key, out _)) { }
         }
 
         #endregion

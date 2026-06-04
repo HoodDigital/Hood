@@ -9,21 +9,24 @@
         Dark,
         Light,
         Primary,
-        Secondary
+        Secondary,
     }
+
     public enum AlertSize
-    {        
+    {
         Small,
         Medium,
         Large,
-        Epic
+        Epic,
     }
+
     public static class AlertExtensions
     {
         public static string ToAlertCssClass(this AlertType alertType)
         {
             return $"alert-{alertType.ToString().ToLower()}";
         }
+
         public static string ToIconSizeCssClass(this AlertSize alertSize)
         {
             switch (alertSize)

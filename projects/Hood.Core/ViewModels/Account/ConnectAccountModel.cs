@@ -12,6 +12,7 @@ namespace Hood.ViewModels
         [FromForm(Name = "returnUrl")]
         public string ReturnUrl { get; set; }
     }
+
     public class DisconnectAccountModel : SaveableModel
     {
         public string LocalPicture { get; set; }

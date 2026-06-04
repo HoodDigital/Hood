@@ -1,9 +1,9 @@
-﻿using Hood.Extensions;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Hood.Extensions;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Hood.Models
 {
@@ -476,14 +476,18 @@ namespace Hood.Models
                 "fa-window-restore",
                 "fa-won-sign",
                 "fa-wrench",
-                "fa-yen-sign"
+                "fa-yen-sign",
             };
 
         public static Dictionary<string, string> Icons
-        { 
-            get {
-                return IconStrings
-                    .ToDictionary(c => c, c => $"<i class='fa {c} me-2'></i> {c.Replace("fa-", "").Replace("-", " ").ToTitleCase()}");
+        {
+            get
+            {
+                return IconStrings.ToDictionary(
+                    c => c,
+                    c =>
+                        $"<i class='fa {c} me-2'></i> {c.Replace("fa-", "").Replace("-", " ").ToTitleCase()}"
+                );
             }
         }
     }

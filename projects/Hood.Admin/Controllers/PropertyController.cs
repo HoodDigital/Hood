@@ -10,8 +10,6 @@ namespace Hood.Areas.Admin.Controllers
     public class PropertyController : BasePropertyController
     {
         public PropertyController()
-            : base()
-        {
-        }
+            : base() { }
     }
 }

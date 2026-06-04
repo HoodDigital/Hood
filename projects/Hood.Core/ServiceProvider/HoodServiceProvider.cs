@@ -1,4 +1,7 @@
-﻿using Hood.Enums;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Services;
@@ -6,9 +9,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Hood.Core
 {
@@ -22,10 +22,7 @@ namespace Hood.Core
         public List<StartupException> StartupExceptions { get; set; }
         public bool Installed
         {
-            get
-            {
-                return !StartupExceptions.Any();
-            }
+            get { return !StartupExceptions.Any(); }
         }
 
         public List<StartupException> GetStartupExceptionsByType(StartupError type)
@@ -49,9 +46,11 @@ namespace Hood.Core
             return context != null ? context.RequestServices : ServiceProvider;
         }
 
-        public IServiceProvider ConfigureServices(IServiceCollection services, IConfiguration config)
+        public IServiceProvider ConfigureServices(
+            IServiceCollection services,
+            IConfiguration config
+        )
         {
-
             // Register engine
             services.AddSingleton<IHoodServiceProvider>(this);
 
@@ -67,8 +66,10 @@ namespace Hood.Core
             var dependencies = typeFinder.FindClassesOfType<IHoodComponent>();
 
             var instances = dependencies
-                                .Select(dependencyRegistrar => (IHoodComponent)Activator.CreateInstance(dependencyRegistrar))
-                                .OrderBy(dependencyRegistrar => dependencyRegistrar.ServiceConfigurationOrder);
+                .Select(dependencyRegistrar =>
+                    (IHoodComponent)Activator.CreateInstance(dependencyRegistrar)
+                )
+                .OrderBy(dependencyRegistrar => dependencyRegistrar.ServiceConfigurationOrder);
 
             foreach (var dependency in instances)
                 dependency.ConfigureServices(services, config);
@@ -90,8 +91,8 @@ namespace Hood.Core
             var mvcCoreBuilder = services.AddMvcCore();
         }
 
-
-        public T Resolve<T>() where T : class
+        public T Resolve<T>()
+            where T : class
         {
             return (T)GetServiceProvider().GetRequiredService(typeof(T));
         }
@@ -114,13 +115,15 @@ namespace Hood.Core
                 try
                 {
                     //try to resolve constructor parameters
-                    var parameters = constructor.GetParameters().Select(parameter =>
-                    {
-                        var service = Resolve(parameter.ParameterType);
-                        if (service == null)
-                            throw new Exception("Unknown dependency");
-                        return service;
-                    });
+                    var parameters = constructor
+                        .GetParameters()
+                        .Select(parameter =>
+                        {
+                            var service = Resolve(parameter.ParameterType);
+                            if (service == null)
+                                throw new Exception("Unknown dependency");
+                            return service;
+                        });
 
                     //all is ok, so create instance
                     return Activator.CreateInstance(type, parameters.ToArray());
@@ -130,7 +133,10 @@ namespace Hood.Core
                     innerException = ex;
                 }
             }
-            throw new Exception("No constructor was found that had all the dependencies satisfied.", innerException);
+            throw new Exception(
+                "No constructor was found that had all the dependencies satisfied.",
+                innerException
+            );
         }
     }
 }

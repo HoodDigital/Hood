@@ -1,6 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Hood.BaseControllers;
 using Hood.Caching;
 using Hood.Contexts;
-using Hood.BaseControllers;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
@@ -9,11 +14,6 @@ using Hood.Services;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Hood.Admin.BaseControllers
 {
@@ -23,6 +23,7 @@ namespace Hood.Admin.BaseControllers
         protected readonly IContentRepository _content;
         protected readonly ContentCategoryCache _contentCategoryCache;
         protected readonly IHoodAccountRepository _account;
+
         public BaseContentController()
             : base()
         {
@@ -33,10 +34,14 @@ namespace Hood.Admin.BaseControllers
         }
 
         [Route("admin/content/manage/{type?}/")]
-        public virtual async Task<IActionResult> Index(ContentModel model) => await List(model, "Index");
+        public virtual async Task<IActionResult> Index(ContentModel model) =>
+            await List(model, "Index");
 
         [Route("admin/content/list/{type?}/")]
-        public virtual async Task<IActionResult> List(ContentModel model, string viewName = "_List_Content")
+        public virtual async Task<IActionResult> List(
+            ContentModel model,
+            string viewName = "_List_Content"
+        )
         {
             model = await _content.GetContentAsync(model);
             model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
@@ -74,10 +79,14 @@ namespace Hood.Admin.BaseControllers
                 {
                     if (await _content.SlugExists(modelToUpdate.Slug, modelToUpdate.Id))
                     {
-                        modelToUpdate.Type = Engine.Settings.Content.GetContentType(modelToUpdate.ContentType);
+                        modelToUpdate.Type = Engine.Settings.Content.GetContentType(
+                            modelToUpdate.ContentType
+                        );
                         if (modelToUpdate.Type.BaseName == "Page")
                         {
-                            throw new Exception("The slug is not valid, it already exists or is a reserved system word.");
+                            throw new Exception(
+                                "The slug is not valid, it already exists or is a reserved system word."
+                            );
                         }
                         else
                         {
@@ -90,9 +99,13 @@ namespace Hood.Admin.BaseControllers
                     await GenerateNewSlug(modelToUpdate);
                 }
 
-
                 // update  meta values
-                foreach (KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues> val in Request.Form)
+                foreach (
+                    KeyValuePair<
+                        string,
+                        Microsoft.Extensions.Primitives.StringValues
+                    > val in Request.Form
+                )
                 {
                     if (val.Key.StartsWith("Meta:"))
                     {
@@ -105,16 +118,27 @@ namespace Hood.Admin.BaseControllers
                         else
                         {
                             // Add it...
-                            CustomField metaDetails = modelToUpdate.Type.GetMetaDetails(val.Key.Replace("Meta:", ""));
-                            modelToUpdate.AddMeta(metaDetails.Name, val.Value.ToString(), metaDetails.Type);
+                            CustomField metaDetails = modelToUpdate.Type.GetMetaDetails(
+                                val.Key.Replace("Meta:", "")
+                            );
+                            modelToUpdate.AddMeta(
+                                metaDetails.Name,
+                                val.Value.ToString(),
+                                metaDetails.Type
+                            );
                         }
                     }
                 }
 
-                string currentTemplate = modelToUpdate.GetMeta("Settings.Template").GetStringValue();
+                string currentTemplate = modelToUpdate
+                    .GetMeta("Settings.Template")
+                    .GetStringValue();
 
                 // delete all template metas that do not exist in the new template, and add any that are missing
-                List<string> newMetas = _content.GetMetasForTemplate(currentTemplate, modelToUpdate.Type.TemplateFolder);
+                List<string> newMetas = _content.GetMetasForTemplate(
+                    currentTemplate,
+                    modelToUpdate.Type.TemplateFolder
+                );
                 if (newMetas != null)
                     _content.UpdateTemplateMetas(modelToUpdate, newMetas);
 
@@ -123,18 +147,18 @@ namespace Hood.Admin.BaseControllers
                 SaveMessage = "Saved!";
                 MessageType = AlertType.Success;
                 return View(modelToUpdate);
-
             }
             catch (Exception ex)
             {
                 SaveMessage = "There was a problem saving: " + ex.Message;
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<BaseContentController>(SaveMessage, ex);
-                model.Metadata = await _contentDb.ContentMetadata.Where(cm => cm.ContentId == model.Id).ToListAsync();
+                model.Metadata = await _contentDb
+                    .ContentMetadata.Where(cm => cm.ContentId == model.Id)
+                    .ToListAsync();
                 model = await GetEditorModel(model);
                 return View(model);
             }
-
         }
 
         protected virtual async Task GenerateNewSlug(Content model)
@@ -156,7 +180,7 @@ namespace Hood.Admin.BaseControllers
             {
                 PublishDate = DateTime.UtcNow,
                 Type = Engine.Settings.Content.GetContentType(type),
-                Status = ContentStatus.Draft
+                Status = ContentStatus.Draft,
             };
             return View("_Blade_Content", model);
         }
@@ -178,11 +202,17 @@ namespace Hood.Admin.BaseControllers
                 model.ShareCount = 0;
                 model.Views = 0;
                 model = await _content.AddAsync(model);
-                return new Response(true, $"The content was created successfully.<br /><a href='{Url.Action(nameof(Edit), new { id = model.Id })}'>Go to the new content</a>");
+                return new Response(
+                    true,
+                    $"The content was created successfully.<br /><a href='{Url.Action(nameof(Edit), new { id = model.Id })}'>Go to the new content</a>"
+                );
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseContentController>($"Error publishing content.", ex);
+                return await ErrorResponseAsync<BaseContentController>(
+                    $"Error publishing content.",
+                    ex
+                );
             }
         }
 
@@ -196,7 +226,7 @@ namespace Hood.Admin.BaseControllers
             EditContentModel model = new EditContentModel()
             {
                 ContentType = Engine.Settings.Content.GetContentType(content.ContentType),
-                Content = content
+                Content = content,
             };
             return View(model);
         }
@@ -222,25 +252,35 @@ namespace Hood.Admin.BaseControllers
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseContentController>($"Error toggling a content category.", ex);
+                return await ErrorResponseAsync<BaseContentController>(
+                    $"Error toggling a content category.",
+                    ex
+                );
             }
         }
 
         [Route("admin/content/categories/suggestions/{type}/")]
         public virtual IActionResult CategorySuggestions(string type)
         {
-            var suggestions = _contentCategoryCache.GetSuggestions(type).Select(c => new { id = c.Id, displayName = c.DisplayName, slug = c.Slug });
+            var suggestions = _contentCategoryCache
+                .GetSuggestions(type)
+                .Select(c => new
+                {
+                    id = c.Id,
+                    displayName = c.DisplayName,
+                    slug = c.Slug,
+                });
             return Json(suggestions.ToArray());
         }
         #endregion
 
-        #region Manage Categories        
+        #region Manage Categories
         [Route("admin/content/categories/list/{type}/")]
         public virtual IActionResult Categories(string type)
         {
             ContentModel model = new ContentModel
             {
-                ContentType = Engine.Settings.Content.GetContentType(type)
+                ContentType = Engine.Settings.Content.GetContentType(type),
             };
             return View("_List_Categories", model);
         }
@@ -258,7 +298,7 @@ namespace Hood.Admin.BaseControllers
             ContentCategory model = new ContentCategory()
             {
                 ContentType = type,
-                Categories = _contentCategoryCache.TopLevel(type)
+                Categories = _contentCategoryCache.TopLevel(type),
             };
             return View("_Blade_Category", model);
         }
@@ -281,7 +321,10 @@ namespace Hood.Admin.BaseControllers
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseContentController>($"Error adding a content category.", ex);
+                return await ErrorResponseAsync<BaseContentController>(
+                    $"Error adding a content category.",
+                    ex
+                );
             }
         }
 
@@ -306,10 +349,18 @@ namespace Hood.Admin.BaseControllers
                         throw new Exception("You cannot set the parent to be the same category!");
                     }
 
-                    IEnumerable<ContentCategory> thisAndChildren = _contentCategoryCache.GetThisAndChildren(model.Id);
-                    if (thisAndChildren.Select(c => c.Id).ToList().Contains(model.ParentCategoryId.Value))
+                    IEnumerable<ContentCategory> thisAndChildren =
+                        _contentCategoryCache.GetThisAndChildren(model.Id);
+                    if (
+                        thisAndChildren
+                            .Select(c => c.Id)
+                            .ToList()
+                            .Contains(model.ParentCategoryId.Value)
+                    )
                     {
-                        throw new Exception("You cannot set the parent to be a child of this category!");
+                        throw new Exception(
+                            "You cannot set the parent to be a child of this category!"
+                        );
                     }
                 }
 
@@ -318,7 +369,10 @@ namespace Hood.Admin.BaseControllers
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseContentController>($"Error updating a content category.", ex);
+                return await ErrorResponseAsync<BaseContentController>(
+                    $"Error updating a content category.",
+                    ex
+                );
             }
         }
 
@@ -333,7 +387,10 @@ namespace Hood.Admin.BaseControllers
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseContentController>($"Error deleting a content category, did you make sure it was empty first?", ex);
+                return await ErrorResponseAsync<BaseContentController>(
+                    $"Error deleting a content category, did you make sure it was empty first?",
+                    ex
+                );
             }
         }
         #endregion
@@ -351,7 +408,10 @@ namespace Hood.Admin.BaseControllers
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseContentController>($"Error publishing content with Id: {id}", ex);
+                return await ErrorResponseAsync<BaseContentController>(
+                    $"Error publishing content with Id: {id}",
+                    ex
+                );
             }
         }
         #endregion
@@ -368,7 +428,10 @@ namespace Hood.Admin.BaseControllers
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseContentController>($"Error deleting content with Id: {id}", ex);
+                return await ErrorResponseAsync<BaseContentController>(
+                    $"Error deleting content with Id: {id}",
+                    ex
+                );
             }
         }
 
@@ -425,7 +488,10 @@ namespace Hood.Admin.BaseControllers
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseContentController>($"Error setting a homepage as content Id: {id}", ex);
+                return await ErrorResponseAsync<BaseContentController>(
+                    $"Error setting a homepage as content Id: {id}",
+                    ex
+                );
             }
         }
 
@@ -442,7 +508,9 @@ namespace Hood.Admin.BaseControllers
                 model.ValidateOrThrow();
 
                 // load the media object.
-                Content content = await _contentDb.Content.Where(p => p.Id == id).FirstOrDefaultAsync();
+                Content content = await _contentDb
+                    .Content.Where(p => p.Id == id)
+                    .FirstOrDefaultAsync();
                 if (content == null)
                 {
                     throw new Exception("Could not load content to attach media.");
@@ -473,7 +541,10 @@ namespace Hood.Admin.BaseControllers
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseContentController>($"Error attaching a media file to an entity.", ex);
+                return await ErrorResponseAsync<BaseContentController>(
+                    $"Error attaching a media file to an entity.",
+                    ex
+                );
             }
         }
 
@@ -487,7 +558,9 @@ namespace Hood.Admin.BaseControllers
             try
             {
                 // load the media object.
-                Content content = await _contentDb.Content.Where(p => p.Id == id).FirstOrDefaultAsync();
+                Content content = await _contentDb
+                    .Content.Where(p => p.Id == id)
+                    .FirstOrDefaultAsync();
                 MediaObject media = _db.Media.SingleOrDefault(m => m.Id == model.MediaId);
                 string cacheKey = typeof(Content).ToString() + ".Single." + id;
 
@@ -503,12 +576,18 @@ namespace Hood.Admin.BaseControllers
 
                 await _contentDb.SaveChangesAsync();
                 _cache.Remove(cacheKey);
-                return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
-
+                return new Response(
+                    true,
+                    MediaObject.Blank,
+                    $"The media file has been removed successfully."
+                );
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseContentController>($"Error removing a media file from an entity.", ex);
+                return await ErrorResponseAsync<BaseContentController>(
+                    $"Error removing a media file from an entity.",
+                    ex
+                );
             }
         }
         #endregion
@@ -530,7 +609,6 @@ namespace Hood.Admin.BaseControllers
         [Route("admin/content/media/{id}/upload/gallery")]
         public virtual async Task<Response> UploadToGallery(List<int> media, int id)
         {
-
             try
             {
                 Content content = await _content.GetContentByIdAsync(id);
@@ -550,7 +628,9 @@ namespace Hood.Admin.BaseControllers
                     foreach (int mediaId in media)
                     {
                         // load the media object from db
-                        MediaObject mediaObject = _db.Media.AsNoTracking().SingleOrDefault(m => m.Id == mediaId);
+                        MediaObject mediaObject = _db
+                            .Media.AsNoTracking()
+                            .SingleOrDefault(m => m.Id == mediaId);
                         if (media == null)
                         {
                             throw new Exception("Could not load media to attach.");
@@ -560,14 +640,16 @@ namespace Hood.Admin.BaseControllers
                         propertyMedia.Id = 0;
                         _contentDb.ContentMedia.Add(propertyMedia);
                         await _contentDb.SaveChangesAsync();
-
                     }
                 }
                 return new Response(true, "The media has been attached successfully.");
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseContentController>($"Error uploading media to the gallery.", ex);
+                return await ErrorResponseAsync<BaseContentController>(
+                    $"Error uploading media to the gallery.",
+                    ex
+                );
             }
         }
 
@@ -577,14 +659,19 @@ namespace Hood.Admin.BaseControllers
         {
             try
             {
-                ContentMedia media = await _contentDb.ContentMedia.SingleOrDefaultAsync(m => m.Id == mediaId);
+                ContentMedia media = await _contentDb.ContentMedia.SingleOrDefaultAsync(m =>
+                    m.Id == mediaId
+                );
                 _contentDb.Entry(media).State = EntityState.Deleted;
                 await _contentDb.SaveChangesAsync();
                 return new Response(true, "The image has now been removed.");
             }
             catch (Exception ex)
             {
-                await _logService.AddExceptionAsync<BaseContentController>("Error removing media item.", ex);
+                await _logService.AddExceptionAsync<BaseContentController>(
+                    "Error removing media item.",
+                    ex
+                );
                 return new Response(ex);
             }
         }
@@ -595,7 +682,6 @@ namespace Hood.Admin.BaseControllers
 
         protected virtual async Task<Content> GetEditorModel(Content model)
         {
-
             model.Type = Engine.Settings.Content.GetContentType(model.ContentType);
 
             model.Authors = await _account.GetUsersInRole("Editor");
@@ -631,10 +717,16 @@ namespace Hood.Admin.BaseControllers
                 }
             }
 
-            string[] templateDirs = {
+            string[] templateDirs =
+            {
                 _env.ContentRootPath + "\\UI\\" + templateDirectory + "\\",
                 _env.ContentRootPath + "\\Views\\" + templateDirectory + "\\",
-                _env.ContentRootPath + "\\Themes\\" + Engine.Settings["Hood.Settings.Theme"] + "\\Views\\" + templateDirectory + "\\"
+                _env.ContentRootPath
+                    + "\\Themes\\"
+                    + Engine.Settings["Hood.Settings.Theme"]
+                    + "\\Views\\"
+                    + templateDirectory
+                    + "\\",
             };
 
             foreach (string str in templateDirs)
@@ -658,7 +750,10 @@ namespace Hood.Admin.BaseControllers
                 catch { }
             }
 
-            model.Templates = templates.Distinct().OrderBy(s => s.Key).ToDictionary(t => t.Key, t => t.Value);
+            model.Templates = templates
+                .Distinct()
+                .OrderBy(s => s.Key)
+                .ToDictionary(t => t.Key, t => t.Value);
 
             return model;
         }
@@ -689,7 +784,6 @@ namespace Hood.Admin.BaseControllers
                 // refresh all content metas and things
                 await RefreshAllMetasAsync();
 
-
                 SaveMessage = "Settings saved!";
                 MessageType = AlertType.Success;
             }
@@ -703,7 +797,9 @@ namespace Hood.Admin.BaseControllers
 
         public virtual async Task RefreshAllMetasAsync()
         {
-            foreach (var content in _contentDb.Content.Include(p => p.Metadata).AsNoTracking().ToList())
+            foreach (
+                var content in _contentDb.Content.Include(p => p.Metadata).AsNoTracking().ToList()
+            )
             {
                 var type = Engine.Settings.Content.GetContentType(content.ContentType);
                 if (type != null)
@@ -716,7 +812,10 @@ namespace Hood.Admin.BaseControllers
                         if (template.IsSet())
                         {
                             // delete all template metas that do not exist in the new template, and add any that are missing
-                            List<string> newMetas = _content.GetMetasForTemplate(template, type.TemplateFolder);
+                            List<string> newMetas = _content.GetMetasForTemplate(
+                                template,
+                                type.TemplateFolder
+                            );
                             if (newMetas != null)
                                 _content.UpdateTemplateMetas(content, newMetas);
                         }
@@ -725,10 +824,5 @@ namespace Hood.Admin.BaseControllers
             }
             await _contentDb.SaveChangesAsync();
         }
-
     }
-
-
 }
-
-

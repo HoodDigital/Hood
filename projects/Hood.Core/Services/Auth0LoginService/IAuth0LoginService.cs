@@ -1,15 +1,14 @@
 using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authentication;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace Hood.Services
 {
     public interface IAuth0LoginService
     {
-
 #nullable enable
 
         string Domain { get; set; }

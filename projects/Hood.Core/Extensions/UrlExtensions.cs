@@ -1,21 +1,26 @@
-﻿using Hood.Core;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Web;
+using Hood.Core;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.Extensions
 {
     public static class UrlHelpers
     {
         private static IHttpContextAccessor HttpContextAccessor;
+
         public static void Configure(IHttpContextAccessor httpContextAccessor)
         {
             HttpContextAccessor = httpContextAccessor;
         }
 
-        public static Uri AddParameterToUrl(this string url, Dictionary<string, string> parameters, bool relative = true)
+        public static Uri AddParameterToUrl(
+            this string url,
+            Dictionary<string, string> parameters,
+            bool relative = true
+        )
         {
             var uriBuilder = new UriBuilder(url);
             var uri = uriBuilder.Uri;
@@ -37,7 +42,8 @@ namespace Hood.Extensions
                     {
                         hostname = mediaSettings.AzureHost.IsSet() ? mediaSettings.AzureHost : null;
                     }
-                } catch (Exception) { }
+                }
+                catch (Exception) { }
             }
 
             var host = hostname.IsSet() ? hostname : absoluteUri.Host;
@@ -46,11 +52,10 @@ namespace Hood.Extensions
             {
                 Host = host,
                 Scheme = scheme,
-                Port = -1
+                Port = -1,
             };
             return uriBuilder.Uri.AbsoluteUri;
         }
-
 
         public static Uri AddParameter(this Uri url, string name, string value)
         {
@@ -69,7 +74,12 @@ namespace Hood.Extensions
         /// <param name="controllerName"></param>
         /// <param name="routeValues"></param>
         /// <returns></returns>
-        public static string AbsoluteAction(this IUrlHelper url, string actionName, string controllerName, object routeValues = null)
+        public static string AbsoluteAction(
+            this IUrlHelper url,
+            string actionName,
+            string controllerName,
+            object routeValues = null
+        )
         {
             string scheme = HttpContextAccessor.HttpContext.Request.Scheme;
             return url.Action(actionName, controllerName, routeValues, scheme);
@@ -84,7 +94,15 @@ namespace Hood.Extensions
         public static string AbsoluteUrl(this IUrlHelper url, string slug = "")
         {
             var request = HttpContextAccessor.HttpContext.Request;
-            return string.Concat(request.Scheme, "://", request.Host.ToUriComponent(), request.PathBase.ToUriComponent(), "/", slug); ;
+            return string.Concat(
+                request.Scheme,
+                "://",
+                request.Host.ToUriComponent(),
+                request.PathBase.ToUriComponent(),
+                "/",
+                slug
+            );
+            ;
         }
     }
 }

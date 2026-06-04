@@ -1,11 +1,11 @@
-﻿using Hood.Extensions;
-using Microsoft.AspNetCore.Identity;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Security.Claims;
+using Hood.Extensions;
+using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 
 namespace Hood.Models
 {
@@ -31,16 +31,22 @@ namespace Hood.Models
 
         public UserProfile UserProfile { get; set; }
         public IList<Auth0Identity> ConnectedAuth0Accounts { get; set; }
+
         [PersonalData]
         public string Id { get; set; }
+
         [ProtectedPersonalData]
         public string UserName { get; set; }
+
         [PersonalData]
         public bool EmailConfirmed { get; set; }
+
         [ProtectedPersonalData]
         public string Email { get; set; }
+
         [PersonalData]
         public bool PhoneNumberConfirmed { get; set; }
+
         [ProtectedPersonalData]
         public string PhoneNumber { get; set; }
 
@@ -50,6 +56,7 @@ namespace Hood.Models
         public string LastLoginIP { get; set; }
         public string LastLoginLocation { get; set; }
         public int AccessFailedCount { get; set; }
+
         [PersonalData]
         public bool TwoFactorEnabled { get; set; }
         public bool LockoutEnabled { get; set; }
@@ -106,6 +113,4 @@ namespace Hood.Models
             return changed;
         }
     }
-
-
 }

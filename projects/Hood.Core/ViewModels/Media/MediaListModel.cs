@@ -1,10 +1,10 @@
-﻿using Hood.Enums;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Hood.ViewModels
 {
@@ -19,29 +19,39 @@ namespace Hood.ViewModels
 
         [FromQuery(Name = "user")]
         public string UserId { get; set; }
+
         [Display(Name = "File Type")]
         [FromQuery(Name = "fileType")]
         public GenericFileType? GenericFileType { get; set; }
+
         [FromQuery(Name = "restrict")]
         public string Restrict { get; set; }
+
         [FromQuery(Name = "dir")]
         public int? DirectoryId { get; set; }
+
         [FromQuery(Name = "root")]
         public int? RootId { get; set; }
 
         #region Actions
         [FromQuery(Name = "doAction")]
         public MediaWindowAction? Action { get; set; }
+
         [FromQuery(Name = "id")]
         public string Id { get; set; }
+
         [FromQuery(Name = "entity")]
         public string Entity { get; set; }
+
         [FromQuery(Name = "field")]
         public string Field { get; set; }
+
         [FromQuery(Name = "type")]
         public string Type { get; set; }
+
         [FromQuery(Name = "tag")]
         public string Tag { get; set; }
+
         [FromQuery(Name = "media")]
         public int? MediaId { get; set; }
         #endregion
@@ -59,7 +69,6 @@ namespace Hood.ViewModels
             query += Restrict.IsSet() ? "&restrict=" + Restrict : "";
             query += GenericFileType.HasValue ? "&fileType=" + GenericFileType : "";
             query += UserId.IsSet() ? "&user=" + UserId : "";
-
 
             query += Id.IsSet() ? "&id=" + Id : "";
             query += Entity.IsSet() ? "&entity=" + Entity : "";

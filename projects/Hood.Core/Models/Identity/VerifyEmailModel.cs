@@ -1,8 +1,8 @@
-﻿using Hood.Extensions;
+﻿using System.Collections.Generic;
 using Hood.Core;
-using SendGrid.Helpers.Mail;
-using System.Collections.Generic;
+using Hood.Extensions;
 using Hood.Interfaces;
+using SendGrid.Helpers.Mail;
 
 namespace Hood.Models
 {
@@ -22,10 +22,7 @@ namespace Hood.Models
 
         public EmailAddress To
         {
-            get
-            {
-                return new EmailAddress(User.Email, User.ToInternalName());
-            }
+            get { return new EmailAddress(User.Email, User.ToInternalName()); }
         }
 
         public string NotificationTitle { get; set; }
@@ -41,17 +38,25 @@ namespace Hood.Models
             var _accountSettings = Engine.Settings.Account;
 
             if (_accountSettings.VerifySubject.IsSet())
-                message.Subject = _accountSettings.VerifySubject.ReplaceUserVariables(User).ReplaceSiteVariables();
+                message.Subject = _accountSettings
+                    .VerifySubject.ReplaceUserVariables(User)
+                    .ReplaceSiteVariables();
             else
-                message.Subject = "Confirm your email address for {Site.Title}.".ReplaceUserVariables(User).ReplaceSiteVariables();
+                message.Subject = "Confirm your email address for {Site.Title}."
+                    .ReplaceUserVariables(User)
+                    .ReplaceSiteVariables();
 
             if (_accountSettings.VerifyTitle.IsSet())
-                message.PreHeader = _accountSettings.VerifyTitle.ReplaceUserVariables(User).ReplaceSiteVariables();
+                message.PreHeader = _accountSettings
+                    .VerifyTitle.ReplaceUserVariables(User)
+                    .ReplaceSiteVariables();
             else
                 message.PreHeader = "Confirm your email address.";
 
             if (_accountSettings.VerifyMessage.IsSet())
-                message.AddDiv(_accountSettings.VerifyMessage.ReplaceSiteVariables().ReplaceUserVariables(User));
+                message.AddDiv(
+                    _accountSettings.VerifyMessage.ReplaceSiteVariables().ReplaceUserVariables(User)
+                );
             else
                 message.AddParagraph("You have been sent this in order to confirm your email.");
 

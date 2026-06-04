@@ -1,20 +1,20 @@
-using Hood.Core;
-using Hood.Extensions;
-using Hood.Models;
-using Microsoft.AspNetCore.Routing;
-using StackExchange.Redis;
 using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
-using Microsoft.Extensions.Configuration;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Hood.Core;
+using Hood.Extensions;
 using Hood.Identity;
+using Hood.Models;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
+using StackExchange.Redis;
 
 namespace Hood.Services
 {
@@ -23,7 +23,9 @@ namespace Hood.Services
         public Auth0LoginService(IConfiguration config)
         {
             this.Domain = this.Domain.IsSet() ? this.Domain : config["Identity:Auth0:Domain"];
-            this.ClientId = this.ClientId.IsSet() ? this.ClientId : config["Identity:Auth0:ClientId"];
+            this.ClientId = this.ClientId.IsSet()
+                ? this.ClientId
+                : config["Identity:Auth0:ClientId"];
             this.Scope = this.Scope.IsSet() ? this.Scope : "openid profile email";
         }
 
@@ -33,7 +35,6 @@ namespace Hood.Services
         public string ClientId { get; set; }
         public string? ClientSecret { get; set; }
         public string Scope { get; set; }
-
 
         public string? CallbackPath { get; set; }
         public string? Organization { get; set; }
@@ -47,7 +48,6 @@ namespace Hood.Services
         public string SignupCompleteAction { get; set; } = "Index";
         public string SignupCompleteController { get; set; } = "Account";
 
-
 #nullable disable
 
         public OpenIdConnectEvents AsOpenIdConnectEvents()
@@ -59,17 +59,22 @@ namespace Hood.Services
                 OnRemoteFailure = this.OnRemoteFailure,
                 OnRemoteSignOut = this.OnRemoteSignOut,
                 OnSignedOutCallbackRedirect = this.OnSignedOutCallbackRedirect,
-                OnRedirectToIdentityProviderForSignOut = this.OnRedirectToIdentityProviderForSignOut,
+                OnRedirectToIdentityProviderForSignOut =
+                    this.OnRedirectToIdentityProviderForSignOut,
                 OnAccessDenied = this.OnAccessDenied,
                 OnMessageReceived = this.OnMessageReceived,
                 OnAuthorizationCodeReceived = this.OnAuthorizationCodeReceived,
                 OnAuthenticationFailed = this.OnAuthenticationFailed,
                 OnTokenValidated = this.OnTokenValidated,
-                OnUserInformationReceived = this.OnUserInformationReceived
+                OnUserInformationReceived = this.OnUserInformationReceived,
             };
         }
 
-        public virtual Task OnTokenResponseReceived(TokenResponseReceivedContext e) { return Task.CompletedTask; }
+        public virtual Task OnTokenResponseReceived(TokenResponseReceivedContext e)
+        {
+            return Task.CompletedTask;
+        }
+
         public virtual async Task OnTicketReceived(TicketReceivedContext e)
         {
             var _account = Engine.Services.Resolve<IAuth0AccountRepository>();
@@ -88,46 +93,76 @@ namespace Hood.Services
             {
                 // user exists and has auth0 account linked to it.
                 var emailVerifiedClaim = e.Principal.FindFirst("email_verified");
-                if (user.Active || (emailVerifiedClaim != null && emailVerifiedClaim.Value == "true"))
+                if (
+                    user.Active
+                    || (emailVerifiedClaim != null && emailVerifiedClaim.Value == "true")
+                )
                 {
                     identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.Active, "true"));
-                    await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, e.Properties);
+                    await e.HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        principal,
+                        e.Properties
+                    );
                 }
 
                 await SetDefaultClaims(e, user);
                 return;
             }
 
-            // check if the user has an account, via email, if so, the should be asked to link to this account                           
+            // check if the user has an account, via email, if so, the should be asked to link to this account
             user = await _account.GetUserByEmailAsync(e.Principal.GetEmail());
             if (user != null)
             {
                 // user exists, but the current Auth0 signin method is not saved, force them into the connect account flow.
                 if (user.ConnectedAuth0Accounts != null && user.ConnectedAuth0Accounts.Count() > 0)
                 {
-                    identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.AccountLinkRequired, "true"));
+                    identity.AddClaim(
+                        new Claim(Hood.Constants.Identity.ClaimTypes.AccountLinkRequired, "true")
+                    );
                 }
 
-                // This is a legacy account just send to the local account connect flow - 
+                // This is a legacy account just send to the local account connect flow -
                 // Email needs to be verified to attach to a local account.
 
-                identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.AccountNotConnected, "true"));
+                identity.AddClaim(
+                    new Claim(Hood.Constants.Identity.ClaimTypes.AccountNotConnected, "true")
+                );
 
                 await SetDefaultClaims(e, user);
 
-                identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreationFailed, "true"));
-                e.Response.Redirect(_linkGenerator.GetPathByAction("ConnectAccount", this.AccountControllerName, new { returnUrl = e.ReturnUri }));
+                identity.AddClaim(
+                    new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreationFailed, "true")
+                );
+                e.Response.Redirect(
+                    _linkGenerator.GetPathByAction(
+                        "ConnectAccount",
+                        this.AccountControllerName,
+                        new { returnUrl = e.ReturnUri }
+                    )
+                );
                 e.HandleResponse();
                 return;
             }
 
-
             if (!Engine.Settings.Account.AllowRemoteSignups)
             {
                 // user has not been found, or created & signups are disabled on this end
-                identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreationFailed, "true"));
-                returnUrl = _linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = "signup-disabled" });
-                e.Response.Redirect(_linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new { returnUrl }));
+                identity.AddClaim(
+                    new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreationFailed, "true")
+                );
+                returnUrl = _linkGenerator.GetPathByAction(
+                    "RemoteSigninFailed",
+                    this.AccountControllerName,
+                    new { r = "signup-disabled" }
+                );
+                e.Response.Redirect(
+                    _linkGenerator.GetPathByAction(
+                        "SignOut",
+                        this.AccountControllerName,
+                        new { returnUrl }
+                    )
+                );
                 e.HandleResponse();
                 return;
             }
@@ -136,14 +171,18 @@ namespace Hood.Services
             var authUser = await _auth0.GetUserById(userId);
             if (authUser == null)
             {
-                throw new ApplicationException("Something went wrong while authorizing your account.");
+                throw new ApplicationException(
+                    "Something went wrong while authorizing your account."
+                );
             }
             user = new Auth0User
             {
                 UserName = authUser.UserName.IsSet() ? authUser.UserName : authUser.Email,
                 Email = authUser.Email,
                 PhoneNumber = authUser.PhoneNumber,
-                EmailConfirmed = authUser.EmailVerified.HasValue ? authUser.EmailVerified.Value : false,
+                EmailConfirmed = authUser.EmailVerified.HasValue
+                    ? authUser.EmailVerified.Value
+                    : false,
                 CreatedOn = DateTime.Now,
                 LastLogOn = DateTime.Now,
                 UserProfile = new UserProfile
@@ -156,27 +195,51 @@ namespace Hood.Services
                     LastName = principal.GetClaimValue(ClaimTypes.Surname),
                     DisplayName = "",
                     JobTitle = "",
-                    Anonymous = false
-                }
+                    Anonymous = false,
+                },
             };
             var result = await _account.CreateAsync(user);
             if (!result)
             {
                 // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
-                identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreationFailed, "true"));
-                returnUrl = _linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = "account-creation-failed" });
-                e.Response.Redirect(_linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new { returnUrl }));
+                identity.AddClaim(
+                    new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreationFailed, "true")
+                );
+                returnUrl = _linkGenerator.GetPathByAction(
+                    "RemoteSigninFailed",
+                    this.AccountControllerName,
+                    new { r = "account-creation-failed" }
+                );
+                e.Response.Redirect(
+                    _linkGenerator.GetPathByAction(
+                        "SignOut",
+                        this.AccountControllerName,
+                        new { returnUrl }
+                    )
+                );
                 e.HandleResponse();
                 return;
             }
 
-            // If the user is still not found, there is a problem... 
+            // If the user is still not found, there is a problem...
             if (user == null)
             {
                 // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
-                identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreationFailed, "true"));
-                returnUrl = _linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = "account-linking-failed" });
-                e.Response.Redirect(_linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new { returnUrl }));
+                identity.AddClaim(
+                    new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreationFailed, "true")
+                );
+                returnUrl = _linkGenerator.GetPathByAction(
+                    "RemoteSigninFailed",
+                    this.AccountControllerName,
+                    new { r = "account-linking-failed" }
+                );
+                e.Response.Redirect(
+                    _linkGenerator.GetPathByAction(
+                        "SignOut",
+                        this.AccountControllerName,
+                        new { returnUrl }
+                    )
+                );
                 e.HandleResponse();
                 return;
             }
@@ -203,7 +266,11 @@ namespace Hood.Services
             }
 
             // Account setup complete, send user to manage profile with new-account-connection flag.
-            returnUrl = _linkGenerator.GetPathByAction(this.SignupCompleteAction, this.SignupCompleteController, new { returnUrl = e.ReturnUri, created = true });
+            returnUrl = _linkGenerator.GetPathByAction(
+                this.SignupCompleteAction,
+                this.SignupCompleteController,
+                new { returnUrl = e.ReturnUri, created = true }
+            );
             e.Response.Redirect(returnUrl);
             e.HandleResponse();
             return;
@@ -216,58 +283,129 @@ namespace Hood.Services
             string description = "Sign in failed due to a remote error.";
             if (e.Failure == null || e.Failure.Data == null || e.Failure.Data.Count == 0)
             {
-                if (e.Failure?.Message != null && e.Failure.Message.ToLower().Contains("message.state"))
+                if (
+                    e.Failure?.Message != null
+                    && e.Failure.Message.ToLower().Contains("message.state")
+                )
                 {
                     reason = "state-failure";
                 }
             }
             else
             {
-                var data = e.Failure.Data.Cast<DictionaryEntry>()
+                var data = e
+                    .Failure.Data.Cast<DictionaryEntry>()
                     .Where(de => de.Key is string && de.Value is string)
                     .ToDictionary(de => (string)de.Key, de => (string)de.Value);
-                if (data.ContainsKey("error")) { reason = data["error"]; }
-                if (data.ContainsKey("error_description")) { description = data["error_description"]; }
+                if (data.ContainsKey("error"))
+                {
+                    reason = data["error"];
+                }
+                if (data.ContainsKey("error_description"))
+                {
+                    description = data["error_description"];
+                }
             }
             var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
-            var returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = reason, d = description });
-            e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new { returnUrl, d = description }));
+            var returnUrl = linkGenerator.GetPathByAction(
+                "RemoteSigninFailed",
+                this.AccountControllerName,
+                new { r = reason, d = description }
+            );
+            e.Response.Redirect(
+                linkGenerator.GetPathByAction(
+                    "SignOut",
+                    this.AccountControllerName,
+                    new { returnUrl, d = description }
+                )
+            );
             e.HandleResponse();
             return Task.CompletedTask;
         }
-        public virtual Task OnRemoteSignOut(RemoteSignOutContext e) { return Task.CompletedTask; }
-        public virtual Task OnSignedOutCallbackRedirect(RemoteSignOutContext e) { return Task.CompletedTask; }
-        public virtual Task OnRedirectToIdentityProviderForSignOut(RedirectContext e) { return Task.CompletedTask; }
-        public virtual Task OnRedirectToIdentityProvider(RedirectContext e) { return Task.CompletedTask; }
-        public virtual Task OnAccessDenied(AccessDeniedContext e) { return Task.CompletedTask; }
-        public virtual Task OnMessageReceived(MessageReceivedContext e) { return Task.CompletedTask; }
-        public virtual Task OnAuthorizationCodeReceived(AuthorizationCodeReceivedContext e) { return Task.CompletedTask; }
+
+        public virtual Task OnRemoteSignOut(RemoteSignOutContext e)
+        {
+            return Task.CompletedTask;
+        }
+
+        public virtual Task OnSignedOutCallbackRedirect(RemoteSignOutContext e)
+        {
+            return Task.CompletedTask;
+        }
+
+        public virtual Task OnRedirectToIdentityProviderForSignOut(RedirectContext e)
+        {
+            return Task.CompletedTask;
+        }
+
+        public virtual Task OnRedirectToIdentityProvider(RedirectContext e)
+        {
+            return Task.CompletedTask;
+        }
+
+        public virtual Task OnAccessDenied(AccessDeniedContext e)
+        {
+            return Task.CompletedTask;
+        }
+
+        public virtual Task OnMessageReceived(MessageReceivedContext e)
+        {
+            return Task.CompletedTask;
+        }
+
+        public virtual Task OnAuthorizationCodeReceived(AuthorizationCodeReceivedContext e)
+        {
+            return Task.CompletedTask;
+        }
+
         public virtual Task OnAuthenticationFailed(AuthenticationFailedContext e)
         {
             // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
             var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
-            var returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", this.AccountControllerName, new { r = "auth-failed" });
-            e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", this.AccountControllerName, new
-            {
-                returnUrl
-            }));
+            var returnUrl = linkGenerator.GetPathByAction(
+                "RemoteSigninFailed",
+                this.AccountControllerName,
+                new { r = "auth-failed" }
+            );
+            e.Response.Redirect(
+                linkGenerator.GetPathByAction(
+                    "SignOut",
+                    this.AccountControllerName,
+                    new { returnUrl }
+                )
+            );
             e.HandleResponse();
             return Task.CompletedTask;
         }
-        public virtual Task OnTokenValidated(TokenValidatedContext e) { return Task.CompletedTask; }
-        public virtual Task OnUserInformationReceived(UserInformationReceivedContext e) { return Task.CompletedTask; }
+
+        public virtual Task OnTokenValidated(TokenValidatedContext e)
+        {
+            return Task.CompletedTask;
+        }
+
+        public virtual Task OnUserInformationReceived(UserInformationReceivedContext e)
+        {
+            return Task.CompletedTask;
+        }
+
         protected virtual async Task SetDefaultClaims(TicketReceivedContext e, Auth0User user)
         {
-            // Set the remote avatar on a local claim, in case the local overrides it. 
+            // Set the remote avatar on a local claim, in case the local overrides it.
             if (e.Principal.HasClaim(Hood.Constants.Identity.ClaimTypes.Picture))
             {
-                e.Principal.AddOrUpdateClaimValue(Hood.Constants.Identity.ClaimTypes.RemotePicture, e.Principal.GetClaimValue(Hood.Constants.Identity.ClaimTypes.Picture));
+                e.Principal.AddOrUpdateClaimValue(
+                    Hood.Constants.Identity.ClaimTypes.RemotePicture,
+                    e.Principal.GetClaimValue(Hood.Constants.Identity.ClaimTypes.Picture)
+                );
             }
 
             // Set the user claims locally
             e.Principal.SetUserClaims(user.UserProfile);
-            await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, e.Principal, e.Properties);
+            await e.HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                e.Principal,
+                e.Properties
+            );
         }
-
     }
 }

@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Threading;
-using System.Net;
 using System.IO;
+using System.Net;
+using System.Threading;
 
 namespace Hood.Services
 {
     public class FTPService : IFTPService
     {
-
         private readonly ReaderWriterLock Lock;
         private bool Running;
         private double Complete;
@@ -18,6 +17,7 @@ namespace Hood.Services
         private string StatusMessage;
         private bool Cancelled;
         private bool Success;
+
         public FTPService()
         {
             Lock = new ReaderWriterLock();
@@ -32,7 +32,13 @@ namespace Hood.Services
             StatusMessage = "Not running...";
         }
 
-        public bool GetFileFromFTP(string server, string username, string password, string filename, string destination)
+        public bool GetFileFromFTP(
+            string server,
+            string username,
+            string password,
+            string filename,
+            string destination
+        )
         {
             try
             {
@@ -54,13 +60,12 @@ namespace Hood.Services
                 Thread thread = new Thread(pts)
                 {
                     Name = "GetFile",
-                    Priority = ThreadPriority.Normal
+                    Priority = ThreadPriority.Normal,
                 };
                 thread.Start(parameters);
 
                 // If we have reached this point, then we have successfully started the thread, so return true.
                 return true;
-
             }
             catch (Exception ex)
             {
@@ -87,7 +92,7 @@ namespace Hood.Services
             string filename = (string)parameters[3];
             string destination = (string)parameters[4];
 
-            // WHILE FILE IS NOT COMPLETELY DOWNLOADED AND FINISHED _ 
+            // WHILE FILE IS NOT COMPLETELY DOWNLOADED AND FINISHED _
             // LOOP THE FTP PROCESS - OR WE HAVE TRIED 5 TIMES
             // IF AN ERROR OCCURS IT WILL RETRY, BASICALLY
             bool downloaded = false;
@@ -110,9 +115,10 @@ namespace Hood.Services
                     }
 
                     outputStream = new FileStream(destination + filename, FileMode.OpenOrCreate);
-                    #pragma warning disable SYSLIB0014
-                    FtpWebRequest reqFTP = (FtpWebRequest)WebRequest.Create(new Uri(server + filename));
-                    #pragma warning restore SYSLIB0014
+#pragma warning disable SYSLIB0014
+                    FtpWebRequest reqFTP = (FtpWebRequest)
+                        WebRequest.Create(new Uri(server + filename));
+#pragma warning restore SYSLIB0014
                     reqFTP.Method = WebRequestMethods.Ftp.DownloadFile;
                     reqFTP.UseBinary = true;
                     reqFTP.Credentials = new NetworkCredential(username, password);
@@ -153,7 +159,6 @@ namespace Hood.Services
                     Success = true;
                     StatusMessage = "Download of file, " + filename + " is complete.";
                     Lock.ReleaseWriterLock();
-
                 }
                 catch (Exception)
                 {
@@ -167,27 +172,28 @@ namespace Hood.Services
                 {
                     try
                     {
-                        if (outputStream != null) outputStream.Close();
+                        if (outputStream != null)
+                            outputStream.Close();
                     }
                     catch (Exception) { }
                     try
                     {
-                        if (outputStream != null) outputStream.Close();
+                        if (outputStream != null)
+                            outputStream.Close();
                     }
                     catch (Exception) { }
                     try
                     {
-                        if (response != null) response.Close();
+                        if (response != null)
+                            response.Close();
                     }
                     catch (Exception) { }
                 }
-
             }
 
             Lock.AcquireWriterLock(Timeout.Infinite);
             Running = false;
             Lock.ReleaseWriterLock();
-
         }
 
         public bool IsComplete()
@@ -221,7 +227,7 @@ namespace Hood.Services
             FTPServiceReport report = new FTPServiceReport
             {
                 Complete = Complete,
-                StatusMessage = StatusMessage
+                StatusMessage = StatusMessage,
             };
             Lock.ReleaseReaderLock();
             return report;

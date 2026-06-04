@@ -7,15 +7,9 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin,Editor")]
-
     public class ContentController : BaseContentController
     {
         public ContentController()
-            : base()
-        {
-        }
+            : base() { }
     }
-
 }
-
-

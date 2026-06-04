@@ -1,6 +1,5 @@
 ﻿namespace Hood.Models
 {
-
     public class PostcodeValidation
     {
         public int status { get; set; }

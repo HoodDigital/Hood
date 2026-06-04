@@ -5,6 +5,6 @@
         BeforeCss,
         AfterCss,
         BeforeScripts,
-        AfterScripts
+        AfterScripts,
     }
 }

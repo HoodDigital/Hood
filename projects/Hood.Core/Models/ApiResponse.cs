@@ -1,4 +1,5 @@
 namespace Hood.Models;
+
 public class ApiResponse
 {
     public ApiResponse(string message)

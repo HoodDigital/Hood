@@ -1,4 +1,6 @@
-﻿using Hood.Contexts;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Hood.Contexts;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
@@ -6,8 +8,6 @@ using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Hood.BaseControllers
 {
@@ -34,7 +34,10 @@ namespace Hood.BaseControllers
         }
 
         [Route("{slug:propertySlug}/list/")]
-        public virtual async Task<IActionResult> List(PropertyListModel model, string viewName = "_List_Property")
+        public virtual async Task<IActionResult> List(
+            PropertyListModel model,
+            string viewName = "_List_Property"
+        )
         {
             var propertySettings = Engine.Settings.Property;
             if (!propertySettings.Enabled || !propertySettings.ShowList)
@@ -44,7 +47,9 @@ namespace Hood.BaseControllers
             model = await _property.GetPropertiesAsync(model);
 
             model.Locations = await _property.GetLocationsAsync(model);
-            model.CentrePoint = GeoCalculations.GetCentralGeoCoordinate(model.Locations.Select(p => new GeoCoordinate(p.Latitude, p.Longitude)));
+            model.CentrePoint = GeoCalculations.GetCentralGeoCoordinate(
+                model.Locations.Select(p => new GeoCoordinate(p.Latitude, p.Longitude))
+            );
             PropertySettings settings = Engine.Settings.Property;
             model.AvailableTypes = settings.GetListingTypes();
             model.PlanningTypes = settings.GetPlanningTypes();
@@ -59,7 +64,6 @@ namespace Hood.BaseControllers
             return View("_Map_Properties", locations);
         }
 
-
         [Route("{slug:propertySlug}/{id:int}/{city?}/{postcode?}/{title?}")]
         public virtual async Task<IActionResult> Show(int id)
         {
@@ -69,7 +73,7 @@ namespace Hood.BaseControllers
 
             ShowPropertyModel um = new ShowPropertyModel()
             {
-                Property = await _property.GetPropertyViewByIdAsync(id)
+                Property = await _property.GetPropertyViewByIdAsync(id),
             };
 
             if (um.Property == null)
@@ -87,7 +91,7 @@ namespace Hood.BaseControllers
         {
             ShowPropertyModel um = new ShowPropertyModel()
             {
-                Property = await _property.GetPropertyViewByIdAsync(id)
+                Property = await _property.GetPropertyViewByIdAsync(id),
             };
 
             // if not admin, and not published, hide.
@@ -100,5 +104,3 @@ namespace Hood.BaseControllers
         #endregion
     }
 }
-
-

@@ -4,7 +4,6 @@
     {
         Short,
         SingleLine,
-        MultiLine
+        MultiLine,
     }
 }
-

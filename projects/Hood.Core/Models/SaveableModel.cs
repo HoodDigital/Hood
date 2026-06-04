@@ -1,8 +1,8 @@
-﻿using Hood.Attributes;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Hood.Attributes;
 using Hood.Enums;
 using Hood.Interfaces;
 using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.BaseTypes
 {
@@ -17,6 +17,5 @@ namespace Hood.BaseTypes
         [RouteIgnore]
         [NotMapped]
         public AlertType MessageType { get; set; }
-
     }
 }

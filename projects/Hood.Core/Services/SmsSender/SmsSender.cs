@@ -15,7 +15,6 @@ namespace Hood.Services
             return null;
         }
 
-        public SmsSenderOptions Options { get; }  // set only via Secret Manager
-
+        public SmsSenderOptions Options { get; } // set only via Secret Manager
     }
 }

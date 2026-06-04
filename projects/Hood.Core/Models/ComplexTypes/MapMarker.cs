@@ -23,7 +23,14 @@ namespace Hood.Models
         public string MarkerUrl { get; set; }
         public string ImageUrl { get; set; }
 
-        public MapMarker(IAddress address, string title, string description, string id, string url, string imageUrl)
+        public MapMarker(
+            IAddress address,
+            string title,
+            string description,
+            string id,
+            string url,
+            string imageUrl
+        )
         {
             Address1 = address.Address1;
             Address2 = address.Address2;
@@ -41,4 +48,3 @@ namespace Hood.Models
         }
     }
 }
-

@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Razor.TagHelpers;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Hood.TagHelpers
 {
@@ -33,12 +33,18 @@ namespace Hood.TagHelpers
         {
             for (var i = 0; i < validatorMetadata.Count; i++)
             {
-                if (validatorMetadata[i] is StringLengthAttribute stringLengthAttribute && stringLengthAttribute.MaximumLength > 0)
+                if (
+                    validatorMetadata[i] is StringLengthAttribute stringLengthAttribute
+                    && stringLengthAttribute.MaximumLength > 0
+                )
                 {
                     return stringLengthAttribute.MaximumLength;
                 }
 
-                if (validatorMetadata[i] is MaxLengthAttribute maxLengthAttribute && maxLengthAttribute.Length > 0)
+                if (
+                    validatorMetadata[i] is MaxLengthAttribute maxLengthAttribute
+                    && maxLengthAttribute.Length > 0
+                )
                 {
                     return maxLengthAttribute.Length;
                 }

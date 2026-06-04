@@ -1,21 +1,19 @@
-﻿using Hood.BaseControllers;
+﻿using System;
+using System.Threading.Tasks;
+using Hood.BaseControllers;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using System;
-using System.Threading.Tasks;
 
 namespace Hood.Admin.BaseControllers
 {
     public abstract class BaseHomeController : BaseController
     {
         public BaseHomeController()
-            : base()
-        {
-        }
+            : base() { }
 
         [Route("admin/")]
         public virtual IActionResult Index()
@@ -31,11 +29,15 @@ namespace Hood.Admin.BaseControllers
         //     //PropertyStatistics properties = await _property.GetStatisticsAsync();
         //     return Json(new Statistics(content, users, properties));
         // }
-
     }
+
     public class Statistics
     {
-        public Statistics(ContentStatitsics content, UserStatistics users, PropertyStatistics properties)
+        public Statistics(
+            ContentStatitsics content,
+            UserStatistics users,
+            PropertyStatistics properties
+        )
         {
             Content = content;
             Users = users;
@@ -46,5 +48,4 @@ namespace Hood.Admin.BaseControllers
         public UserStatistics Users { get; set; }
         public PropertyStatistics Properties { get; set; }
     }
-
 }

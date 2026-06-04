@@ -4,7 +4,7 @@ using Hood.Interfaces;
 
 namespace Hood.Models
 {
-    public interface IHoodIdentity 
+    public interface IHoodIdentity
     {
         string Id { get; set; }
         string UserName { get; set; }

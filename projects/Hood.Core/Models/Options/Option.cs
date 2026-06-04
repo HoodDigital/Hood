@@ -9,4 +9,3 @@ namespace Hood.Models
         public string Value { get; set; }
     }
 }
-

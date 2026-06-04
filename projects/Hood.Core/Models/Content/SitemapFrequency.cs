@@ -8,6 +8,6 @@
         Weekly,
         Daily,
         Hourly,
-        Always
+        Always,
     }
 }

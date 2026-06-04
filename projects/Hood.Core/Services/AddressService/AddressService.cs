@@ -1,19 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Hood.Interfaces;
 using Geocoding;
 using Geocoding.Google;
-using Hood.Extensions;
 using Hood.Core;
+using Hood.Extensions;
+using Hood.Interfaces;
 
 namespace Hood.Services
 {
     public class AddressService : IAddressService
     {
-
-        public AddressService()
-        {
-        }
+        public AddressService() { }
 
         public GoogleAddress GeocodeAddress(IAddress address)
         {
@@ -22,13 +19,17 @@ namespace Hood.Services
                 return null;
 
             IGeocoder geocoder = new GoogleGeocoder() { ApiKey = key };
-            IEnumerable<Address> addresses = geocoder.GeocodeAsync(
-                address.Number.IsSet() ? string.Format("{0} {1}", address.Number, address.Address1) : address.Address1,
-                address.City,
-                address.County,
-                address.Postcode,
-                address.Country
-            ).Result;
+            IEnumerable<Address> addresses = geocoder
+                .GeocodeAsync(
+                    address.Number.IsSet()
+                        ? string.Format("{0} {1}", address.Number, address.Address1)
+                        : address.Address1,
+                    address.City,
+                    address.County,
+                    address.Postcode,
+                    address.Country
+                )
+                .Result;
             if (addresses.Count() == 0)
             {
                 addresses = geocoder.GeocodeAsync(address.Postcode).Result;
@@ -38,6 +39,5 @@ namespace Hood.Services
 
             return (GoogleAddress)addresses.First();
         }
-
     }
 }

@@ -12,8 +12,6 @@ namespace Hood.Areas.Admin.Controllers
     public class UsersController : Hood.Admin.BaseControllers.UsersController
     {
         public UsersController()
-            : base()
-        {
-        }
+            : base() { }
     }
 }

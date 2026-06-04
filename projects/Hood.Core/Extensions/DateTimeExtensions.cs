@@ -9,24 +9,34 @@ namespace Hood.Extensions
         public static string ToDisplay(this DateTime value, bool includeTime = true)
         {
             if (includeTime)
-                return value.ToShortDateString() + " at " + value.ToString("hh:mmtt", CultureInfo.InvariantCulture).ToLowerInvariant();
-            else return value.ToShortDateString();
+                return value.ToShortDateString()
+                    + " at "
+                    + value.ToString("hh:mmtt", CultureInfo.InvariantCulture).ToLowerInvariant();
+            else
+                return value.ToShortDateString();
         }
+
         public static string ToLongDisplay(this DateTime value, bool includeTime = true)
         {
             if (includeTime)
-                return value.ToLongDateString() + " at " + value.ToString("hh:mmtt", CultureInfo.InvariantCulture).ToLowerInvariant();
-            else return value.ToLongDateString();
+                return value.ToLongDateString()
+                    + " at "
+                    + value.ToString("hh:mmtt", CultureInfo.InvariantCulture).ToLowerInvariant();
+            else
+                return value.ToLongDateString();
         }
+
         public static string ToTimeDisplay(this DateTime value)
         {
             return value.ToString("hh:mmtt", CultureInfo.InvariantCulture).ToLowerInvariant();
         }
+
         public static IEnumerable<DateTime> EachDay(DateTime from, DateTime thru)
         {
             for (var day = from.Date; day.Date <= thru.Date; day = day.AddDays(1))
                 yield return day;
         }
+
         public static string ToHumaneDate(this DateTime value)
         {
             const int SECOND = 1;

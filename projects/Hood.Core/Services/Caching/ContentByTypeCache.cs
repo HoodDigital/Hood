@@ -1,12 +1,12 @@
-﻿using Hood.Contexts;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Hood.Contexts;
 using Hood.Core;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Hood.Caching
 {
@@ -18,9 +18,11 @@ namespace Hood.Caching
         private readonly ContentCategoryCache _categories;
         private readonly IEventsService _events;
 
-        public ContentByTypeCache(IConfiguration config, 
-                                  ContentCategoryCache categories,
-                                  IEventsService events)
+        public ContentByTypeCache(
+            IConfiguration config,
+            ContentCategoryCache categories,
+            IEventsService events
+        )
         {
             _config = config;
             _categories = categories;
@@ -54,7 +56,9 @@ namespace Hood.Caching
             {
                 bySlug.Add(
                     type.Type,
-                    new Lazy<Dictionary<int, Content>>(() => db.Content.Where(c => c.ContentType == type.Type).ToDictionary(c => c.Id))
+                    new Lazy<Dictionary<int, Content>>(() =>
+                        db.Content.Where(c => c.ContentType == type.Type).ToDictionary(c => c.Id)
+                    )
                 );
             }
         }

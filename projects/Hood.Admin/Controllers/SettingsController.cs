@@ -10,8 +10,6 @@ namespace Hood.Areas.Admin.Controllers
     public class SettingsController : BaseSettingsController
     {
         public SettingsController()
-            : base()
-        {
-        }
+            : base() { }
     }
 }

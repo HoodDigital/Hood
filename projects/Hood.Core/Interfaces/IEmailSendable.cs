@@ -1,6 +1,6 @@
-﻿using Hood.Models;
+﻿using System.Collections.Generic;
+using Hood.Models;
 using SendGrid.Helpers.Mail;
-using System.Collections.Generic;
 
 namespace Hood.Interfaces
 {
@@ -14,8 +14,6 @@ namespace Hood.Interfaces
 
         List<EmailAddress> NotifyEmails { get; set; }
         string NotifyRole { get; set; }
-
-
 
         MailObject WriteToMailObject(MailObject message);
         MailObject WriteNotificationToMailObject(MailObject message);

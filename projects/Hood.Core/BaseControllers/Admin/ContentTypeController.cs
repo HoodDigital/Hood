@@ -1,6 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Hood.BaseControllers;
 using Hood.Caching;
 using Hood.Contexts;
-using Hood.BaseControllers;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
@@ -12,12 +18,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Hood.Admin.BaseControllers
 {
@@ -26,6 +26,7 @@ namespace Hood.Admin.BaseControllers
         protected readonly ContentContext _contentDb;
         protected readonly IContentRepository _content;
         protected readonly ContentCategoryCache _contentCategoryCache;
+
         public BaseContentTypeController()
             : base()
         {
@@ -38,7 +39,10 @@ namespace Hood.Admin.BaseControllers
         public virtual IActionResult Index(ContentTypeListModel model) => List(model, "Index");
 
         [Route("admin/content-types/list/")]
-        public virtual IActionResult List(ContentTypeListModel model, string viewName = "_List_ContentType")
+        public virtual IActionResult List(
+            ContentTypeListModel model,
+            string viewName = "_List_ContentType"
+        )
         {
             // get das list and shit.
             _cache.Remove(typeof(ContentSettings).ToString());
@@ -48,12 +52,14 @@ namespace Hood.Admin.BaseControllers
 
             if (model.Search.IsSet())
             {
-                query = query.Where(c =>
-                    c.Title.Contains(model.Search) ||
-                    c.Type.Contains(model.Search) ||
-                    c.Type.Contains(model.Search) ||
-                    c.TypeName.Contains(model.Search)
-                ).ToList();
+                query = query
+                    .Where(c =>
+                        c.Title.Contains(model.Search)
+                        || c.Type.Contains(model.Search)
+                        || c.Type.Contains(model.Search)
+                        || c.TypeName.Contains(model.Search)
+                    )
+                    .ToList();
             }
 
             switch (model.Order)
@@ -76,7 +82,7 @@ namespace Hood.Admin.BaseControllers
             return View(viewName, model);
         }
 
-        #region Fields 
+        #region Fields
 
         [Route("admin/content-types/{id}/fields")]
         public virtual IActionResult FieldList(string id, string viewName = "_List_CustomField")
@@ -118,7 +124,10 @@ namespace Hood.Admin.BaseControllers
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseContentTypeController>($"Error adding custom field.", ex);
+                return await ErrorResponseAsync<BaseContentTypeController>(
+                    $"Error adding custom field.",
+                    ex
+                );
             }
         }
 
@@ -140,7 +149,10 @@ namespace Hood.Admin.BaseControllers
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseContentTypeController>($"Error removing custom field.", ex);
+                return await ErrorResponseAsync<BaseContentTypeController>(
+                    $"Error removing custom field.",
+                    ex
+                );
             }
         }
 
@@ -188,17 +200,25 @@ namespace Hood.Admin.BaseControllers
                 MessageType = AlertType.Success;
                 SaveMessage = "Created successfully.";
 
-                return new Response(true, $"The content was created successfully.<br /><a href='{Url.Action(nameof(Edit), new { type = model.Type })}'>Go to the new content type</a>");
+                return new Response(
+                    true,
+                    $"The content was created successfully.<br /><a href='{Url.Action(nameof(Edit), new { type = model.Type })}'>Go to the new content type</a>"
+                );
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<BaseContentTypeController>($"Error publishing content type.", ex);
+                return await ErrorResponseAsync<BaseContentTypeController>(
+                    $"Error publishing content type.",
+                    ex
+                );
             }
         }
 
         protected virtual async Task RefreshAllMetasAsync()
         {
-            foreach (var content in _contentDb.Content.Include(p => p.Metadata).AsNoTracking().ToList())
+            foreach (
+                var content in _contentDb.Content.Include(p => p.Metadata).AsNoTracking().ToList()
+            )
             {
                 var type = Engine.Settings.Content.GetContentType(content.ContentType);
                 if (type != null)
@@ -211,7 +231,10 @@ namespace Hood.Admin.BaseControllers
                         if (template.IsSet())
                         {
                             // delete all template metas that do not exist in the new template, and add any that are missing
-                            List<string> newMetas = _content.GetMetasForTemplate(template, type.TemplateFolder);
+                            List<string> newMetas = _content.GetMetasForTemplate(
+                                template,
+                                type.TemplateFolder
+                            );
                             if (newMetas != null)
                                 _content.UpdateTemplateMetas(content, newMetas);
                         }
@@ -336,9 +359,5 @@ namespace Hood.Admin.BaseControllers
 
             return RedirectToAction(nameof(Index));
         }
-
-
     }
 }
-
-

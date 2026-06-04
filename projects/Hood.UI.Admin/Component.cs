@@ -19,8 +19,11 @@ namespace Hood.UI.Admin
 
         public bool IsUIComponent => true;
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config)
-        { }
+        public void Configure(
+            IApplicationBuilder app,
+            IWebHostEnvironment env,
+            IConfiguration config
+        ) { }
 
         public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {

@@ -26,9 +26,10 @@ namespace Hood.ViewModels
     {
         Vertical,
         Horizontal,
-        Floating
+        Floating,
     }
 }
+
 namespace Hood.TagHelpers
 {
     [HtmlTargetElement("input", Attributes = "bs-for")]
@@ -71,14 +72,12 @@ namespace Hood.TagHelpers
 
             model.Name = For.Name;
             model.Layout = Layout;
-            
+
             model.Type = Type; // Autodetect type?
 
             model.Disabled = Disabled ? "disabled" : "";
 
-            var property = For.Metadata
-                .ContainerType
-                .GetProperty(For.Metadata.Name);
+            var property = For.Metadata.ContainerType.GetProperty(For.Metadata.Name);
 
             model.Required = Attribute.IsDefined(property, typeof(RequiredAttribute));
 
@@ -105,11 +104,16 @@ namespace Hood.TagHelpers
             output.Attributes.SetAttribute("style", styleValue);
 
             if (output.Attributes.ContainsName("class"))
-                output.Attributes.SetAttribute("class", $"{output.Attributes["class"].Value} bootstrap-input {Margin}");
+                output.Attributes.SetAttribute(
+                    "class",
+                    $"{output.Attributes["class"].Value} bootstrap-input {Margin}"
+                );
             else
                 output.Attributes.SetAttribute("class", $"bootstrap-input {Margin}");
 
-            output.Content.SetHtmlContent(await _htmlHelper.PartialAsync("BootstrapFormInput", model));
+            output.Content.SetHtmlContent(
+                await _htmlHelper.PartialAsync("BootstrapFormInput", model)
+            );
         }
     }
 }

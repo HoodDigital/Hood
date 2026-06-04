@@ -1,4 +1,9 @@
-﻿using Auth0.AspNetCore.Authentication;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Auth0.AspNetCore.Authentication;
 using Auth0.AuthenticationApi;
 using Auth0.AuthenticationApi.Models;
 using Auth0.Core.Exceptions;
@@ -21,11 +26,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Unsplasharp;
 
 namespace Hood.BaseControllers
@@ -34,6 +34,7 @@ namespace Hood.BaseControllers
     {
         protected readonly IAuth0Service _auth0;
         protected readonly IAuth0AccountRepository _account;
+
         public Auth0AccountController()
         {
             _auth0 = Engine.Services.Resolve<IAuth0Service>();
@@ -57,7 +58,7 @@ namespace Hood.BaseControllers
                 Profile = await _account.GetUserProfileByIdAsync(user.Id),
                 Accounts = user.ConnectedAuth0Accounts,
                 ReturnUrl = returnUrl,
-                NewAccountCreated = created
+                NewAccountCreated = created,
             };
             return View(model);
         }
@@ -65,7 +66,11 @@ namespace Hood.BaseControllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("account/")]
-        public virtual async Task<IActionResult> Index(ManageAccountViewModel model, string returnUrl, bool created = false)
+        public virtual async Task<IActionResult> Index(
+            ManageAccountViewModel model,
+            string returnUrl,
+            bool created = false
+        )
         {
             try
             {
@@ -78,12 +83,14 @@ namespace Hood.BaseControllers
                 user = await _account.UpdateProfileAsync(user, model.Profile);
 
                 User.SetUserClaims(user.UserProfile);
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    User
+                );
 
                 SaveMessage = "Your profile has been updated.";
                 MessageType = AlertType.Success;
                 return RedirectToAction(nameof(Index));
-
             }
             catch (Exception ex)
             {
@@ -94,7 +101,6 @@ namespace Hood.BaseControllers
                 model.NewAccountCreated = created;
                 return View(model);
             }
-
         }
 
         // [Route("account/avatar")]
@@ -136,7 +142,7 @@ namespace Hood.BaseControllers
 
         #endregion
 
-        #region Login 
+        #region Login
 
         [HttpGet]
         [AllowAnonymous]
@@ -184,14 +190,20 @@ namespace Hood.BaseControllers
         [Route("account/authorize")]
         public virtual async Task Authorize(string returnUrl = "/", string mode = "login")
         {
-            var authenticationPropertiesBuilder = new LoginAuthenticationPropertiesBuilder()
-                .WithRedirectUri(returnUrl);
+            var authenticationPropertiesBuilder =
+                new LoginAuthenticationPropertiesBuilder().WithRedirectUri(returnUrl);
 
-            authenticationPropertiesBuilder = authenticationPropertiesBuilder.WithParameter("action", mode);
+            authenticationPropertiesBuilder = authenticationPropertiesBuilder.WithParameter(
+                "action",
+                mode
+            );
 
             var authenticationProperties = authenticationPropertiesBuilder.Build();
 
-            await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
+            await HttpContext.ChallengeAsync(
+                Auth0Constants.AuthenticationScheme,
+                authenticationProperties
+            );
         }
 
         [HttpGet]
@@ -203,7 +215,10 @@ namespace Hood.BaseControllers
                 .WithRedirectUri(returnUrl.IsSet() ? returnUrl : Url.Action("Index", "Home"))
                 .Build();
 
-            await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
+            await HttpContext.SignOutAsync(
+                Auth0Constants.AuthenticationScheme,
+                authenticationProperties
+            );
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
 
@@ -230,19 +245,23 @@ namespace Hood.BaseControllers
                     break;
                 case "state-failure":
                     ViewData["allow-relog"] = true;
-                    ViewData["Reason"] = "Authentication failed, looks like you may be trying to log in with a different browser or device. Make sure you are using the same device to click your login link.";
+                    ViewData["Reason"] =
+                        "Authentication failed, looks like you may be trying to log in with a different browser or device. Make sure you are using the same device to click your login link.";
                     break;
                 case "remote-failed":
                     ViewData["allow-relog"] = true;
-                    ViewData["Reason"] = "We could not sign you in due to a techical issue, likely just a loose wire.";
+                    ViewData["Reason"] =
+                        "We could not sign you in due to a techical issue, likely just a loose wire.";
                     break;
                 case "account-creation-failed":
                     ViewData["allow-relog"] = true;
-                    ViewData["Reason"] = "We could not create a local account due to a techical issue, likely just a loose wire.";
+                    ViewData["Reason"] =
+                        "We could not create a local account due to a techical issue, likely just a loose wire.";
                     break;
                 case "account-linking-failed":
                     ViewData["allow-relog"] = true;
-                    ViewData["Reason"] = "We could not connect your login to a local account due to a techical issue, likely just a loose wire.";
+                    ViewData["Reason"] =
+                        "We could not connect your login to a local account due to a techical issue, likely just a loose wire.";
                     break;
             }
             return View();
@@ -261,7 +280,9 @@ namespace Hood.BaseControllers
             {
                 LocalPicture = user.UserProfile.GetAvatar(),
                 ReturnUrl = returnUrl,
-                RemotePicture = User.GetClaimValue(Hood.Constants.Identity.ClaimTypes.RemotePicture)
+                RemotePicture = User.GetClaimValue(
+                    Hood.Constants.Identity.ClaimTypes.RemotePicture
+                ),
             };
             if (User.HasClaim(Hood.Constants.Identity.ClaimTypes.AccountLinkRequired))
             {
@@ -288,7 +309,7 @@ namespace Hood.BaseControllers
                     return RedirectToAction(nameof(ConfirmRequired));
                 }
 
-                // connect the accounts.       
+                // connect the accounts.
 
                 var user = await GetCurrentUserOrThrow();
                 var linkedUser = await _account.GetUserByAuth0Id(User.GetUserId());
@@ -297,10 +318,16 @@ namespace Hood.BaseControllers
                     throw new Exception("This account is already connected to an account.");
                 }
 
-                var newAuthUser = await _account.CreateLocalAuthIdentity(User.GetUserId(), user, User.GetClaimValue(Hood.Constants.Identity.ClaimTypes.RemotePicture));
+                var newAuthUser = await _account.CreateLocalAuthIdentity(
+                    User.GetUserId(),
+                    user,
+                    User.GetClaimValue(Hood.Constants.Identity.ClaimTypes.RemotePicture)
+                );
                 if (newAuthUser == null)
                 {
-                    throw new Exception("There was a problem connecting your account, please try again.");
+                    throw new Exception(
+                        "There was a problem connecting your account, please try again."
+                    );
                 }
 
                 // Update local account profile from remote account info - if set and not set etc etc.
@@ -311,7 +338,10 @@ namespace Hood.BaseControllers
 
                 User.RemoveClaim(Hood.Constants.Identity.ClaimTypes.AccountNotConnected);
                 User.AddOrUpdateClaimValue(Hood.Constants.Identity.ClaimTypes.Active, "true");
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    User
+                );
 
                 return RedirectToAction(nameof(ConnectAccountComplete), new { returnUrl });
             }
@@ -341,7 +371,7 @@ namespace Hood.BaseControllers
                     return RedirectToAction(nameof(ConfirmRequired));
                 }
 
-                // connect the accounts.             
+                // connect the accounts.
                 var user = await GetCurrentUserOrThrow();
                 var linkedUser = await _account.GetUserByAuth0Id(User.GetUserId());
                 if (linkedUser != null)
@@ -372,14 +402,21 @@ namespace Hood.BaseControllers
                     switch (ex.ApiError.ErrorCode)
                     {
                         case "identity_conflict":
-                            if (ex.ApiError.ExtraData.ContainsKey("statusCode") && ex.ApiError.ExtraData["statusCode"] == "409")
+                            if (
+                                ex.ApiError.ExtraData.ContainsKey("statusCode")
+                                && ex.ApiError.ExtraData["statusCode"] == "409"
+                            )
                             {
                                 // Account already linked, remove link claim and continue.
-                                User.RemoveClaim(Hood.Constants.Identity.ClaimTypes.AccountLinkRequired);
+                                User.RemoveClaim(
+                                    Hood.Constants.Identity.ClaimTypes.AccountLinkRequired
+                                );
                             }
                             break;
                         default:
-                            throw new Exception("Could not link the remote accounts: " + ex.Message);
+                            throw new Exception(
+                                "Could not link the remote accounts: " + ex.Message
+                            );
                     }
                 }
                 catch (Exception ex)
@@ -387,17 +424,25 @@ namespace Hood.BaseControllers
                     throw new Exception("Could not link the remote accounts: " + ex.Message);
                 }
 
-                var newAuthUser = await _account.CreateLocalAuthIdentity(User.GetUserId(), user, User.GetClaimValue(Hood.Constants.Identity.ClaimTypes.RemotePicture));
+                var newAuthUser = await _account.CreateLocalAuthIdentity(
+                    User.GetUserId(),
+                    user,
+                    User.GetClaimValue(Hood.Constants.Identity.ClaimTypes.RemotePicture)
+                );
                 if (newAuthUser == null)
                 {
-                    throw new Exception("There was a problem connecting your account, please try again.");
+                    throw new Exception(
+                        "There was a problem connecting your account, please try again."
+                    );
                 }
 
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    User
+                );
 
                 // Round trip the user through authorize to ensure claims are up to date.
                 return RedirectToAction(nameof(ConnectAccountComplete), new { returnUrl });
-
             }
             catch (Exception ex)
             {
@@ -417,7 +462,9 @@ namespace Hood.BaseControllers
             {
                 LocalPicture = user.UserProfile.GetAvatar(),
                 ReturnUrl = returnUrl,
-                RemotePicture = User.GetClaimValue(Hood.Constants.Identity.ClaimTypes.RemotePicture)
+                RemotePicture = User.GetClaimValue(
+                    Hood.Constants.Identity.ClaimTypes.RemotePicture
+                ),
             };
             return View(model);
         }
@@ -430,28 +477,35 @@ namespace Hood.BaseControllers
         public virtual async Task<IActionResult> DisconnectAccount(string accountId)
         {
             var user = await GetCurrentUserOrThrow();
-            var accountToDisconnect = user.ConnectedAuth0Accounts.SingleOrDefault(a => a.LocalUserId == accountId);
+            var accountToDisconnect = user.ConnectedAuth0Accounts.SingleOrDefault(a =>
+                a.LocalUserId == accountId
+            );
             var model = new DisconnectAccountModel()
             {
                 LocalPicture = user.UserProfile.GetAvatar(),
                 AccountId = accountId,
-                RemotePicture = accountToDisconnect.Picture
+                RemotePicture = accountToDisconnect.Picture,
             };
             return View(model);
         }
+
         [HttpPost]
         [Authorize]
         [Route("account/auth/disconnect-confirm")]
-        public virtual async Task<IActionResult> DisconnectAccountConfirm(DisconnectAccountModel model)
+        public virtual async Task<IActionResult> DisconnectAccountConfirm(
+            DisconnectAccountModel model
+        )
         {
             try
             {
                 if (model.AccountId == User.GetUserId())
                 {
-                    throw new Exception("You cannot delete the account you are currently using to sign in.");
+                    throw new Exception(
+                        "You cannot delete the account you are currently using to sign in."
+                    );
                 }
 
-                // connect the accounts.     
+                // connect the accounts.
                 var user = await GetCurrentUserOrThrow();
                 var linkedUser = await _account.GetUserByAuth0Id(model.AccountId);
                 if (linkedUser == null)
@@ -464,7 +518,9 @@ namespace Hood.BaseControllers
                     throw new Exception("Could not load your primary sign in method.");
                 }
 
-                var identityToDisconnect = user.ConnectedAuth0Accounts.SingleOrDefault(a => a.LocalUserId == model.AccountId);
+                var identityToDisconnect = user.ConnectedAuth0Accounts.SingleOrDefault(a =>
+                    a.LocalUserId == model.AccountId
+                );
                 if (identityToDisconnect == null)
                 {
                     throw new Exception("Could not load your sign in method to remove.");
@@ -499,7 +555,10 @@ namespace Hood.BaseControllers
             {
                 SaveMessage = ex.Message;
                 MessageType = AlertType.Danger;
-                return RedirectToAction(nameof(DisconnectAccount), new { accountId = model.AccountId });
+                return RedirectToAction(
+                    nameof(DisconnectAccount),
+                    new { accountId = model.AccountId }
+                );
             }
         }
 
@@ -573,16 +632,22 @@ namespace Hood.BaseControllers
             try
             {
                 var user = await GetCurrentUserOrThrow();
-                await SendAuth0VerificationEmail((Auth0User)user, User.GetUserId(), Url.AbsoluteAction("Login", "Account"));
+                await SendAuth0VerificationEmail(
+                    (Auth0User)user,
+                    User.GetUserId(),
+                    Url.AbsoluteAction("Login", "Account")
+                );
                 SaveMessage = $"Email verification has been resent.";
                 MessageType = AlertType.Success;
-
             }
             catch (Exception ex)
             {
                 SaveMessage = $"Error sending an email verification: {ex.Message}";
                 MessageType = AlertType.Danger;
-                await _logService.AddExceptionAsync<Auth0AccountController>($"Error when sending an email verification.", ex);
+                await _logService.AddExceptionAsync<Auth0AccountController>(
+                    $"Error when sending an email verification.",
+                    ex
+                );
             }
 
             return RedirectToAction(nameof(ConfirmRequired));
@@ -603,15 +668,20 @@ namespace Hood.BaseControllers
         [Authorize(Policies.Active)]
         [ValidateAntiForgeryToken]
         [Route("account/change-password/sent")]
-        public virtual async Task<IActionResult> ChangePasswordSentAsync(ChangePasswordViewModel model)
+        public virtual async Task<IActionResult> ChangePasswordSentAsync(
+            ChangePasswordViewModel model
+        )
         {
             var user = await GetCurrentUserOrThrow();
             // get currently signed in user.
             var userId = User.GetUserId();
-            Auth0Identity remoteUser = user.ConnectedAuth0Accounts.SingleOrDefault(ca => ca.Id == userId);
+            Auth0Identity remoteUser = user.ConnectedAuth0Accounts.SingleOrDefault(ca =>
+                ca.Id == userId
+            );
             if (remoteUser == null)
             {
-                SaveMessage = "Could not send a password change as you are using a passwordless connection.";
+                SaveMessage =
+                    "Could not send a password change as you are using a passwordless connection.";
                 MessageType = AlertType.Warning;
                 return View(new ChangePasswordViewModel());
             }
@@ -624,11 +694,13 @@ namespace Hood.BaseControllers
                 switch (remoteUser.Provider)
                 {
                     case "email":
-                        SaveMessage = "Could not send a password change as you are using a passwordless connection.";
+                        SaveMessage =
+                            "Could not send a password change as you are using a passwordless connection.";
                         MessageType = AlertType.Warning;
                         break;
                     default:
-                        SaveMessage = "Could not send a password change as you are using an external login account. Please change your password there and then sign out and back in again to update your login security.";
+                        SaveMessage =
+                            "Could not send a password change as you are using an external login account. Please change your password there and then sign out and back in again to update your login security.";
                         MessageType = AlertType.Warning;
                         break;
                 }
@@ -654,13 +726,15 @@ namespace Hood.BaseControllers
         {
             try
             {
-
                 var user = await GetCurrentUserOrThrow();
                 await _account.DeleteUserAsync(user.Id, User);
 
                 if (Engine.Auth0Enabled)
                 {
-                    return RedirectToAction(nameof(SignOut), new { returnUrl = Url.Action(nameof(Deleted)) });
+                    return RedirectToAction(
+                        nameof(SignOut),
+                        new { returnUrl = Url.Action(nameof(Deleted)) }
+                    );
                 }
                 else
                 {
@@ -668,14 +742,19 @@ namespace Hood.BaseControllers
                     await signInManager.SignOutAsync();
                 }
 
-                await _logService.AddLogAsync<Auth0AccountController>($"User with Id {user.Id} has deleted their account.");
+                await _logService.AddLogAsync<Auth0AccountController>(
+                    $"User with Id {user.Id} has deleted their account."
+                );
                 return RedirectToAction(nameof(Deleted));
             }
             catch (Exception ex)
             {
                 SaveMessage = $"Error deleting your account: {ex.Message}";
                 MessageType = AlertType.Danger;
-                await _logService.AddExceptionAsync<Auth0AccountController>($"Error when user attemted to delete their account.", ex);
+                await _logService.AddExceptionAsync<Auth0AccountController>(
+                    $"Error when user attemted to delete their account.",
+                    ex
+                );
             }
             return RedirectToAction(nameof(Delete));
         }
@@ -695,19 +774,25 @@ namespace Hood.BaseControllers
             var user = await _account.GetUserByIdAsync(User.GetLocalUserId());
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with email '{User.GetEmail()}'.");
+                throw new ApplicationException(
+                    $"Unable to load user with email '{User.GetEmail()}'."
+                );
             }
             return user;
         }
 
-        protected virtual async Task SendAuth0VerificationEmail(Auth0User localUser, string userId, string returnUrl)
+        protected virtual async Task SendAuth0VerificationEmail(
+            Auth0User localUser,
+            string userId,
+            string returnUrl
+        )
         {
             // get the users' current connected account.
             // send a verification email on the whattheolddowntheold.
             var ticket = await _auth0.GetEmailVerificationTicket(userId, returnUrl);
             var verifyModel = new VerifyEmailModel(localUser.UserProfile, ticket.Value)
             {
-                SendToRecipient = true
+                SendToRecipient = true,
             };
             await _mailService.ProcessAndSend(verifyModel);
         }

@@ -41,13 +41,18 @@ namespace Hood.Tests
             }
         }
 
-        private DbContextOptions<T> Options<T>() where T : DbContext =>
+        private DbContextOptions<T> Options<T>()
+            where T : DbContext =>
             new DbContextOptionsBuilder<T>().UseSqlServer(ConnectionString).Options;
 
         public HoodDbContext NewHoodDb() => new(Options<HoodDbContext>());
+
         public ContentContext NewContent() => new(Options<ContentContext>());
+
         public PropertyContext NewProperty() => new(Options<PropertyContext>());
+
         public IdentityContext NewIdentity() => new(Options<IdentityContext>());
+
         public Auth0IdentityContext NewAuth0Identity() => new(Options<Auth0IdentityContext>());
     }
 

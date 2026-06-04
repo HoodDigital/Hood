@@ -1,8 +1,8 @@
-﻿using Hood.Enums;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Hood.Enums;
 using Hood.Models;
 using Hood.ViewModels;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Hood.Services
 {
@@ -38,6 +38,5 @@ namespace Hood.Services
         #region Statistics
         Task<PropertyStatistics> GetStatisticsAsync();
         #endregion
-
     }
 }

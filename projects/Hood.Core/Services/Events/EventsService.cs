@@ -1,6 +1,6 @@
-﻿using Hood.Core;
-using System;
+﻿using System;
 using System.Linq;
+using Hood.Core;
 
 namespace Hood.Services
 {
@@ -16,11 +16,9 @@ namespace Hood.Services
                     _ForumChanged += value;
                 }
             }
-            remove
-            {
-                _ForumChanged -= value;
-            }
+            remove { _ForumChanged -= value; }
         }
+
         public void TriggerForumChanged(object sender)
         {
             try
@@ -33,7 +31,10 @@ namespace Hood.Services
             catch (Exception ex)
             {
                 var logService = Engine.Services.Resolve<ILogService>();
-                logService.AddExceptionAsync<EventsService>("An error while triggering an event handler: " + nameof(TriggerForumChanged), ex);
+                logService.AddExceptionAsync<EventsService>(
+                    "An error while triggering an event handler: " + nameof(TriggerForumChanged),
+                    ex
+                );
             }
         }
 
@@ -47,11 +48,9 @@ namespace Hood.Services
                     _ContentChanged += value;
                 }
             }
-            remove
-            {
-                _ContentChanged -= value;
-            }
+            remove { _ContentChanged -= value; }
         }
+
         public void TriggerContentChanged(object sender)
         {
             _ContentChanged?.Invoke(sender, new EventArgs());
@@ -62,16 +61,17 @@ namespace Hood.Services
         {
             add
             {
-                if (_PropertiesChanged == null || !_PropertiesChanged.GetInvocationList().Contains(value))
+                if (
+                    _PropertiesChanged == null
+                    || !_PropertiesChanged.GetInvocationList().Contains(value)
+                )
                 {
                     _PropertiesChanged += value;
                 }
             }
-            remove
-            {
-                _PropertiesChanged -= value;
-            }
+            remove { _PropertiesChanged -= value; }
         }
+
         public void TriggerPropertiesChanged(object sender)
         {
             try
@@ -84,7 +84,11 @@ namespace Hood.Services
             catch (Exception ex)
             {
                 var logService = Engine.Services.Resolve<ILogService>();
-                logService.AddExceptionAsync<EventsService>("An error while triggering an event handler: " + nameof(TriggerPropertiesChanged), ex);
+                logService.AddExceptionAsync<EventsService>(
+                    "An error while triggering an event handler: "
+                        + nameof(TriggerPropertiesChanged),
+                    ex
+                );
             }
         }
 
@@ -98,11 +102,9 @@ namespace Hood.Services
                     _OptionsChanged += value;
                 }
             }
-            remove
-            {
-                _OptionsChanged -= value;
-            }
+            remove { _OptionsChanged -= value; }
         }
+
         public void TriggerOptionsChanged(object sender)
         {
             try
@@ -115,7 +117,10 @@ namespace Hood.Services
             catch (Exception ex)
             {
                 var logService = Engine.Services.Resolve<ILogService>();
-                logService.AddExceptionAsync<EventsService>("An error while triggering an event handler: " + nameof(TriggerOptionsChanged), ex);
+                logService.AddExceptionAsync<EventsService>(
+                    "An error while triggering an event handler: " + nameof(TriggerOptionsChanged),
+                    ex
+                );
             }
         }
     }

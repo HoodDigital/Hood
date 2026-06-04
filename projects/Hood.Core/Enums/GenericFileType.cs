@@ -11,14 +11,14 @@
         Directory,
         Audio,
         Video,
-        Unknown
+        Unknown,
     }
 
     public enum MediaWindowAction
     {
-        View, 
+        View,
         Select,
         Attach,
-        Insert
+        Insert,
     }
 }

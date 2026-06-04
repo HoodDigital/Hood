@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Hood.Core
 {
     /// <summary>
-    /// Classes implementing this interface can serve as a portal for the various services composing the Nop engine. 
+    /// Classes implementing this interface can serve as a portal for the various services composing the Nop engine.
     /// Edit functionality, modules and implementations access most Nop functionality through this interface.
     /// </summary>
     public interface IHoodServiceProvider
@@ -33,14 +33,18 @@ namespace Hood.Core
         /// <param name="services">Collection of service descriptors</param>
         /// <param name="configuration">Configuration root of the application</param>
         /// <returns>Service provider</returns>
-        IServiceProvider ConfigureServices(IServiceCollection services, IConfiguration configuration);
+        IServiceProvider ConfigureServices(
+            IServiceCollection services,
+            IConfiguration configuration
+        );
 
         /// <summary>
         /// Resolve dependency
         /// </summary>
         /// <typeparam name="T">Type of resolved service</typeparam>
         /// <returns>Resolved service</returns>
-        T Resolve<T>() where T : class;
+        T Resolve<T>()
+            where T : class;
 
         /// <summary>
         /// Resolve dependency

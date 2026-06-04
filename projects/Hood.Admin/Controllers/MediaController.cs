@@ -10,8 +10,6 @@ namespace Hood.Areas.Admin.Controllers
     public class MediaController : BaseMediaController
     {
         public MediaController()
-            : base()
-        {
-        }
+            : base() { }
     }
 }

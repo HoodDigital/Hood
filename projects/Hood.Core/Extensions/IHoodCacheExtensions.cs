@@ -1,5 +1,5 @@
-﻿using Hood.Caching;
-using System;
+﻿using System;
+using Hood.Caching;
 
 namespace Hood.Extensions
 {

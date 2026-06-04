@@ -5,14 +5,13 @@ namespace Hood.Services
 {
     public class RecaptchaResponse
     {
-        public RecaptchaResponse()
-        { }
+        public RecaptchaResponse() { }
 
         public RecaptchaResponse(bool success, string message)
         {
             Passed = success;
             Message = message;
-        }        
+        }
 
         [JsonProperty(PropertyName = "success")]
         internal bool Success { get; set; }
@@ -34,7 +33,5 @@ namespace Hood.Services
 
         [JsonIgnore]
         public string Message { get; internal set; }
-
     }
 }
-

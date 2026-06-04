@@ -11,7 +11,9 @@ namespace Hood.Extensions
             var output = (T)Enum.Parse(typeof(T), value, true);
             return output != null ? output : defaultValue;
         }
-        public static IEnumerable<T> ToList<T>() where T : Enum
+
+        public static IEnumerable<T> ToList<T>()
+            where T : Enum
         {
             return Enum.GetValues(typeof(T)).Cast<T>();
         }

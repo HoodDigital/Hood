@@ -8,44 +8,53 @@ namespace Hood.Models
     {
         [JsonIgnore]
         public PropertyListing Property { get; set; }
+
         [NotMapped]
         public PropertyListingView PropertyListingView { get; set; }
         public int PropertyId { get; set; }
 
         public PropertyMedia()
-            : base()
-        { }
-        public PropertyMedia(IMediaObject media)
-            : base(media)
-        { }
-        public PropertyMedia(string url, string smallUrl = null, string mediumUrl = null, string largeUrl = null, string thumbUrl = null)
-        : base(url, smallUrl, mediumUrl, largeUrl, thumbUrl)
-        {
-        }
+            : base() { }
 
-        public new static IMediaObject Blank => MediaBase.Blank;
+        public PropertyMedia(IMediaObject media)
+            : base(media) { }
+
+        public PropertyMedia(
+            string url,
+            string smallUrl = null,
+            string mediumUrl = null,
+            string largeUrl = null,
+            string thumbUrl = null
+        )
+            : base(url, smallUrl, mediumUrl, largeUrl, thumbUrl) { }
+
+        public static new IMediaObject Blank => MediaBase.Blank;
     }
 
     public partial class PropertyFloorplan : MediaBase
     {
         [JsonIgnore]
         public PropertyListing Property { get; set; }
+
         [NotMapped]
         public PropertyListingView PropertyListingView { get; set; }
         public int PropertyId { get; set; }
 
         public PropertyFloorplan()
-            : base()
-        { }
+            : base() { }
 
         public PropertyFloorplan(IMediaObject media)
-            : base(media)
-        { }
-        public PropertyFloorplan(string url, string smallUrl = null, string mediumUrl = null, string largeUrl = null, string thumbUrl = null)
-           : base(url, smallUrl, mediumUrl, largeUrl, thumbUrl)
-        {
-        }
+            : base(media) { }
 
-        public new static IMediaObject Blank => MediaBase.Blank;
+        public PropertyFloorplan(
+            string url,
+            string smallUrl = null,
+            string mediumUrl = null,
+            string largeUrl = null,
+            string thumbUrl = null
+        )
+            : base(url, smallUrl, mediumUrl, largeUrl, thumbUrl) { }
+
+        public static new IMediaObject Blank => MediaBase.Blank;
     }
 }

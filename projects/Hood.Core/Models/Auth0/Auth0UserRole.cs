@@ -15,6 +15,4 @@ namespace Hood.Models
         /// </summary>
         public virtual string RoleId { get; set; } = default!;
     }
-
-
 }

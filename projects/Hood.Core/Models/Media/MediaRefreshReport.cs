@@ -10,5 +10,4 @@
         public bool Succeeded { get; internal set; }
         public bool HasRun { get; internal set; }
     }
-
 }

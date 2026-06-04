@@ -18,18 +18,20 @@ namespace Hood.Extensions
         {
             return ((decimal)amount / 100).ToString("N2");
         }
+
         public static string ToCurrencyString(this decimal amount)
         {
             return ((decimal)amount / 100).ToString("N2");
         }
+
         public static string ToCurrencyString(this long amount)
         {
             return ((decimal)amount / 100).ToString("N2");
         }
+
         public static string ToCurrencyString(this int amount)
         {
             return ((decimal)amount / 100).ToString("N2");
         }
-
     }
 }

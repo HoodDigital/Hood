@@ -13,8 +13,7 @@ namespace Hood.ViewModels
 {
     public class SpamPreventionModel : SaveableModel, IValidatableObject
     {
-        public SpamPreventionModel()
-        { }
+        public SpamPreventionModel() { }
 
         public const string HoneypotFieldName = "full_enquiry";
 
@@ -56,7 +55,15 @@ namespace Hood.ViewModels
             }
 
             DateTime timestamp;
-            if (!DateTime.TryParseExact(this.Timestamp, "ffffHHMMyytssddmm", null, DateTimeStyles.None, out timestamp))
+            if (
+                !DateTime.TryParseExact(
+                    this.Timestamp,
+                    "ffffHHMMyytssddmm",
+                    null,
+                    DateTimeStyles.None,
+                    out timestamp
+                )
+            )
             {
                 return failedResult;
             }

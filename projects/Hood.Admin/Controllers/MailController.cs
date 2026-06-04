@@ -6,13 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles="SuperUser,Admin")]
-
+    [Authorize(Roles = "SuperUser,Admin")]
     public class MailController : BaseMailController
     {
         public MailController()
-            : base()
-        {
-        }
+            : base() { }
     }
 }

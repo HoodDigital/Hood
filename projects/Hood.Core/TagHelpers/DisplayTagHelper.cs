@@ -1,8 +1,8 @@
-﻿using Hood.Enums;
+﻿using System;
+using Hood.Enums;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using System;
 
 namespace Hood.TagHelpers
 {
@@ -13,21 +13,25 @@ namespace Hood.TagHelpers
 
         [HtmlAttributeName("asp-for")]
         public ModelExpression For { get; set; }
+
         /// <summary>
         /// Choose the type of alert to display
         /// </summary>
         [HtmlAttributeName("type")]
         public AlertType Type { get; set; }
+
         /// <summary>
         /// Choose a size for the alert.
         /// </summary>
         [HtmlAttributeName("multiline")]
         public bool Multiline { get; set; }
+
         /// <summary>
         /// Set a Font-Awesome Icon here for example "fa-user-friends".
         /// </summary>
         [HtmlAttributeName("icon")]
         public string Icon { get; set; }
+
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             output.TagName = "div";
@@ -57,17 +61,20 @@ namespace Hood.TagHelpers
 
             if (Multiline)
             {
-                template += $@"<textarea id='{fieldId}' class='form-control select-text disabled' placeholder='{For.ModelExplorer.Metadata.DisplayName}' disabled>{fieldValue}";
+                template +=
+                    $@"<textarea id='{fieldId}' class='form-control select-text disabled' placeholder='{For.ModelExplorer.Metadata.DisplayName}' disabled>{fieldValue}";
             }
             else
             {
-                template += $@"<input id='{fieldId}' class='form-control select-text disabled' placeholder='{For.ModelExplorer.Metadata.DisplayName}' value='{fieldValue}' disabled />";
+                template +=
+                    $@"<input id='{fieldId}' class='form-control select-text disabled' placeholder='{For.ModelExplorer.Metadata.DisplayName}' value='{fieldValue}' disabled />";
             }
 
             template += $@"<label for='{fieldId}'>{fieldDisplayName}</label>";
 
             if (For.ModelExplorer.Metadata.Description.IsSet())
-                template += $"<small class='form-text text-info'>{For.ModelExplorer.Metadata.Description}</small>";
+                template +=
+                    $"<small class='form-text text-info'>{For.ModelExplorer.Metadata.Description}</small>";
 
             if (!output.Attributes.ContainsName("class"))
                 output.Attributes.SetAttribute("class", $"form-group floating-label");

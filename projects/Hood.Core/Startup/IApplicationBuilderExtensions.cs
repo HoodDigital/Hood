@@ -1,4 +1,8 @@
-﻿using Hood.Core;
+﻿using System;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Identity;
@@ -9,20 +13,19 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using Microsoft.Data.SqlClient;
-using System.Globalization;
-using System.IO;
-using System.Linq;
 
 namespace Hood.Startup
 {
-
     public static class IApplicationBuilderExtensions
     {
-        public static IApplicationBuilder UseHood(this IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config)
+        public static IApplicationBuilder UseHood(
+            this IApplicationBuilder app,
+            IWebHostEnvironment env,
+            IConfiguration config
+        )
         {
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.GetCultureInfo("en-GB");
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-GB");
@@ -41,22 +44,29 @@ namespace Hood.Startup
             var provider = new FileExtensionContentTypeProvider();
             provider.Mappings[".md"] = "text/markdown";
             provider.Mappings[".webmanifest"] = "text/json";
-            app.UseStaticFiles(new StaticFileOptions()
-            {
-                HttpsCompression = Microsoft.AspNetCore.Http.Features.HttpsCompressionMode.Compress,
-                ContentTypeProvider = provider,
-                OnPrepareResponse =
-                    ctx =>
+            app.UseStaticFiles(
+                new StaticFileOptions()
+                {
+                    HttpsCompression = Microsoft
+                        .AspNetCore
+                        .Http
+                        .Features
+                        .HttpsCompressionMode
+                        .Compress,
+                    ContentTypeProvider = provider,
+                    OnPrepareResponse = ctx =>
                     {
                         ctx.Context.Response.Headers["Cache-Control"] = "max-age=600";
-                    }
-            });
+                    },
+                }
+            );
 
             app.UseRouting();
             app.UseCors();
 
             // Activate url helpers
-            var httpContextAccessor = app.ApplicationServices.GetRequiredService<IHttpContextAccessor>();
+            var httpContextAccessor =
+                app.ApplicationServices.GetRequiredService<IHttpContextAccessor>();
             UrlHelpers.Configure(httpContextAccessor);
 
             if (config.IsDatabaseConnected())
@@ -64,25 +74,34 @@ namespace Hood.Startup
                 app.UseAuthentication();
                 app.UseAuthorization();
 
-                var cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Authentication.CookieDefaultName;
+                var cookieName = config["Identity:Cookies:Name"].IsSet()
+                    ? config["Identity:Cookies:Name"]
+                    : Authentication.CookieDefaultName;
 
                 var builder = new CookieBuilder() { Name = $".{cookieName}.Session" };
                 builder.Expiration = TimeSpan.FromMinutes(config.GetValue("Session:Timeout", 60));
 
-                app.UseSession(new SessionOptions()
-                {
-                    IdleTimeout = builder.Expiration.Value,
-                    Cookie = builder
-                });
+                app.UseSession(
+                    new SessionOptions()
+                    {
+                        IdleTimeout = builder.Expiration.Value,
+                        Cookie = builder,
+                    }
+                );
             }
 
             app.UseHoodComponents(env, config);
-            
+
             app.UseHoodDefaultRoutes(config);
 
             return app;
         }
-        public static IApplicationBuilder UseHoodComponents(this IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config)
+
+        public static IApplicationBuilder UseHoodComponents(
+            this IApplicationBuilder app,
+            IWebHostEnvironment env,
+            IConfiguration config
+        )
         {
             if (app == null)
                 throw new ArgumentNullException(nameof(app));
@@ -96,19 +115,24 @@ namespace Hood.Startup
             var dependencies = typeFinder.FindClassesOfType<IHoodComponent>();
 
             var instances = dependencies
-                                .Select(dependencyRegistrar => (IHoodComponent)Activator.CreateInstance(dependencyRegistrar))
-                                .OrderBy(dependencyRegistrar => dependencyRegistrar.ServiceConfigurationOrder);
+                .Select(dependencyRegistrar =>
+                    (IHoodComponent)Activator.CreateInstance(dependencyRegistrar)
+                )
+                .OrderBy(dependencyRegistrar => dependencyRegistrar.ServiceConfigurationOrder);
 
             foreach (var dependency in instances)
                 dependency.Configure(app, env, config);
 
             return app;
         }
-        public static IApplicationBuilder UseHoodDefaultRoutes(this IApplicationBuilder app, IConfiguration config)
+
+        public static IApplicationBuilder UseHoodDefaultRoutes(
+            this IApplicationBuilder app,
+            IConfiguration config
+        )
         {
             app.UseEndpoints(endpoints =>
             {
-
                 endpoints.MapControllerRoute(
                     name: "Areas",
                     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
@@ -118,10 +142,8 @@ namespace Hood.Startup
                     name: "Default",
                     pattern: "{controller=Home}/{action=Index}/{id?}"
                 );
-
             });
             return app;
         }
     }
-
 }

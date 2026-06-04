@@ -1,22 +1,22 @@
-﻿using Hood.Core;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using Hood.Core;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 
 namespace Hood
 {
     public static class UserInterfaceProvider
     {
         /// <summary>
-        /// Gets a directory listing from the embedded files in the Hood assembly. 
-        /// WARNING, this should only be used for loading files in known definite locations. as the 
+        /// Gets a directory listing from the embedded files in the Hood assembly.
+        /// WARNING, this should only be used for loading files in known definite locations. as the
         /// file provider uses a flat structure, sub-directories will be returned along with the files.
         /// </summary>
         /// <param name="basePath">The base path in the form ~/path/of/the/file.extension</param>
@@ -30,13 +30,14 @@ namespace Hood
                 return new List<string>().ToArray();
             }
             IDirectoryContents contents = provider.GetDirectoryContents("");
-            System.Collections.Generic.IEnumerable<IFileInfo> dir = contents.Where(p => p.Name.StartsWith(basePath));
+            System.Collections.Generic.IEnumerable<IFileInfo> dir = contents.Where(p =>
+                p.Name.StartsWith(basePath)
+            );
             return dir.Select(f => f.Name.Replace(basePath, "")).ToArray();
         }
 
         public static EmbeddedFileProvider GetProvider(IConfiguration config)
         {
-            
             // load the theme from the options.
             string ui = config["Hood:UI"];
 

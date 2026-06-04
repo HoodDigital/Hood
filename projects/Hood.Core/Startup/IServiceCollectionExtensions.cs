@@ -1,13 +1,27 @@
-﻿using Hood.Caching;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Auth0.AspNetCore.Authentication;
+using Hood.Caching;
+using Hood.Constants.Identity;
+using Hood.Contexts;
 using Hood.Core;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Filters;
+using Hood.Identity;
 using Hood.Models;
 using Hood.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
@@ -15,24 +29,10 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
-using Newtonsoft.Json.Serialization;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Auth0.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Hood.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Hood.Enums;
-using Hood.Contexts;
-using Microsoft.AspNetCore.Hosting;
-using Hood.Constants.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Hood.Startup
 {
@@ -41,7 +41,11 @@ namespace Hood.Startup
     /// </summary>
     public static class IServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureHood(this IServiceCollection services, IConfiguration config, IWebHostEnvironment env)
+        public static IServiceCollection ConfigureHood(
+            this IServiceCollection services,
+            IConfiguration config,
+            IWebHostEnvironment env
+        )
         {
             try
             {
@@ -54,7 +58,11 @@ namespace Hood.Startup
             return services;
         }
 
-        public static IServiceCollection ConfigureHoodApi(this IServiceCollection services, IConfiguration config, IWebHostEnvironment env)
+        public static IServiceCollection ConfigureHoodApi(
+            this IServiceCollection services,
+            IConfiguration config,
+            IWebHostEnvironment env
+        )
         {
             try
             {
@@ -63,14 +71,14 @@ namespace Hood.Startup
                 services.AddCors(options =>
                 {
                     string[] domains = config.GetSection("Cors:Domains").Get<string[]>();
-                    options.AddDefaultPolicy(
-                    builder =>
+                    options.AddDefaultPolicy(builder =>
                     {
                         builder.WithOrigins(domains);
                     });
                 });
 
-                services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                services
+                    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>
                     {
                         options.Authority = $"https://{config["Identity:Auth0:Domain"]}/";
@@ -83,23 +91,28 @@ namespace Hood.Startup
                                 context.Response.OnStarting(async () =>
                                 {
                                     await context.Response.WriteAsync(
-                                        JsonConvert.SerializeObject(new ApiResponse("You are not authorized!"))
+                                        JsonConvert.SerializeObject(
+                                            new ApiResponse("You are not authorized!")
+                                        )
                                     );
                                 });
                                 return Task.CompletedTask;
-                            }
+                            },
                         };
                     });
 
                 services.AddAuthorization(options =>
                 {
-                    options.AddPolicy("Admin", policy =>
-                    policy.RequireAssertion(context =>
-                        context.User.HasClaim(c =>
-                            (c.Type == "permissions" &&
-                            c.Value == "read:admin-messages") &&
-                            c.Issuer == $"https://{config["Identity:Auth0:Domain"]}/")));
-
+                    options.AddPolicy(
+                        "Admin",
+                        policy =>
+                            policy.RequireAssertion(context =>
+                                context.User.HasClaim(c =>
+                                    (c.Type == "permissions" && c.Value == "read:admin-messages")
+                                    && c.Issuer == $"https://{config["Identity:Auth0:Domain"]}/"
+                                )
+                            )
+                    );
                 });
 
                 services.AddControllers().AddNewtonsoftJson();
@@ -108,8 +121,11 @@ namespace Hood.Startup
             return services;
         }
 
-
-        public static IServiceCollection ConfigureHoodCore(this IServiceCollection services, IConfiguration config, IWebHostEnvironment env)
+        public static IServiceCollection ConfigureHoodCore(
+            this IServiceCollection services,
+            IConfiguration config,
+            IWebHostEnvironment env
+        )
         {
             try
             {
@@ -121,9 +137,12 @@ namespace Hood.Startup
             return services;
         }
 
-        private static IServiceCollection ConfigureHoodBasics(this IServiceCollection services, IConfiguration config, IWebHostEnvironment env)
+        private static IServiceCollection ConfigureHoodBasics(
+            this IServiceCollection services,
+            IConfiguration config,
+            IWebHostEnvironment env
+        )
         {
-
             services.Configure<HoodConfiguration>(config.GetSection("Hood"));
             services.Configure<Auth0Configuration>(config.GetSection("Identity:Auth0"));
 
@@ -149,9 +168,14 @@ namespace Hood.Startup
         // hosting. Without it the keys default to an ephemeral per-process/container location and reset on
         // every rebuild (causing "The antiforgery token could not be decrypted"). The path is left unset by
         // default — single-host installs work fine on the default key ring; containers/farms set the path.
-        private static IServiceCollection ConfigureDataProtection(this IServiceCollection services, IConfiguration config)
+        private static IServiceCollection ConfigureDataProtection(
+            this IServiceCollection services,
+            IConfiguration config
+        )
         {
-            IDataProtectionBuilder dataProtection = services.AddDataProtection().SetApplicationName("Hood");
+            IDataProtectionBuilder dataProtection = services
+                .AddDataProtection()
+                .SetApplicationName("Hood");
 
             string keyPath = config["Hood:DataProtectionKeyPath"];
             if (keyPath.IsSet())
@@ -163,7 +187,11 @@ namespace Hood.Startup
             return services;
         }
 
-        private static IServiceCollection ConfigureHoodSite(this IServiceCollection services, IConfiguration config, IWebHostEnvironment env)
+        private static IServiceCollection ConfigureHoodSite(
+            this IServiceCollection services,
+            IConfiguration config,
+            IWebHostEnvironment env
+        )
         {
             // Register site stuff.
             services.AddSingleton<IThemesService, ThemesService>();
@@ -173,11 +201,16 @@ namespace Hood.Startup
 
             if (!config.IsDatabaseConnected())
             {
-                throw new StartupException("Database connection string is not configured.", StartupError.NoConnectionString);
+                throw new StartupException(
+                    "Database connection string is not configured.",
+                    StartupError.NoConnectionString
+                );
             }
 
-
-            if (config.IsConfigured("Identity:Auth0:Domain") && config.IsConfigured("Identity:Auth0:ClientId"))
+            if (
+                config.IsConfigured("Identity:Auth0:Domain")
+                && config.IsConfigured("Identity:Auth0:ClientId")
+            )
             {
                 services.ConfigureAuth0(config, new Auth0LoginService(config));
             }
@@ -185,7 +218,6 @@ namespace Hood.Startup
             {
                 services.ConfigurePasswordAuthentication(config);
             }
-
 
             if (env.EnvironmentName == "Development" || env.EnvironmentName == "Hood")
             {
@@ -202,13 +234,14 @@ namespace Hood.Startup
 
             services.ConfigureHoodSlugRouteConstraints();
 
-            services.AddControllersWithViews()
+            services
+                .AddControllersWithViews()
                 .AddRazorRuntimeCompilation()
                 .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.ContractResolver = new DefaultContractResolver()
                     {
-                        NamingStrategy = new CamelCaseNamingStrategy()
+                        NamingStrategy = new CamelCaseNamingStrategy(),
                     };
                 })
                 .AddApplicationPart(typeof(Engine).Assembly)
@@ -218,9 +251,10 @@ namespace Hood.Startup
             return services;
         }
 
-        public static IServiceCollection ConfigureHoodDatabaseDependentServices(this IServiceCollection services)
+        public static IServiceCollection ConfigureHoodDatabaseDependentServices(
+            this IServiceCollection services
+        )
         {
-
             // Register singletons.
             services.AddSingleton<IDirectoryManager, DirectoryManager>();
             services.AddSingleton<IMediaManager, MediaManager>();
@@ -235,7 +269,10 @@ namespace Hood.Startup
             return services;
         }
 
-        public static IServiceCollection ConfigureHoodEngine(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection ConfigureHoodEngine(
+            this IServiceCollection services,
+            IConfiguration configuration
+        )
         {
             //add accessor to HttpContext
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -250,7 +287,10 @@ namespace Hood.Startup
 
         #region Caching
 
-        public static IServiceCollection ConfigureCache(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection ConfigureCache(
+            this IServiceCollection services,
+            IConfiguration config
+        )
         {
             // Caching
             //if (config["ConnectionStrings:RedisCache"].IsSet())
@@ -267,53 +307,43 @@ namespace Hood.Startup
             services.AddSingleton<IHoodCache, HoodCache>();
             return services;
         }
+
         public static IServiceCollection ConfigureCacheProfiles(this IServiceCollection services)
         {
             services.Configure<MvcOptions>(options =>
             {
-                options.CacheProfiles.Add("Year",
+                options.CacheProfiles.Add(
+                    "Year",
                     new CacheProfile
                     {
                         Location = ResponseCacheLocation.Client,
-                        Duration = 31536000
-                    });
-                options.CacheProfiles.Add("Month",
-                    new CacheProfile
-                    {
-                        Location = ResponseCacheLocation.Client,
-                        Duration = 2629000
-                    });
-                options.CacheProfiles.Add("Week",
-                    new CacheProfile
-                    {
-                        Location = ResponseCacheLocation.Client,
-                        Duration = 604800
-                    });
-                options.CacheProfiles.Add("Day",
-                    new CacheProfile
-                    {
-                        Location = ResponseCacheLocation.Client,
-                        Duration = 86400
-                    });
-                options.CacheProfiles.Add("Hour",
-                    new CacheProfile
-                    {
-                        Location = ResponseCacheLocation.Client,
-                        Duration = 3600
-                    });
-                options.CacheProfiles.Add("HalfHour",
-                     new CacheProfile
-                     {
-                         Location = ResponseCacheLocation.Client,
-                         Duration = 1800
-                     });
-                options.CacheProfiles.Add("TenMinutes",
-                     new CacheProfile
-                     {
-                         Location = ResponseCacheLocation.Client,
-                         Duration = 600
-                     });
-
+                        Duration = 31536000,
+                    }
+                );
+                options.CacheProfiles.Add(
+                    "Month",
+                    new CacheProfile { Location = ResponseCacheLocation.Client, Duration = 2629000 }
+                );
+                options.CacheProfiles.Add(
+                    "Week",
+                    new CacheProfile { Location = ResponseCacheLocation.Client, Duration = 604800 }
+                );
+                options.CacheProfiles.Add(
+                    "Day",
+                    new CacheProfile { Location = ResponseCacheLocation.Client, Duration = 86400 }
+                );
+                options.CacheProfiles.Add(
+                    "Hour",
+                    new CacheProfile { Location = ResponseCacheLocation.Client, Duration = 3600 }
+                );
+                options.CacheProfiles.Add(
+                    "HalfHour",
+                    new CacheProfile { Location = ResponseCacheLocation.Client, Duration = 1800 }
+                );
+                options.CacheProfiles.Add(
+                    "TenMinutes",
+                    new CacheProfile { Location = ResponseCacheLocation.Client, Duration = 600 }
+                );
             });
 
             return services;
@@ -323,30 +353,49 @@ namespace Hood.Startup
 
         #region Contexts
 
-        public static IServiceCollection ConfigureHoodDatabase(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection ConfigureHoodDatabase(
+            this IServiceCollection services,
+            IConfiguration config
+        )
         {
-            services.AddDbContext<HoodDbContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]));
+            services.AddDbContext<HoodDbContext>(options =>
+                options.UseSqlServer(config["ConnectionStrings:DefaultConnection"])
+            );
             return services;
         }
-        public static IServiceCollection ConfigureProperty(this IServiceCollection services, IConfiguration config)
+
+        public static IServiceCollection ConfigureProperty(
+            this IServiceCollection services,
+            IConfiguration config
+        )
         {
             // PropertyListingView reads Include several collections (Media/FloorPlans/Metadata); split
             // those into separate queries to avoid the cartesian-explosion single-query (EF Query[20504]).
-            services.AddDbContext<PropertyContext>(options => options.UseSqlServer(
-                config["ConnectionStrings:DefaultConnection"],
-                sql => sql.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
+            services.AddDbContext<PropertyContext>(options =>
+                options.UseSqlServer(
+                    config["ConnectionStrings:DefaultConnection"],
+                    sql => sql.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
+                )
+            );
             services.AddSingleton<IFTPService, FTPService>();
             services.AddSingleton<IPropertyImporter, BlmFileImporter>();
             services.AddScoped<IPropertyRepository, PropertyRepository>();
             return services;
         }
-        public static IServiceCollection ConfigureContent(this IServiceCollection services, IConfiguration config)
+
+        public static IServiceCollection ConfigureContent(
+            this IServiceCollection services,
+            IConfiguration config
+        )
         {
             // ContentView reads Include several collections (Media/Metadata/Categories); split those into
             // separate queries to avoid the cartesian-explosion single-query (EF Query[20504]).
-            services.AddDbContext<ContentContext>(options => options.UseSqlServer(
-                config["ConnectionStrings:DefaultConnection"],
-                sql => sql.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
+            services.AddDbContext<ContentContext>(options =>
+                options.UseSqlServer(
+                    config["ConnectionStrings:DefaultConnection"],
+                    sql => sql.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
+                )
+            );
             services.AddSingleton<ContentCategoryCache>();
             services.AddSingleton<ContentByTypeCache>();
             services.AddScoped<IContentRepository, ContentRepository>();
@@ -357,13 +406,20 @@ namespace Hood.Startup
 
         #region Anti Forgery
 
-        public static IServiceCollection ConfigureAntiForgery(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection ConfigureAntiForgery(
+            this IServiceCollection services,
+            IConfiguration config
+        )
         {
-            string cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Authentication.CookieDefaultName;
+            string cookieName = config["Identity:Cookies:Name"].IsSet()
+                ? config["Identity:Cookies:Name"]
+                : Authentication.CookieDefaultName;
             services.AddAntiforgery(options =>
             {
                 options.Cookie.Name = $"{cookieName}_af";
-                options.Cookie.Domain = config["Identity:Cookies:Domain"].IsSet() ? config["Identity:Cookies:Domain"] : null;
+                options.Cookie.Domain = config["Identity:Cookies:Domain"].IsSet()
+                    ? config["Identity:Cookies:Domain"]
+                    : null;
             });
             return services;
         }
@@ -372,9 +428,14 @@ namespace Hood.Startup
 
         #region Cookie Consent
 
-        public static IServiceCollection ConfigureCookieConsent(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection ConfigureCookieConsent(
+            this IServiceCollection services,
+            IConfiguration config
+        )
         {
-            string cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Authentication.CookieDefaultName;
+            string cookieName = config["Identity:Cookies:Name"].IsSet()
+                ? config["Identity:Cookies:Name"]
+                : Authentication.CookieDefaultName;
             bool consentRequired = config.GetValue("Identity:Cookies:ConsentRequired", true);
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -383,7 +444,9 @@ namespace Hood.Startup
                 options.CheckConsentNeeded = context => consentRequired;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
                 options.ConsentCookie.Name = $"{cookieName}_consent";
-                options.ConsentCookie.Domain = config["Identity:Cookies:Domain"].IsSet() ? config["Identity:Cookies:Domain"] : null;
+                options.ConsentCookie.Domain = config["Identity:Cookies:Domain"].IsSet()
+                    ? config["Identity:Cookies:Domain"]
+                    : null;
             });
             return services;
         }
@@ -392,26 +455,42 @@ namespace Hood.Startup
 
         #region Password Authentication
 
-        public static IServiceCollection ConfigurePasswordAuthentication(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection ConfigurePasswordAuthentication(
+            this IServiceCollection services,
+            IConfiguration config
+        )
         {
-            services.AddDbContext<IdentityContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]));
+            services.AddDbContext<IdentityContext>(options =>
+                options.UseSqlServer(config["ConnectionStrings:DefaultConnection"])
+            );
             services.AddScoped<IPasswordAccountRepository, AccountRepository>();
             services.AddScoped<IHoodAccountRepository, AccountRepository>();
 
-            services.AddIdentity<ApplicationUser, IdentityRole>(o =>
-            {
-                // configure identity options
-                o.User.RequireUniqueEmail = true;
+            services
+                .AddIdentity<ApplicationUser, IdentityRole>(o =>
+                {
+                    // configure identity options
+                    o.User.RequireUniqueEmail = true;
 
-                o.SignIn.RequireConfirmedEmail = false;
-                o.SignIn.RequireConfirmedPhoneNumber = false;
+                    o.SignIn.RequireConfirmedEmail = false;
+                    o.SignIn.RequireConfirmedPhoneNumber = false;
 
-                o.Password.RequireDigit = !config["Identity:Password:RequireDigit"].IsSet() || bool.Parse(config["Identity:Password:RequireDigit"]);
-                o.Password.RequireLowercase = config["Identity:Password:RequireLowercase"].IsSet() && bool.Parse(config["Identity:Password:RequireLowercase"]);
-                o.Password.RequireUppercase = config["Identity:Password:RequireUppercase"].IsSet() && bool.Parse(config["Identity:Password:RequireUppercase"]);
-                o.Password.RequireNonAlphanumeric = !config["Identity:Password:RequireNonAlphanumeric"].IsSet() || bool.Parse(config["Identity:Password:RequireNonAlphanumeric"]);
-                o.Password.RequiredLength = config["Identity:Password:RequiredLength"].IsSet() ? int.Parse(config["Identity:Password:RequiredLength"]) : 6;
-            })
+                    o.Password.RequireDigit =
+                        !config["Identity:Password:RequireDigit"].IsSet()
+                        || bool.Parse(config["Identity:Password:RequireDigit"]);
+                    o.Password.RequireLowercase =
+                        config["Identity:Password:RequireLowercase"].IsSet()
+                        && bool.Parse(config["Identity:Password:RequireLowercase"]);
+                    o.Password.RequireUppercase =
+                        config["Identity:Password:RequireUppercase"].IsSet()
+                        && bool.Parse(config["Identity:Password:RequireUppercase"]);
+                    o.Password.RequireNonAlphanumeric =
+                        !config["Identity:Password:RequireNonAlphanumeric"].IsSet()
+                        || bool.Parse(config["Identity:Password:RequireNonAlphanumeric"]);
+                    o.Password.RequiredLength = config["Identity:Password:RequiredLength"].IsSet()
+                        ? int.Parse(config["Identity:Password:RequiredLength"])
+                        : 6;
+                })
                 .AddEntityFrameworkStores<IdentityContext>()
                 .AddDefaultTokenProviders();
 
@@ -421,8 +500,12 @@ namespace Hood.Startup
 
                 options.Cookie.SameSite = SameSiteMode.Strict;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                options.Cookie.Domain = config["Identity:Cookies:Domain"].IsSet() ? config["Identity:Cookies:Domain"] : null;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(config.GetValue("Session:Timeout", 60));
+                options.Cookie.Domain = config["Identity:Cookies:Domain"].IsSet()
+                    ? config["Identity:Cookies:Domain"]
+                    : null;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(
+                    config.GetValue("Session:Timeout", 60)
+                );
                 options.SlidingExpiration = true;
 
                 options.Events = new CookieAuthenticationEvents()
@@ -435,22 +518,38 @@ namespace Hood.Startup
                         e.Principal.SetUserClaims(user.UserProfile);
                         if (user.EmailConfirmed)
                         {
-                            e.Principal.AddOrUpdateClaimValue(Hood.Constants.Identity.ClaimTypes.EmailConfirmed, "true");
+                            e.Principal.AddOrUpdateClaimValue(
+                                Hood.Constants.Identity.ClaimTypes.EmailConfirmed,
+                                "true"
+                            );
                         }
                         if (user.Active || !Engine.Settings.Account.RequireEmailConfirmation)
                         {
-                            e.Principal.AddOrUpdateClaimValue(Hood.Constants.Identity.ClaimTypes.Active, "true");
+                            e.Principal.AddOrUpdateClaimValue(
+                                Hood.Constants.Identity.ClaimTypes.Active,
+                                "true"
+                            );
                         }
-                    }
+                    },
                 };
             });
 
-
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(Policies.Active, policy => policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.Active));
-                options.AddPolicy(Policies.AccountNotConnected, policy => policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.AccountNotConnected));
-                options.AddPolicy(Policies.AccountLinkRequired, policy => policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.AccountLinkRequired));
+                options.AddPolicy(
+                    Policies.Active,
+                    policy => policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.Active)
+                );
+                options.AddPolicy(
+                    Policies.AccountNotConnected,
+                    policy =>
+                        policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.AccountNotConnected)
+                );
+                options.AddPolicy(
+                    Policies.AccountLinkRequired,
+                    policy =>
+                        policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.AccountLinkRequired)
+                );
             });
 
             services.ConfigurePasswordImpersonation();
@@ -458,15 +557,23 @@ namespace Hood.Startup
             return services;
         }
 
-        public static IServiceCollection ConfigurePasswordImpersonation(this IServiceCollection services)
+        public static IServiceCollection ConfigurePasswordImpersonation(
+            this IServiceCollection services
+        )
         {
             services.Configure<SecurityStampValidatorOptions>(options => // different class name
             {
-                options.ValidationInterval = TimeSpan.FromMinutes(1);  // new property name
-                options.OnRefreshingPrincipal = context =>             // new property name
+                options.ValidationInterval = TimeSpan.FromMinutes(1); // new property name
+                options.OnRefreshingPrincipal = context => // new property name
                 {
-                    System.Security.Claims.Claim originalUserIdClaim = context.CurrentPrincipal.FindFirst(Hood.Constants.Identity.ClaimTypes.OriginalUserId);
-                    System.Security.Claims.Claim isImpersonatingClaim = context.CurrentPrincipal.FindFirst(Hood.Constants.Identity.ClaimTypes.IsImpersonating);
+                    System.Security.Claims.Claim originalUserIdClaim =
+                        context.CurrentPrincipal.FindFirst(
+                            Hood.Constants.Identity.ClaimTypes.OriginalUserId
+                        );
+                    System.Security.Claims.Claim isImpersonatingClaim =
+                        context.CurrentPrincipal.FindFirst(
+                            Hood.Constants.Identity.ClaimTypes.IsImpersonating
+                        );
                     if (originalUserIdClaim != null && isImpersonatingClaim.Value == "true")
                     {
                         context.NewPrincipal.Identities.First().AddClaim(originalUserIdClaim);
@@ -483,9 +590,15 @@ namespace Hood.Startup
 
         #region Auth0 Authentication
 
-        public static IServiceCollection ConfigureAuth0(this IServiceCollection services, IConfiguration config, IAuth0LoginService auth0Options)
+        public static IServiceCollection ConfigureAuth0(
+            this IServiceCollection services,
+            IConfiguration config,
+            IAuth0LoginService auth0Options
+        )
         {
-            services.AddDbContext<Auth0IdentityContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]));
+            services.AddDbContext<Auth0IdentityContext>(options =>
+                options.UseSqlServer(config["ConnectionStrings:DefaultConnection"])
+            );
             services.AddSingleton<IAuth0Service, Auth0Service>();
             services.AddScoped<IAuth0AccountRepository, Auth0AccountRepository>();
             services.AddScoped<IHoodAccountRepository, Auth0AccountRepository>();
@@ -507,7 +620,10 @@ namespace Hood.Startup
                 options.Scope = auth0Options.Scope;
             });
 
-            services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
+            services
+                .AddOptions<CookieAuthenticationOptions>(
+                    CookieAuthenticationDefaults.AuthenticationScheme
+                )
                 .Configure(options =>
                 {
                     SetAuthenticationCookieDefaults(config, options);
@@ -515,36 +631,62 @@ namespace Hood.Startup
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(Policies.Active, policy => policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.Active));
-                options.AddPolicy(Policies.AccountNotConnected, policy => policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.AccountNotConnected));
+                options.AddPolicy(
+                    Policies.Active,
+                    policy => policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.Active)
+                );
+                options.AddPolicy(
+                    Policies.AccountNotConnected,
+                    policy =>
+                        policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.AccountNotConnected)
+                );
             });
             return services;
-
         }
-        private static void SetAuthenticationCookieDefaults(IConfiguration config, CookieAuthenticationOptions options)
+
+        private static void SetAuthenticationCookieDefaults(
+            IConfiguration config,
+            CookieAuthenticationOptions options
+        )
         {
-            string cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Authentication.CookieDefaultName;
+            string cookieName = config["Identity:Cookies:Name"].IsSet()
+                ? config["Identity:Cookies:Name"]
+                : Authentication.CookieDefaultName;
 
             options.Cookie.Name = $"{cookieName}_auth";
             options.Cookie.HttpOnly = true;
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-            options.Cookie.Domain = config["Identity:Cookies:Domain"].IsSet() ? config["Identity:Cookies:Domain"] : null;
+            options.Cookie.Domain = config["Identity:Cookies:Domain"].IsSet()
+                ? config["Identity:Cookies:Domain"]
+                : null;
 
-            options.AccessDeniedPath = config["Identity:AccessDeniedPath"].IsSet() ? config["Identity:AccessDeniedPath"] : "/account/access-denied";
-            options.LoginPath = config["Identity:LoginPath"].IsSet() ? config["Identity:LoginPath"] : "/account/login";
-            options.LogoutPath = config["Identity:LogoutPath"].IsSet() ? config["Identity:LogoutPath"] : "/account/logout";
+            options.AccessDeniedPath = config["Identity:AccessDeniedPath"].IsSet()
+                ? config["Identity:AccessDeniedPath"]
+                : "/account/access-denied";
+            options.LoginPath = config["Identity:LoginPath"].IsSet()
+                ? config["Identity:LoginPath"]
+                : "/account/login";
+            options.LogoutPath = config["Identity:LogoutPath"].IsSet()
+                ? config["Identity:LogoutPath"]
+                : "/account/logout";
             options.ReturnUrlParameter = Authentication.ReturnUrlParameter;
         }
-        private static IServiceCollection ConfigureSameSiteNoneCookies(this IServiceCollection services)
+
+        private static IServiceCollection ConfigureSameSiteNoneCookies(
+            this IServiceCollection services
+        )
         {
             services.Configure<CookiePolicyOptions>(options =>
             {
                 options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
-                options.OnAppendCookie = cookieContext => CheckSameSite(cookieContext.CookieOptions);
-                options.OnDeleteCookie = cookieContext => CheckSameSite(cookieContext.CookieOptions);
+                options.OnAppendCookie = cookieContext =>
+                    CheckSameSite(cookieContext.CookieOptions);
+                options.OnDeleteCookie = cookieContext =>
+                    CheckSameSite(cookieContext.CookieOptions);
             });
             return services;
         }
+
         private static void CheckSameSite(CookieOptions options)
         {
             if (options.SameSite == SameSiteMode.None && options.Secure == false)
@@ -557,15 +699,22 @@ namespace Hood.Startup
 
         #region Session
 
-        public static IServiceCollection ConfigureSession(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection ConfigureSession(
+            this IServiceCollection services,
+            IConfiguration config
+        )
         {
-            string cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Authentication.CookieDefaultName;
+            string cookieName = config["Identity:Cookies:Name"].IsSet()
+                ? config["Identity:Cookies:Name"]
+                : Authentication.CookieDefaultName;
             services.Configure<CookieTempDataProviderOptions>(options =>
             {
                 options.Cookie.IsEssential = true;
                 options.Cookie.Name = $"{cookieName}_td";
                 options.Cookie.HttpOnly = true;
-                options.Cookie.Domain = config["Identity:Cookies:Domain"].IsSet() ? config["Identity:Cookies:Domain"] : null;
+                options.Cookie.Domain = config["Identity:Cookies:Domain"].IsSet()
+                    ? config["Identity:Cookies:Domain"]
+                    : null;
             });
 
             int sessionTimeout = 60;
@@ -574,7 +723,9 @@ namespace Hood.Startup
                 options.Cookie.IsEssential = true;
                 options.Cookie.Name = $"{cookieName}_session";
                 options.Cookie.HttpOnly = true;
-                options.Cookie.Domain = config["Identity:Cookies:Domain"].IsSet() ? config["Identity:Cookies:Domain"] : null;
+                options.Cookie.Domain = config["Identity:Cookies:Domain"].IsSet()
+                    ? config["Identity:Cookies:Domain"]
+                    : null;
 
                 if (int.TryParse(config["Session:Timeout"], out sessionTimeout))
                 {
@@ -592,7 +743,9 @@ namespace Hood.Startup
 
         #region RouteConstraints
 
-        public static IServiceCollection ConfigureHoodSlugRouteConstraints(this IServiceCollection services)
+        public static IServiceCollection ConfigureHoodSlugRouteConstraints(
+            this IServiceCollection services
+        )
         {
             services.Configure<RouteOptions>(options =>
             {
@@ -608,12 +761,22 @@ namespace Hood.Startup
 
         #region View Engine (File Providers & Theme)
 
-        public static IServiceCollection ConfigureViewEngine(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection ConfigureViewEngine(
+            this IServiceCollection services,
+            IConfiguration config
+        )
         {
             services.Configure<MvcRazorRuntimeCompilationOptions>(options =>
             {
-                options.FileProviders.Add(new EmbeddedFileProvider(typeof(Engine).Assembly, "ComponentLib"));
-                options.FileProviders.Add(new EmbeddedFileProvider(typeof(IServiceCollectionExtensions).Assembly, "ComponentLib"));
+                options.FileProviders.Add(
+                    new EmbeddedFileProvider(typeof(Engine).Assembly, "ComponentLib")
+                );
+                options.FileProviders.Add(
+                    new EmbeddedFileProvider(
+                        typeof(IServiceCollectionExtensions).Assembly,
+                        "ComponentLib"
+                    )
+                );
                 if (Engine.Services.Installed)
                 {
                     EmbeddedFileProvider defaultUI = UserInterfaceProvider.GetProvider(config);

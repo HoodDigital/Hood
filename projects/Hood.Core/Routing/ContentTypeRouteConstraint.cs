@@ -1,21 +1,28 @@
-﻿using Hood.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Caching.Memory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Hood.Core
 {
     public class ContentTypeRouteConstraint : IRouteConstraint
     {
-        public bool Match(HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection)
+        public bool Match(
+            HttpContext httpContext,
+            IRouter route,
+            string routeKey,
+            RouteValueDictionary values,
+            RouteDirection routeDirection
+        )
         {
             try
             {
-                if (!Engine.Services.Installed) {
+                if (!Engine.Services.Installed)
+                {
                     return false;
                 }
                 ContentType type = null;

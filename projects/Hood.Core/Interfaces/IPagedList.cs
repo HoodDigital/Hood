@@ -19,5 +19,4 @@ namespace System.Collections.Generic
         Task<IPagedList<T>> ReloadAsync(IQueryable<T> source, int pageIndex, int pageSize);
         Task<IPagedList<T>> ReloadAsync(IQueryable<T> source);
     }
-
 }

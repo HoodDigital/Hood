@@ -9,8 +9,10 @@ namespace Hood.Models
         {
             get
             {
-                return new List<ContentType>() {
-                    new ContentType() {
+                return new List<ContentType>()
+                {
+                    new ContentType()
+                    {
                         BaseName = "Slider",
                         Slug = "slider",
                         Type = "slider",
@@ -34,14 +36,34 @@ namespace Hood.Models
                         Templates = false,
                         TemplateFolder = "SliderTemplates",
                         CustomFields = BaseFields(
-                        new List<CustomField>()
-                        {
-                            new CustomField() { Name = "Content.Slider.CallToAction.Url", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Slider.CallToAction.Style", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Slider.CallToAction.Text", Default = "", System = true, Type="System.String" }
-                        })
+                            new List<CustomField>()
+                            {
+                                new CustomField()
+                                {
+                                    Name = "Content.Slider.CallToAction.Url",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.Slider.CallToAction.Style",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.Slider.CallToAction.Text",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                            }
+                        ),
                     },
-                    new ContentType() {
+                    new ContentType()
+                    {
                         BaseName = "News",
                         Slug = "news",
                         Type = "news",
@@ -66,13 +88,27 @@ namespace Hood.Models
                         Templates = false,
                         TemplateFolder = "Templates",
                         CustomFields = BaseFields(
-                        new List<CustomField>()
-                        {
-                            new CustomField() { Name = "Content.News.Video", Default = "", System = true, Type="Hood.MultiLineString" },
-                            new CustomField() { Name = "Content.News.Headline", Default = "", System = true, Type="System.String" }
-                        })
+                            new List<CustomField>()
+                            {
+                                new CustomField()
+                                {
+                                    Name = "Content.News.Video",
+                                    Default = "",
+                                    System = true,
+                                    Type = "Hood.MultiLineString",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.News.Headline",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                            }
+                        ),
                     },
-                    new ContentType() {
+                    new ContentType()
+                    {
                         BaseName = "Client",
                         Slug = "client",
                         Type = "client",
@@ -95,11 +131,21 @@ namespace Hood.Models
                         Gallery = false,
                         Templates = false,
                         TemplateFolder = "Templates",
-                        CustomFields = BaseFields(new List<CustomField>() {
-                            new CustomField() { Name = "Settings.Image.Featured.Fit", Default = "contain", System = true, Type = "System.String" }
-                        })
+                        CustomFields = BaseFields(
+                            new List<CustomField>()
+                            {
+                                new CustomField()
+                                {
+                                    Name = "Settings.Image.Featured.Fit",
+                                    Default = "contain",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                            }
+                        ),
                     },
-                    new ContentType() {
+                    new ContentType()
+                    {
                         BaseName = "FAQ",
                         Slug = "faq",
                         Type = "faq",
@@ -124,12 +170,20 @@ namespace Hood.Models
                         Templates = false,
                         TemplateFolder = "Templates",
                         CustomFields = BaseFields(
-                        new List<CustomField>()
-                        {
-                            new CustomField() { Name = "Content.FAQ.Department", Default = "", System = true, Type="System.String" }
-                        })
+                            new List<CustomField>()
+                            {
+                                new CustomField()
+                                {
+                                    Name = "Content.FAQ.Department",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                            }
+                        ),
                     },
-                    new ContentType() {
+                    new ContentType()
+                    {
                         BaseName = "Page",
                         Slug = "pages",
                         Type = "page",
@@ -153,12 +207,20 @@ namespace Hood.Models
                         Templates = true,
                         TemplateFolder = "Templates",
                         CustomFields = BaseFields(
-                        new List<CustomField>()
-                        {
-                            new CustomField() { Name = "Settings.Security.Subscription", Default = "", System = true, Type="System.String" }
-                        })
+                            new List<CustomField>()
+                            {
+                                new CustomField()
+                                {
+                                    Name = "Settings.Security.Subscription",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                            }
+                        ),
                     },
-                    new ContentType() {
+                    new ContentType()
+                    {
                         BaseName = "Team",
                         Slug = "team",
                         Type = "team",
@@ -182,19 +244,69 @@ namespace Hood.Models
                         Templates = false,
                         TemplateFolder = "Templates",
                         CustomFields = BaseFields(
-                        new List<CustomField>()
-                        {
-                            new CustomField() { Name = "Content.Team.Email", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Team.JobTitle", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Team.Phone", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Team.Mobile", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Team.Twitter", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Team.LinkedIn", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Team.Facebook", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Team.GooglePlus", Default = "", System = true, Type="System.String" }
-                        })
+                            new List<CustomField>()
+                            {
+                                new CustomField()
+                                {
+                                    Name = "Content.Team.Email",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.Team.JobTitle",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.Team.Phone",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.Team.Mobile",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.Team.Twitter",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.Team.LinkedIn",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.Team.Facebook",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.Team.GooglePlus",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                            }
+                        ),
                     },
-                    new ContentType() {
+                    new ContentType()
+                    {
                         BaseName = "Testimonial",
                         Slug = "testimonials",
                         Type = "testimonial",
@@ -217,16 +329,42 @@ namespace Hood.Models
                         Gallery = false,
                         Templates = false,
                         TemplateFolder = "Templates",
-                        CustomFields = BaseFields(new List<CustomField>()
-                        {
-                            new CustomField() { Name = "Settings.Image.Featured.Fit", Default = "contain", System = true, Type = "System.String" },
-
-                            new CustomField() { Name = "Content.Testimonial.CompanyName", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Testimonial.JobTitle", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Testimonial.JobTitle", Default = "", System = true, Type="System.String" }
-                        })
+                        CustomFields = BaseFields(
+                            new List<CustomField>()
+                            {
+                                new CustomField()
+                                {
+                                    Name = "Settings.Image.Featured.Fit",
+                                    Default = "contain",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.Testimonial.CompanyName",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.Testimonial.JobTitle",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.Testimonial.JobTitle",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                            }
+                        ),
                     },
-                    new ContentType() {
+                    new ContentType()
+                    {
                         BaseName = "Portfolio",
                         Slug = "portfolio",
                         Type = "portfolio",
@@ -251,50 +389,188 @@ namespace Hood.Models
                         UrlFormatting = "news-title",
                         TemplateFolder = "Templates",
                         CustomFields = BaseFields(
-                        new List<CustomField>()
-                        {
-                            new CustomField() { Name = "Content.Portfolio.Client", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Portfolio.ServiceType", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Portfolio.CaseStudy", Default = "false", System = true, Type="System.Boolean" },
-                            new CustomField() { Name = "Content.Portfolio.ExternalUrl", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Portfolio.DeliveryDate", Default = "", System = true, Type="System.DateTime" },
-                            new CustomField() { Name = "Content.Portfolio.Headline", Default = "", System = true, Type="System.String" }
-                        })
+                            new List<CustomField>()
+                            {
+                                new CustomField()
+                                {
+                                    Name = "Content.Portfolio.Client",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.Portfolio.ServiceType",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.Portfolio.CaseStudy",
+                                    Default = "false",
+                                    System = true,
+                                    Type = "System.Boolean",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.Portfolio.ExternalUrl",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.Portfolio.DeliveryDate",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.DateTime",
+                                },
+                                new CustomField()
+                                {
+                                    Name = "Content.Portfolio.Headline",
+                                    Default = "",
+                                    System = true,
+                                    Type = "System.String",
+                                },
+                            }
+                        ),
                     },
-                    ContentType.CustomType
+                    ContentType.CustomType,
                 };
             }
         }
+
         public static List<CustomField> BaseFields(List<CustomField> fields)
         {
             var baseFields = new List<CustomField>()
             {
-                new CustomField() { Name="DisplayOrder", Default="0", System = true, Type="System.Int32" },
-
-                new CustomField() { Name="Rating", Default="0", System = true, Type="System.Int32" },
-
-                new CustomField() { Name="Settings.Template", Default = "", System = true, Type = "System.String" },
-
-                new CustomField() { Name="Settings.SubType", Default = "", System = true, Type = "System.String" },
-
-                new CustomField() { Name="SEO.Meta.Title", Default = "", System = true, Type = "System.String" },
-                new CustomField() { Name="SEO.Meta.Description", Default = "", System = true, Type = "System.String" },
-
-                new CustomField() { Name="SEO.Facebook.Title", Default = "", System = true, Type = "System.String" },
-                new CustomField() { Name="SEO.Facebook.Description", Default = "", System = true, Type = "System.String" },
-                new CustomField() { Name="SEO.Facebook.ImageUrl", Default = "", System = true, Type = "Hood.Image" },
-
-                new CustomField() { Name="SEO.Twitter.Title", Default = "", System = true, Type = "System.String" },
-                new CustomField() { Name="SEO.Twitter.Description", Default = "", System = true, Type = "System.String" },
-                new CustomField() { Name="SEO.Twitter.ImageUrl", Default = "", System = true, Type = "Hood.Image" },
-                new CustomField() { Name="SEO.Twitter.Creator", Default = "", System = true, Type = "System.String" },
-
-                new CustomField() { Name="Settings.Security.AdminOnly", Default = "false", System = true, Type = "System.Boolean" },
-                new CustomField() { Name="Settings.Security.UsersOnly", Default = "false", System = true, Type = "System.Boolean" },
-
-                new CustomField() { Name="Settings.Image.Featured.Align", Default = "center", System = true, Type = "System.String" },
-                new CustomField() { Name="Settings.Image.Featured.Fit", Default = "cover", System = true, Type = "System.String" },
-                new CustomField() { Name="Settings.Image.Featured.Background", Default = "transparent", System = true, Type = "System.String" }
+                new CustomField()
+                {
+                    Name = "DisplayOrder",
+                    Default = "0",
+                    System = true,
+                    Type = "System.Int32",
+                },
+                new CustomField()
+                {
+                    Name = "Rating",
+                    Default = "0",
+                    System = true,
+                    Type = "System.Int32",
+                },
+                new CustomField()
+                {
+                    Name = "Settings.Template",
+                    Default = "",
+                    System = true,
+                    Type = "System.String",
+                },
+                new CustomField()
+                {
+                    Name = "Settings.SubType",
+                    Default = "",
+                    System = true,
+                    Type = "System.String",
+                },
+                new CustomField()
+                {
+                    Name = "SEO.Meta.Title",
+                    Default = "",
+                    System = true,
+                    Type = "System.String",
+                },
+                new CustomField()
+                {
+                    Name = "SEO.Meta.Description",
+                    Default = "",
+                    System = true,
+                    Type = "System.String",
+                },
+                new CustomField()
+                {
+                    Name = "SEO.Facebook.Title",
+                    Default = "",
+                    System = true,
+                    Type = "System.String",
+                },
+                new CustomField()
+                {
+                    Name = "SEO.Facebook.Description",
+                    Default = "",
+                    System = true,
+                    Type = "System.String",
+                },
+                new CustomField()
+                {
+                    Name = "SEO.Facebook.ImageUrl",
+                    Default = "",
+                    System = true,
+                    Type = "Hood.Image",
+                },
+                new CustomField()
+                {
+                    Name = "SEO.Twitter.Title",
+                    Default = "",
+                    System = true,
+                    Type = "System.String",
+                },
+                new CustomField()
+                {
+                    Name = "SEO.Twitter.Description",
+                    Default = "",
+                    System = true,
+                    Type = "System.String",
+                },
+                new CustomField()
+                {
+                    Name = "SEO.Twitter.ImageUrl",
+                    Default = "",
+                    System = true,
+                    Type = "Hood.Image",
+                },
+                new CustomField()
+                {
+                    Name = "SEO.Twitter.Creator",
+                    Default = "",
+                    System = true,
+                    Type = "System.String",
+                },
+                new CustomField()
+                {
+                    Name = "Settings.Security.AdminOnly",
+                    Default = "false",
+                    System = true,
+                    Type = "System.Boolean",
+                },
+                new CustomField()
+                {
+                    Name = "Settings.Security.UsersOnly",
+                    Default = "false",
+                    System = true,
+                    Type = "System.Boolean",
+                },
+                new CustomField()
+                {
+                    Name = "Settings.Image.Featured.Align",
+                    Default = "center",
+                    System = true,
+                    Type = "System.String",
+                },
+                new CustomField()
+                {
+                    Name = "Settings.Image.Featured.Fit",
+                    Default = "cover",
+                    System = true,
+                    Type = "System.String",
+                },
+                new CustomField()
+                {
+                    Name = "Settings.Image.Featured.Background",
+                    Default = "transparent",
+                    System = true,
+                    Type = "System.String",
+                },
             };
             foreach (var field in baseFields)
             {
@@ -307,4 +583,3 @@ namespace Hood.Models
         }
     }
 }
-

@@ -1,4 +1,9 @@
-﻿using Hood.Attributes;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using Hood.Attributes;
 using Hood.Core;
 using Hood.Entities;
 using Hood.Enums;
@@ -6,19 +11,10 @@ using Hood.Extensions;
 using Hood.Interfaces;
 using Microsoft.AspNetCore.Routing;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace Hood.Models
 {
-
-    public class Content : BaseContent
-    {
-
-    }
+    public class Content : BaseContent { }
 
     public partial class BaseContent : BaseEntity
     {
@@ -30,25 +26,32 @@ namespace Hood.Models
         [Required]
         [FormUpdatable]
         public string Excerpt { get; set; }
+
         [FormUpdatable]
         public string Body { get; set; }
 
         [FormUpdatable]
-        [Display(Name = "URL Slug", Description = "Do not start your url slug with reserved words as they will not reach this page.<br />These include: <strong>account, about, store, admin, api, services.</strong>")]
+        [Display(
+            Name = "URL Slug",
+            Description = "Do not start your url slug with reserved words as they will not reach this page.<br />These include: <strong>account, about, store, admin, api, services.</strong>"
+        )]
         public string Slug { get; set; }
-
 
         // Parent Content
         public int? ParentId { get; set; }
 
         // Dates
         [FormUpdatable]
-        [Display(Name = "Publish Date", Description = "The content will only appear on the site after this date, when set to published.")]
+        [Display(
+            Name = "Publish Date",
+            Description = "The content will only appear on the site after this date, when set to published."
+        )]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddTHH:mm}")]
         public DateTime PublishDate { get; set; }
 
         // Content Type
         public string ContentType { get; set; }
+
         [NotMapped]
         public ContentType Type { get; set; }
 
@@ -60,6 +63,7 @@ namespace Hood.Models
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddTHH:mm}")]
         public DateTime CreatedOn { get; set; }
         public string CreatedBy { get; set; }
+
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddTHH:mm}")]
         public DateTime LastEditedOn { get; set; }
         public string LastEditedBy { get; set; }
@@ -83,11 +87,17 @@ namespace Hood.Models
         }
 
         [FormUpdatable]
-        [Display(Name = "Protected", Description = "This will only be available to logged in users.")]
+        [Display(
+            Name = "Protected",
+            Description = "This will only be available to logged in users."
+        )]
         public bool Public { get; set; }
 
         [FormUpdatable]
-        [Display(Name = "Featured Content", Description = "This will appear in the featured lists on which can be displayed in templates.")]
+        [Display(
+            Name = "Featured Content",
+            Description = "This will appear in the featured lists on which can be displayed in templates."
+        )]
         public bool Featured { get; set; }
 
         // Formatted Members
@@ -99,9 +109,15 @@ namespace Hood.Models
                 {
                     case ContentStatus.Published:
                         if (PublishDate > DateTime.UtcNow)
-                            return "Will publish on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
+                            return "Will publish on: "
+                                + PublishDate.ToShortDateString()
+                                + " at "
+                                + PublishDate.ToShortTimeString();
                         else
-                            return "Published on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
+                            return "Published on: "
+                                + PublishDate.ToShortDateString()
+                                + " at "
+                                + PublishDate.ToShortTimeString();
                     case ContentStatus.Draft:
                     default:
                         return "Draft";
@@ -130,7 +146,8 @@ namespace Hood.Models
 
                 if (type == null || type.IsUnknown)
                 {
-                    var linkGenerator = Engine.Services.Resolve<Microsoft.AspNetCore.Routing.LinkGenerator>();
+                    var linkGenerator =
+                        Engine.Services.Resolve<Microsoft.AspNetCore.Routing.LinkGenerator>();
                     return linkGenerator.GetPathByAction("Show", "Home", new { id = Id });
                 }
 
@@ -148,7 +165,8 @@ namespace Hood.Models
                     case "news":
                         return string.Format("/{0}/{1}/{2}", type.Slug, Id, Slug);
                     default:
-                        var linkGenerator = Engine.Services.Resolve<Microsoft.AspNetCore.Routing.LinkGenerator>();
+                        var linkGenerator =
+                            Engine.Services.Resolve<Microsoft.AspNetCore.Routing.LinkGenerator>();
                         return linkGenerator.GetPathByAction("Show", "Home", new { id = Id });
                 }
             }
@@ -161,20 +179,28 @@ namespace Hood.Models
                 return Id == basicSettings.Homepage;
             }
         }
+
         public string GetImageStyle(string imageType = "Featured")
         {
-            string align = GetMetaValue<string>(string.Format("Settings.Image.{0}.Align", imageType));
+            string align = GetMetaValue<string>(
+                string.Format("Settings.Image.{0}.Align", imageType)
+            );
             string fit = GetMetaValue<string>(string.Format("Settings.Image.{0}.Fit", imageType));
-            string bg = GetMetaValue<string>(string.Format("Settings.Image.{0}.Background", imageType));
-            return string.Format("{0}{1}{2}",
+            string bg = GetMetaValue<string>(
+                string.Format("Settings.Image.{0}.Background", imageType)
+            );
+            return string.Format(
+                "{0}{1}{2}",
                 !string.IsNullOrEmpty(align) ? "background-position:" + align + ";" : "",
                 !string.IsNullOrEmpty(fit) ? "background-size:" + fit + ";" : "",
-                !string.IsNullOrEmpty(bg) ? "background-color:" + bg + ";" : "");
+                !string.IsNullOrEmpty(bg) ? "background-color:" + bg + ";" : ""
+            );
         }
 
         [NotMapped]
         public IEnumerable<ContentCategory> AllowedCategories { get; set; }
-        // Author 
+
+        // Author
         [FormUpdatable]
         [Display(Name = "Author/Owner", Description = "The author or creator of this content.")]
         public string AuthorId { get; set; }
@@ -184,18 +210,30 @@ namespace Hood.Models
         public List<ContentMedia> Media { get; set; }
 
         public string FeaturedImageJson { get; set; }
+
         [NotMapped]
         public IMediaObject FeaturedImage
         {
-            get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<ContentMedia>(FeaturedImageJson) : ContentMedia.Blank; }
+            get
+            {
+                return FeaturedImageJson.IsSet()
+                    ? JsonConvert.DeserializeObject<ContentMedia>(FeaturedImageJson)
+                    : ContentMedia.Blank;
+            }
             set { FeaturedImageJson = JsonConvert.SerializeObject(value); }
         }
 
         public string ShareImageJson { get; set; }
+
         [NotMapped]
         public IMediaObject ShareImage
         {
-            get { return ShareImageJson.IsSet() ? JsonConvert.DeserializeObject<ContentMedia>(ShareImageJson) : ContentMedia.Blank; }
+            get
+            {
+                return ShareImageJson.IsSet()
+                    ? JsonConvert.DeserializeObject<ContentMedia>(ShareImageJson)
+                    : ContentMedia.Blank;
+            }
             set { ShareImageJson = JsonConvert.SerializeObject(value); }
         }
 
@@ -209,6 +247,7 @@ namespace Hood.Models
         #region Edit View Model Stuff
         [NotMapped]
         public Dictionary<string, string> Templates { get; set; }
+
         [NotMapped]
         public IList<IUserProfile> Authors { get; set; }
         #endregion
@@ -222,10 +261,11 @@ namespace Hood.Models
                 {
                     BaseValue = null,
                     Name = name,
-                    Type = null
+                    Type = null,
                 };
             return cm;
         }
+
         public T GetMetaValue<T>(string name)
         {
             ContentMeta cm = Metadata.FirstOrDefault(p => p.Name == name);
@@ -233,6 +273,7 @@ namespace Hood.Models
                 return cm.GetValue<T>();
             return default;
         }
+
         public void UpdateMeta(string name, string value)
         {
             if (Metadata != null)
@@ -244,14 +285,14 @@ namespace Hood.Models
                 }
             }
         }
+
         public void AddMeta(string name, string value, string metaType = "System.String")
         {
-
             var newMeta = new ContentMeta()
             {
                 Name = name,
                 Type = metaType,
-                ContentId = Id
+                ContentId = Id,
             };
             newMeta.SetValue(value);
             if (Metadata != null)
@@ -259,6 +300,7 @@ namespace Hood.Models
                 Metadata.Add(newMeta);
             }
         }
+
         public bool HasMeta(string name)
         {
             if (Metadata != null)
@@ -272,4 +314,3 @@ namespace Hood.Models
         #endregion
     }
 }
-

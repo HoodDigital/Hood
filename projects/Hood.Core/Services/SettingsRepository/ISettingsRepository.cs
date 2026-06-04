@@ -6,7 +6,6 @@ namespace Hood.Services
 {
     public interface ISettingsRepository : IConfiguration
     {
-
         #region Get/Set/Delete
         T Get<T>(string key = null);
         void Set<T>(T value, string key = null);

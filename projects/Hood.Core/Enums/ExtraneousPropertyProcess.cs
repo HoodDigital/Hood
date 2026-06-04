@@ -5,6 +5,6 @@
         StatusDelete,
         StatusArchive,
         LeaseStatusLetSold,
-        Delete
+        Delete,
     }
 }

@@ -1,4 +1,11 @@
-﻿using Hood.Caching;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using Hood.Caching;
 using Hood.Contexts;
 using Hood.Core;
 using Hood.Enums;
@@ -9,17 +16,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Hood.Services
 {
-
     public class ContentRepository : IContentRepository
     {
         private readonly ContentContext _db;
@@ -33,7 +32,8 @@ namespace Hood.Services
             HoodDbContext hoodDb,
             IHoodCache cache,
             IWebHostEnvironment env,
-            IEventsService eventService)
+            IEventsService eventService
+        )
         {
             _db = db;
             _hoodDb = hoodDb;
@@ -45,10 +45,11 @@ namespace Hood.Services
         #region Content CRUD
         public async Task<ContentModel> GetContentAsync(ContentModel model)
         {
-            IQueryable<ContentView> content = _db.ContentViews
-                .Include(p => p.Media)
+            IQueryable<ContentView> content = _db
+                .ContentViews.Include(p => p.Media)
                 .Include(p => p.Metadata)
-                .Include(p => p.Categories).ThenInclude(c => c.Category)
+                .Include(p => p.Categories)
+                .ThenInclude(c => c.Category)
                 .AsNoTracking();
 
             // filter posts by type
@@ -81,11 +82,15 @@ namespace Hood.Services
 
             if (model.Categories != null && model.Categories.Count > 0)
             {
-                content = content.Where(c => c.Categories.Any(cc => model.Categories.Any(mc => cc.Category.Slug == mc)));
+                content = content.Where(c =>
+                    c.Categories.Any(cc => model.Categories.Any(mc => cc.Category.Slug == mc))
+                );
             }
             if (!string.IsNullOrEmpty(model.Category))
             {
-                content = content.Where(c => c.Categories.Any(cc => cc.Category.Slug == model.Category));
+                content = content.Where(c =>
+                    c.Categories.Any(cc => cc.Category.Slug == model.Category)
+                );
             }
 
             // search the collection
@@ -93,16 +98,16 @@ namespace Hood.Services
             if (!string.IsNullOrEmpty(model.Search))
             {
                 content = content.Where(c =>
-                    c.Title.Contains(model.Search) ||
-                    c.Body.Contains(model.Search) ||
-                    c.Excerpt.Contains(model.Search) ||
-                    c.Metadata.Any(m => m.BaseValue.Contains(model.Search))
+                    c.Title.Contains(model.Search)
+                    || c.Body.Contains(model.Search)
+                    || c.Excerpt.Contains(model.Search)
+                    || c.Metadata.Any(m => m.BaseValue.Contains(model.Search))
                 );
             }
 
             if (!string.IsNullOrEmpty(model.Filter))
             {
-                // search for a specific meta value 
+                // search for a specific meta value
                 if (model.Filter.Contains("<"))
                 {
                     content = ProcessFilterByOperator(content, model.Filter, '<');
@@ -125,13 +130,23 @@ namespace Hood.Services
                     string sortVal = model.Order.Replace("Meta:", "").Replace(":Desc", "");
                     if (model.Order.EndsWith("Desc"))
                     {
-                        content = content.Where(n => n.Metadata != null && n.Metadata.SingleOrDefault(m => m.Name == sortVal) != null);
-                        content = content.OrderByDescending(n => n.Metadata.Single(m => m.Name == sortVal).BaseValue);
+                        content = content.Where(n =>
+                            n.Metadata != null
+                            && n.Metadata.SingleOrDefault(m => m.Name == sortVal) != null
+                        );
+                        content = content.OrderByDescending(n =>
+                            n.Metadata.Single(m => m.Name == sortVal).BaseValue
+                        );
                     }
                     else
                     {
-                        content = content.Where(n => n.Metadata != null && n.Metadata.SingleOrDefault(m => m.Name == sortVal) != null);
-                        content = content.OrderBy(n => n.Metadata.Single(m => m.Name == sortVal).BaseValue);
+                        content = content.Where(n =>
+                            n.Metadata != null
+                            && n.Metadata.SingleOrDefault(m => m.Name == sortVal) != null
+                        );
+                        content = content.OrderBy(n =>
+                            n.Metadata.Single(m => m.Name == sortVal).BaseValue
+                        );
                     }
                 }
                 else
@@ -165,48 +180,80 @@ namespace Hood.Services
                             break;
 
                         default:
-                            content = content.OrderByDescending(n => n.PublishDate).ThenByDescending(n => n.CreatedOn);
+                            content = content
+                                .OrderByDescending(n => n.PublishDate)
+                                .ThenByDescending(n => n.CreatedOn);
                             break;
                     }
                 }
             }
             else
             {
-                content = content.OrderByDescending(n => n.PublishDate).ThenByDescending(n => n.CreatedOn);
+                content = content
+                    .OrderByDescending(n => n.PublishDate)
+                    .ThenByDescending(n => n.CreatedOn);
             }
             await model.ReloadAsync(content);
             return model;
         }
 
-        private static IQueryable<ContentView> ProcessFilterByOperator(IQueryable<ContentView> content, string filterString, char filterOperator)
+        private static IQueryable<ContentView> ProcessFilterByOperator(
+            IQueryable<ContentView> content,
+            string filterString,
+            char filterOperator
+        )
         {
             List<string> stringParts = filterString.Split(filterOperator).ToList();
             string value = stringParts.LastOrDefault();
             string metaName = stringParts.FirstOrDefault();
             if (!value.IsSet() || !metaName.IsSet())
                 return content;
-            string jsonValue = JsonConvert.SerializeObject(value, new JsonSerializerSettings() { DateFormatHandling = DateFormatHandling.IsoDateFormat });
+            string jsonValue = JsonConvert.SerializeObject(
+                value,
+                new JsonSerializerSettings()
+                {
+                    DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                }
+            );
             switch (filterOperator)
             {
                 case '>':
-                    return content.Where(c => c.Metadata.Any(cm => cm.Name == metaName && string.Compare(cm.BaseValue, jsonValue) > 0));
+                    return content.Where(c =>
+                        c.Metadata.Any(cm =>
+                            cm.Name == metaName && string.Compare(cm.BaseValue, jsonValue) > 0
+                        )
+                    );
                 case '<':
-                    return content.Where(c => c.Metadata.Any(cm => cm.Name == metaName && string.Compare(cm.BaseValue, jsonValue) < 0));
+                    return content.Where(c =>
+                        c.Metadata.Any(cm =>
+                            cm.Name == metaName && string.Compare(cm.BaseValue, jsonValue) < 0
+                        )
+                    );
                 case '=':
-                    return content.Where(c => c.Metadata.Any(cm => cm.Name == metaName && string.Equals(cm.BaseValue, jsonValue)));
+                    return content.Where(c =>
+                        c.Metadata.Any(cm =>
+                            cm.Name == metaName && string.Equals(cm.BaseValue, jsonValue)
+                        )
+                    );
             }
             return content;
         }
 
-        public async Task<Content> GetContentByIdAsync(int id, bool clearCache = false, bool track = true)
+        public async Task<Content> GetContentByIdAsync(
+            int id,
+            bool clearCache = false,
+            bool track = true
+        )
         {
             string cacheKey = typeof(Content).ToString() + ".Single." + id;
             if (!_cache.TryGetValue(cacheKey, out Content content) || clearCache)
             {
-                content = await _db.Content.Include(p => p.Categories).ThenInclude(c => c.Category)
-                                    .Include(p => p.Media)
-                                    .Include(p => p.Metadata)
-                                    .FirstOrDefaultAsync(c => c.Id == id);
+                content = await _db
+                    .Content.Include(p => p.Categories)
+                    .ThenInclude(c => c.Category)
+                    .Include(p => p.Media)
+                    .Include(p => p.Metadata)
+                    .FirstOrDefaultAsync(c => c.Id == id);
                 if (content == null)
                 {
                     return content;
@@ -217,15 +264,22 @@ namespace Hood.Services
             }
             return content;
         }
-        public async Task<ContentView> GetContentViewByIdAsync(int id, bool clearCache = false, bool track = true)
+
+        public async Task<ContentView> GetContentViewByIdAsync(
+            int id,
+            bool clearCache = false,
+            bool track = true
+        )
         {
             string cacheKey = typeof(ContentView).ToString() + ".Single." + id;
             if (!_cache.TryGetValue(cacheKey, out ContentView content) || clearCache)
             {
-                content = await _db.ContentViews.Include(p => p.Categories).ThenInclude(c => c.Category)
-                                    .Include(p => p.Media)
-                                    .Include(p => p.Metadata)
-                                    .FirstOrDefaultAsync(c => c.Id == id);
+                content = await _db
+                    .ContentViews.Include(p => p.Categories)
+                    .ThenInclude(c => c.Category)
+                    .Include(p => p.Media)
+                    .Include(p => p.Metadata)
+                    .FirstOrDefaultAsync(c => c.Id == id);
                 if (content == null)
                 {
                     return content;
@@ -235,6 +289,7 @@ namespace Hood.Services
             }
             return content;
         }
+
         public async Task<Content> AddAsync(Content content)
         {
             // create the slug
@@ -253,6 +308,7 @@ namespace Hood.Services
             ClearPageCaches();
             return content;
         }
+
         public async Task<Content> UpdateAsync(Content content)
         {
             string cacheKey = typeof(Content).ToString() + ".Single." + content.Id;
@@ -263,6 +319,7 @@ namespace Hood.Services
             ClearPageCaches();
             return content;
         }
+
         public async Task DeleteAsync(int id)
         {
             Content content = _db.Content.Where(p => p.Id == id).FirstOrDefault();
@@ -280,31 +337,42 @@ namespace Hood.Services
         private void ClearPageCaches()
         {
             string prefix = typeof(Content).ToString();
-            foreach (string key in _cache.Keys.Keys.Where(k => k.StartsWith(prefix) && k.EndsWith(".Pages")).ToList())
+            foreach (
+                string key in _cache
+                    .Keys.Keys.Where(k => k.StartsWith(prefix) && k.EndsWith(".Pages"))
+                    .ToList()
+            )
             {
                 _cache.Remove(key);
             }
         }
+
         public async Task SetStatusAsync(int id, ContentStatus status)
         {
             Content content = _db.Content.Where(p => p.Id == id).FirstOrDefault();
             content.Status = status;
             await UpdateAsync(content);
         }
+
         public async Task DeleteAllAsync(string type)
         {
-            _db.Content.Where(c => c.ContentType == type).ForEach(p =>
-            {
-                _db.Entry(p).State = EntityState.Deleted;
-                string cacheKey = typeof(Content).ToString() + ".Single." + p.Id;
-                _cache.Remove(cacheKey);
-            });
+            _db.Content.Where(c => c.ContentType == type)
+                .ForEach(p =>
+                {
+                    _db.Entry(p).State = EntityState.Deleted;
+                    string cacheKey = typeof(Content).ToString() + ".Single." + p.Id;
+                    _cache.Remove(cacheKey);
+                });
             await _db.SaveChangesAsync();
             _eventService.TriggerContentChanged(this);
         }
+
         public async Task<MediaDirectory> GetDirectoryAsync()
         {
-            MediaDirectory contentDirectory = await _hoodDb.MediaDirectories.SingleOrDefaultAsync(md => md.Slug == MediaManager.ContentDirectorySlug && md.Type == DirectoryType.System);
+            MediaDirectory contentDirectory = await _hoodDb.MediaDirectories.SingleOrDefaultAsync(
+                md =>
+                    md.Slug == MediaManager.ContentDirectorySlug && md.Type == DirectoryType.System
+            );
             if (contentDirectory == null)
             {
                 throw new Exception("Site folder is not available.");
@@ -316,9 +384,7 @@ namespace Hood.Services
         #region Duplicate
         public async Task<Content> DuplicateContentAsync(int id)
         {
-            Content clone = await _db.Content
-                                 .AsNoTracking()
-                                 .SingleOrDefaultAsync(c => c.Id == id);
+            Content clone = await _db.Content.AsNoTracking().SingleOrDefaultAsync(c => c.Id == id);
             if (clone == null)
             {
                 return null;
@@ -333,17 +399,20 @@ namespace Hood.Services
             _db.Content.Add(clone);
             await _db.SaveChangesAsync();
 
-            Content copyObject = await _db.Content
-                                .AsNoTracking()
-                                .Include(p => p.Categories).ThenInclude(c => c.Category)
-                                .Include(p => p.Media)
-                                .Include(p => p.Metadata)
-                                .SingleOrDefaultAsync(c => c.Id == id);
+            Content copyObject = await _db
+                .Content.AsNoTracking()
+                .Include(p => p.Categories)
+                .ThenInclude(c => c.Category)
+                .Include(p => p.Media)
+                .Include(p => p.Metadata)
+                .SingleOrDefaultAsync(c => c.Id == id);
 
             clone.Categories = new List<ContentCategoryJoin>();
             foreach (ContentCategoryJoin c in copyObject.Categories)
             {
-                clone.Categories.Add(new ContentCategoryJoin() { ContentId = clone.Id, CategoryId = c.CategoryId });
+                clone.Categories.Add(
+                    new ContentCategoryJoin() { ContentId = clone.Id, CategoryId = c.CategoryId }
+                );
             }
             clone.Media = new List<ContentMedia>();
             foreach (ContentMedia c in copyObject.Media)
@@ -381,7 +450,11 @@ namespace Hood.Services
         #endregion
 
         #region Content Views
-        public async Task<ContentModel> GetRecentAsync(string type, string category = null, int pageSize = 5)
+        public async Task<ContentModel> GetRecentAsync(
+            string type,
+            string category = null,
+            int pageSize = 5
+        )
         {
             string cacheKey = typeof(ContentModel).ToString() + ".Recent." + type;
             if (category.IsSet())
@@ -391,12 +464,26 @@ namespace Hood.Services
 
             if (!_cache.TryGetValue(cacheKey, out ContentModel content))
             {
-                content = await GetContentAsync(new ContentModel() { Type = type, Category = category, PageSize = pageSize, Order = "PublishDesc", Status = ContentStatus.Published });
+                content = await GetContentAsync(
+                    new ContentModel()
+                    {
+                        Type = type,
+                        Category = category,
+                        PageSize = pageSize,
+                        Order = "PublishDesc",
+                        Status = ContentStatus.Published,
+                    }
+                );
                 _cache.Add(cacheKey, content, TimeSpan.FromMinutes(5));
             }
             return content;
         }
-        public async Task<ContentModel> GetFeaturedAsync(string type, string category = null, int pageSize = 5)
+
+        public async Task<ContentModel> GetFeaturedAsync(
+            string type,
+            string category = null,
+            int pageSize = 5
+        )
         {
             string cacheKey = typeof(ContentModel).ToString() + ".Featured." + type;
             if (category.IsSet())
@@ -406,24 +493,49 @@ namespace Hood.Services
 
             if (!_cache.TryGetValue(cacheKey, out ContentModel content))
             {
-                content = await GetContentAsync(new ContentModel() { Featured = true, Type = type, Category = category, PageSize = pageSize, Status = ContentStatus.Published });
+                content = await GetContentAsync(
+                    new ContentModel()
+                    {
+                        Featured = true,
+                        Type = type,
+                        Category = category,
+                        PageSize = pageSize,
+                        Status = ContentStatus.Published,
+                    }
+                );
                 _cache.Add(cacheKey, content, TimeSpan.FromMinutes(5));
             }
             return content;
         }
-        public async Task<ContentNeighbours> GetNeighbourContentAsync(int id, string type, string category = null)
+
+        public async Task<ContentNeighbours> GetNeighbourContentAsync(
+            int id,
+            string type,
+            string category = null
+        )
         {
             string cacheKey = typeof(Content).ToString() + ".Neighbours." + id;
             if (!_cache.TryGetValue(cacheKey, out ContentNeighbours neighbours))
             {
                 // get all the content - sorted by publish date.
                 // find the ones either side of the id.
-                ContentView[] all = (await GetContentAsync(new ContentModel() { Status = ContentStatus.Published, Category = category, Type = type, PageSize = int.MaxValue, Order = "Date" })).List.ToArray();
+                ContentView[] all = (
+                    await GetContentAsync(
+                        new ContentModel()
+                        {
+                            Status = ContentStatus.Published,
+                            Category = category,
+                            Type = type,
+                            PageSize = int.MaxValue,
+                            Order = "Date",
+                        }
+                    )
+                ).List.ToArray();
                 int index = Array.FindIndex(all, row => row.Id == id);
                 neighbours = new ContentNeighbours()
                 {
                     Next = all.ElementAtOrDefault(index + 1),
-                    Previous = all.ElementAtOrDefault(index - 1)
+                    Previous = all.ElementAtOrDefault(index - 1),
                 };
                 _cache.Add(cacheKey, neighbours, TimeSpan.FromMinutes(60));
             }
@@ -431,36 +543,46 @@ namespace Hood.Services
         }
         #endregion
 
-        #region Categories 
+        #region Categories
         public async Task<ContentCategory> GetCategoryByIdAsync(int categoryId)
         {
-            ContentCategory category = await _db.ContentCategories.FirstOrDefaultAsync(c => c.Id == categoryId);
+            ContentCategory category = await _db.ContentCategories.FirstOrDefaultAsync(c =>
+                c.Id == categoryId
+            );
             return category;
         }
+
         public async Task<IEnumerable<ContentCategory>> GetCategoriesAsync(int contentId)
         {
             Content club = await GetContentByIdAsync(contentId);
             return club?.Categories?.Select(c => c.Category);
         }
+
         public async Task<ContentCategory> AddCategoryAsync(string value, string type)
         {
             // Ensure it is in title case.
             value = value.Trim().ToTitleCase();
             string slug = value.ToSeoUrl();
             int counter = 1;
-            while (await _db.ContentCategories.CountAsync(cc => cc.Slug == slug && cc.ContentType == type) > 0)
+            while (
+                await _db.ContentCategories.CountAsync(cc =>
+                    cc.Slug == slug && cc.ContentType == type
+                ) > 0
+            )
             {
                 slug = value.ToSeoUrl() + "-" + counter;
                 counter++;
             }
-            ContentCategory category = _db.ContentCategories.SingleOrDefault(t => t.DisplayName == value && t.ContentType == type);
+            ContentCategory category = _db.ContentCategories.SingleOrDefault(t =>
+                t.DisplayName == value && t.ContentType == type
+            );
             if (category == null)
             {
                 category = new ContentCategory()
                 {
                     DisplayName = value,
                     ContentType = type,
-                    Slug = slug
+                    Slug = slug,
                 };
                 _db.ContentCategories.Add(category);
                 await _db.SaveChangesAsync();
@@ -468,6 +590,7 @@ namespace Hood.Services
             }
             return category;
         }
+
         public async Task<ContentCategory> AddCategoryAsync(ContentCategory category)
         {
             // Ensure it is in title case.
@@ -485,19 +608,24 @@ namespace Hood.Services
             _eventService.TriggerContentChanged(this);
             return category;
         }
+
         public async Task DeleteCategoryAsync(int categoryId)
         {
-            ContentCategory category = await _db.ContentCategories.FirstOrDefaultAsync(c => c.Id == categoryId);
+            ContentCategory category = await _db.ContentCategories.FirstOrDefaultAsync(c =>
+                c.Id == categoryId
+            );
             _db.Entry(category).State = EntityState.Deleted;
             await _db.SaveChangesAsync();
             _eventService.TriggerContentChanged(this);
         }
+
         public async Task UpdateCategoryAsync(ContentCategory category)
         {
             _db.Update(category);
             await _db.SaveChangesAsync();
             _eventService.TriggerContentChanged(this);
         }
+
         public async Task AddCategoryToContentAsync(int contentId, int categoryId)
         {
             Content content = await GetContentByIdAsync(contentId, true);
@@ -507,28 +635,35 @@ namespace Hood.Services
                 return;
             }
 
-            ContentCategory category = await _db.ContentCategories.SingleOrDefaultAsync(c => c.Id == categoryId);
+            ContentCategory category = await _db.ContentCategories.SingleOrDefaultAsync(c =>
+                c.Id == categoryId
+            );
             if (category == null)
             {
                 throw new Exception("The category does not exist.");
             }
 
-            content.Categories.Add(new ContentCategoryJoin() { CategoryId = category.Id, ContentId = content.Id });
+            content.Categories.Add(
+                new ContentCategoryJoin() { CategoryId = category.Id, ContentId = content.Id }
+            );
 
             await UpdateAsync(content);
         }
+
         public async Task RemoveCategoryFromContentAsync(int contentId, int categoryId)
         {
             Content content = await GetContentByIdAsync(contentId, true);
 
-            if (!content.IsInCategory(categoryId))// Content is already out!
+            if (!content.IsInCategory(categoryId)) // Content is already out!
             {
                 return;
             }
 
-            ContentCategoryJoin cat = content.Categories.SingleOrDefault(c => c.CategoryId == categoryId);
+            ContentCategoryJoin cat = content.Categories.SingleOrDefault(c =>
+                c.CategoryId == categoryId
+            );
 
-            if (cat == null)// Content is already out!
+            if (cat == null) // Content is already out!
             {
                 return;
             }
@@ -543,58 +678,77 @@ namespace Hood.Services
         // Sitemap
         public async Task<List<ContentView>> GetPages(string category = null)
         {
-            string cacheKey = typeof(Content).ToString() + (category.IsSet() ? $".{category}" : "") + ".Pages";
+            string cacheKey =
+                typeof(Content).ToString() + (category.IsSet() ? $".{category}" : "") + ".Pages";
             if (!_cache.TryGetValue(cacheKey, out List<ContentView> pages))
             {
-                ContentModel content = await GetContentAsync(new ContentModel() { Type = "page", PageSize = int.MaxValue, Category = category });
+                ContentModel content = await GetContentAsync(
+                    new ContentModel()
+                    {
+                        Type = "page",
+                        PageSize = int.MaxValue,
+                        Category = category,
+                    }
+                );
                 pages = content.List;
                 _cache.Add(cacheKey, pages, TimeSpan.FromMinutes(60));
             }
             return pages;
         }
+
         public async Task<string> GetSitemapDocumentAsync(IUrlHelper urlHelper)
         {
             string cacheKey = typeof(Content).ToString() + ".SitemapDocument";
             if (!_cache.TryGetValue(cacheKey, out string pages))
             {
                 List<SitemapNode> nodes = new List<SitemapNode>
-            {
-                new SitemapNode()
                 {
-                    Url = urlHelper.AbsoluteUrl(""),
-                    Priority = 1,
-                    Frequency = SitemapFrequency.Daily
-                },
-                new SitemapNode()
-                {
-                    Url = urlHelper.AbsoluteUrl("contact"),
-                    Priority = 0.9,
-                    Frequency = SitemapFrequency.Never
-                }
-            };
+                    new SitemapNode()
+                    {
+                        Url = urlHelper.AbsoluteUrl(""),
+                        Priority = 1,
+                        Frequency = SitemapFrequency.Daily,
+                    },
+                    new SitemapNode()
+                    {
+                        Url = urlHelper.AbsoluteUrl("contact"),
+                        Priority = 0.9,
+                        Frequency = SitemapFrequency.Never,
+                    },
+                };
                 foreach (ContentType type in Engine.Settings.Content.AllowedTypes)
                 {
                     if (type.IsPublic)
                     {
-                        nodes.Add(new SitemapNode()
-                        {
-                            Url = urlHelper.AbsoluteUrl(type.Slug),
-                            Frequency = SitemapFrequency.Weekly,
-                            Priority = 0.8
-                        });
+                        nodes.Add(
+                            new SitemapNode()
+                            {
+                                Url = urlHelper.AbsoluteUrl(type.Slug),
+                                Frequency = SitemapFrequency.Weekly,
+                                Priority = 0.8,
+                            }
+                        );
                     }
                     if (type.HasPage)
                     {
-                        ContentModel typeContent = await GetContentAsync(new ContentModel() { Type = type.Type, PageSize = int.MaxValue });
-                        foreach (ContentView content in typeContent.List.OrderByDescending(c => c.PublishDate))
+                        ContentModel typeContent = await GetContentAsync(
+                            new ContentModel() { Type = type.Type, PageSize = int.MaxValue }
+                        );
+                        foreach (
+                            ContentView content in typeContent.List.OrderByDescending(c =>
+                                c.PublishDate
+                            )
+                        )
                         {
-                            nodes.Add(new SitemapNode()
-                            {
-                                Url = urlHelper.AbsoluteUrl(content.Url.TrimStart('/')),
-                                LastModified = content.PublishDate,
-                                Frequency = SitemapFrequency.Weekly,
-                                Priority = 0.7
-                            });
+                            nodes.Add(
+                                new SitemapNode()
+                                {
+                                    Url = urlHelper.AbsoluteUrl(content.Url.TrimStart('/')),
+                                    LastModified = content.PublishDate,
+                                    Frequency = SitemapFrequency.Weekly,
+                                    Priority = 0.7,
+                                }
+                            );
                         }
                     }
                 }
@@ -607,15 +761,30 @@ namespace Hood.Services
                     XElement urlElement = new XElement(
                         xmlns + "url",
                         new XElement(xmlns + "loc", Uri.EscapeDataString(sitemapNode.Url)),
-                        sitemapNode.LastModified == null ? null : new XElement(
-                            xmlns + "lastmod",
-                            sitemapNode.LastModified.Value.ToLocalTime().ToString("yyyy-MM-ddTHH:mm:sszzz")),
-                        sitemapNode.Frequency == null ? null : new XElement(
-                            xmlns + "changefreq",
-                            sitemapNode.Frequency.Value.ToString().ToLowerInvariant()),
-                        sitemapNode.Priority == null ? null : new XElement(
-                            xmlns + "priority",
-                            sitemapNode.Priority.Value.ToString("F1", CultureInfo.InvariantCulture)));
+                        sitemapNode.LastModified == null
+                            ? null
+                            : new XElement(
+                                xmlns + "lastmod",
+                                sitemapNode
+                                    .LastModified.Value.ToLocalTime()
+                                    .ToString("yyyy-MM-ddTHH:mm:sszzz")
+                            ),
+                        sitemapNode.Frequency == null
+                            ? null
+                            : new XElement(
+                                xmlns + "changefreq",
+                                sitemapNode.Frequency.Value.ToString().ToLowerInvariant()
+                            ),
+                        sitemapNode.Priority == null
+                            ? null
+                            : new XElement(
+                                xmlns + "priority",
+                                sitemapNode.Priority.Value.ToString(
+                                    "F1",
+                                    CultureInfo.InvariantCulture
+                                )
+                            )
+                    );
                     root.Add(urlElement);
                 }
 
@@ -632,7 +801,7 @@ namespace Hood.Services
         public void UpdateTemplateMetas(Content content, List<string> newMetas)
         {
             // iterate through content metas that start with Template_
-            // if it exists in new, leave, if it doesnt remove 
+            // if it exists in new, leave, if it doesnt remove
             List<ContentMeta> toRemove = new List<ContentMeta>();
             foreach (ContentMeta cm in content.Metadata)
             {
@@ -647,7 +816,7 @@ namespace Hood.Services
                 content.Metadata.Remove(cm);
             }
 
-            // iterate through new metas 
+            // iterate through new metas
             // if it doesnt exist in content.Metas, add to content.Metas
             if (newMetas != null)
             {
@@ -655,17 +824,20 @@ namespace Hood.Services
                 {
                     if (!content.HasMeta(meta))
                     {
-                        content.Metadata.Add(new ContentMeta()
-                        {
-                            ContentId = content.Id,
-                            Name = meta,
-                            Type = "System.String",
-                            BaseValue = JsonConvert.SerializeObject("")
-                        });
+                        content.Metadata.Add(
+                            new ContentMeta()
+                            {
+                                ContentId = content.Id,
+                                Name = meta,
+                                Type = "System.String",
+                                BaseValue = JsonConvert.SerializeObject(""),
+                            }
+                        );
                     }
                 }
             }
         }
+
         public async Task RefreshMetasAsync(Content content)
         {
             ContentType type = Engine.Settings.Content.GetContentType(content.ContentType);
@@ -712,18 +884,48 @@ namespace Hood.Services
         public async Task<ContentStatitsics> GetStatisticsAsync()
         {
             int totalPosts = await _db.Content.CountAsync();
-            int totalPublished = await _db.Content.Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.UtcNow).CountAsync();
-            var data = await _db.Content.Where(p => p.CreatedOn >= DateTime.Now.AddYears(-1)).Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.UtcNow).Select(c => new { type = c.ContentType, date = c.CreatedOn.Date, month = c.CreatedOn.Month, pubdate = c.PublishDate.Date, pubmonth = c.PublishDate.Month }).ToListAsync();
+            int totalPublished = await _db
+                .Content.Where(c =>
+                    c.Status == ContentStatus.Published && c.PublishDate < DateTime.UtcNow
+                )
+                .CountAsync();
+            var data = await _db
+                .Content.Where(p => p.CreatedOn >= DateTime.Now.AddYears(-1))
+                .Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.UtcNow)
+                .Select(c => new
+                {
+                    type = c.ContentType,
+                    date = c.CreatedOn.Date,
+                    month = c.CreatedOn.Month,
+                    pubdate = c.PublishDate.Date,
+                    pubmonth = c.PublishDate.Month,
+                })
+                .ToListAsync();
 
-            var createdByDate = data.GroupBy(p => p.date).Select(g => new { name = g.Key, count = g.Count() });
-            var createdByMonth = data.GroupBy(p => p.month).Select(g => new { name = g.Key, count = g.Count() });
-            var publishedByDate = data.GroupBy(p => p.pubdate).Select(g => new { name = g.Key, count = g.Count() });
-            var publishedByMonth = data.GroupBy(p => p.pubmonth).Select(g => new { name = g.Key, count = g.Count() });
-            var byType = data.GroupBy(p => p.type).Select(g => new ContentTypeStat() { Type = Engine.Settings.Content.GetContentType(g.Key), Total = g.Count(), Name = g.Key });
+            var createdByDate = data.GroupBy(p => p.date)
+                .Select(g => new { name = g.Key, count = g.Count() });
+            var createdByMonth = data.GroupBy(p => p.month)
+                .Select(g => new { name = g.Key, count = g.Count() });
+            var publishedByDate = data.GroupBy(p => p.pubdate)
+                .Select(g => new { name = g.Key, count = g.Count() });
+            var publishedByMonth = data.GroupBy(p => p.pubmonth)
+                .Select(g => new { name = g.Key, count = g.Count() });
+            var byType = data.GroupBy(p => p.type)
+                .Select(g => new ContentTypeStat()
+                {
+                    Type = Engine.Settings.Content.GetContentType(g.Key),
+                    Total = g.Count(),
+                    Name = g.Key,
+                });
 
             List<KeyValuePair<string, int>> days = new List<KeyValuePair<string, int>>();
             List<KeyValuePair<string, int>> publishDays = new List<KeyValuePair<string, int>>();
-            foreach (DateTime day in DateTimeExtensions.EachDay(DateTime.UtcNow.AddDays(-89), DateTime.UtcNow))
+            foreach (
+                DateTime day in DateTimeExtensions.EachDay(
+                    DateTime.UtcNow.AddDays(-89),
+                    DateTime.UtcNow
+                )
+            )
             {
                 var dayvalue = createdByDate.SingleOrDefault(c => c.name == day.Date);
                 int count = dayvalue != null ? dayvalue.count : 0;
@@ -736,7 +938,11 @@ namespace Hood.Services
 
             List<KeyValuePair<string, int>> months = new List<KeyValuePair<string, int>>();
             List<KeyValuePair<string, int>> publishMonths = new List<KeyValuePair<string, int>>();
-            for (DateTime dt = DateTime.UtcNow.AddMonths(-11); dt <= DateTime.UtcNow; dt = dt.AddMonths(1))
+            for (
+                DateTime dt = DateTime.UtcNow.AddMonths(-11);
+                dt <= DateTime.UtcNow;
+                dt = dt.AddMonths(1)
+            )
             {
                 var monthvalue = createdByMonth.SingleOrDefault(c => c.name == dt.Month);
                 int count = monthvalue != null ? monthvalue.count : 0;
@@ -747,23 +953,40 @@ namespace Hood.Services
                 publishMonths.Add(new KeyValuePair<string, int>(dt.ToString("MMMM, yyyy"), count));
             }
 
-            return new ContentStatitsics(totalPosts, totalPublished, days, months, publishDays, publishMonths, byType);
-
+            return new ContentStatitsics(
+                totalPosts,
+                totalPublished,
+                days,
+                months,
+                publishDays,
+                publishMonths,
+                byType
+            );
         }
         #endregion
 
-        #region Metas 
+        #region Metas
 
         public List<string> GetMetasForTemplate(string templateName, string folder)
         {
             templateName = templateName.Replace("Meta:", "");
             var _env = Engine.Services.Resolve<IWebHostEnvironment>();
             // get the right template file (from theme or if it doesnt appear there from base)
-            string templatePath = _env.ContentRootPath + "\\Themes\\" + Engine.Settings["Hood.Settings.Theme"] + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
+            string templatePath =
+                _env.ContentRootPath
+                + "\\Themes\\"
+                + Engine.Settings["Hood.Settings.Theme"]
+                + "\\Views\\"
+                + folder
+                + "\\"
+                + templateName
+                + ".cshtml";
             if (!System.IO.File.Exists(templatePath))
-                templatePath = _env.ContentRootPath + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
+                templatePath =
+                    _env.ContentRootPath + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
             if (!System.IO.File.Exists(templatePath))
-                templatePath = _env.ContentRootPath + "\\UI\\" + folder + "\\" + templateName + ".cshtml";
+                templatePath =
+                    _env.ContentRootPath + "\\UI\\" + folder + "\\" + templateName + ".cshtml";
             if (!System.IO.File.Exists(templatePath))
             {
                 templatePath = null;
@@ -771,7 +994,7 @@ namespace Hood.Services
             string template;
             if (templatePath != null)
             {
-                // get the file contents 
+                // get the file contents
                 template = System.IO.File.ReadAllText(templatePath);
             }
             else
@@ -806,7 +1029,6 @@ namespace Hood.Services
             return metas.Distinct().ToList();
         }
 
-
         #endregion
     }
 
@@ -819,7 +1041,15 @@ namespace Hood.Services
 
     public class ContentStatitsics
     {
-        public ContentStatitsics(int totalPosts, int totalPublished, List<KeyValuePair<string, int>> days, List<KeyValuePair<string, int>> months, List<KeyValuePair<string, int>> publishDays, List<KeyValuePair<string, int>> publishMonths, IEnumerable<ContentTypeStat> byType)
+        public ContentStatitsics(
+            int totalPosts,
+            int totalPublished,
+            List<KeyValuePair<string, int>> days,
+            List<KeyValuePair<string, int>> months,
+            List<KeyValuePair<string, int>> publishDays,
+            List<KeyValuePair<string, int>> publishMonths,
+            IEnumerable<ContentTypeStat> byType
+        )
         {
             TotalPosts = totalPosts;
             TotalPublished = totalPublished;

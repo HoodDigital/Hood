@@ -1,4 +1,10 @@
-﻿using Geocoding.Google;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Geocoding.Google;
 using Hood.Contexts;
 using Hood.Core;
 using Hood.Enums;
@@ -14,12 +20,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Hood.Services
 {
@@ -39,7 +39,7 @@ namespace Hood.Services
             IAddressService address,
             ILogService logService,
             IDirectoryManager directoryManager
-            )
+        )
         {
             _ftp = ftp;
             _env = env;
@@ -64,7 +64,8 @@ namespace Hood.Services
             TempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(BlmFileImporter) + "\\";
             _propertySettings = Engine.Settings.Property;
 
-            LocalFolder = env.ContentRootPath + "\\" + _propertySettings.FTPImporterSettings.LocalFolder;
+            LocalFolder =
+                env.ContentRootPath + "\\" + _propertySettings.FTPImporterSettings.LocalFolder;
             _context = context;
             _address = address;
             _logService = logService;
@@ -127,17 +128,21 @@ namespace Hood.Services
                 StatusMessage = "Starting import, loading property files from FTP Service...";
                 _propertySettings = Engine.Settings.Property;
                 // Get a new instance of the HoodDbContext for this import.
-                DbContextOptionsBuilder<HoodDbContext> dbOptions = new DbContextOptionsBuilder<HoodDbContext>();
+                DbContextOptionsBuilder<HoodDbContext> dbOptions =
+                    new DbContextOptionsBuilder<HoodDbContext>();
                 dbOptions.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
                 _hoodDb = new HoodDbContext(dbOptions.Options);
 
-                DbContextOptionsBuilder<PropertyContext> propertyDbOptions = new DbContextOptionsBuilder<PropertyContext>();
+                DbContextOptionsBuilder<PropertyContext> propertyDbOptions =
+                    new DbContextOptionsBuilder<PropertyContext>();
                 propertyDbOptions.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
                 _db = new PropertyContext(propertyDbOptions.Options);
 
                 _media = new MediaManager(_env, _config);
 
-                MediaDirectory propertyDirectory = _hoodDb.MediaDirectories.SingleOrDefault(md => md.Slug == MediaManager.PropertyDirectorySlug && md.Type == DirectoryType.System);
+                MediaDirectory propertyDirectory = _hoodDb.MediaDirectories.SingleOrDefault(md =>
+                    md.Slug == MediaManager.PropertyDirectorySlug && md.Type == DirectoryType.System
+                );
                 if (propertyDirectory == null)
                 {
                     throw new Exception("Could not load the Property directory.");
@@ -151,7 +156,7 @@ namespace Hood.Services
                 Thread thread = new Thread(pts)
                 {
                     Name = "Import",
-                    Priority = ThreadPriority.Normal
+                    Priority = ThreadPriority.Normal,
                 };
                 thread.Start();
             }
@@ -161,12 +166,15 @@ namespace Hood.Services
                 Running = false;
                 StatusMessage = ex.Message;
                 Lock.ReleaseWriterLock();
-                await _logService.AddExceptionAsync<BlmFileImporter>("An error occurred starting a property update.", ex);
+                await _logService.AddExceptionAsync<BlmFileImporter>(
+                    "An error occurred starting a property update.",
+                    ex
+                );
             }
         }
 
         /// <summary>
-        /// This is the main thread, controls the whole update process. 
+        /// This is the main thread, controls the whole update process.
         /// All other functions are fired of from here and once complete, the update is complete.
         /// </summary>
         private async void Import()
@@ -193,22 +201,29 @@ namespace Hood.Services
 
                 if (HasFileError())
                 {
-                    throw new Exception("There was a problem downloading the properties file. Please try again.");
+                    throw new Exception(
+                        "There was a problem downloading the properties file. Please try again."
+                    );
                 }
 
                 // Go through the file, and extract key/value pairs of
                 List<Dictionary<string, string>> properties = await GetPropertiesFromFileAsync();
 
                 List<PropertyListing> feedProperties = new List<PropertyListing>();
-                List<PropertyListing> siteProperties = _db.Properties
-                    .Where(p => p.UserVars == "IMPORTED")
+                List<PropertyListing> siteProperties = _db
+                    .Properties.Where(p => p.UserVars == "IMPORTED")
                     .AsNoTracking()
                     .ToList();
 
                 foreach (Dictionary<string, string> data in properties)
                 {
                     Lock.AcquireWriterLock(Timeout.Infinite);
-                    StatusMessage = "Checking property (" + data["ADDRESS_1"] + ", " + data["ADDRESS_2"] + ") information from the BLM file...";
+                    StatusMessage =
+                        "Checking property ("
+                        + data["ADDRESS_1"]
+                        + ", "
+                        + data["ADDRESS_2"]
+                        + ") information from the BLM file...";
                     Lock.ReleaseWriterLock();
 
                     PropertyListing property = new PropertyListing();
@@ -217,9 +232,15 @@ namespace Hood.Services
                 }
 
                 // Now we have a list of properties, in the feed
-                IEnumerable<PropertyListing> newProperties = feedProperties.Where(p => !siteProperties.Any(p2 => p2.Reference == p.Reference));
-                IEnumerable<PropertyListing> existingProperties = siteProperties.Where(site => feedProperties.Any(feed => feed.Reference == site.Reference));
-                IEnumerable<PropertyListing> extraneous = siteProperties.Where(p => !feedProperties.Any(p2 => p2.Reference == p.Reference));
+                IEnumerable<PropertyListing> newProperties = feedProperties.Where(p =>
+                    !siteProperties.Any(p2 => p2.Reference == p.Reference)
+                );
+                IEnumerable<PropertyListing> existingProperties = siteProperties.Where(site =>
+                    feedProperties.Any(feed => feed.Reference == site.Reference)
+                );
+                IEnumerable<PropertyListing> extraneous = siteProperties.Where(p =>
+                    !feedProperties.Any(p2 => p2.Reference == p.Reference)
+                );
 
                 switch (_propertySettings.FTPImporterSettings.ExtraneousPropertyProcess)
                 {
@@ -244,7 +265,9 @@ namespace Hood.Services
                     try
                     {
                         // Find matching record to update the property.
-                        Dictionary<string, string> data = properties.SingleOrDefault(p => p["AGENT_REF"] == propertyRef.Reference);
+                        Dictionary<string, string> data = properties.SingleOrDefault(p =>
+                            p["AGENT_REF"] == propertyRef.Reference
+                        );
 
                         PropertyListing property = await ProcessAsync(new PropertyListing(), data);
 
@@ -255,16 +278,26 @@ namespace Hood.Services
                         Processed++;
                         Added++;
                         Lock.ReleaseWriterLock();
-                        MarkCompleteTask("Added new property: " + property.ToFormat(AddressFormat.SingleLine));
+                        MarkCompleteTask(
+                            "Added new property: " + property.ToFormat(AddressFormat.SingleLine)
+                        );
                     }
                     catch (Exception addPropertyException)
                     {
                         Lock.AcquireWriterLock(Timeout.Infinite);
                         Processed++;
                         Added++;
-                        Errors.Add(FormatLog("Error adding property: " + addPropertyException.Message, propertyRef));
+                        Errors.Add(
+                            FormatLog(
+                                "Error adding property: " + addPropertyException.Message,
+                                propertyRef
+                            )
+                        );
                         Lock.ReleaseWriterLock();
-                        await _logService.AddExceptionAsync<BlmFileImporter>("An error occurred adding a property via BLM import.", addPropertyException);
+                        await _logService.AddExceptionAsync<BlmFileImporter>(
+                            "An error occurred adding a property via BLM import.",
+                            addPropertyException
+                        );
                         MarkCompleteTask("Adding property failed: " + addPropertyException.Message);
                     }
                 }
@@ -273,12 +306,14 @@ namespace Hood.Services
                 foreach (PropertyListing propertyRef in existingProperties)
                 {
                     CheckForCancel();
-                    Dictionary<string, string> data = properties.SingleOrDefault(p => p["AGENT_REF"] == propertyRef.Reference);
+                    Dictionary<string, string> data = properties.SingleOrDefault(p =>
+                        p["AGENT_REF"] == propertyRef.Reference
+                    );
 
                     try
                     {
-                        PropertyListing property = _db.Properties
-                            .Include(p => p.Media)
+                        PropertyListing property = _db
+                            .Properties.Include(p => p.Media)
                             .Include(p => p.FloorPlans)
                             .Include(p => p.Metadata)
                             .FirstOrDefault(p => p.Id == propertyRef.Id);
@@ -290,7 +325,9 @@ namespace Hood.Services
                         Processed++;
                         Updated++;
                         Lock.ReleaseWriterLock();
-                        MarkCompleteTask("Updated property: " + property.ToFormat(AddressFormat.SingleLine));
+                        MarkCompleteTask(
+                            "Updated property: " + property.ToFormat(AddressFormat.SingleLine)
+                        );
                     }
                     catch (Exception updatePropertyException)
                     {
@@ -298,12 +335,20 @@ namespace Hood.Services
                         Processed++;
                         Updated++;
                         Lock.ReleaseWriterLock();
-                        await _logService.AddLogAsync<BlmFileImporter>("Error updating property: " + updatePropertyException.Message, FormatLog("Error updating property: " + updatePropertyException.Message, propertyRef), LogType.Error);
-                        MarkCompleteTask("Updating property failed: " + updatePropertyException.Message);
+                        await _logService.AddLogAsync<BlmFileImporter>(
+                            "Error updating property: " + updatePropertyException.Message,
+                            FormatLog(
+                                "Error updating property: " + updatePropertyException.Message,
+                                propertyRef
+                            ),
+                            LogType.Error
+                        );
+                        MarkCompleteTask(
+                            "Updating property failed: " + updatePropertyException.Message
+                        );
                     }
                 }
                 await SaveChangesToDatabaseAsync();
-
 
                 // Clean any from the DB that have been removed from the BLM file.
                 foreach (PropertyListing property in extraneous)
@@ -316,18 +361,32 @@ namespace Hood.Services
                             case ExtraneousPropertyProcess.Delete:
                                 property.Media.ForEach(async m =>
                                 {
-                                    if (_propertySettings.FTPImporterSettings.DeletePhysicalImageFiles)
-                                        try { await _media.DeleteStoredMedia(m); } catch (Exception) { }
+                                    if (
+                                        _propertySettings
+                                            .FTPImporterSettings
+                                            .DeletePhysicalImageFiles
+                                    )
+                                        try
+                                        {
+                                            await _media.DeleteStoredMedia(m);
+                                        }
+                                        catch (Exception) { }
                                     _db.Entry(m).State = EntityState.Deleted;
-
                                 });
                                 await SaveChangesToDatabaseAsync();
                                 property.FloorPlans.ForEach(async m =>
                                 {
-                                    if (_propertySettings.FTPImporterSettings.DeletePhysicalImageFiles)
-                                        try { await _media.DeleteStoredMedia(m); } catch (Exception) { }
+                                    if (
+                                        _propertySettings
+                                            .FTPImporterSettings
+                                            .DeletePhysicalImageFiles
+                                    )
+                                        try
+                                        {
+                                            await _media.DeleteStoredMedia(m);
+                                        }
+                                        catch (Exception) { }
                                     _db.Entry(m).State = EntityState.Deleted;
-
                                 });
                                 await SaveChangesToDatabaseAsync();
                                 property.Metadata.ForEach(m =>
@@ -366,22 +425,33 @@ namespace Hood.Services
                                 break;
                         }
 
-
                         Lock.AcquireWriterLock(Timeout.Infinite);
                         Processed++;
                         Deleted++;
                         Lock.ReleaseWriterLock();
-                        MarkCompleteTask("Removed property: " + property.ToFormat(AddressFormat.SingleLine));
+                        MarkCompleteTask(
+                            "Removed property: " + property.ToFormat(AddressFormat.SingleLine)
+                        );
                     }
                     catch (Exception removePropertyException)
                     {
                         Lock.AcquireWriterLock(Timeout.Infinite);
                         Processed++;
                         Updated++;
-                        Errors.Add(FormatLog("Error removing property: " + removePropertyException.Message, property));
+                        Errors.Add(
+                            FormatLog(
+                                "Error removing property: " + removePropertyException.Message,
+                                property
+                            )
+                        );
                         Lock.ReleaseWriterLock();
-                        await _logService.AddExceptionAsync<BlmFileImporter>("An error occurred updating a removing via BLM import.", removePropertyException);
-                        MarkCompleteTask("Removing property failed: " + removePropertyException.Message);
+                        await _logService.AddExceptionAsync<BlmFileImporter>(
+                            "An error occurred updating a removing via BLM import.",
+                            removePropertyException
+                        );
+                        MarkCompleteTask(
+                            "Removing property failed: " + removePropertyException.Message
+                        );
                     }
                 }
                 await SaveChangesToDatabaseAsync();
@@ -392,10 +462,19 @@ namespace Hood.Services
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 Succeeded = true;
                 Running = false;
-                StatusMessage = "Update completed at " + DateTime.UtcNow.ToShortTimeString() + " on " + DateTime.UtcNow.ToLongDateString() + ".";
+                StatusMessage =
+                    "Update completed at "
+                    + DateTime.UtcNow.ToShortTimeString()
+                    + " on "
+                    + DateTime.UtcNow.ToLongDateString()
+                    + ".";
                 Lock.ReleaseWriterLock();
 
-                await _logService.AddLogAsync<BlmFileImporter>("Sucessfully imported properties via BLM.", "Process completed!", LogType.Success);
+                await _logService.AddLogAsync<BlmFileImporter>(
+                    "Sucessfully imported properties via BLM.",
+                    "Process completed!",
+                    LogType.Success
+                );
 
                 return;
             }
@@ -405,7 +484,10 @@ namespace Hood.Services
                 Running = false;
                 StatusMessage = ex.Message;
                 Lock.ReleaseWriterLock();
-                await _logService.AddExceptionAsync<BlmFileImporter>("An error occurred importing properties via BLM.", ex);
+                await _logService.AddExceptionAsync<BlmFileImporter>(
+                    "An error occurred importing properties via BLM.",
+                    ex
+                );
                 return;
             }
         }
@@ -413,16 +495,21 @@ namespace Hood.Services
         private void UnzipLocalFile()
         {
             Lock.AcquireWriterLock(Timeout.Infinite);
-            StatusMessage = "Unzipping the local zipped data file (" + _propertySettings.FTPImporterSettings.ZipFile + "), please wait...";
+            StatusMessage =
+                "Unzipping the local zipped data file ("
+                + _propertySettings.FTPImporterSettings.ZipFile
+                + "), please wait...";
             FileError = false;
             Lock.ReleaseWriterLock();
             // First thing is to get the zip file, and unzip the contents to the local folder.
-            string zipFilename = Path.Combine(LocalFolder, _propertySettings.FTPImporterSettings.ZipFile);
+            string zipFilename = Path.Combine(
+                LocalFolder,
+                _propertySettings.FTPImporterSettings.ZipFile
+            );
             ZipFile zf = null;
 
             try
             {
-
                 FileStream fs = File.OpenRead(zipFilename);
                 zf = new ZipFile(fs);
 
@@ -430,7 +517,7 @@ namespace Hood.Services
                 {
                     if (!zipEntry.IsFile)
                     {
-                        continue;           // Ignore directories
+                        continue; // Ignore directories
                     }
 
                     string entryFileName = zipEntry.Name;
@@ -438,7 +525,7 @@ namespace Hood.Services
                     // Optionally match entrynames against a selection list here to skip as desired.
                     // The unpacked length is available in the zipEntry.Size property.
 
-                    byte[] buffer = new byte[4096];     // 4K is optimum
+                    byte[] buffer = new byte[4096]; // 4K is optimum
                     Stream zipStream = zf.GetInputStream(zipEntry);
 
                     // Manipulate the output filename here as desired.
@@ -470,7 +557,10 @@ namespace Hood.Services
             }
         }
 
-        private async Task<PropertyListing> ProcessAsync(PropertyListing property, Dictionary<string, string> data)
+        private async Task<PropertyListing> ProcessAsync(
+            PropertyListing property,
+            Dictionary<string, string> data
+        )
         {
             CheckForCancel();
 
@@ -510,19 +600,27 @@ namespace Hood.Services
                 catch (Exception ex)
                 {
                     Lock.AcquireWriterLock(Timeout.Infinite);
-                    StatusMessage = $"There was an error processing the info document. {ex.Message}";
+                    StatusMessage =
+                        $"There was an error processing the info document. {ex.Message}";
                     Errors.Add(FormatLog(StatusMessage, property));
                     Lock.ReleaseWriterLock();
                 }
-
             }
 
             return property;
         }
-        private async Task<PropertyListing> ProcessDocumentsAsync(PropertyListing property, Dictionary<string, string> data)
+
+        private async Task<PropertyListing> ProcessDocumentsAsync(
+            PropertyListing property,
+            Dictionary<string, string> data
+        )
         {
             // Documents
-            foreach (string key in data.Keys.Where(k => k.Contains("MEDIA_DOCUMENT") && !k.Contains("TEXT")))
+            foreach (
+                string key in data.Keys.Where(k =>
+                    k.Contains("MEDIA_DOCUMENT") && !k.Contains("TEXT")
+                )
+            )
             {
                 if (data[key].IsSet())
                 {
@@ -548,7 +646,13 @@ namespace Hood.Services
                         FileInfo fi = new FileInfo(imageFile);
                         using (FileStream s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath);
+                            mediaResult = await _media.ProcessUpload(
+                                s,
+                                fi.Name,
+                                MimeTypes.GetMimeType(fi.Extension),
+                                fi.Length,
+                                DirectoryPath
+                            );
                         }
                         if (mediaResult != null)
                         {
@@ -559,8 +663,12 @@ namespace Hood.Services
                             }
                             else
                             {
-                                await _media.DeleteStoredMedia(new MediaObject(property.InfoDownload));
-                                property.InfoDownload = property.InfoDownload.UpdateUrls(new PropertyMedia(mediaResult)) as MediaObject;
+                                await _media.DeleteStoredMedia(
+                                    new MediaObject(property.InfoDownload)
+                                );
+                                property.InfoDownload =
+                                    property.InfoDownload.UpdateUrls(new PropertyMedia(mediaResult))
+                                    as MediaObject;
                             }
                         }
                     }
@@ -568,7 +676,11 @@ namespace Hood.Services
             }
             return property;
         }
-        private async Task<PropertyListing> ProcessFloorPlansAsync(PropertyListing property, Dictionary<string, string> data)
+
+        private async Task<PropertyListing> ProcessFloorPlansAsync(
+            PropertyListing property,
+            Dictionary<string, string> data
+        )
         {
             // Floor plans
             if (_propertySettings.FTPImporterSettings.ClearImagesBeforeImport)
@@ -584,7 +696,11 @@ namespace Hood.Services
                     await SaveChangesToDatabaseAsync();
                 }
             }
-            foreach (string key in data.Keys.Where(k => k.Contains("MEDIA_FLOOR_PLAN") && !k.Contains("TEXT")))
+            foreach (
+                string key in data.Keys.Where(k =>
+                    k.Contains("MEDIA_FLOOR_PLAN") && !k.Contains("TEXT")
+                )
+            )
             {
                 if (data[key].IsSet())
                 {
@@ -600,7 +716,9 @@ namespace Hood.Services
                     }
 
                     // if the photo exists, overwrite it.
-                    PropertyFloorplan fp = property.FloorPlans.FirstOrDefault(f => f.Filename == data[key]);
+                    PropertyFloorplan fp = property.FloorPlans.FirstOrDefault(f =>
+                        f.Filename == data[key]
+                    );
                     if (fp == null)
                     {
                         // This image filename is not added to the property yet.
@@ -622,7 +740,14 @@ namespace Hood.Services
                             FileInfo fi = new FileInfo(imageFile);
                             using (FileStream s = File.OpenRead(imageFile))
                             {
-                                mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath) as MediaObject;
+                                mediaResult =
+                                    await _media.ProcessUpload(
+                                        s,
+                                        fi.Name,
+                                        MimeTypes.GetMimeType(fi.Extension),
+                                        fi.Length,
+                                        DirectoryPath
+                                    ) as MediaObject;
                             }
                             if (mediaResult != null)
                             {
@@ -636,7 +761,11 @@ namespace Hood.Services
             }
             return property;
         }
-        private async Task<PropertyListing> ProcessImagesAsync(PropertyListing property, Dictionary<string, string> data)
+
+        private async Task<PropertyListing> ProcessImagesAsync(
+            PropertyListing property,
+            Dictionary<string, string> data
+        )
         {
             // Images
             if (property.Media == null)
@@ -657,7 +786,11 @@ namespace Hood.Services
                     await SaveChangesToDatabaseAsync();
                 }
             }
-            foreach (string key in data.Keys.Where(k => k.Contains("MEDIA_IMAGE") && !k.Contains("TEXT")).OrderBy(k => k))
+            foreach (
+                string key in data
+                    .Keys.Where(k => k.Contains("MEDIA_IMAGE") && !k.Contains("TEXT"))
+                    .OrderBy(k => k)
+            )
             {
                 try
                 {
@@ -668,7 +801,9 @@ namespace Hood.Services
                         Lock.ReleaseWriterLock();
 
                         // if the photo exists, overwrite it.
-                        PropertyMedia fp = property.Media.FirstOrDefault(f => f.Filename == data[key]);
+                        PropertyMedia fp = property.Media.FirstOrDefault(f =>
+                            f.Filename == data[key]
+                        );
                         if (fp == null)
                         {
                             // This image filename is not added to the property yet.
@@ -685,16 +820,23 @@ namespace Hood.Services
 
                             if (!HasFileError())
                             {
-
                                 string imageFile = TempFolder + data[key];
                                 Lock.AcquireWriterLock(Timeout.Infinite);
-                                StatusMessage = $"Thumbnailing and processing image ({data[key]})...";
+                                StatusMessage =
+                                    $"Thumbnailing and processing image ({data[key]})...";
                                 Lock.ReleaseWriterLock();
                                 MediaObject mediaResult = null;
                                 FileInfo fi = new FileInfo(imageFile);
                                 using (FileStream s = File.OpenRead(imageFile))
                                 {
-                                    mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath) as MediaObject;
+                                    mediaResult =
+                                        await _media.ProcessUpload(
+                                            s,
+                                            fi.Name,
+                                            MimeTypes.GetMimeType(fi.Extension),
+                                            fi.Length,
+                                            DirectoryPath
+                                        ) as MediaObject;
                                 }
                                 if (mediaResult != null)
                                 {
@@ -707,7 +849,8 @@ namespace Hood.Services
                         else
                         {
                             Lock.AcquireWriterLock(Timeout.Infinite);
-                            StatusMessage = $"The image ({data[key]}) has already been added to property {property.Title} ({property.Id}), skipping upload & processing...";
+                            StatusMessage =
+                                $"The image ({data[key]}) has already been added to property {property.Title} ({property.Id}), skipping upload & processing...";
                             Warnings.Add(FormatLog(StatusMessage));
                             Lock.ReleaseWriterLock();
                         }
@@ -715,7 +858,8 @@ namespace Hood.Services
                         {
                             if (data[key] == property.FeaturedImage?.Filename)
                             {
-                                property.FeaturedImage = property.FeaturedImage.UpdateUrls(fp) as MediaObject;
+                                property.FeaturedImage =
+                                    property.FeaturedImage.UpdateUrls(fp) as MediaObject;
                             }
                         }
                         else
@@ -749,7 +893,14 @@ namespace Hood.Services
                             string fileName = data[key].ToLower().Replace(".jpg", ".pdf");
                             using (FileStream s = File.OpenRead(imageFile))
                             {
-                                mediaResult = await _media.ProcessUpload(s, fileName, MimeTypes.GetMimeType("pdf"), fi.Length, DirectoryPath) as MediaObject;
+                                mediaResult =
+                                    await _media.ProcessUpload(
+                                        s,
+                                        fileName,
+                                        MimeTypes.GetMimeType("pdf"),
+                                        fi.Length,
+                                        DirectoryPath
+                                    ) as MediaObject;
                             }
                             if (mediaResult != null)
                             {
@@ -769,7 +920,8 @@ namespace Hood.Services
                 catch (Exception ex)
                 {
                     Lock.AcquireWriterLock(Timeout.Infinite);
-                    StatusMessage = $"There was an error processing an image ({data[key]}): {ex.Message}";
+                    StatusMessage =
+                        $"There was an error processing an image ({data[key]}): {ex.Message}";
                     Errors.Add(FormatLog(StatusMessage, property));
                     Lock.ReleaseWriterLock();
                 }
@@ -798,10 +950,11 @@ namespace Hood.Services
             FileInfo[] oldFiles = directoryInfo.GetFiles();
             foreach (FileInfo fi in oldFiles)
             {
-                // Delete the files in the directory. 
+                // Delete the files in the directory.
                 fi.Delete();
             }
         }
+
         /// <summary>
         /// Validates the record to ensure that the detail stored is valid and can be used as a PropertyListing.
         /// </summary>
@@ -819,11 +972,15 @@ namespace Hood.Services
                 StatusMessage = "There was an error with validating a property.";
                 Warnings.Add(FormatLog(StatusMessage));
                 Lock.ReleaseWriterLock();
-                await _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
+                await _logService.AddExceptionAsync<BlmFileImporter>(
+                    "BLM Property Importer: " + StatusMessage,
+                    ex
+                );
                 return false;
             }
             return true;
         }
+
         /// <summary>
         /// This will download the property file from the FTP service. The thread will wait until the file is downloaded before continuing.
         /// </summary>
@@ -837,7 +994,11 @@ namespace Hood.Services
             try
             {
                 // Now simply copy the BLM file to the temp folder for the import.
-                File.Copy(Path.Combine(LocalFolder, filename), Path.Combine(TempFolder, filename), true);
+                File.Copy(
+                    Path.Combine(LocalFolder, filename),
+                    Path.Combine(TempFolder, filename),
+                    true
+                );
 
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 StatusMessage = "Copied the file (" + filename + ") successfully...";
@@ -850,9 +1011,13 @@ namespace Hood.Services
                 Errors.Add(FormatLog(StatusMessage));
                 FileError = true;
                 Lock.ReleaseWriterLock();
-                await _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
+                await _logService.AddExceptionAsync<BlmFileImporter>(
+                    "BLM Property Importer: " + StatusMessage,
+                    ex
+                );
             }
         }
+
         /// <summary>
         /// This will download the property file from the FTP service. The thread will wait until the file is downloaded before continuing.
         /// </summary>
@@ -863,11 +1028,13 @@ namespace Hood.Services
             FileError = false;
             Lock.ReleaseWriterLock();
 
-            _ftp.GetFileFromFTP(_propertySettings.FTPImporterSettings.Server,
-                                _propertySettings.FTPImporterSettings.Username,
-                                _propertySettings.FTPImporterSettings.Password,
-                                filename,
-                                TempFolder);
+            _ftp.GetFileFromFTP(
+                _propertySettings.FTPImporterSettings.Server,
+                _propertySettings.FTPImporterSettings.Username,
+                _propertySettings.FTPImporterSettings.Password,
+                filename,
+                TempFolder
+            );
 
             while (!_ftp.IsComplete())
             {
@@ -888,6 +1055,7 @@ namespace Hood.Services
                 Lock.ReleaseWriterLock();
             }
         }
+
         /// <summary>
         /// Extracts the property data from the given BLM file, and translates it into a list of dictionaries of key/value pairs, representing each property.
         /// </summary>
@@ -904,27 +1072,42 @@ namespace Hood.Services
             string fileContents = objStreamReader.ReadToEnd();
             objStreamReader.Close();
 
-            string[] definitions = fileContents.ExtractTextBetween("#DEFINITION#", "#DATA#").Trim(Environment.NewLine.ToCharArray()).Trim().Split(new[] { '^' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] definitions = fileContents
+                .ExtractTextBetween("#DEFINITION#", "#DATA#")
+                .Trim(Environment.NewLine.ToCharArray())
+                .Trim()
+                .Split(new[] { '^' }, StringSplitOptions.RemoveEmptyEntries);
             List<string> defs = definitions.ToList();
             int imageTasks = defs.Count(c => c.Contains("MEDIA_IMAGE") && !c.Contains("TEXT"));
             int docTasks = defs.Count(c => c.Contains("MEDIA_FLOOR_PLAN") && !c.Contains("TEXT"));
             int fpTasks = defs.Count(c => c.Contains("MEDIA_DOCUMENT") && !c.Contains("TEXT"));
 
-            string stringData = fileContents.ExtractTextBetween("#DATA#", "#END#").Trim(Environment.NewLine.ToCharArray()).Trim();
+            string stringData = fileContents
+                .ExtractTextBetween("#DATA#", "#END#")
+                .Trim(Environment.NewLine.ToCharArray())
+                .Trim();
             string[] items = stringData.Split(new[] { '~' }, StringSplitOptions.RemoveEmptyEntries);
 
             // Now, read the entire file into a string
             List<Dictionary<string, string>> allProperties = new List<Dictionary<string, string>>();
             int counter = 1;
-            foreach (string currentProperty in items.Select(p => p.Trim(Environment.NewLine.ToCharArray()).Trim()))
+            foreach (
+                string currentProperty in items.Select(p =>
+                    p.Trim(Environment.NewLine.ToCharArray()).Trim()
+                )
+            )
             {
                 CheckForCancel();
 
                 Lock.AcquireWriterLock(Timeout.Infinite);
-                StatusMessage = "Processing raw property data from FTP BLM feed file (" + counter + ")...";
+                StatusMessage =
+                    "Processing raw property data from FTP BLM feed file (" + counter + ")...";
                 Lock.ReleaseWriterLock();
 
-                Dictionary<string, string> propertyDetails = GetPropertyDetails(currentProperty.Split('^'), definitions);
+                Dictionary<string, string> propertyDetails = GetPropertyDetails(
+                    currentProperty.Split('^'),
+                    definitions
+                );
                 if (!await ValidatePropertyAsync(propertyDetails))
                 {
                     continue;
@@ -943,13 +1126,17 @@ namespace Hood.Services
 
             return allProperties;
         }
+
         /// <summary>
         /// Extracts the property information to a key/value dictionary based on the array of definitions from the file.
         /// </summary>
         /// <param name="currentProperty">The property array to populate the dictionary values.</param>
         /// <param name="definitions">The definitions array to populate the dictionary keys.</param>
         /// <returns></returns>
-        private Dictionary<string, string> GetPropertyDetails(string[] currentProperty, string[] definitions)
+        private Dictionary<string, string> GetPropertyDetails(
+            string[] currentProperty,
+            string[] definitions
+        )
         {
             Dictionary<string, string> detail = new Dictionary<string, string>();
             for (int i = 0; i < definitions.Count(); i++)
@@ -958,16 +1145,22 @@ namespace Hood.Services
             }
             return detail;
         }
+
         /// <summary>
         /// Takes the dictionary object and translates it into a full PropertyListing object, ready to insert to db.
         /// </summary>
         /// <param name="data">Property</param>
         /// <returns></returns>
-        private async Task<PropertyListing> ProcessPropertyAsync(PropertyListing property, Dictionary<string, string> data, bool validatingOnly = false)
+        private async Task<PropertyListing> ProcessPropertyAsync(
+            PropertyListing property,
+            Dictionary<string, string> data,
+            bool validatingOnly = false
+        )
         {
             CheckForCancel();
 
-            property.Status = data["PUBLISHED_FLAG"] == "1" ? ContentStatus.Published : ContentStatus.Archived;
+            property.Status =
+                data["PUBLISHED_FLAG"] == "1" ? ContentStatus.Published : ContentStatus.Archived;
 
             property.Reference = data["AGENT_REF"];
 
@@ -988,7 +1181,6 @@ namespace Hood.Services
 
             property.Bedrooms = bedrooms;
 
-
             string furnished = PropertyDetails.Furnished[int.Parse(data["LET_FURN_ID"])];
 
             string propertyType = PropertyDetails.PropertyTypes[int.Parse(data["PROP_SUB_ID"])];
@@ -1005,7 +1197,9 @@ namespace Hood.Services
                 {
                     property.AskingPrice = price;
 
-                    string priceQual = PropertyDetails.PriceQualifiers[int.Parse(data["PRICE_QUALIFIER"])];
+                    string priceQual = PropertyDetails.PriceQualifiers[
+                        int.Parse(data["PRICE_QUALIFIER"])
+                    ];
                     property.AskingPriceDisplay = priceQual;
                 }
                 else
@@ -1024,7 +1218,9 @@ namespace Hood.Services
                 if (data.ContainsKey("PRICE") && decimal.TryParse(data["PRICE"], out rent))
                 {
                     property.Rent = rent;
-                    string rentFreq = PropertyDetails.RentFrequency[int.Parse(data["LET_RENT_FREQUENCY"])];
+                    string rentFreq = PropertyDetails.RentFrequency[
+                        int.Parse(data["LET_RENT_FREQUENCY"])
+                    ];
                     property.RentDisplay = rentFreq;
                 }
                 else
@@ -1060,7 +1256,9 @@ namespace Hood.Services
             property.Address2 = data.ContainsKey("ADDRESS_3") ? data["ADDRESS_3"] : "";
             property.AgentId = _userId;
             property.AllowComments = false;
-            property.AgentInfo = data.ContainsKey("ADMINISTRATION_FEE") ? data["ADMINISTRATION_FEE"] : "";
+            property.AgentInfo = data.ContainsKey("ADMINISTRATION_FEE")
+                ? data["ADMINISTRATION_FEE"]
+                : "";
             property.City = data.ContainsKey("TOWN") ? data["TOWN"] : "";
             property.Confidential = false;
             property.Country = "United Kingdom";
@@ -1070,11 +1268,12 @@ namespace Hood.Services
             property.PublishDate = DateTime.Now;
             property.ShareCount = 0;
             property.ShortDescription = data["SUMMARY"];
-            property.Title = data.ContainsKey("DISPLAY_ADDRESS") ? data["DISPLAY_ADDRESS"] : property.Address1;
+            property.Title = data.ContainsKey("DISPLAY_ADDRESS")
+                ? data["DISPLAY_ADDRESS"]
+                : property.Address1;
             property.Views = 0;
 
             property.UserVars = "IMPORTED";
-
 
             // Geocode
             if (!validatingOnly)
@@ -1090,22 +1289,37 @@ namespace Hood.Services
                     {
                         case GoogleStatus.RequestDenied:
                             Lock.AcquireWriterLock(Timeout.Infinite);
-                            StatusMessage = "There was an error with the Google API [RequestDenied] this means your API account is not activated for Geocoding Requests.";
-                            await _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
+                            StatusMessage =
+                                "There was an error with the Google API [RequestDenied] this means your API account is not activated for Geocoding Requests.";
+                            await _logService.AddExceptionAsync<BlmFileImporter>(
+                                "BLM Property Importer: " + StatusMessage,
+                                ex
+                            );
                             Errors.Add(FormatLog(StatusMessage, property));
                             Lock.ReleaseWriterLock();
                             break;
                         case GoogleStatus.OverQueryLimit:
                             Lock.AcquireWriterLock(Timeout.Infinite);
-                            StatusMessage = "There was an error with the Google API [OverQueryLimit] this means your API account is has run out of Geocoding Requests.";
-                            await _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
+                            StatusMessage =
+                                "There was an error with the Google API [OverQueryLimit] this means your API account is has run out of Geocoding Requests.";
+                            await _logService.AddExceptionAsync<BlmFileImporter>(
+                                "BLM Property Importer: " + StatusMessage,
+                                ex
+                            );
                             Errors.Add(FormatLog(StatusMessage, property));
                             Lock.ReleaseWriterLock();
                             break;
                         default:
                             Lock.AcquireWriterLock(Timeout.Infinite);
-                            StatusMessage = "There was an error with the Google API [" + ex.Status.ToString() + "]: " + ex.Message;
-                            await _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
+                            StatusMessage =
+                                "There was an error with the Google API ["
+                                + ex.Status.ToString()
+                                + "]: "
+                                + ex.Message;
+                            await _logService.AddExceptionAsync<BlmFileImporter>(
+                                "BLM Property Importer: " + StatusMessage,
+                                ex
+                            );
                             Errors.Add(FormatLog(StatusMessage, property));
                             Lock.ReleaseWriterLock();
                             break;
@@ -1117,22 +1331,42 @@ namespace Hood.Services
                     StatusMessage = "There was an error GeoLocating the property.";
                     Errors.Add(FormatLog(StatusMessage, property));
                     Lock.ReleaseWriterLock();
-                    await _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
+                    await _logService.AddExceptionAsync<BlmFileImporter>(
+                        "BLM Property Importer: " + StatusMessage,
+                        ex
+                    );
                 }
             }
 
             return property;
         }
+
         private string FormatLog(string statusMessage, PropertyListing property = null)
         {
             if (property != null)
             {
-                return string.Format("<strong>[{0} {1}] [Property {2} - {3}]</strong>: {4}", DateTime.UtcNow.ToShortDateString(), DateTime.UtcNow.ToShortTimeString(), property.Id, property.Postcode, statusMessage);
+                return string.Format(
+                    "<strong>[{0} {1}] [Property {2} - {3}]</strong>: {4}",
+                    DateTime.UtcNow.ToShortDateString(),
+                    DateTime.UtcNow.ToShortTimeString(),
+                    property.Id,
+                    property.Postcode,
+                    statusMessage
+                );
             }
 
-            return string.Format("<strong>[{0} {1}]</strong>: {2}", DateTime.UtcNow.ToShortDateString(), DateTime.UtcNow.ToShortTimeString(), statusMessage);
+            return string.Format(
+                "<strong>[{0} {1}]</strong>: {2}",
+                DateTime.UtcNow.ToShortDateString(),
+                DateTime.UtcNow.ToShortTimeString(),
+                statusMessage
+            );
         }
-        private async Task<PropertyListing> UpdateMetadataAsync(PropertyListing property, Dictionary<string, string> data)
+
+        private async Task<PropertyListing> UpdateMetadataAsync(
+            PropertyListing property,
+            Dictionary<string, string> data
+        )
         {
             if (property.Metadata == null)
             {
@@ -1140,7 +1374,15 @@ namespace Hood.Services
             }
 
             string[] format = { "yyyy-MM-dd hh:mm:ss" };
-            if (DateTime.TryParseExact(data["LET_DATE_AVAILABLE"], format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime available))
+            if (
+                DateTime.TryParseExact(
+                    data["LET_DATE_AVAILABLE"],
+                    format,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.None,
+                    out DateTime available
+                )
+            )
             {
                 if (!property.HasMeta("LetDate"))
                 {
@@ -1151,7 +1393,6 @@ namespace Hood.Services
                     property.UpdateMeta("LetDate", available.ToString());
                 }
             }
-
 
             string furnished = PropertyDetails.Furnished[int.Parse(data["LET_FURN_ID"])];
             if (!property.HasMeta("Furnished"))
@@ -1188,25 +1429,53 @@ namespace Hood.Services
 
             try
             {
-
                 bool includesWater = data["LET_BILL_INC_WATER"] == "Y";
-                property = AddMeta(property, "Bill.IncludesWater", JsonConvert.SerializeObject(includesWater), "System.Boolean");
+                property = AddMeta(
+                    property,
+                    "Bill.IncludesWater",
+                    JsonConvert.SerializeObject(includesWater),
+                    "System.Boolean"
+                );
 
                 bool includesGas = data["LET_BILL_INC_GAS"] == "Y";
-                property = AddMeta(property, "Bill.IncludesGas", JsonConvert.SerializeObject(includesGas), "System.Boolean");
+                property = AddMeta(
+                    property,
+                    "Bill.IncludesGas",
+                    JsonConvert.SerializeObject(includesGas),
+                    "System.Boolean"
+                );
 
                 bool includesElectricity = data["LET_BILL_INC_ELECTRICITY"] == "Y";
-                property = AddMeta(property, "Bill.IncludesElectricity", JsonConvert.SerializeObject(includesElectricity), "System.Boolean");
+                property = AddMeta(
+                    property,
+                    "Bill.IncludesElectricity",
+                    JsonConvert.SerializeObject(includesElectricity),
+                    "System.Boolean"
+                );
 
                 bool includesTvLicense = data["LET_BILL_INC_TV_LICENCE"] == "Y";
-                property = AddMeta(property, "Bill.IncludesTVLicense", JsonConvert.SerializeObject(includesTvLicense), "System.Boolean");
+                property = AddMeta(
+                    property,
+                    "Bill.IncludesTVLicense",
+                    JsonConvert.SerializeObject(includesTvLicense),
+                    "System.Boolean"
+                );
 
                 bool includesTv = data["LET_BILL_INC_TV_SUBSCRIPTION"] == "Y";
-                property = AddMeta(property, "Bill.IncludesTVSubscription", JsonConvert.SerializeObject(includesTv), "System.Boolean");
+                property = AddMeta(
+                    property,
+                    "Bill.IncludesTVSubscription",
+                    JsonConvert.SerializeObject(includesTv),
+                    "System.Boolean"
+                );
 
                 bool includesInternet = data["LET_BILL_INC_INTERNET"] == "Y";
-                property = AddMeta(property, "Bill.IncludesInternet", JsonConvert.SerializeObject(includesInternet), "System.Boolean");
-
+                property = AddMeta(
+                    property,
+                    "Bill.IncludesInternet",
+                    JsonConvert.SerializeObject(includesInternet),
+                    "System.Boolean"
+                );
             }
             catch (Exception ex)
             {
@@ -1214,11 +1483,22 @@ namespace Hood.Services
                 StatusMessage = "Could not get the bills inclusive data for the property.";
                 Warnings.Add(FormatLog(StatusMessage, property));
                 Lock.ReleaseWriterLock();
-                await _logService.AddExceptionAsync<BlmFileImporter>(StatusMessage, property, ex, LogType.Warning);
+                await _logService.AddExceptionAsync<BlmFileImporter>(
+                    StatusMessage,
+                    property,
+                    ex,
+                    LogType.Warning
+                );
             }
             return property;
         }
-        private PropertyListing AddMeta(PropertyListing property, string key, string value, string type)
+
+        private PropertyListing AddMeta(
+            PropertyListing property,
+            string key,
+            string value,
+            string type
+        )
         {
             if (!property.HasMeta(key))
             {
@@ -1231,6 +1511,7 @@ namespace Hood.Services
 
             return property;
         }
+
         #region "Externals"
 
         public bool IsRunning()
@@ -1240,6 +1521,7 @@ namespace Hood.Services
             Lock.ReleaseReaderLock();
             return running;
         }
+
         public bool IsComplete()
         {
             Lock.AcquireReaderLock(Timeout.Infinite);
@@ -1247,6 +1529,7 @@ namespace Hood.Services
             Lock.ReleaseReaderLock();
             return !running;
         }
+
         public void Kill()
         {
             // stop any threads belonging to this
@@ -1257,13 +1540,17 @@ namespace Hood.Services
             // stop the ftp service
             _ftp.Kill();
         }
+
         public PropertyImporterReport Report()
         {
             Lock.AcquireReaderLock(Timeout.Infinite);
             PropertyImporterReport report = new PropertyImporterReport
             {
                 Added = Added,
-                Complete = Succeeded ? 100 : Tasks > 0 ? (CompletedTasks / (double)Tasks) * 100 : 0,
+                Complete =
+                    Succeeded ? 100
+                    : Tasks > 0 ? (CompletedTasks / (double)Tasks) * 100
+                    : 0,
                 Deleted = Deleted,
                 Processed = Processed,
                 Running = Running,
@@ -1274,7 +1561,7 @@ namespace Hood.Services
                 ToDelete = ToDelete,
                 ToUpdate = ToUpdate,
                 Errors = Errors,
-                Warnings = Warnings
+                Warnings = Warnings,
             };
             Lock.ReleaseReaderLock();
             return report;
@@ -1298,6 +1585,7 @@ namespace Hood.Services
             CompletedTasks++;
             Lock.ReleaseWriterLock();
         }
+
         private void CheckForCancel()
         {
             Lock.AcquireWriterLock(Timeout.Infinite);
@@ -1311,6 +1599,7 @@ namespace Hood.Services
                 throw new Exception("Action cancelled...");
             }
         }
+
         private bool HasFileError()
         {
             bool fileError = false;
@@ -1319,6 +1608,7 @@ namespace Hood.Services
             Lock.ReleaseWriterLock();
             return fileError;
         }
+
         private async Task<bool> SaveChangesToDatabaseAsync()
         {
             var saved = false;
@@ -1344,10 +1634,7 @@ namespace Hood.Services
                                 var proposedValue = proposedValues[property];
                                 var databaseValue = databaseValues[property];
 
-                                if (proposedValue != databaseValue)
-                                {
-
-                                }
+                                if (proposedValue != databaseValue) { }
                                 // TODO: decide which value should be written to database
                                 // proposedValues[property] = <value to be saved>;
                             }
@@ -1359,7 +1646,8 @@ namespace Hood.Services
                         {
                             throw new NotSupportedException(
                                 "Don't know how to handle concurrency conflicts for "
-                                + entry.Metadata.Name);
+                                    + entry.Metadata.Name
+                            );
                         }
                     }
                 }
@@ -1367,6 +1655,5 @@ namespace Hood.Services
             return saved;
         }
         #endregion
-
     }
 }

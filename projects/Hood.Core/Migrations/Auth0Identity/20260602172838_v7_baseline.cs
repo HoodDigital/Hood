@@ -16,15 +16,24 @@ namespace Hood.Core.Migrations.Auth0Identity
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Name = table.Column<string>(
+                        type: "nvarchar(256)",
+                        maxLength: 256,
+                        nullable: true
+                    ),
+                    NormalizedName = table.Column<string>(
+                        type: "nvarchar(256)",
+                        maxLength: 256,
+                        nullable: true
+                    ),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RemoteId = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    RemoteId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetRoles", x => x.Id);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "AspNetUsers",
@@ -38,8 +47,14 @@ namespace Hood.Core.Migrations.Auth0Identity
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BillingAddressJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DeliveryAddressJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BillingAddressJson = table.Column<string>(
+                        type: "nvarchar(max)",
+                        nullable: true
+                    ),
+                    DeliveryAddressJson = table.Column<string>(
+                        type: "nvarchar(max)",
+                        nullable: true
+                    ),
                     AvatarJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserVars = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
@@ -52,12 +67,16 @@ namespace Hood.Core.Migrations.Auth0Identity
                     AccessFailedCount = table.Column<int>(type: "int", nullable: false),
                     TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
                     LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    LockoutEnd = table.Column<DateTimeOffset>(
+                        type: "datetimeoffset",
+                        nullable: true
+                    ),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "AspNetAuth0Identities",
@@ -67,7 +86,7 @@ namespace Hood.Core.Migrations.Auth0Identity
                     LocalUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     IsPrimary = table.Column<bool>(type: "bit", nullable: false),
                     Picture = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Provider = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Provider = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -77,15 +96,17 @@ namespace Hood.Core.Migrations.Auth0Identity
                         column: x => x.LocalUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -95,47 +116,49 @@ namespace Hood.Core.Migrations.Auth0Identity
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade
+                    );
                     table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetAuth0Identities_LocalUserId",
                 table: "AspNetAuth0Identities",
-                column: "LocalUserId");
+                column: "LocalUserId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
                 unique: true,
-                filter: "[NormalizedName] IS NOT NULL");
+                filter: "[NormalizedName] IS NOT NULL"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserRoles_RoleId",
                 table: "AspNetUserRoles",
-                column: "RoleId");
+                column: "RoleId"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "AspNetAuth0Identities");
+            migrationBuilder.DropTable(name: "AspNetAuth0Identities");
 
-            migrationBuilder.DropTable(
-                name: "AspNetUserRoles");
+            migrationBuilder.DropTable(name: "AspNetUserRoles");
 
-            migrationBuilder.DropTable(
-                name: "AspNetRoles");
+            migrationBuilder.DropTable(name: "AspNetRoles");
 
-            migrationBuilder.DropTable(
-                name: "AspNetUsers");
+            migrationBuilder.DropTable(name: "AspNetUsers");
         }
     }
 }

@@ -1,13 +1,13 @@
-﻿using Hood.Extensions;
+﻿using System.Collections.Generic;
+using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace Hood.ViewModels
 {
     public class AddressListModel : PagedList<Address>, IPageableModel
-    {        // Params
+    { // Params
         [FromQuery(Name = "user")]
         public string UserId { get; set; }
         public UserProfile UserProfile { get; set; }
@@ -18,6 +18,5 @@ namespace Hood.ViewModels
             query += UserId.IsSet() ? "&user=" + UserId : "";
             return query;
         }
-
     }
 }

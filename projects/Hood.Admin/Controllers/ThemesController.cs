@@ -10,8 +10,6 @@ namespace Hood.Areas.Admin.Controllers
     public class ThemesController : BaseThemesController
     {
         public ThemesController()
-            : base()
-        {
-        }
+            : base() { }
     }
 }

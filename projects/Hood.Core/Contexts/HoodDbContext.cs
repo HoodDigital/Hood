@@ -1,4 +1,8 @@
-﻿using Hood.Contexts;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Hood.Contexts;
 using Hood.Core;
 using Hood.Entities;
 using Hood.Enums;
@@ -13,19 +17,13 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Hood.Models
 {
     public class HoodDbContext : DbContext
     {
         public HoodDbContext(DbContextOptions<HoodDbContext> options)
-            : base(options)
-        {
-        }
+            : base(options) { }
 
         // Media
         public DbSet<MediaObject> Media { get; set; }
@@ -54,8 +52,18 @@ namespace Hood.Models
             builder.Entity<MediaObject>().ToTable("HoodMedia");
             builder.Entity<MediaObject>().Property(b => b.Path).HasColumnName("Directory");
             builder.Entity<MediaDirectory>().ToTable("HoodMediaDirectories");
-            builder.Entity<MediaDirectory>().HasOne(m => m.Parent).WithMany(m => m.Children).HasForeignKey(m => m.ParentId).OnDelete(DeleteBehavior.Restrict);
-            builder.Entity<MediaObject>().HasOne(m => m.Directory).WithMany(m => m.Media).HasForeignKey(m => m.DirectoryId).OnDelete(DeleteBehavior.Restrict);
+            builder
+                .Entity<MediaDirectory>()
+                .HasOne(m => m.Parent)
+                .WithMany(m => m.Children)
+                .HasForeignKey(m => m.ParentId)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder
+                .Entity<MediaObject>()
+                .HasOne(m => m.Directory)
+                .WithMany(m => m.Media)
+                .HasForeignKey(m => m.DirectoryId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Log.User is the only path that reaches the identity entities from HoodDbContext. The nav is
             // unused (nothing .Include()s it) and pulling it in made EF generate standalone ApplicationUser
@@ -64,25 +72,24 @@ namespace Hood.Models
             builder.Entity<Log>().Ignore(l => l.User);
         }
 
-        public DbSet<TEntity> Set<TEntity, TKey>() where TEntity : BaseEntity<TKey>
+        public DbSet<TEntity> Set<TEntity, TKey>()
+            where TEntity : BaseEntity<TKey>
         {
             return base.Set<TEntity>();
         }
 
-        public async virtual Task Seed(IHoodIdentityContext identityContext)
+        public virtual async Task Seed(IHoodIdentityContext identityContext)
         {
             await CheckDatabaseIsInitialisedAsync();
 
             var siteAdmin = await identityContext.GetSiteAdmin();
 
-            var siteOwnerRef = await Options.SingleOrDefaultAsync(o => o.Id == "Hood.Settings.SiteOwner");
+            var siteOwnerRef = await Options.SingleOrDefaultAsync(o =>
+                o.Id == "Hood.Settings.SiteOwner"
+            );
             if (siteOwnerRef == null)
             {
-                Options.Add(new Option
-                {
-                    Id = "Hood.Settings.SiteOwner",
-                    Value = siteAdmin.Id
-                });
+                Options.Add(new Option { Id = "Hood.Settings.SiteOwner", Value = siteAdmin.Id });
             }
             else
             {
@@ -103,37 +110,96 @@ namespace Hood.Models
             }
             catch (SqlException ex)
             {
-                if (ex.Message.Contains("Login failed for user") || ex.Message.Contains("permission was denied"))
+                if (
+                    ex.Message.Contains("Login failed for user")
+                    || ex.Message.Contains("permission was denied")
+                )
                 {
-                    throw new StartupException("There was a problem connecting to the database.", ex, StartupError.DatabaseConnectionFailed);
+                    throw new StartupException(
+                        "There was a problem connecting to the database.",
+                        ex,
+                        StartupError.DatabaseConnectionFailed
+                    );
                 }
                 else if (ex.Message.Contains("Invalid object name"))
                 {
-                    throw new StartupException("There are migrations missing.", ex, StartupError.MigrationMissing);
+                    throw new StartupException(
+                        "There are migrations missing.",
+                        ex,
+                        StartupError.MigrationMissing
+                    );
                 }
             }
         }
 
         protected virtual async Task SetupHoodMediaDirectoriesAsync(string siteAdminId)
         {
-            if (!MediaDirectories.Any(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System))
+            if (
+                !MediaDirectories.Any(o =>
+                    o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System
+                )
+            )
             {
-                MediaDirectories.Add(new MediaDirectory { DisplayName = "Default", Slug = MediaManager.SiteDirectorySlug, OwnerId = siteAdminId, Type = DirectoryType.System });
+                MediaDirectories.Add(
+                    new MediaDirectory
+                    {
+                        DisplayName = "Default",
+                        Slug = MediaManager.SiteDirectorySlug,
+                        OwnerId = siteAdminId,
+                        Type = DirectoryType.System,
+                    }
+                );
             }
 
-            if (!MediaDirectories.Any(o => o.Slug == MediaManager.UserDirectorySlug && o.Type == DirectoryType.System))
+            if (
+                !MediaDirectories.Any(o =>
+                    o.Slug == MediaManager.UserDirectorySlug && o.Type == DirectoryType.System
+                )
+            )
             {
-                MediaDirectories.Add(new MediaDirectory { DisplayName = "User Media", Slug = MediaManager.UserDirectorySlug, OwnerId = siteAdminId, Type = DirectoryType.System });
+                MediaDirectories.Add(
+                    new MediaDirectory
+                    {
+                        DisplayName = "User Media",
+                        Slug = MediaManager.UserDirectorySlug,
+                        OwnerId = siteAdminId,
+                        Type = DirectoryType.System,
+                    }
+                );
             }
 
-            if (!MediaDirectories.Any(o => o.Slug == MediaManager.ContentDirectorySlug && o.Type == DirectoryType.System))
+            if (
+                !MediaDirectories.Any(o =>
+                    o.Slug == MediaManager.ContentDirectorySlug && o.Type == DirectoryType.System
+                )
+            )
             {
-                MediaDirectories.Add(new MediaDirectory { DisplayName = "Content", Slug = MediaManager.ContentDirectorySlug, OwnerId = siteAdminId, Type = DirectoryType.System });
+                MediaDirectories.Add(
+                    new MediaDirectory
+                    {
+                        DisplayName = "Content",
+                        Slug = MediaManager.ContentDirectorySlug,
+                        OwnerId = siteAdminId,
+                        Type = DirectoryType.System,
+                    }
+                );
             }
 
-            if (!MediaDirectories.Any(o => o.Slug == MediaManager.PropertyDirectorySlug && o.Type == DirectoryType.System))
+            if (
+                !MediaDirectories.Any(o =>
+                    o.Slug == MediaManager.PropertyDirectorySlug && o.Type == DirectoryType.System
+                )
+            )
             {
-                MediaDirectories.Add(new MediaDirectory { DisplayName = "Property", Slug = MediaManager.PropertyDirectorySlug, OwnerId = siteAdminId, Type = DirectoryType.System });
+                MediaDirectories.Add(
+                    new MediaDirectory
+                    {
+                        DisplayName = "Property",
+                        Slug = MediaManager.PropertyDirectorySlug,
+                        OwnerId = siteAdminId,
+                        Type = DirectoryType.System,
+                    }
+                );
             }
             await SaveChangesAsync();
         }
@@ -142,7 +208,13 @@ namespace Hood.Models
         {
             if (!Options.Any(o => o.Id == "Hood.Settings.Theme"))
             {
-                Options.Add(new Option { Id = "Hood.Settings.Theme", Value = JsonConvert.SerializeObject("default") });
+                Options.Add(
+                    new Option
+                    {
+                        Id = "Hood.Settings.Theme",
+                        Value = JsonConvert.SerializeObject("default"),
+                    }
+                );
             }
 
             if (!Options.Any(o => o.Id == typeof(AccountSettings).ToString()))
@@ -151,12 +223,26 @@ namespace Hood.Models
                 if (Options.Any(o => o.Id == "Hood.Settings.Account"))
                 {
                     Option option = Options.Find("Hood.Settings.Account");
-                    AccountSettings setting = JsonConvert.DeserializeObject<AccountSettings>(option.Value);
-                    Options.Add(new Option { Id = typeof(AccountSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
+                    AccountSettings setting = JsonConvert.DeserializeObject<AccountSettings>(
+                        option.Value
+                    );
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(AccountSettings).ToString(),
+                            Value = JsonConvert.SerializeObject(setting),
+                        }
+                    );
                 }
                 else
                 {
-                    Options.Add(new Option { Id = typeof(AccountSettings).ToString(), Value = JsonConvert.SerializeObject(new AccountSettings()) });
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(AccountSettings).ToString(),
+                            Value = JsonConvert.SerializeObject(new AccountSettings()),
+                        }
+                    );
                 }
             }
 
@@ -166,12 +252,26 @@ namespace Hood.Models
                 if (Options.Any(o => o.Id == "Hood.Settings.Basic"))
                 {
                     Option option = Options.Find("Hood.Settings.Basic");
-                    BasicSettings setting = JsonConvert.DeserializeObject<BasicSettings>(option.Value);
-                    Options.Add(new Option { Id = typeof(BasicSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
+                    BasicSettings setting = JsonConvert.DeserializeObject<BasicSettings>(
+                        option.Value
+                    );
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(BasicSettings).ToString(),
+                            Value = JsonConvert.SerializeObject(setting),
+                        }
+                    );
                 }
                 else
                 {
-                    Options.Add(new Option { Id = typeof(BasicSettings).ToString(), Value = JsonConvert.SerializeObject(new BasicSettings()) });
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(BasicSettings).ToString(),
+                            Value = JsonConvert.SerializeObject(new BasicSettings()),
+                        }
+                    );
                 }
             }
 
@@ -181,12 +281,26 @@ namespace Hood.Models
                 if (Options.Any(o => o.Id == "Hood.Settings.Contact"))
                 {
                     Option option = Options.Find("Hood.Settings.Contact");
-                    ContactSettings setting = JsonConvert.DeserializeObject<ContactSettings>(option.Value);
-                    Options.Add(new Option { Id = typeof(ContactSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
+                    ContactSettings setting = JsonConvert.DeserializeObject<ContactSettings>(
+                        option.Value
+                    );
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(ContactSettings).ToString(),
+                            Value = JsonConvert.SerializeObject(setting),
+                        }
+                    );
                 }
                 else
                 {
-                    Options.Add(new Option { Id = typeof(ContactSettings).ToString(), Value = JsonConvert.SerializeObject(new ContactSettings()) });
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(ContactSettings).ToString(),
+                            Value = JsonConvert.SerializeObject(new ContactSettings()),
+                        }
+                    );
                 }
             }
 
@@ -196,12 +310,26 @@ namespace Hood.Models
                 if (Options.Any(o => o.Id == "Hood.Settings.Content"))
                 {
                     Option option = Options.Find("Hood.Settings.Content");
-                    ContentSettings setting = JsonConvert.DeserializeObject<ContentSettings>(option.Value);
-                    Options.Add(new Option { Id = typeof(ContentSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
+                    ContentSettings setting = JsonConvert.DeserializeObject<ContentSettings>(
+                        option.Value
+                    );
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(ContentSettings).ToString(),
+                            Value = JsonConvert.SerializeObject(setting),
+                        }
+                    );
                 }
                 else
                 {
-                    Options.Add(new Option { Id = typeof(ContentSettings).ToString(), Value = JsonConvert.SerializeObject(new ContentSettings()) });
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(ContentSettings).ToString(),
+                            Value = JsonConvert.SerializeObject(new ContentSettings()),
+                        }
+                    );
                 }
             }
 
@@ -211,12 +339,25 @@ namespace Hood.Models
                 if (Options.Any(o => o.Id == "Hood.Settings.Integrations"))
                 {
                     Option option = Options.Find("Hood.Settings.Integrations");
-                    IntegrationSettings setting = JsonConvert.DeserializeObject<IntegrationSettings>(option.Value);
-                    Options.Add(new Option { Id = typeof(IntegrationSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
+                    IntegrationSettings setting =
+                        JsonConvert.DeserializeObject<IntegrationSettings>(option.Value);
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(IntegrationSettings).ToString(),
+                            Value = JsonConvert.SerializeObject(setting),
+                        }
+                    );
                 }
                 else
                 {
-                    Options.Add(new Option { Id = typeof(IntegrationSettings).ToString(), Value = JsonConvert.SerializeObject(new IntegrationSettings()) });
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(IntegrationSettings).ToString(),
+                            Value = JsonConvert.SerializeObject(new IntegrationSettings()),
+                        }
+                    );
                 }
             }
 
@@ -226,12 +367,26 @@ namespace Hood.Models
                 if (Options.Any(o => o.Id == "Hood.Settings.Mail"))
                 {
                     Option option = Options.Find("Hood.Settings.Mail");
-                    MailSettings setting = JsonConvert.DeserializeObject<MailSettings>(option.Value);
-                    Options.Add(new Option { Id = typeof(MailSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
+                    MailSettings setting = JsonConvert.DeserializeObject<MailSettings>(
+                        option.Value
+                    );
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(MailSettings).ToString(),
+                            Value = JsonConvert.SerializeObject(setting),
+                        }
+                    );
                 }
                 else
                 {
-                    Options.Add(new Option { Id = typeof(MailSettings).ToString(), Value = JsonConvert.SerializeObject(new MailSettings()) });
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(MailSettings).ToString(),
+                            Value = JsonConvert.SerializeObject(new MailSettings()),
+                        }
+                    );
                 }
             }
 
@@ -241,12 +396,26 @@ namespace Hood.Models
                 if (Options.Any(o => o.Id == "Hood.Settings.Media"))
                 {
                     Option option = Options.Find("Hood.Settings.Media");
-                    MediaSettings setting = JsonConvert.DeserializeObject<MediaSettings>(option.Value);
-                    Options.Add(new Option { Id = typeof(MediaSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
+                    MediaSettings setting = JsonConvert.DeserializeObject<MediaSettings>(
+                        option.Value
+                    );
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(MediaSettings).ToString(),
+                            Value = JsonConvert.SerializeObject(setting),
+                        }
+                    );
                 }
                 else
                 {
-                    Options.Add(new Option { Id = typeof(MediaSettings).ToString(), Value = JsonConvert.SerializeObject(new MediaSettings()) });
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(MediaSettings).ToString(),
+                            Value = JsonConvert.SerializeObject(new MediaSettings()),
+                        }
+                    );
                 }
             }
 
@@ -256,12 +425,26 @@ namespace Hood.Models
                 if (Options.Any(o => o.Id == "Hood.Settings.Property"))
                 {
                     Option option = Options.Find("Hood.Settings.Property");
-                    PropertySettings setting = JsonConvert.DeserializeObject<PropertySettings>(option.Value);
-                    Options.Add(new Option { Id = typeof(PropertySettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
+                    PropertySettings setting = JsonConvert.DeserializeObject<PropertySettings>(
+                        option.Value
+                    );
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(PropertySettings).ToString(),
+                            Value = JsonConvert.SerializeObject(setting),
+                        }
+                    );
                 }
                 else
                 {
-                    Options.Add(new Option { Id = typeof(PropertySettings).ToString(), Value = JsonConvert.SerializeObject(new PropertySettings()) });
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(PropertySettings).ToString(),
+                            Value = JsonConvert.SerializeObject(new PropertySettings()),
+                        }
+                    );
                 }
             }
 
@@ -272,11 +455,23 @@ namespace Hood.Models
                 {
                     Option option = Options.Find("Hood.Settings.Seo");
                     SeoSettings setting = JsonConvert.DeserializeObject<SeoSettings>(option.Value);
-                    Options.Add(new Option { Id = typeof(SeoSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(SeoSettings).ToString(),
+                            Value = JsonConvert.SerializeObject(setting),
+                        }
+                    );
                 }
                 else
                 {
-                    Options.Add(new Option { Id = typeof(SeoSettings).ToString(), Value = JsonConvert.SerializeObject(new SeoSettings()) });
+                    Options.Add(
+                        new Option
+                        {
+                            Id = typeof(SeoSettings).ToString(),
+                            Value = JsonConvert.SerializeObject(new SeoSettings()),
+                        }
+                    );
                 }
             }
             await SaveChangesAsync();
@@ -290,10 +485,27 @@ namespace Hood.Models
                 await SaveChangesAsync();
 
                 // Translate any un directoried images.
-                MediaDirectory defaultDir = MediaDirectories.AsNoTracking().SingleOrDefault(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System);
-                MediaDirectory contentDir = MediaDirectories.AsNoTracking().SingleOrDefault(o => o.Slug == MediaManager.ContentDirectorySlug && o.Type == DirectoryType.System);
-                MediaDirectory propertyDir = MediaDirectories.AsNoTracking().SingleOrDefault(o => o.Slug == MediaManager.PropertyDirectorySlug && o.Type == DirectoryType.System);
-                Media.Where(o => o.FileType == "directory/dir").ToList().ForEach(a => Entry(a).State = EntityState.Deleted);
+                MediaDirectory defaultDir = MediaDirectories
+                    .AsNoTracking()
+                    .SingleOrDefault(o =>
+                        o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System
+                    );
+                MediaDirectory contentDir = MediaDirectories
+                    .AsNoTracking()
+                    .SingleOrDefault(o =>
+                        o.Slug == MediaManager.ContentDirectorySlug
+                        && o.Type == DirectoryType.System
+                    );
+                MediaDirectory propertyDir = MediaDirectories
+                    .AsNoTracking()
+                    .SingleOrDefault(o =>
+                        o.Slug == MediaManager.PropertyDirectorySlug
+                        && o.Type == DirectoryType.System
+                    );
+                Media
+                    .Where(o => o.FileType == "directory/dir")
+                    .ToList()
+                    .ForEach(a => Entry(a).State = EntityState.Deleted);
                 try
                 {
                     if (Media.Any(o => o.DirectoryId == null))
@@ -303,33 +515,45 @@ namespace Hood.Models
                         // ExecuteSql (FormattableString) parameterises the interpolated values
                         // automatically — replaces the deprecated ExecuteSqlRaw (HOOD-48 #3).
                         int affectedRows = Database.ExecuteSql(
-                            $"UPDATE HoodMedia SET DirectoryId = {propertyDir.Id} WHERE DirectoryId IS NULL AND Directory = 'Property'");
+                            $"UPDATE HoodMedia SET DirectoryId = {propertyDir.Id} WHERE DirectoryId IS NULL AND Directory = 'Property'"
+                        );
 
                         Option option = Options.Find(typeof(ContentSettings).ToString());
-                        var contentSettings = JsonConvert.DeserializeObject<ContentSettings>(option.Value);
+                        var contentSettings = JsonConvert.DeserializeObject<ContentSettings>(
+                            option.Value
+                        );
                         foreach (var type in contentSettings.Types)
                         {
                             // Bug fix (HOOD-48 #3): the old raw SQL had '@Directory' quoted as a string
                             // literal, so the parameter was never substituted and only 'Property' media
                             // was ever re-pointed. Interpolation makes type.TypeName a real parameter.
                             affectedRows = Database.ExecuteSql(
-                                $"UPDATE HoodMedia SET DirectoryId = {contentDir.Id} WHERE DirectoryId IS NULL AND Directory = {type.TypeName}");
+                                $"UPDATE HoodMedia SET DirectoryId = {contentDir.Id} WHERE DirectoryId IS NULL AND Directory = {type.TypeName}"
+                            );
                         }
 
                         affectedRows = Database.ExecuteSql(
-                            $"UPDATE HoodMedia SET DirectoryId = {defaultDir.Id} WHERE DirectoryId IS NULL");
-
+                            $"UPDATE HoodMedia SET DirectoryId = {defaultDir.Id} WHERE DirectoryId IS NULL"
+                        );
                     }
                 }
                 catch (SqlException ex)
                 {
-                    throw new StartupException("Error updating the media entries.", ex, StartupError.DatabaseMediaError);
+                    throw new StartupException(
+                        "Error updating the media entries.",
+                        ex,
+                        StartupError.DatabaseMediaError
+                    );
                 }
                 catch (DbUpdateException ex)
                 {
                     if (ex.InnerException != null && ex.InnerException.Message.Contains("Timeout"))
                     {
-                        throw new StartupException("Error updating the media entries.", ex, StartupError.DatabaseMediaError);
+                        throw new StartupException(
+                            "Error updating the media entries.",
+                            ex,
+                            StartupError.DatabaseMediaError
+                        );
                     }
                 }
             }
@@ -351,7 +575,7 @@ namespace Hood.Models
             await SaveChangesAsync();
         }
     }
-    
+
     /// <summary>
     /// Factory for creating the HoodDbContext, only used for script creation.
     /// </summary>

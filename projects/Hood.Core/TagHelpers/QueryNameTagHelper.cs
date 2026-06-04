@@ -21,7 +21,10 @@ namespace Hood.TagHelpers
             // Process only if 'maxlength' attribute is not present already
             if (For.ModelExplorer.Metadata.BinderModelName.IsSet())
             {
-                output.Attributes.SetAttribute("name", $"{For.ModelExplorer.Metadata.BinderModelName}");
+                output.Attributes.SetAttribute(
+                    "name",
+                    $"{For.ModelExplorer.Metadata.BinderModelName}"
+                );
             }
         }
     }

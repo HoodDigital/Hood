@@ -190,10 +190,16 @@ namespace Hood.Core
                 { "dna", "application/vnd.dna" },
                 { "doc", "application/msword" },
                 { "docm", "application/vnd.ms-word.document.macroenabled.12" },
-                { "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+                {
+                    "docx",
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                },
                 { "dot", "application/msword" },
                 { "dotm", "application/vnd.ms-word.template.macroenabled.12" },
-                { "dotx", "application/vnd.openxmlformats-officedocument.wordprocessingml.template" },
+                {
+                    "dotx",
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.template"
+                },
                 { "dp", "application/vnd.osgi.dp" },
                 { "dpg", "application/vnd.dpgraph" },
                 { "dra", "audio/vnd.dra" },
@@ -624,10 +630,16 @@ namespace Hood.Core
                 { "ppm", "image/x-portable-pixmap" },
                 { "pps", "application/vnd.ms-powerpoint" },
                 { "ppsm", "application/vnd.ms-powerpoint.slideshow.macroenabled.12" },
-                { "ppsx", "application/vnd.openxmlformats-officedocument.presentationml.slideshow" },
+                {
+                    "ppsx",
+                    "application/vnd.openxmlformats-officedocument.presentationml.slideshow"
+                },
                 { "ppt", "application/vnd.ms-powerpoint" },
                 { "pptm", "application/vnd.ms-powerpoint.presentation.macroenabled.12" },
-                { "pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation" },
+                {
+                    "pptx",
+                    "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+                },
                 { "pqa", "application/vnd.palm" },
                 { "prc", "application/x-mobipocket-ebook" },
                 { "pre", "application/vnd.lotus-freelance" },

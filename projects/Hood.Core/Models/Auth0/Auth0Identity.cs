@@ -11,8 +11,7 @@ namespace Hood.Models
 {
     public class Auth0Identity
     {
-        public Auth0Identity()
-        { }
+        public Auth0Identity() { }
 
         public Auth0Identity(Auth0.ManagementApi.Models.Identity identity)
         {
@@ -23,12 +22,13 @@ namespace Hood.Models
         [Key]
         [JsonIgnore]
         public string Id { get; set; }
-        
+
         [JsonIgnore]
         public string LocalUserId { get; set; }
+
         [JsonIgnore]
         public Auth0User User { get; set; }
-        
+
         [JsonIgnore]
         public bool IsPrimary { get; set; }
         public string Picture { get; set; }
@@ -51,6 +51,7 @@ namespace Hood.Models
                     return "<i class='fa fa-external-link me-2'></i>Extenal";
             }
         }
+
         public string ToProviderString()
         {
             switch (Provider)
@@ -68,7 +69,5 @@ namespace Hood.Models
                     return "External";
             }
         }
-
-
     }
 }

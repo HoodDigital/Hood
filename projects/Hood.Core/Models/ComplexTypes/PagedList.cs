@@ -1,12 +1,12 @@
-﻿using Hood.Attributes;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
+using Hood.Attributes;
 using Hood.BaseTypes;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace System.Collections.Generic
 {
@@ -18,7 +18,7 @@ namespace System.Collections.Generic
     public partial class PagedList<T> : SaveableModel, IPagedList<T>
     {
         private List<T> _list;
-        
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -60,7 +60,10 @@ namespace System.Collections.Generic
         /// </summary>
         [RouteIgnore]
         [JsonProperty("totalCount")]
-        [Display(Name = "Total Records", Description = "Total number of results returned from this set.")]
+        [Display(
+            Name = "Total Records",
+            Description = "Total number of results returned from this set."
+        )]
         public int TotalCount { get; set; }
 
         /// <summary>
@@ -78,6 +81,7 @@ namespace System.Collections.Generic
         [JsonProperty("sort")]
         [Display(Name = "Sorting Order", Description = "The order for the results to be returned.")]
         public string Order { get; set; }
+
         /// <summary>
         /// Search filter - Used with <see cref="Hood.Interfaces.IPageableModel"/> sorting functions.
         /// </summary>
@@ -92,13 +96,13 @@ namespace System.Collections.Generic
         [RouteIgnore]
         [JsonProperty("hasPreviousPage")]
         public bool HasPreviousPage => (PageIndex > 1);
+
         /// <summary>
         /// Has next page
         /// </summary>
         [RouteIgnore]
         [JsonProperty("hasNextPage")]
         public bool HasNextPage => (PageIndex < TotalPages);
-
 
         public List<T> List
         {
@@ -154,7 +158,11 @@ namespace System.Collections.Generic
             return this;
         }
 
-        public async Threading.Tasks.Task<IPagedList<T>> ReloadAsync(IQueryable<T> source, int pageIndex, int pageSize)
+        public async Threading.Tasks.Task<IPagedList<T>> ReloadAsync(
+            IQueryable<T> source,
+            int pageIndex,
+            int pageSize
+        )
         {
             int total = await source.CountAsync();
             TotalCount = total;
@@ -173,7 +181,9 @@ namespace System.Collections.Generic
             }
             else
             {
-                _list.AddRange(await source.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToListAsync());
+                _list.AddRange(
+                    await source.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToListAsync()
+                );
             }
 
             return this;
@@ -196,7 +206,9 @@ namespace System.Collections.Generic
             }
             else
             {
-                _list.AddRange(await source.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToListAsync());
+                _list.AddRange(
+                    await source.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToListAsync()
+                );
             }
 
             return this;

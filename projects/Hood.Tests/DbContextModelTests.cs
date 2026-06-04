@@ -29,14 +29,25 @@ namespace Hood.Tests
             Assert.NotEmpty(entityTypes);
         }
 
-        private static DbContext Create(string name) => name switch
-        {
-            "HoodDbContext" => new HoodDbContextFactory().CreateDbContext(Array.Empty<string>()),
-            "ContentContext" => new ContentContextFactory().CreateDbContext(Array.Empty<string>()),
-            "PropertyContext" => new PropertyContextFactory().CreateDbContext(Array.Empty<string>()),
-            "IdentityContext" => new IdentityContextFactory().CreateDbContext(Array.Empty<string>()),
-            "Auth0IdentityContext" => new Auth0IdentityContextFactory().CreateDbContext(Array.Empty<string>()),
-            _ => throw new ArgumentOutOfRangeException(nameof(name), name, "Unknown context"),
-        };
+        private static DbContext Create(string name) =>
+            name switch
+            {
+                "HoodDbContext" => new HoodDbContextFactory().CreateDbContext(
+                    Array.Empty<string>()
+                ),
+                "ContentContext" => new ContentContextFactory().CreateDbContext(
+                    Array.Empty<string>()
+                ),
+                "PropertyContext" => new PropertyContextFactory().CreateDbContext(
+                    Array.Empty<string>()
+                ),
+                "IdentityContext" => new IdentityContextFactory().CreateDbContext(
+                    Array.Empty<string>()
+                ),
+                "Auth0IdentityContext" => new Auth0IdentityContextFactory().CreateDbContext(
+                    Array.Empty<string>()
+                ),
+                _ => throw new ArgumentOutOfRangeException(nameof(name), name, "Unknown context"),
+            };
     }
 }

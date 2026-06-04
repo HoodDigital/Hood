@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using StackExchange.Redis;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using StackExchange.Redis;
 
 namespace Hood.Caching
 {
@@ -14,6 +14,7 @@ namespace Hood.Caching
         {
             _connectionMultiplexer = connectionMultiplexer;
         }
+
         protected IDatabase Database => _connectionMultiplexer.GetDatabase();
 
         public ConcurrentDictionary<string, DateTime> Keys { get; }

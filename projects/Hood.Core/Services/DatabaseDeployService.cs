@@ -28,12 +28,20 @@ namespace Hood.Services
         /// (optionally) the consumer's scripts from <paramref name="consumerScriptsPath"/> — both
         /// journalled in the same <c>SchemaVersions</c> table, so the consumer's SQL always runs after Hood's.
         /// </summary>
-        public DatabaseDeployResult Deploy(string connectionString, string consumerScriptsPath = null, Action<string> log = null)
+        public DatabaseDeployResult Deploy(
+            string connectionString,
+            string consumerScriptsPath = null,
+            Action<string> log = null
+        )
         {
             log ??= Console.WriteLine;
 
             if (string.IsNullOrWhiteSpace(connectionString))
-                return new DatabaseDeployResult { Successful = false, Error = "No connection string was supplied." };
+                return new DatabaseDeployResult
+                {
+                    Successful = false,
+                    Error = "No connection string was supplied.",
+                };
 
             try
             {
@@ -44,8 +52,12 @@ namespace Hood.Services
 
                 // 1) Hood core schema — embedded, ordered by LogicalName.
                 log("Applying Hood core schema...");
-                var coreResult = DeployChanges.To.SqlDatabase(connectionString)
-                    .WithScriptsEmbeddedInAssembly(typeof(DatabaseDeployService).Assembly, n => n.StartsWith(CoreScriptPrefix))
+                var coreResult = DeployChanges
+                    .To.SqlDatabase(connectionString)
+                    .WithScriptsEmbeddedInAssembly(
+                        typeof(DatabaseDeployService).Assembly,
+                        n => n.StartsWith(CoreScriptPrefix)
+                    )
                     .JournalToSqlTable("dbo", "SchemaVersions")
                     .WithTransactionPerScript()
                     .LogToConsole()
@@ -53,14 +65,19 @@ namespace Hood.Services
                     .PerformUpgrade();
 
                 if (!coreResult.Successful)
-                    return new DatabaseDeployResult { Successful = false, Error = coreResult.Error?.Message ?? "Core schema upgrade failed." };
+                    return new DatabaseDeployResult
+                    {
+                        Successful = false,
+                        Error = coreResult.Error?.Message ?? "Core schema upgrade failed.",
+                    };
                 applied.AddRange(coreResult.Scripts.Select(s => s.Name));
 
                 // 2) Consumer project SQL — runs after Hood's core, same journal.
                 if (!string.IsNullOrWhiteSpace(consumerScriptsPath))
                 {
                     log($"Applying consumer scripts from {consumerScriptsPath}...");
-                    var consumerResult = DeployChanges.To.SqlDatabase(connectionString)
+                    var consumerResult = DeployChanges
+                        .To.SqlDatabase(connectionString)
                         .WithScriptsFromFileSystem(consumerScriptsPath)
                         .JournalToSqlTable("dbo", "SchemaVersions")
                         .WithTransactionPerScript()
@@ -69,7 +86,12 @@ namespace Hood.Services
                         .PerformUpgrade();
 
                     if (!consumerResult.Successful)
-                        return new DatabaseDeployResult { Successful = false, Error = consumerResult.Error?.Message ?? "Consumer schema upgrade failed." };
+                        return new DatabaseDeployResult
+                        {
+                            Successful = false,
+                            Error =
+                                consumerResult.Error?.Message ?? "Consumer schema upgrade failed.",
+                        };
                     applied.AddRange(consumerResult.Scripts.Select(s => s.Name));
                 }
 

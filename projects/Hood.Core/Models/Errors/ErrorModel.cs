@@ -11,5 +11,4 @@ namespace Hood.Models
         public int Code { get; set; }
         public string ErrorMessage { get; set; }
     }
-
 }

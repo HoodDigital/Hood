@@ -1,9 +1,9 @@
-﻿using Geocoding;
+﻿using System;
+using Geocoding;
 using Hood.Enums;
 using Hood.Interfaces;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
 
 namespace Hood.Extensions
 {
@@ -38,23 +38,25 @@ namespace Hood.Extensions
                 address.Longitude = location.Longitude;
             }
         }
+
         public static bool IsSet(this IAddress from)
         {
-            if (from != null
+            if (
+                from != null
                 && from.Address1.IsSet()
                 && from.Postcode.IsSet()
-                && from.Country.IsSet())
+                && from.Country.IsSet()
+            )
             {
                 return true;
             }
 
             return false;
         }
+
         public static bool IsGeoLocated(this IAddress from)
         {
-            if (from != null
-                && from.Latitude != 0
-                && from.Longitude != 0)
+            if (from != null && from.Latitude != 0 && from.Longitude != 0)
             {
                 return true;
             }
@@ -62,7 +64,12 @@ namespace Hood.Extensions
             return false;
         }
 
-        public static string ToFormat(this IAddress from, AddressFormat format, bool showPostcode = true, bool showCountry = false)
+        public static string ToFormat(
+            this IAddress from,
+            AddressFormat format,
+            bool showPostcode = true,
+            bool showCountry = false
+        )
         {
             string ret = "";
             if (from == null || !from.Address1.IsSet())
@@ -79,7 +86,9 @@ namespace Hood.Extensions
                     break;
                 case AddressFormat.SingleLine:
                     ret = "";
-                    ret += from.Number.IsSet() ? from.Number + (from.Address1.IsSet() ? ", " : "") : "";
+                    ret += from.Number.IsSet()
+                        ? from.Number + (from.Address1.IsSet() ? ", " : "")
+                        : "";
                     ret += from.Address1.IsSet() ? from.Address1 : "";
                     ret += from.Address2.IsSet() ? ", " + from.Address2 : "";
                     ret += from.City.IsSet() ? ", " + from.City : "";
@@ -89,19 +98,33 @@ namespace Hood.Extensions
                     return ret;
                 case AddressFormat.MultiLine:
                     ret = "";
-                    ret += from.Number.IsSet() ? from.Number + (from.Address1.IsSet() ? ", " : "") : "";
+                    ret += from.Number.IsSet()
+                        ? from.Number + (from.Address1.IsSet() ? ", " : "")
+                        : "";
                     ret += from.Address1.IsSet() ? from.Address1 : "";
                     ret += from.Address2.IsSet() ? Environment.NewLine + from.Address2 : "";
                     ret += from.City.IsSet() ? Environment.NewLine + from.City : "";
                     ret += from.County.IsSet() ? Environment.NewLine + from.County : "";
-                    ret += from.Postcode.IsSet() && showPostcode ? Environment.NewLine + from.Postcode : "";
-                    ret += from.Country.IsSet() && showCountry ? Environment.NewLine + from.Country : "";
+                    ret +=
+                        from.Postcode.IsSet() && showPostcode
+                            ? Environment.NewLine + from.Postcode
+                            : "";
+                    ret +=
+                        from.Country.IsSet() && showCountry
+                            ? Environment.NewLine + from.Country
+                            : "";
                     return ret;
             }
             return ret;
         }
 
-        public static IHtmlContent FormatAddress(this IHtmlHelper html, IAddress address, AddressFormat format, bool showPostcode = true, bool showCountry = false)
+        public static IHtmlContent FormatAddress(
+            this IHtmlHelper html,
+            IAddress address,
+            AddressFormat format,
+            bool showPostcode = true,
+            bool showCountry = false
+        )
         {
             string ret = "";
             if (address == null || !address.Address1.IsSet())
@@ -129,7 +152,8 @@ namespace Hood.Extensions
                     ret += address.Address2.IsSet() ? "<br />" + address.Address2 : "";
                     ret += address.City.IsSet() ? "<br />" + address.City : "";
                     ret += address.County.IsSet() ? "<br />" + address.County : "";
-                    ret += address.Postcode.IsSet() && showPostcode ? "<br />" + address.Postcode : "";
+                    ret +=
+                        address.Postcode.IsSet() && showPostcode ? "<br />" + address.Postcode : "";
                     ret += address.Country.IsSet() && showCountry ? "<br />" + address.Country : "";
                     break;
             }
@@ -137,4 +161,3 @@ namespace Hood.Extensions
         }
     }
 }
-

@@ -23,4 +23,3 @@ namespace Hood.Interfaces
         double Longitude { get; set; }
     }
 }
-
