@@ -19,6 +19,21 @@
     <PackageProjectUrl>https://github.com/HoodDigital/Hood</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HoodDigital/Hood</RepositoryUrl>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+    <!-- Embed the repo readme in every package so it renders on the nuget.org listing. -->
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)readme.md" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
+
+  <!--
+    Hood's theming / view-override model relies on Razor runtime compilation, which net10 deprecates
+    (ASPDEPR003). The dependency is intentional and load-bearing; a migration off runtime compilation
+    is tracked separately (HOOD-54). Suppress the obsolete-API warning rather than churn the architecture.
+  -->
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);ASPDEPR003</NoWarn>
   </PropertyGroup>
 
   <!-- MinVer: version from git tags, default pre-release phase `rc` -->

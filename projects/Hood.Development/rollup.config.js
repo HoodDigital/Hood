@@ -34,7 +34,7 @@ const external = [
     'sweetalert2',
     'dropzone',
     '@simonwep/pickr',
-    'tinymce/tinymce',
+    'hugerte/hugerte',
     'chart.js'
 ];
 
@@ -135,7 +135,7 @@ export default commandLineArgs => {
                 sweetalert2: 'Swal',
                 dropzone: 'Dropzone',
                 '@simonwep/pickr': 'Pickr',
-                'tinymce/tinymce': 'tinymce',
+                'hugerte/hugerte': 'hugerte',
                 'chart.js': 'Chart'
             },
             sourcemap: sourcemaps,

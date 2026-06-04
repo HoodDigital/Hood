@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 
 namespace Hood.Core
 {
@@ -80,8 +79,8 @@ namespace Hood.Core
 
         public void Initialize(IServiceCollection services)
         {
-            //most of API providers require TLS 1.2 nowadays
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            // (TLS 1.2+ is the runtime/OS default on net10 and ServicePointManager no longer
+            // affects HttpClient, so the old ServicePointManager.SecurityProtocol set is removed.)
 
             //set base application path
             var provider = services.BuildServiceProvider();
