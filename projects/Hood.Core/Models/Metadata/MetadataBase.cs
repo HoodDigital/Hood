@@ -2,7 +2,6 @@
 using System.Linq;
 using Hood.Entities;
 using Hood.Extensions;
-using Microsoft.AspNetCore.Html;
 using Newtonsoft.Json;
 
 namespace Hood.Models
@@ -92,10 +91,7 @@ namespace Hood.Models
                         BaseValue = JsonConvert.SerializeObject(0);
                     }
                     break;
-                case "System.String":
-                case "Hood.WYSIWYG":
-                case "Hood.ImageUrl":
-                case "Hood.MultiLineString":
+
                 default:
                     BaseValue = JsonConvert.SerializeObject(value);
                     break;

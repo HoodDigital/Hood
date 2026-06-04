@@ -10,8 +10,8 @@ namespace Hood.ViewModels
 {
     public class ContactFormModel : SpamPreventionModel, IEmailSendable
     {
-        public EmailAddress From { get; set; } = null;
-        public EmailAddress ReplyTo { get; set; } = null;
+        public EmailAddress From { get; set; }
+        public EmailAddress ReplyTo { get; set; }
 
         [Required]
         [Display(Name = "Your name")]

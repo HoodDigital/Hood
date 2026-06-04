@@ -1,14 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Hood.Core;
-using Hood.Models;
 using Hood.Services;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
-using Newtonsoft.Json;
 
 namespace Hood
 {
@@ -30,9 +26,7 @@ namespace Hood
                 return new List<string>().ToArray();
             }
             IDirectoryContents contents = provider.GetDirectoryContents("");
-            System.Collections.Generic.IEnumerable<IFileInfo> dir = contents.Where(p =>
-                p.Name.StartsWith(basePath)
-            );
+            IEnumerable<IFileInfo> dir = contents.Where(p => p.Name.StartsWith(basePath));
             return dir.Select(f => f.Name.Replace(basePath, "")).ToArray();
         }
 

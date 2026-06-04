@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Auth0.ManagementApi.Models;
 using Hood.Models;
@@ -15,22 +15,10 @@ namespace Hood.Services
         Task<Ticket> GetEmailVerificationTicket(string accountId, string returnUrl);
         Task<Role> GetRoleById(string roleId);
         Task<Role> GetRoleByName(string roleName);
-        Task<System.Collections.Generic.IPagedList<Role>> GetRoles(
-            string search = "",
-            int page = 0,
-            int pageSize = 50
-        );
-        Task<System.Collections.Generic.PagedList<Role>> GetRolesForUser(
-            string userId,
-            int page = 0,
-            int pageSize = 50
-        );
+        Task<IPagedList<Role>> GetRoles(string search = "", int page = 0, int pageSize = 50);
+        Task<PagedList<Role>> GetRolesForUser(string userId, int page = 0, int pageSize = 50);
         Task<User> GetUserById(string userId);
-        Task<System.Collections.Generic.IPagedList<User>> GetUsers(
-            string search = "",
-            int page = 0,
-            int pageSize = 50
-        );
+        Task<IPagedList<User>> GetUsers(string search = "", int page = 0, int pageSize = 50);
         Task<IList<User>> GetUsersByEmail(string email);
         Task LinkAccountAsync(Auth0Identity primaryAccount, string fullAuthUserId);
         Task RemoveRolesFromUser(string userId, string[] roleIds);

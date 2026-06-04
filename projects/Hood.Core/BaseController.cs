@@ -3,13 +3,11 @@ using System.Threading.Tasks;
 using Hood.Caching;
 using Hood.Core;
 using Hood.Enums;
-using Hood.Extensions;
 using Hood.Filters;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 

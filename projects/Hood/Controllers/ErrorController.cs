@@ -2,7 +2,6 @@
 {
     public class ErrorController : Hood.BaseControllers.ErrorController
     {
-        public ErrorController()
-            : base() { }
+        public ErrorController() { }
     }
 }

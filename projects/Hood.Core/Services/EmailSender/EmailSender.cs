@@ -1,13 +1,8 @@
-﻿using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using Hood.Core;
 using Hood.Extensions;
-using Hood.Interfaces;
 using Hood.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Newtonsoft.Json;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
@@ -16,7 +11,7 @@ namespace Hood.Services
     public class EmailSender : IEmailSender
     {
         protected Models.MailSettings _mail;
-        protected Models.BasicSettings _info;
+        protected BasicSettings _info;
         protected readonly IRazorViewRenderer _renderer;
 
         public EmailSender()

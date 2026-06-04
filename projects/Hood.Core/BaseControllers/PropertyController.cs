@@ -18,7 +18,6 @@ namespace Hood.BaseControllers
         protected readonly PropertySettings _propertySettings;
 
         public PropertyController()
-            : base()
         {
             _property = Engine.Services.Resolve<IPropertyRepository>();
             _propertyDb = Engine.Services.Resolve<PropertyContext>();

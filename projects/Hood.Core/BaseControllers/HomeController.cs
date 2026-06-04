@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Hood.Caching;
 using Hood.Contexts;
 using Hood.Core;
@@ -9,11 +7,7 @@ using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 
 namespace Hood.BaseControllers
 {
@@ -24,7 +18,6 @@ namespace Hood.BaseControllers
         protected readonly ContentCategoryCache _contentCategoryCache;
 
         public HomeController()
-            : base()
         {
             _contentDb = Engine.Services.Resolve<ContentContext>();
             _content = Engine.Services.Resolve<IContentRepository>();

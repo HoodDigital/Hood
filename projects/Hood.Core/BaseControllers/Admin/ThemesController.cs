@@ -4,8 +4,6 @@ using Hood.BaseControllers;
 using Hood.Core;
 using Hood.Models;
 using Hood.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 
@@ -13,8 +11,7 @@ namespace Hood.Admin.BaseControllers
 {
     public abstract class BaseThemesController : BaseController
     {
-        public BaseThemesController()
-            : base() { }
+        public BaseThemesController() { }
 
         [Route("admin/theme/")]
         public virtual IActionResult Index(ThemeListView model) => List(model, "Index");

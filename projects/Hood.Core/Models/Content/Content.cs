@@ -16,7 +16,7 @@ namespace Hood.Models
 {
     public class Content : BaseContent { }
 
-    public partial class BaseContent : BaseEntity
+    public class BaseContent : BaseEntity
     {
         // Content
         [Required]
@@ -105,7 +105,7 @@ namespace Hood.Models
         {
             get
             {
-                switch ((Enums.ContentStatus)Status)
+                switch (Status)
                 {
                     case ContentStatus.Published:
                         if (PublishDate > DateTime.UtcNow)
@@ -146,8 +146,7 @@ namespace Hood.Models
 
                 if (type == null || type.IsUnknown)
                 {
-                    var linkGenerator =
-                        Engine.Services.Resolve<Microsoft.AspNetCore.Routing.LinkGenerator>();
+                    var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
                     return linkGenerator.GetPathByAction("Show", "Home", new { id = Id });
                 }
 
@@ -165,8 +164,7 @@ namespace Hood.Models
                     case "news":
                         return string.Format("/{0}/{1}/{2}", type.Slug, Id, Slug);
                     default:
-                        var linkGenerator =
-                            Engine.Services.Resolve<Microsoft.AspNetCore.Routing.LinkGenerator>();
+                        var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
                         return linkGenerator.GetPathByAction("Show", "Home", new { id = Id });
                 }
             }

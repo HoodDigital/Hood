@@ -1,4 +1,4 @@
-﻿using Hood.Entities;
+using Hood.Entities;
 using Hood.Extensions;
 using Newtonsoft.Json;
 using System;

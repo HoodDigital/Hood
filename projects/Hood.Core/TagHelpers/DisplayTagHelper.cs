@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Hood.Enums;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;

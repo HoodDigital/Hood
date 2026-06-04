@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using Hood.Extensions;
 using Microsoft.AspNetCore.Identity;
-using Newtonsoft.Json;
 
 namespace Hood.Models
 {

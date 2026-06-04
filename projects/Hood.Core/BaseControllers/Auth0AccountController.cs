@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Auth0.AspNetCore.Authentication;
-using Auth0.AuthenticationApi;
-using Auth0.AuthenticationApi.Models;
 using Auth0.Core.Exceptions;
-using Hood.Attributes;
 using Hood.BaseTypes;
 using Hood.Constants.Identity;
 using Hood.Core;
@@ -20,13 +15,8 @@ using Hood.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
-using Unsplasharp;
 
 namespace Hood.BaseControllers
 {
@@ -280,11 +270,9 @@ namespace Hood.BaseControllers
             {
                 LocalPicture = user.UserProfile.GetAvatar(),
                 ReturnUrl = returnUrl,
-                RemotePicture = User.GetClaimValue(
-                    Hood.Constants.Identity.ClaimTypes.RemotePicture
-                ),
+                RemotePicture = User.GetClaimValue(ClaimTypes.RemotePicture),
             };
-            if (User.HasClaim(Hood.Constants.Identity.ClaimTypes.AccountLinkRequired))
+            if (User.HasClaim(ClaimTypes.AccountLinkRequired))
             {
                 return View("ConnectAccountLink", model);
             }
@@ -298,7 +286,7 @@ namespace Hood.BaseControllers
         {
             try
             {
-                if (User.HasClaim(Hood.Constants.Identity.ClaimTypes.AccountLinkRequired))
+                if (User.HasClaim(ClaimTypes.AccountLinkRequired))
                 {
                     return RedirectToAction(nameof(ConnectAccount), new { returnUrl });
                 }
@@ -321,7 +309,7 @@ namespace Hood.BaseControllers
                 var newAuthUser = await _account.CreateLocalAuthIdentity(
                     User.GetUserId(),
                     user,
-                    User.GetClaimValue(Hood.Constants.Identity.ClaimTypes.RemotePicture)
+                    User.GetClaimValue(ClaimTypes.RemotePicture)
                 );
                 if (newAuthUser == null)
                 {
@@ -336,8 +324,8 @@ namespace Hood.BaseControllers
                     await _account.UpdateUserAsync(user);
                 }
 
-                User.RemoveClaim(Hood.Constants.Identity.ClaimTypes.AccountNotConnected);
-                User.AddOrUpdateClaimValue(Hood.Constants.Identity.ClaimTypes.Active, "true");
+                User.RemoveClaim(ClaimTypes.AccountNotConnected);
+                User.AddOrUpdateClaimValue(ClaimTypes.Active, "true");
                 await HttpContext.SignInAsync(
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     User
@@ -360,7 +348,7 @@ namespace Hood.BaseControllers
         {
             try
             {
-                if (!User.HasClaim(Hood.Constants.Identity.ClaimTypes.AccountLinkRequired))
+                if (!User.HasClaim(ClaimTypes.AccountLinkRequired))
                 {
                     return RedirectToAction(nameof(ConnectAccount), new { returnUrl });
                 }
@@ -391,7 +379,7 @@ namespace Hood.BaseControllers
                     await _auth0.LinkAccountAsync(primaryAccount, User.GetUserId());
 
                     // Success - remove link claim.
-                    User.RemoveClaim(Hood.Constants.Identity.ClaimTypes.AccountLinkRequired);
+                    User.RemoveClaim(ClaimTypes.AccountLinkRequired);
                 }
                 catch (ErrorApiException ex)
                 {
@@ -408,9 +396,7 @@ namespace Hood.BaseControllers
                             )
                             {
                                 // Account already linked, remove link claim and continue.
-                                User.RemoveClaim(
-                                    Hood.Constants.Identity.ClaimTypes.AccountLinkRequired
-                                );
+                                User.RemoveClaim(ClaimTypes.AccountLinkRequired);
                             }
                             break;
                         default:
@@ -427,7 +413,7 @@ namespace Hood.BaseControllers
                 var newAuthUser = await _account.CreateLocalAuthIdentity(
                     User.GetUserId(),
                     user,
-                    User.GetClaimValue(Hood.Constants.Identity.ClaimTypes.RemotePicture)
+                    User.GetClaimValue(ClaimTypes.RemotePicture)
                 );
                 if (newAuthUser == null)
                 {
@@ -462,9 +448,7 @@ namespace Hood.BaseControllers
             {
                 LocalPicture = user.UserProfile.GetAvatar(),
                 ReturnUrl = returnUrl,
-                RemotePicture = User.GetClaimValue(
-                    Hood.Constants.Identity.ClaimTypes.RemotePicture
-                ),
+                RemotePicture = User.GetClaimValue(ClaimTypes.RemotePicture),
             };
             return View(model);
         }
@@ -633,7 +617,7 @@ namespace Hood.BaseControllers
             {
                 var user = await GetCurrentUserOrThrow();
                 await SendAuth0VerificationEmail(
-                    (Auth0User)user,
+                    user,
                     User.GetUserId(),
                     Url.AbsoluteAction("Login", "Account")
                 );

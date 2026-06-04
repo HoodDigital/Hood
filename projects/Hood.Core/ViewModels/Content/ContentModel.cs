@@ -1,16 +1,14 @@
 ﻿using System.Collections.Generic;
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Interfaces;
 using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.ViewModels
 {
-    public class ContentModel : PagedList<ContentView>, IPageableModel
+    public class ContentModel : PagedList<ContentView>
     {
-        public ContentModel()
-            : base() { }
+        public ContentModel() { }
 
         public override int PageSize
         {

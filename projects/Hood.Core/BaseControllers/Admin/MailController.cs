@@ -1,21 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Hood.BaseControllers;
-using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
-using Hood.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SendGrid.Helpers.Mail;
 
 namespace Hood.Admin.BaseControllers
 {
     public abstract class BaseMailController : BaseController
     {
-        public BaseMailController()
-            : base() { }
+        public BaseMailController() { }
 
         [Route("admin/mail/preview/plain/")]
         public virtual IActionResult Plain()
@@ -45,7 +40,7 @@ namespace Hood.Admin.BaseControllers
         [Route("admin/mail/test/")]
         public virtual async Task<IActionResult> Test(
             string email = "info@hooddigital.com",
-            string template = Models.MailSettings.PlainTemplate
+            string template = MailSettings.PlainTemplate
         )
         {
             try

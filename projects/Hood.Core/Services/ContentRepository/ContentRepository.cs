@@ -49,7 +49,7 @@ namespace Hood.Services
                 .ContentViews.Include(p => p.Media)
                 .Include(p => p.Metadata)
                 .Include(p => p.Categories)
-                .ThenInclude(c => c.Category)
+                    .ThenInclude(c => c.Category)
                 .AsNoTracking();
 
             // filter posts by type
@@ -245,12 +245,12 @@ namespace Hood.Services
             bool track = true
         )
         {
-            string cacheKey = typeof(Content).ToString() + ".Single." + id;
+            string cacheKey = typeof(Content) + ".Single." + id;
             if (!_cache.TryGetValue(cacheKey, out Content content) || clearCache)
             {
                 content = await _db
                     .Content.Include(p => p.Categories)
-                    .ThenInclude(c => c.Category)
+                        .ThenInclude(c => c.Category)
                     .Include(p => p.Media)
                     .Include(p => p.Metadata)
                     .FirstOrDefaultAsync(c => c.Id == id);
@@ -271,12 +271,12 @@ namespace Hood.Services
             bool track = true
         )
         {
-            string cacheKey = typeof(ContentView).ToString() + ".Single." + id;
+            string cacheKey = typeof(ContentView) + ".Single." + id;
             if (!_cache.TryGetValue(cacheKey, out ContentView content) || clearCache)
             {
                 content = await _db
                     .ContentViews.Include(p => p.Categories)
-                    .ThenInclude(c => c.Category)
+                        .ThenInclude(c => c.Category)
                     .Include(p => p.Media)
                     .Include(p => p.Metadata)
                     .FirstOrDefaultAsync(c => c.Id == id);
@@ -311,7 +311,7 @@ namespace Hood.Services
 
         public async Task<Content> UpdateAsync(Content content)
         {
-            string cacheKey = typeof(Content).ToString() + ".Single." + content.Id;
+            string cacheKey = typeof(Content) + ".Single." + content.Id;
             _db.Update(content);
             await _db.SaveChangesAsync();
             _eventService.TriggerContentChanged(this);
@@ -325,7 +325,7 @@ namespace Hood.Services
             Content content = _db.Content.Where(p => p.Id == id).FirstOrDefault();
             _db.Entry(content).State = EntityState.Deleted;
             await _db.SaveChangesAsync();
-            _cache.Remove(typeof(Content).ToString() + ".Single." + id);
+            _cache.Remove(typeof(Content) + ".Single." + id);
             _eventService.TriggerContentChanged(this);
             ClearPageCaches();
         }
@@ -360,7 +360,7 @@ namespace Hood.Services
                 .ForEach(p =>
                 {
                     _db.Entry(p).State = EntityState.Deleted;
-                    string cacheKey = typeof(Content).ToString() + ".Single." + p.Id;
+                    string cacheKey = typeof(Content) + ".Single." + p.Id;
                     _cache.Remove(cacheKey);
                 });
             await _db.SaveChangesAsync();
@@ -402,7 +402,7 @@ namespace Hood.Services
             Content copyObject = await _db
                 .Content.AsNoTracking()
                 .Include(p => p.Categories)
-                .ThenInclude(c => c.Category)
+                    .ThenInclude(c => c.Category)
                 .Include(p => p.Media)
                 .Include(p => p.Metadata)
                 .SingleOrDefaultAsync(c => c.Id == id);
@@ -456,7 +456,7 @@ namespace Hood.Services
             int pageSize = 5
         )
         {
-            string cacheKey = typeof(ContentModel).ToString() + ".Recent." + type;
+            string cacheKey = typeof(ContentModel) + ".Recent." + type;
             if (category.IsSet())
             {
                 cacheKey += "-" + category;
@@ -485,7 +485,7 @@ namespace Hood.Services
             int pageSize = 5
         )
         {
-            string cacheKey = typeof(ContentModel).ToString() + ".Featured." + type;
+            string cacheKey = typeof(ContentModel) + ".Featured." + type;
             if (category.IsSet())
             {
                 cacheKey += "." + category;
@@ -514,7 +514,7 @@ namespace Hood.Services
             string category = null
         )
         {
-            string cacheKey = typeof(Content).ToString() + ".Neighbours." + id;
+            string cacheKey = typeof(Content) + ".Neighbours." + id;
             if (!_cache.TryGetValue(cacheKey, out ContentNeighbours neighbours))
             {
                 // get all the content - sorted by publish date.
@@ -678,8 +678,7 @@ namespace Hood.Services
         // Sitemap
         public async Task<List<ContentView>> GetPages(string category = null)
         {
-            string cacheKey =
-                typeof(Content).ToString() + (category.IsSet() ? $".{category}" : "") + ".Pages";
+            string cacheKey = typeof(Content) + (category.IsSet() ? $".{category}" : "") + ".Pages";
             if (!_cache.TryGetValue(cacheKey, out List<ContentView> pages))
             {
                 ContentModel content = await GetContentAsync(
@@ -698,14 +697,14 @@ namespace Hood.Services
 
         public async Task<string> GetSitemapDocumentAsync(IUrlHelper urlHelper)
         {
-            string cacheKey = typeof(Content).ToString() + ".SitemapDocument";
+            string cacheKey = typeof(Content) + ".SitemapDocument";
             if (!_cache.TryGetValue(cacheKey, out string pages))
             {
                 List<SitemapNode> nodes = new List<SitemapNode>
                 {
                     new SitemapNode()
                     {
-                        Url = urlHelper.AbsoluteUrl(""),
+                        Url = urlHelper.AbsoluteUrl(),
                         Priority = 1,
                         Frequency = SitemapFrequency.Daily,
                     },

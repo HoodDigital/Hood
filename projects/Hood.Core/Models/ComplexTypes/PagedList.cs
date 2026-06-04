@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Threading.Tasks;
 using Hood.Attributes;
 using Hood.BaseTypes;
 using Hood.Extensions;
@@ -15,7 +14,7 @@ namespace System.Collections.Generic
     /// </summary>
     /// <typeparam name="T">T</typeparam>
     [Serializable]
-    public partial class PagedList<T> : SaveableModel, IPagedList<T>
+    public class PagedList<T> : SaveableModel, IPagedList<T>
     {
         private List<T> _list;
 
@@ -221,8 +220,8 @@ namespace System.Collections.Generic
             {
                 query = $"?page={pageIndex}&pageSize={PageSize}";
             }
-            query += Search.IsSet() ? "&search=" + System.Net.WebUtility.UrlEncode(Search) : "";
-            query += Order.IsSet() ? "&sort=" + System.Net.WebUtility.UrlEncode(Order) : "";
+            query += Search.IsSet() ? "&search=" + Net.WebUtility.UrlEncode(Search) : "";
+            query += Order.IsSet() ? "&sort=" + Net.WebUtility.UrlEncode(Order) : "";
             return query;
         }
     }

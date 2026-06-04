@@ -11,11 +11,8 @@ using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 namespace Hood.Admin.BaseControllers
 {
@@ -27,7 +24,6 @@ namespace Hood.Admin.BaseControllers
         protected readonly IHoodAccountRepository _account;
 
         public BasePropertyController()
-            : base()
         {
             _property = Engine.Services.Resolve<IPropertyRepository>();
             _propertyDb = Engine.Services.Resolve<PropertyContext>();
@@ -303,7 +299,7 @@ namespace Hood.Admin.BaseControllers
                 }
 
                 // Geocode
-                Geocoding.Google.GoogleAddress address = _address.GeocodeAddress(model);
+                GoogleAddress address = _address.GeocodeAddress(model);
                 if (address != null)
                 {
                     model.SetLocation(address.Coordinates);
@@ -322,12 +318,11 @@ namespace Hood.Admin.BaseControllers
 
                 for (int i = 0; i < 11; i++)
                 {
-                    model.AddMeta("Feature" + i.ToString(), "", "System.String");
+                    model.AddMeta("Feature" + i.ToString(), "");
                 }
 
                 await _property.UpdateAsync(model);
                 return new Response(true, "Created successfully.");
-                ;
             }
             catch (Exception ex)
             {
@@ -407,17 +402,17 @@ namespace Hood.Admin.BaseControllers
 
                 switch (model.FieldName)
                 {
-                    case nameof(Models.PropertyListing.FeaturedImage):
+                    case nameof(PropertyListing.FeaturedImage):
                         property.FeaturedImage = new PropertyMedia(media);
                         break;
-                    case nameof(Models.PropertyListing.InfoDownload):
+                    case nameof(PropertyListing.InfoDownload):
                         property.InfoDownload = new PropertyMedia(media);
                         break;
                 }
 
                 await _propertyDb.SaveChangesAsync();
 
-                string cacheKey = typeof(Content).ToString() + ".Single." + id;
+                string cacheKey = typeof(Content) + ".Single." + id;
                 _cache.Remove(cacheKey);
 
                 return new Response(true, media, $"The media has been attached successfully.");
@@ -453,17 +448,17 @@ namespace Hood.Admin.BaseControllers
 
                 switch (model.FieldName)
                 {
-                    case nameof(Models.PropertyListing.FeaturedImage):
+                    case nameof(PropertyListing.FeaturedImage):
                         property.FeaturedImageJson = null;
                         break;
-                    case nameof(Models.PropertyListing.InfoDownload):
+                    case nameof(PropertyListing.InfoDownload):
                         property.InfoDownload = null;
                         break;
                 }
 
                 await _propertyDb.SaveChangesAsync();
 
-                string cacheKey = typeof(PropertyListing).ToString() + ".Single." + id;
+                string cacheKey = typeof(PropertyListing) + ".Single." + id;
                 _cache.Remove(cacheKey);
 
                 return new Response(
@@ -696,7 +691,7 @@ namespace Hood.Admin.BaseControllers
             try
             {
                 PropertyMeta meta = await _propertyDb.PropertyMetadata.FindAsync(metaId);
-                _propertyDb.Entry(meta).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+                _propertyDb.Entry(meta).State = EntityState.Deleted;
                 SaveMessage = $"Successfully deleted {meta.Name}.";
                 MessageType = AlertType.Success;
                 await _propertyDb.SaveChangesAsync();

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 using Hood.Attributes;
 using Hood.Enums;
 using Hood.Interfaces;

@@ -1,25 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Hood.Contexts;
-using Hood.Core;
-using Hood.Entities;
-using Hood.Enums;
-using Hood.Extensions;
-using Hood.Interfaces;
-using Hood.Models;
-using Hood.Services;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Data.SqlClient;
+﻿using Hood.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
-using Newtonsoft.Json;
 
 namespace Hood.Contexts
 {

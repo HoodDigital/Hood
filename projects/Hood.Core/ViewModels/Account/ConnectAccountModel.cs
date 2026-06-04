@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Hood.BaseTypes;
+﻿using Hood.BaseTypes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.ViewModels

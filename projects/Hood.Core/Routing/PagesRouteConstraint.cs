@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Hood.Extensions;
 using Hood.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace Hood.Core
 {
@@ -30,7 +28,7 @@ namespace Hood.Core
                 string fullUrl = httpContext.Request.Path;
                 if (fullUrl.IsSet())
                 {
-                    fullUrl = fullUrl.ToString().ToLower().Trim('/');
+                    fullUrl = fullUrl.ToLower().Trim('/');
                     IContentRepository _content = (IContentRepository)
                         httpContext.RequestServices.GetService(typeof(IContentRepository));
                     var pages = _content.GetPages().Result;

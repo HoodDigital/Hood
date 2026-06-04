@@ -2,7 +2,6 @@
 {
     public class HomeController : Hood.BaseControllers.HomeController
     {
-        public HomeController()
-            : base() { }
+        public HomeController() { }
     }
 }

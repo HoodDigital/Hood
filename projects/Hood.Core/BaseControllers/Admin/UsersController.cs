@@ -7,7 +7,6 @@ using Hood.BaseControllers;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Identity;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
@@ -24,7 +23,6 @@ namespace Hood.Admin.BaseControllers
         protected readonly IPasswordAccountRepository _account;
 
         public UsersController()
-            : base()
         {
             _account = Engine.Services.Resolve<IPasswordAccountRepository>();
         }
@@ -539,15 +537,13 @@ namespace Hood.Admin.BaseControllers
                     .Identities.First()
                     .AddClaim(
                         new Claim(
-                            Hood.Constants.Identity.ClaimTypes.OriginalUserId,
+                            Constants.Identity.ClaimTypes.OriginalUserId,
                             User.GetLocalUserId()
                         )
                     );
                 userPrincipal
                     .Identities.First()
-                    .AddClaim(
-                        new Claim(Hood.Constants.Identity.ClaimTypes.IsImpersonating, "true")
-                    );
+                    .AddClaim(new Claim(Constants.Identity.ClaimTypes.IsImpersonating, "true"));
 
                 impersonatedUser.UserProfile.AddUserNote(
                     new UserNote()
@@ -592,7 +588,7 @@ namespace Hood.Admin.BaseControllers
                 }
 
                 string originalUserId = User.FindFirst(
-                    Hood.Constants.Identity.ClaimTypes.OriginalUserId
+                    Constants.Identity.ClaimTypes.OriginalUserId
                 ).Value;
 
                 ApplicationUser originalUser = await _account.GetUserByIdAsync(originalUserId);

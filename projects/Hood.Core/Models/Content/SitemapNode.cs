@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Hood.Enums;
 
 namespace Hood.Models

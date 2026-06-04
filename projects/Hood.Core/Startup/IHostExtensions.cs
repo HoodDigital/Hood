@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Hood.Core;
 using Hood.Enums;
-using Hood.Extensions;
 using Hood.Models;
-using Hood.Services;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

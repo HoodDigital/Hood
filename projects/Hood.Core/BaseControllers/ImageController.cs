@@ -1,11 +1,8 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Hood.Core;
 using Hood.Extensions;
-using Hood.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Unsplasharp;
 
 namespace Hood.BaseControllers

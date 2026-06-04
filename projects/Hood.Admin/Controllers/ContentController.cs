@@ -1,5 +1,4 @@
-using Hood.Admin.BaseControllers;
-using Hood.Constants.Identity;
+﻿using Hood.Admin.BaseControllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +8,6 @@ namespace Hood.Areas.Admin.Controllers
     [Authorize(Roles = "SuperUser,Admin,Editor")]
     public class ContentController : BaseContentController
     {
-        public ContentController()
-            : base() { }
+        public ContentController() { }
     }
 }

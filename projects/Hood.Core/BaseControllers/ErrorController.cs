@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
+﻿using System.Diagnostics;
 using Hood.Core;
 using Hood.Extensions;
 using Hood.Models;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.BaseControllers
@@ -14,8 +10,7 @@ namespace Hood.BaseControllers
     [Route("error")]
     public abstract class ErrorController : BaseController
     {
-        public ErrorController()
-            : base() { }
+        public ErrorController() { }
 
         [Route("500")]
         public virtual async System.Threading.Tasks.Task<IActionResult> AppError()

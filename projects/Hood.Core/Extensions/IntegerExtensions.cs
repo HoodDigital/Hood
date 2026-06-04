@@ -1,4 +1,4 @@
-﻿namespace Hood.Extensions
+namespace Hood.Extensions
 {
     public static class IntegerExtensions
     {

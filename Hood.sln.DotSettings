@@ -1,0 +1,7 @@
+<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<!-- HOOD-62: code-inspection settings shared with `jb inspectcode` (validate_code.sh).
+	     _Layout_Email.cshtml is skipped: InspectCode's HTML parser misreads the email-client
+	     (MSO) conditional table markup and reports a phantom "unmatched closing tag" — the
+	     document is balanced (verified by tag count with and without comment content). -->
+	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=_005FLayout_005FEmail_002Ecshtml/@EntryIndexedValue">True</s:Boolean>
+</wpf:ResourceDictionary>

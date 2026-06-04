@@ -10,7 +10,6 @@ using Hood.Extensions;
 using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace Hood.Services
 {

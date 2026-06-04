@@ -1,11 +1,11 @@
-@model Content
+﻿@model Content
 <div class="card-img-top">
     @switch (Model.GetMetaValue<string>("Settings.SubType"))
     {
         case "Video":
             @if (Model.GetMetaValue<string>("Content.News.Video").IsSet())
             {
-                @Html.Raw(Model.GetMetaValue<string>("Content.News.Video"));
+                @Html.Raw(Model.GetMetaValue<string>("Content.News.Video"))
             }
             break;
         case "Slides":

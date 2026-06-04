@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Hood.Core;
 using Hood.Extensions;
 using Hood.Interfaces;

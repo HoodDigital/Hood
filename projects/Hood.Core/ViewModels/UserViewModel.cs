@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.ViewModels
 {
-    public class ManageAccountViewModel : SaveableModel, ISaveableModel
+    public class ManageAccountViewModel : SaveableModel
     {
         public string LocalUserId { get; set; }
         public bool IsEmailConfirmed { get; set; }

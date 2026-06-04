@@ -1,4 +1,4 @@
-﻿using Hood.Extensions;
+using Hood.Extensions;
 
 namespace Hood.Interfaces
 {

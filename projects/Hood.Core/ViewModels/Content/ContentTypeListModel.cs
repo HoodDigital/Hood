@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Hood.Interfaces;
 using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.ViewModels
 {
-    public class ContentTypeListModel : PagedList<ContentType>, IPageableModel
+    public class ContentTypeListModel : PagedList<ContentType>
     {
         [FromQuery(Name = "active")]
         [Display(
@@ -15,8 +14,7 @@ namespace Hood.ViewModels
         )]
         public bool HideDisabled { get; set; }
 
-        public ContentTypeListModel()
-            : base() { }
+        public ContentTypeListModel() { }
 
         public override string GetPageUrl(int pageIndex)
         {

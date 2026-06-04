@@ -1,9 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hood.Contexts;
 using Hood.Core;
-using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;

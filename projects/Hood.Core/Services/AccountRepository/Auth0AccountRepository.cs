@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
 using Hood.Contexts;
 using Hood.Core;
@@ -11,9 +9,6 @@ using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.ViewModels;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hood.Services
@@ -163,7 +158,7 @@ namespace Hood.Services
         {
             var auth0user = await _db
                 .Auth0Identities.Include(au => au.User)
-                .ThenInclude(u => u.UserProfile)
+                    .ThenInclude(u => u.UserProfile)
                 .SingleOrDefaultAsync(au => au.Id == id);
             if (auth0user != null)
             {
@@ -223,13 +218,13 @@ namespace Hood.Services
         public async Task DeleteLocalAuthIdentity(string id)
         {
             var userToRemove = _db.Auth0Identities.SingleOrDefault(u => u.Id == id);
-            _db.Entry(userToRemove).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+            _db.Entry(userToRemove).State = EntityState.Deleted;
             await _db.SaveChangesAsync();
         }
 
         public async Task UpdateLocalAuthIdentity(Auth0Identity user)
         {
-            _db.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            _db.Entry(user).State = EntityState.Modified;
             await _db.SaveChangesAsync();
         }
 

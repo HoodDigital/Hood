@@ -1,7 +1,5 @@
-﻿using System.Threading;
-using Hood.Models;
+﻿using Hood.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.Api.BaseControllers
@@ -9,8 +7,7 @@ namespace Hood.Api.BaseControllers
     [ApiController]
     public abstract class HomeController : ControllerBase
     {
-        public HomeController()
-            : base() { }
+        public HomeController() { }
 
         private const string publicMessage =
             "The API doesn't require an access token to share this message.";

@@ -1,4 +1,4 @@
-﻿namespace Hood.Services
+namespace Hood.Services
 {
     public interface IFTPService
     {

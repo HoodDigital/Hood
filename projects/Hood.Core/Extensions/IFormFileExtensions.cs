@@ -1,4 +1,4 @@
-﻿using Hood.Enums;
+using Hood.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 

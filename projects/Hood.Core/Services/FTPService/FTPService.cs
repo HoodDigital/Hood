@@ -56,7 +56,7 @@ namespace Hood.Services
 
                 // Create the newsletter objects and pass it to the threading function
                 object[] parameters = { server, username, password, filename, destination };
-                ParameterizedThreadStart pts = new ParameterizedThreadStart(GetFile);
+                ParameterizedThreadStart pts = (GetFile);
                 Thread thread = new Thread(pts)
                 {
                     Name = "GetFile",

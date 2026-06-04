@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
-using Hood.Core;
 
 namespace Hood.Extensions
 {
@@ -526,18 +525,18 @@ namespace Hood.Extensions
             return Regex.Replace(
                 s,
                 @"(http(s)?://)?([\w-]+\.)+[\w-]+(/\S\w[\w- ;,./?%&=]\S*)?",
-                new MatchEvaluator(URL)
+                (URL)
             );
         }
 
         public static string ParseUsername(this string s)
         {
-            return Regex.Replace(s, "(@)((?:[A-Za-z0-9-_]*))", new MatchEvaluator(Username));
+            return Regex.Replace(s, "(@)((?:[A-Za-z0-9-_]*))", (Username));
         }
 
         public static string ParseHashtag(this string s)
         {
-            return Regex.Replace(s, "(#)((?:[A-Za-z0-9-_]*))", new MatchEvaluator(Hashtag));
+            return Regex.Replace(s, "(#)((?:[A-Za-z0-9-_]*))", (Hashtag));
         }
 
         private static string Hashtag(Match m)

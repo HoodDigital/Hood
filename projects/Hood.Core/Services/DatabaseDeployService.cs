@@ -1,8 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using DbUp;
-using DbUp.Helpers;
 
 namespace Hood.Services
 {

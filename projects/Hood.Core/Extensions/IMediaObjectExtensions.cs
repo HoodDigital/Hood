@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Interfaces;

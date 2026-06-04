@@ -17,7 +17,6 @@ namespace Hood.Admin.BaseControllers
         private readonly IPropertyImporter _blm;
 
         public BaseImportController()
-            : base()
         {
             _ftp = Engine.Services.Resolve<IFTPService>();
             _blm = Engine.Services.Resolve<IPropertyImporter>();
@@ -42,7 +41,7 @@ namespace Hood.Admin.BaseControllers
 
             StringWriter logWriter = new StringWriter();
             logWriter.WriteLine(
-                "Unauthorized attempt from " + HttpContext.Connection.RemoteIpAddress.ToString()
+                "Unauthorized attempt from " + HttpContext.Connection.RemoteIpAddress
             );
             logWriter.WriteLine("Auth Key: " + triggerAuth);
             logWriter.WriteLine("Auth Header: " + Request.Headers["Auth"]);

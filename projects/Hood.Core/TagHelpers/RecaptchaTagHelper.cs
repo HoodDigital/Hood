@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
-using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -52,8 +50,7 @@ namespace Hood.TagHelpers
             string recaptchaId = Guid.NewGuid().ToString();
             _htmlHelper.AddScript(
                 ResourceLocation.BeforeScripts,
-                $"https://www.google.com/recaptcha/api.js?render={Engine.Settings.Integrations.GoogleRecaptchaSiteKey}",
-                false
+                $"https://www.google.com/recaptcha/api.js?render={Engine.Settings.Integrations.GoogleRecaptchaSiteKey}"
             );
             _htmlHelper.AddInlineScript(
                 ResourceLocation.BeforeScripts,

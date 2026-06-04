@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using Hood.Core;
-using Hood.Enums;
 using Hood.Extensions;
 using Hood.Identity;
 using Hood.Interfaces;
-using Hood.Models;
-using Hood.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

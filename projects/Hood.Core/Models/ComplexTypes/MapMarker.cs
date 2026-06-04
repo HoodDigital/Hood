@@ -3,7 +3,7 @@
 namespace Hood.Models
 {
     // Add profile data for application users by adding properties to the ApplicationUser class
-    public partial class MapMarker : IAddress
+    public class MapMarker : IAddress
     {
         // IAddress
         public string ContactName { get; set; }

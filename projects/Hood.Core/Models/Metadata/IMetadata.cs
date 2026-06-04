@@ -1,5 +1,4 @@
-﻿using System;
-using Hood.Extensions;
+﻿using Hood.Extensions;
 using Newtonsoft.Json;
 
 namespace Hood.Models

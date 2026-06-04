@@ -1,4 +1,4 @@
-﻿using Hood.Models;
+using Hood.Models;
 
 namespace Hood.ViewModels
 {

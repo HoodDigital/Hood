@@ -1,4 +1,4 @@
-﻿using Hood.Enums;
+using Hood.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.Services

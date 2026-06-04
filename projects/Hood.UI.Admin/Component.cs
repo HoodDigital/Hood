@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
+﻿using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
@@ -11,7 +8,7 @@ using Microsoft.Extensions.FileProviders;
 
 namespace Hood.UI.Admin
 {
-    public class Component : Hood.Interfaces.IHoodComponent
+    public class Component : Interfaces.IHoodComponent
     {
         public int ServiceConfigurationOrder => 1;
 

@@ -4,9 +4,9 @@ using Hood.BaseTypes;
 
 namespace Hood.Entities
 {
-    public abstract partial class BaseEntity : BaseEntity<int> { }
+    public abstract class BaseEntity : BaseEntity<int> { }
 
-    public abstract partial class BaseEntity<TKey> : SaveableModel, IBaseEntity<TKey>
+    public abstract class BaseEntity<TKey> : SaveableModel, IBaseEntity<TKey>
     {
         /// <summary>
         /// Gets or sets the entity identifier

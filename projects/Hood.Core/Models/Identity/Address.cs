@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Hood.Entities;
 using Hood.Interfaces;
-using Newtonsoft.Json;
 
 namespace Hood.Models
 {

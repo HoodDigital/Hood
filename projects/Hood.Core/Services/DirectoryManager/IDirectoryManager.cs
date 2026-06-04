@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Html;

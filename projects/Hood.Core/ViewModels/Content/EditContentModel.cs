@@ -4,7 +4,7 @@ using Hood.Models;
 
 namespace Hood.ViewModels
 {
-    public partial class EditContentModel : SaveableModel
+    public class EditContentModel : SaveableModel
     {
         public Content Content { get; set; }
         public ContentType ContentType { get; set; }

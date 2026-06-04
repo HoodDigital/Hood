@@ -13,7 +13,7 @@ namespace Hood.Models
         public string Subject { get; set; }
         public string PreHeader { get; set; }
         public string ToName { get; set; }
-        public string Template { get; set; } = Models.MailSettings.PlainTemplate;
+        public string Template { get; set; } = MailSettings.PlainTemplate;
 
         public bool ShowSiteSocials { get; set; } = true;
         public string EmailSmallPrint { get; set; } = "";
@@ -29,7 +29,7 @@ namespace Hood.Models
 
         public string GetBackgroundColor()
         {
-            Models.MailSettings mailSettings = Engine.Settings.Mail;
+            MailSettings mailSettings = Engine.Settings.Mail;
 
             if (!BackgroundColour.IsSet())
                 if (mailSettings.BackgroundColour.IsSet())
@@ -41,7 +41,7 @@ namespace Hood.Models
         public string GetHeader()
         {
             BasicSettings basicSettings = Engine.Settings.Basic;
-            Models.MailSettings mailSettings = Engine.Settings.Mail;
+            MailSettings mailSettings = Engine.Settings.Mail;
 
             if (!Title.IsSet())
                 Title = basicSettings.FullTitle;
@@ -72,7 +72,7 @@ namespace Hood.Models
 
         public string GetHero()
         {
-            Models.MailSettings mailSettings = Engine.Settings.Mail;
+            MailSettings mailSettings = Engine.Settings.Mail;
 
             if (!HeroImage.IsSet())
                 if (mailSettings.HeroImage.IsSet())
@@ -102,7 +102,7 @@ namespace Hood.Models
         public MailObject()
         {
             BasicSettings basicSettings = Engine.Settings.Basic;
-            Models.MailSettings mailSettings = Engine.Settings.Mail;
+            MailSettings mailSettings = Engine.Settings.Mail;
 
             _textBody = new StringWriter();
             _body = new StringWriter();
@@ -308,7 +308,7 @@ namespace Hood.Models
         {
             _textBody.WriteLine("Image: " + url + "(" + altText + ")");
             _body.WriteLine(
-                $"<p style='{GetFontStyles(1)}margin: 0;margin-bottom: 1em;'><img src='{url}' alt='{altText}' width='520' class='img-responsive img-block' style='border:none;-ms-interpolation-mode:bicubic;max-width:100%;display:block;'></p>"
+                $"<p style='{GetFontStyles()}margin: 0;margin-bottom: 1em;'><img src='{url}' alt='{altText}' width='520' class='img-responsive img-block' style='border:none;-ms-interpolation-mode:bicubic;max-width:100%;display:block;'></p>"
             );
         }
 
@@ -324,12 +324,12 @@ namespace Hood.Models
                 $@"<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='margin-bottom:{BaseFontSize}px;border-collapse:separate;mso-table-lspace:0pt;mso-table-rspace:0pt;width;100%;box-sizing:border-box;min-width:100%!important;' width='100%'>
     <tbody>
         <tr>
-            <td align='{align}' style='{GetFontStyles(1)};vertical-align:top;text-align:{align}' valign='top'>
+            <td align='{align}' style='{GetFontStyles()};vertical-align:top;text-align:{align}' valign='top'>
                 <table border='0' cellpadding='0' cellspacing='0' style='border-collapse:separate;mso-table-lspace: 0pt;mso-table-rspace:0pt;width:auto;'>
                     <tbody>
                         <tr>
                             <td style='vetical-align:top;background-color:{colour};border-radius:5px;text-align:{align};' valign='top' bgcolor='{colour}' align='{align}'>
-                                <a href='{url}' target='_blank' style='display:inline-block;color:#ffffff;background-color:{colour};border:solid 1px {colour};border-radius:5px;box-sizing:border-box;cursor:pointer;text-decoration:none;{GetFontStyles(1)}margin-bottom:0px;font-weight:bold;margin:0;padding:12px 25px;border-color:{colour};'>
+                                <a href='{url}' target='_blank' style='display:inline-block;color:#ffffff;background-color:{colour};border:solid 1px {colour};border-radius:5px;box-sizing:border-box;cursor:pointer;text-decoration:none;{GetFontStyles()}margin-bottom:0px;font-weight:bold;margin:0;padding:12px 25px;border-color:{colour};'>
                                     {content}
                                 </a>
                             </td>

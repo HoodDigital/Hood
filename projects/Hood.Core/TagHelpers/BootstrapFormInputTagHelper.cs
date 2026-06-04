@@ -57,7 +57,7 @@ namespace Hood.TagHelpers
         [HtmlAttributeName("disabled")]
         public bool Disabled { get; set; }
 
-        private IHtmlHelper _htmlHelper;
+        private readonly IHtmlHelper _htmlHelper;
 
         public BootstrapFormInputTagHelper(IHtmlHelper htmlHelper)
         {

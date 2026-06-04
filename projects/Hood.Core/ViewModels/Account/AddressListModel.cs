@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using Hood.Extensions;
-using Hood.Interfaces;
 using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.ViewModels
 {
-    public class AddressListModel : PagedList<Address>, IPageableModel
+    public class AddressListModel : PagedList<Address>
     { // Params
         [FromQuery(Name = "user")]
         public string UserId { get; set; }

@@ -5,7 +5,7 @@ using Hood.Entities;
 
 namespace Hood.Models
 {
-    public partial class MediaDirectory : BaseEntity
+    public class MediaDirectory : BaseEntity
     {
         [Display(Name = "Directory Name", Description = "Display name for your directory.")]
         public string DisplayName { get; set; }

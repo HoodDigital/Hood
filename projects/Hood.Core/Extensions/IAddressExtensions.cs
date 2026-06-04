@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Geocoding;
 using Hood.Enums;
 using Hood.Interfaces;

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,14 +7,12 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Hood.Core;
 using Hood.Extensions;
-using Hood.Identity;
 using Hood.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
-using StackExchange.Redis;
 
 namespace Hood.Services
 {
@@ -98,7 +96,7 @@ namespace Hood.Services
                     || (emailVerifiedClaim != null && emailVerifiedClaim.Value == "true")
                 )
                 {
-                    identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.Active, "true"));
+                    identity.AddClaim(new Claim(Constants.Identity.ClaimTypes.Active, "true"));
                     await e.HttpContext.SignInAsync(
                         CookieAuthenticationDefaults.AuthenticationScheme,
                         principal,
@@ -118,7 +116,7 @@ namespace Hood.Services
                 if (user.ConnectedAuth0Accounts != null && user.ConnectedAuth0Accounts.Count() > 0)
                 {
                     identity.AddClaim(
-                        new Claim(Hood.Constants.Identity.ClaimTypes.AccountLinkRequired, "true")
+                        new Claim(Constants.Identity.ClaimTypes.AccountLinkRequired, "true")
                     );
                 }
 
@@ -126,13 +124,13 @@ namespace Hood.Services
                 // Email needs to be verified to attach to a local account.
 
                 identity.AddClaim(
-                    new Claim(Hood.Constants.Identity.ClaimTypes.AccountNotConnected, "true")
+                    new Claim(Constants.Identity.ClaimTypes.AccountNotConnected, "true")
                 );
 
                 await SetDefaultClaims(e, user);
 
                 identity.AddClaim(
-                    new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreationFailed, "true")
+                    new Claim(Constants.Identity.ClaimTypes.AccountCreationFailed, "true")
                 );
                 e.Response.Redirect(
                     _linkGenerator.GetPathByAction(
@@ -149,7 +147,7 @@ namespace Hood.Services
             {
                 // user has not been found, or created & signups are disabled on this end
                 identity.AddClaim(
-                    new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreationFailed, "true")
+                    new Claim(Constants.Identity.ClaimTypes.AccountCreationFailed, "true")
                 );
                 returnUrl = _linkGenerator.GetPathByAction(
                     "RemoteSigninFailed",
@@ -203,7 +201,7 @@ namespace Hood.Services
             {
                 // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
                 identity.AddClaim(
-                    new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreationFailed, "true")
+                    new Claim(Constants.Identity.ClaimTypes.AccountCreationFailed, "true")
                 );
                 returnUrl = _linkGenerator.GetPathByAction(
                     "RemoteSigninFailed",
@@ -226,7 +224,7 @@ namespace Hood.Services
             {
                 // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
                 identity.AddClaim(
-                    new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreationFailed, "true")
+                    new Claim(Constants.Identity.ClaimTypes.AccountCreationFailed, "true")
                 );
                 returnUrl = _linkGenerator.GetPathByAction(
                     "RemoteSigninFailed",
@@ -251,12 +249,12 @@ namespace Hood.Services
             {
                 // Account is already active, so mark it as such, this allows access to secure areas.
 
-                identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.Active, "true"));
+                identity.AddClaim(new Claim(Constants.Identity.ClaimTypes.Active, "true"));
             }
 
             await SetDefaultClaims(e, user);
 
-            identity.AddClaim(new Claim(Hood.Constants.Identity.ClaimTypes.AccountCreated, "true"));
+            identity.AddClaim(new Claim(Constants.Identity.ClaimTypes.AccountCreated, "true"));
 
             if (ForwardToReturnUriOnSignup)
             {
@@ -273,7 +271,6 @@ namespace Hood.Services
             );
             e.Response.Redirect(returnUrl);
             e.HandleResponse();
-            return;
         }
 
         public virtual Task OnRemoteFailure(RemoteFailureContext e)
@@ -391,11 +388,11 @@ namespace Hood.Services
         protected virtual async Task SetDefaultClaims(TicketReceivedContext e, Auth0User user)
         {
             // Set the remote avatar on a local claim, in case the local overrides it.
-            if (e.Principal.HasClaim(Hood.Constants.Identity.ClaimTypes.Picture))
+            if (e.Principal.HasClaim(Constants.Identity.ClaimTypes.Picture))
             {
                 e.Principal.AddOrUpdateClaimValue(
-                    Hood.Constants.Identity.ClaimTypes.RemotePicture,
-                    e.Principal.GetClaimValue(Hood.Constants.Identity.ClaimTypes.Picture)
+                    Constants.Identity.ClaimTypes.RemotePicture,
+                    e.Principal.GetClaimValue(Constants.Identity.ClaimTypes.Picture)
                 );
             }
 

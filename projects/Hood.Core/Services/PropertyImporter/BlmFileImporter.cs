@@ -15,10 +15,8 @@ using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace Hood.Services
@@ -152,7 +150,7 @@ namespace Hood.Services
 
                 Lock.ReleaseWriterLock();
 
-                ThreadStart pts = new ThreadStart(Import);
+                ThreadStart pts = (Import);
                 Thread thread = new Thread(pts)
                 {
                     Name = "Import",
@@ -475,8 +473,6 @@ namespace Hood.Services
                     "Process completed!",
                     LogType.Success
                 );
-
-                return;
             }
             catch (Exception ex)
             {
@@ -488,7 +484,6 @@ namespace Hood.Services
                     "An error occurred importing properties via BLM.",
                     ex
                 );
-                return;
             }
         }
 

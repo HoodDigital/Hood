@@ -1,19 +1,13 @@
-﻿using System;
-using System.Threading.Tasks;
-using Hood.BaseControllers;
+﻿using Hood.BaseControllers;
 using Hood.Models;
 using Hood.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace Hood.Admin.BaseControllers
 {
     public abstract class BaseHomeController : BaseController
     {
-        public BaseHomeController()
-            : base() { }
+        public BaseHomeController() { }
 
         [Route("admin/")]
         public virtual IActionResult Index()

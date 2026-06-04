@@ -3,12 +3,7 @@ using System.Threading.Tasks;
 using Hood.Core;
 using Hood.Extensions;
 using Hood.Models;
-using Hood.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace Hood.Services
 {
@@ -26,7 +21,7 @@ namespace Hood.Services
             switch (type)
             {
                 case LogType.Error:
-                    _logger.LogMessage(HoodLogErrorTypes.SystemMessage, message, LogLevel.Error);
+                    _logger.LogMessage(HoodLogErrorTypes.SystemMessage, message);
                     break;
                 case LogType.Warning:
                     _logger.LogMessage(HoodLogErrorTypes.SystemMessage, message, LogLevel.Warning);
@@ -53,12 +48,7 @@ namespace Hood.Services
             switch (type)
             {
                 case LogType.Error:
-                    _logger.LogException(
-                        HoodLogErrorTypes.SystemMessage,
-                        ex,
-                        message,
-                        LogLevel.Error
-                    );
+                    _logger.LogException(HoodLogErrorTypes.SystemMessage, ex, message);
                     break;
                 case LogType.Warning:
                     _logger.LogException(
@@ -90,12 +80,7 @@ namespace Hood.Services
             switch (type)
             {
                 case LogType.Error:
-                    _logger.LogException(
-                        HoodLogErrorTypes.SystemMessage,
-                        ex,
-                        message,
-                        LogLevel.Error
-                    );
+                    _logger.LogException(HoodLogErrorTypes.SystemMessage, ex, message);
                     break;
                 case LogType.Warning:
                     _logger.LogException(

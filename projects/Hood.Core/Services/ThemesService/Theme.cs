@@ -1,4 +1,4 @@
-﻿using Hood.Core;
+using Hood.Core;
 using Microsoft.Extensions.Configuration;
 
 namespace Hood.Services

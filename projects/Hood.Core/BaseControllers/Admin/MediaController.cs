@@ -8,7 +8,6 @@ using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,8 +16,7 @@ namespace Hood.Admin.BaseControllers
 {
     public abstract class BaseMediaController : BaseController
     {
-        public BaseMediaController()
-            : base() { }
+        public BaseMediaController() { }
 
         [Route("admin/media/list/")]
         public virtual async Task<IActionResult> List(

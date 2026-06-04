@@ -1,4 +1,4 @@
-﻿using Hood.BaseTypes;
+using Hood.BaseTypes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.ViewModels

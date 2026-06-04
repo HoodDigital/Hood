@@ -1,22 +1,14 @@
-using System;
-using System.IO;
+﻿using System;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Auth0.ManagementApi;
 using Auth0.ManagementApi.Models;
 using Auth0.ManagementApi.Paging;
 using Hood.Caching;
-using Hood.Contexts;
 using Hood.Core;
 using Hood.Extensions;
 using Hood.Identity;
 using Hood.Models;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -98,7 +90,7 @@ namespace Hood.Services
                 Search = search,
                 PageIndex = page,
                 PageSize = pageSize,
-                TotalPages = pageSize == 0 ? 0 : (int)(users.Paging.Total / pageSize) + 1,
+                TotalPages = pageSize == 0 ? 0 : (users.Paging.Total / pageSize) + 1,
             };
             return pagedList;
         }
@@ -161,11 +153,7 @@ namespace Hood.Services
             var client = await GetClientAsync();
             var response = await client.Users.LinkAccountAsync(
                 primaryAccount.Id,
-                new Auth0.ManagementApi.Models.UserAccountLinkRequest()
-                {
-                    Provider = authProviderName,
-                    UserId = authUserId,
-                }
+                new UserAccountLinkRequest() { Provider = authProviderName, UserId = authUserId }
             );
         }
 
@@ -186,10 +174,7 @@ namespace Hood.Services
         {
             var client = await GetClientAsync();
             return await client.Tickets.CreatePasswordChangeTicketAsync(
-                new Auth0.ManagementApi.Models.PasswordChangeTicketRequest()
-                {
-                    UserId = remoteUser.LocalUserId,
-                }
+                new PasswordChangeTicketRequest() { UserId = remoteUser.LocalUserId }
             );
         }
 
@@ -229,7 +214,7 @@ namespace Hood.Services
                 Search = search,
                 PageIndex = page,
                 PageSize = pageSize,
-                TotalPages = pageSize == 0 ? 0 : (int)(roles.Paging.Total / pageSize) + 1,
+                TotalPages = pageSize == 0 ? 0 : (roles.Paging.Total / pageSize) + 1,
             };
             return pagedList;
         }
@@ -275,7 +260,7 @@ namespace Hood.Services
                 Search = "",
                 PageIndex = page,
                 PageSize = pageSize,
-                TotalPages = pageSize == 0 ? 0 : (int)(roles.Paging.Total / pageSize) + 1,
+                TotalPages = pageSize == 0 ? 0 : (roles.Paging.Total / pageSize) + 1,
             };
             return pagedList;
         }

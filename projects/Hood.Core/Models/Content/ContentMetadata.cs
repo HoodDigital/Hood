@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Hood.Models
 {
-    public partial class ContentMeta : MetadataBase, IMetadata
+    public class ContentMeta : MetadataBase
     {
         public ContentMeta() { }
 

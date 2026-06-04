@@ -1,4 +1,4 @@
-﻿using Hood.Enums;
+using Hood.Enums;
 
 namespace Hood.Interfaces
 {

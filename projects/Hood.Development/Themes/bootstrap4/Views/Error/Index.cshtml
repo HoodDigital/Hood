@@ -1,4 +1,4 @@
-@model ErrorModel
+﻿@model ErrorModel
 <div class="container">
     @switch (Model.Code)
     {
@@ -15,6 +15,6 @@
     }
     @if (Model.Error != null)
     {
-        @Html.Raw(@Model.Error.Message.AddHtmlLineBreaks())
+        @Html.Raw(Model.Error.Message.AddHtmlLineBreaks())
     }
 </div>

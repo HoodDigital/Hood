@@ -2,16 +2,14 @@
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Interfaces;
 using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.ViewModels
 {
-    public class PropertyListModel : PagedList<PropertyListingView>, IPageableModel
+    public class PropertyListModel : PagedList<PropertyListingView>
     {
         public PropertyListModel()
-            : base()
         {
             PageSize = Engine.Settings.Property.DefaultPageSize;
             if (PageSize <= 0)
@@ -40,7 +38,7 @@ namespace Hood.ViewModels
         /// for internal use only, forces loading of images in the search, not recommended.
         /// </summary>
         [FromQuery(Name = "img")]
-        public bool LoadImages { get; set; } = false;
+        public bool LoadImages { get; set; }
 
         /// <summary>
         /// Filter by planning type.

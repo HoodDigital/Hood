@@ -56,10 +56,7 @@ namespace Hood.Caching
                 string json = JsonConvert.SerializeObject(cacheItem);
                 Database.StringSet(key, json, expiry);
             }
-            catch (JsonSerializationException)
-            {
-                return;
-            }
+            catch (JsonSerializationException) { }
         }
 
         public async Task AddAsync<T>(string key, T cacheItem, TimeSpan? expiry = null)
@@ -69,10 +66,7 @@ namespace Hood.Caching
                 string json = JsonConvert.SerializeObject(cacheItem);
                 await Database.StringSetAsync(key, json, expiry);
             }
-            catch (JsonSerializationException)
-            {
-                return;
-            }
+            catch (JsonSerializationException) { }
         }
 
         public void Remove(string key)

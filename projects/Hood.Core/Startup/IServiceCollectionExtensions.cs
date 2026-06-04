@@ -9,19 +9,16 @@ using Hood.Contexts;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Filters;
 using Hood.Identity;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
@@ -29,7 +26,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -518,17 +514,11 @@ namespace Hood.Startup
                         e.Principal.SetUserClaims(user.UserProfile);
                         if (user.EmailConfirmed)
                         {
-                            e.Principal.AddOrUpdateClaimValue(
-                                Hood.Constants.Identity.ClaimTypes.EmailConfirmed,
-                                "true"
-                            );
+                            e.Principal.AddOrUpdateClaimValue(ClaimTypes.EmailConfirmed, "true");
                         }
                         if (user.Active || !Engine.Settings.Account.RequireEmailConfirmation)
                         {
-                            e.Principal.AddOrUpdateClaimValue(
-                                Hood.Constants.Identity.ClaimTypes.Active,
-                                "true"
-                            );
+                            e.Principal.AddOrUpdateClaimValue(ClaimTypes.Active, "true");
                         }
                     },
                 };
@@ -538,17 +528,15 @@ namespace Hood.Startup
             {
                 options.AddPolicy(
                     Policies.Active,
-                    policy => policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.Active)
+                    policy => policy.RequireClaim(ClaimTypes.Active)
                 );
                 options.AddPolicy(
                     Policies.AccountNotConnected,
-                    policy =>
-                        policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.AccountNotConnected)
+                    policy => policy.RequireClaim(ClaimTypes.AccountNotConnected)
                 );
                 options.AddPolicy(
                     Policies.AccountLinkRequired,
-                    policy =>
-                        policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.AccountLinkRequired)
+                    policy => policy.RequireClaim(ClaimTypes.AccountLinkRequired)
                 );
             });
 
@@ -567,13 +555,9 @@ namespace Hood.Startup
                 options.OnRefreshingPrincipal = context => // new property name
                 {
                     System.Security.Claims.Claim originalUserIdClaim =
-                        context.CurrentPrincipal.FindFirst(
-                            Hood.Constants.Identity.ClaimTypes.OriginalUserId
-                        );
+                        context.CurrentPrincipal.FindFirst(ClaimTypes.OriginalUserId);
                     System.Security.Claims.Claim isImpersonatingClaim =
-                        context.CurrentPrincipal.FindFirst(
-                            Hood.Constants.Identity.ClaimTypes.IsImpersonating
-                        );
+                        context.CurrentPrincipal.FindFirst(ClaimTypes.IsImpersonating);
                     if (originalUserIdClaim != null && isImpersonatingClaim.Value == "true")
                     {
                         context.NewPrincipal.Identities.First().AddClaim(originalUserIdClaim);
@@ -633,12 +617,11 @@ namespace Hood.Startup
             {
                 options.AddPolicy(
                     Policies.Active,
-                    policy => policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.Active)
+                    policy => policy.RequireClaim(ClaimTypes.Active)
                 );
                 options.AddPolicy(
                     Policies.AccountNotConnected,
-                    policy =>
-                        policy.RequireClaim(Hood.Constants.Identity.ClaimTypes.AccountNotConnected)
+                    policy => policy.RequireClaim(ClaimTypes.AccountNotConnected)
                 );
             });
             return services;

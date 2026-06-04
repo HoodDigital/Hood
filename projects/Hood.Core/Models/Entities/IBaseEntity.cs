@@ -1,4 +1,4 @@
-﻿namespace Hood.Entities
+namespace Hood.Entities
 {
     public interface IBaseEntity<T>
     {

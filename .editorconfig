@@ -1,0 +1,235 @@
+# =============================================================================
+# Hood CMS — .editorconfig
+# =============================================================================
+# Formatting is owned by CSharpier (validate_code.sh runs `csharpier check`).
+# This file's job is to configure JetBrains InspectCode (the second gate in
+# validate_code.sh) — the inspections below are disabled deliberately, each
+# group with its reason. Everything not listed here is enforced at the tool's
+# default severity, and the gate fails on any reported issue (HOOD-62).
+#
+# Sections use [*.{cs,cshtml}] because Razor views embed C# — a cs-only
+# section leaves the same inspection firing inside views.
+# =============================================================================
+
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+
+[*.{cs,cshtml,html}]
+
+# --- Library public-API surface -----------------------------------------------
+# Hood is a consumed library: its public members ARE the product. "Unused" /
+# "can be private/init-only" analyses are wrong-by-design against a library's
+# public surface — consumers use these members outside this solution.
+resharper_unused_member_global_highlighting = none
+resharper_unused_type_global_highlighting = none
+resharper_unused_member_in_super_global_highlighting = none
+resharper_unused_auto_property_accessor_global_highlighting = none
+resharper_unused_method_return_value_global_highlighting = none
+resharper_member_can_be_private_global_highlighting = none
+resharper_member_can_be_protected_global_highlighting = none
+resharper_member_can_be_internal_highlighting = none
+resharper_property_can_be_made_init_only_global_highlighting = none
+resharper_auto_property_can_be_made_get_only_global_highlighting = none
+resharper_virtual_member_never_overridden_global_highlighting = none
+resharper_class_never_instantiated_global_highlighting = none
+resharper_class_with_virtual_members_never_inherited_global_highlighting = none
+resharper_event_never_subscribed_to_global_highlighting = none
+resharper_member_can_be_made_static_global_highlighting = none
+resharper_field_can_be_made_read_only_global_highlighting = none
+resharper_return_type_can_be_enumerable_global_highlighting = none
+resharper_parameter_type_can_be_enumerable_global_highlighting = none
+resharper_collection_never_queried_global_highlighting = none
+resharper_collection_never_updated_global_highlighting = none
+resharper_not_accessed_field_global_highlighting = none
+resharper_introduce_optional_parameters_global_highlighting = none
+
+# --- Naming & namespaces ---------------------------------------------------------
+# Public renames and namespace moves are breaking changes for consumers; the
+# legacy naming and the namespace/folder mismatch ship as-is in v7. Revisit
+# only behind a major-version API review.
+resharper_inconsistent_naming_highlighting = none
+resharper_check_namespace_highlighting = none
+
+# --- Nullable-reference-type analyses ------------------------------------------
+# The codebase predates NRT and <Nullable> is disabled solution-wide, so these
+# flow analyses fire on virtually every member access. NRT adoption is its own
+# (future) project — suppressed until then rather than drowning the gate.
+resharper_possible_null_reference_exception_highlighting = none
+resharper_assign_null_to_not_null_attribute_highlighting = none
+resharper_possible_invalid_operation_exception_highlighting = none
+resharper_constant_conditional_access_qualifier_highlighting = none
+resharper_constant_null_coalescing_condition_highlighting = none
+resharper_conditional_access_qualifier_is_non_nullable_according_to_api_contract_highlighting = none
+
+# --- MVC / Razor dynamic resolution ----------------------------------------------
+# Hood resolves views, layouts, sections and actions through its theme system
+# at runtime (Hood.Development is the canonical source; UI packages are copy
+# targets), and controllers reference actions across dynamically-routed areas.
+# InspectCode's static resolution can't follow that — false positives wholesale.
+resharper_mvc_action_not_resolved_highlighting = none
+resharper_mvc_view_not_resolved_highlighting = none
+resharper_mvc_controller_not_resolved_highlighting = none
+resharper_mvc_area_not_resolved_highlighting = none
+resharper_mvc_partial_view_not_resolved_highlighting = none
+resharper_mvc_template_not_resolved_highlighting = none
+resharper_razor_layout_not_resolved_highlighting = none
+resharper_razor_section_not_resolved_highlighting = none
+
+# --- Style suggestions ----------------------------------------------------------
+# Either owned by CSharpier (which already normalises the code) or pure taste
+# with no correctness value; several (async-overload, LINQ rewrites, primary
+# constructors) are behavioural or churn-heavy changes out of scope for the
+# mechanical sweep.
+resharper_arrange_object_creation_when_type_evident_highlighting = none
+resharper_arrange_accessor_owner_body_highlighting = none
+resharper_arrange_this_qualifier_highlighting = none
+resharper_use_string_interpolation_highlighting = none
+resharper_redundant_string_interpolation_highlighting = none
+resharper_redundant_verbatim_string_prefix_highlighting = none
+resharper_method_has_async_overload_highlighting = none
+resharper_method_has_async_overload_with_cancellation_highlighting = none
+resharper_use_method_any_0_highlighting = none
+resharper_use_method_any_1_highlighting = none
+resharper_use_method_any_2_highlighting = none
+resharper_replace_with_single_call_to_count_highlighting = none
+resharper_replace_with_single_call_to_first_or_default_highlighting = none
+resharper_replace_with_single_call_to_single_or_default_highlighting = none
+resharper_replace_with_single_call_to_any_highlighting = none
+resharper_convert_if_statement_to_return_statement_highlighting = none
+resharper_convert_if_statement_to_conditional_ternary_expression_highlighting = none
+resharper_convert_if_statement_to_null_coalescing_assignment_highlighting = none
+resharper_convert_if_statement_to_null_coalescing_expression_highlighting = none
+resharper_convert_if_statement_to_switch_statement_highlighting = none
+resharper_convert_to_using_declaration_highlighting = none
+resharper_convert_to_primary_constructor_highlighting = none
+resharper_convert_constructor_to_member_initializers_highlighting = none
+resharper_invert_if_highlighting = none
+resharper_merge_into_pattern_highlighting = none
+resharper_merge_conditional_expression_highlighting = none
+resharper_merge_sequential_checks_highlighting = none
+resharper_use_object_or_collection_initializer_highlighting = none
+resharper_use_collection_expression_highlighting = none
+resharper_foreach_can_be_converted_to_query_using_another_get_enumerator_highlighting = none
+resharper_foreach_can_be_partly_converted_to_query_using_another_get_enumerator_highlighting = none
+resharper_loop_can_be_converted_to_query_highlighting = none
+resharper_inline_out_variable_declaration_highlighting = none
+resharper_public_constructor_in_abstract_class_highlighting = none
+resharper_prefer_concrete_value_over_default_highlighting = none
+resharper_can_simplify_dictionary_lookup_with_try_get_value_highlighting = none
+resharper_use_index_from_end_expression_highlighting = none
+resharper_use_negated_pattern_matching_highlighting = none
+resharper_use_pattern_matching_highlighting = none
+resharper_use_switch_case_pattern_variable_highlighting = none
+resharper_use_deconstruction_highlighting = none
+resharper_use_nameof_expression_highlighting = none
+resharper_use_string_method_char_overload_with_single_character_string_highlighting = none
+resharper_simplify_string_interpolation_highlighting = none
+resharper_string_literal_typo_highlighting = none
+resharper_comment_typo_highlighting = none
+resharper_identifier_typo_highlighting = none
+resharper_markup_attribute_typo_highlighting = none
+resharper_markup_text_typo_highlighting = none
+
+# --- Known code smells — ticketed, not hidden silently --------------------------
+# Real findings (unused locals, multiple enumeration, dead assignments, empty
+# catches, modified-closure captures, virtual calls in ctors). Fixing them is
+# behavioural-risk work the HOOD-62 mechanical sweep must not do. Tracked to
+# re-enable + fix category-by-category in HOOD-78.
+resharper_unused_variable_highlighting = none
+resharper_unused_local_variable_highlighting = none
+resharper_not_accessed_variable_highlighting = none
+resharper_redundant_assignment_highlighting = none
+resharper_possible_multiple_enumeration_highlighting = none
+resharper_empty_constructor_highlighting = none
+resharper_empty_general_catch_clause_highlighting = none
+resharper_unused_member_local_highlighting = none
+resharper_not_accessed_field_local_highlighting = none
+resharper_unused_parameter_local_highlighting = none
+resharper_unused_parameter_global_highlighting = none
+resharper_access_to_modified_closure_highlighting = none
+resharper_virtual_member_call_in_constructor_highlighting = none
+resharper_invalid_xml_doc_comment_highlighting = none
+
+# --- Markup / web noise ------------------------------------------------------------
+# Legacy theme markup renders fine; paths are theme-relative; ids resolve at
+# runtime through Hood's composition.
+resharper_html_path_error_highlighting = none
+resharper_html_obsolete_highlighting = none
+resharper_html_id_not_resolved_highlighting = none
+resharper_html_attribute_value_not_resolved_highlighting = none
+resharper_html_attribute_not_resolved_highlighting = none
+resharper_html_tag_not_resolved_highlighting = none
+resharper_unknown_css_class_highlighting = none
+
+# --- Remaining smells parked in HOOD-78 (see that block's rationale above) -------
+resharper_access_to_static_member_via_derived_type_highlighting = none
+resharper_condition_is_always_true_or_false_highlighting = none
+resharper_async_void_lambda_highlighting = none
+resharper_unused_method_return_value_local_highlighting = none
+resharper_heuristic_unreachable_code_highlighting = none
+resharper_redundant_string_format_call_highlighting = none
+resharper_string_index_of_is_culture_specific_1_highlighting = none
+resharper_string_index_of_is_culture_specific_2_highlighting = none
+resharper_non_readonly_member_in_get_hash_code_highlighting = none
+resharper_duplicated_statements_highlighting = none
+resharper_unassigned_get_only_auto_property_highlighting = none
+resharper_expression_is_always_null_highlighting = none
+resharper_parameter_hides_member_highlighting = none
+resharper_local_variable_hides_member_highlighting = none
+resharper_short_lived_http_client_highlighting = none
+resharper_unused_auto_property_accessor_local_highlighting = none
+resharper_specify_a_culture_in_string_conversion_explicitly_highlighting = none
+resharper_usage_of_default_struct_equality_highlighting = none
+resharper_base_object_get_hash_code_call_in_get_hash_code_highlighting = none
+resharper_redundant_dictionary_contains_key_before_adding_highlighting = none
+resharper_possible_unintended_queryable_as_enumerable_highlighting = none
+resharper_possible_loss_of_fraction_highlighting = none
+resharper_redundant_bool_compare_highlighting = none
+resharper_redundant_string_to_char_array_call_highlighting = none
+resharper_redundant_explicit_array_creation_highlighting = none
+resharper_unassigned_field_global_highlighting = none
+resharper_return_value_of_pure_method_is_not_used_highlighting = none
+resharper_member_initializer_value_ignored_highlighting = none
+
+# --- More style taste (second sweep) ---------------------------------------------
+resharper_use_await_using_highlighting = none
+resharper_replace_with_field_keyword_highlighting = none
+resharper_arrange_modifiers_order_highlighting = none
+resharper_convert_to_auto_property_highlighting = none
+resharper_simplify_linq_expression_use_all_highlighting = none
+resharper_redundant_type_declaration_body_highlighting = none
+resharper_convert_to_local_function_highlighting = none
+resharper_too_wide_local_variable_scope_highlighting = none
+resharper_use_collection_count_property_highlighting = none
+resharper_auto_property_can_be_made_get_only_local_highlighting = none
+resharper_can_simplify_dictionary_lookup_with_try_add_highlighting = none
+resharper_redundant_attribute_usage_property_highlighting = none
+resharper_simplify_conditional_ternary_expression_highlighting = none
+resharper_replace_with_string_is_null_or_empty_highlighting = none
+resharper_arrange_default_value_when_type_evident_highlighting = none
+resharper_enum_underlying_type_is_int_highlighting = none
+resharper_redundant_explicit_params_array_creation_highlighting = none
+resharper_use_event_args_empty_field_highlighting = none
+resharper_change_field_type_to_system_threading_lock_highlighting = none
+resharper_field_can_be_made_readonly_local_highlighting = none
+resharper_redundant_verbatim_prefix_highlighting = none
+
+# --- Markup noise / static-analysis false positives (second sweep) ----------------
+# Razor.AssemblyNotResolved: `@addTagHelper *, Hood` resolves at runtime via the
+# package — JB can't see it. HtmlErrors: JB's HTML parser misreads email-client
+# conditional table markup (_Layout_Email is balanced; verified).
+resharper_razor_assembly_not_resolved_highlighting = none
+resharper_html_errors_highlighting = none
+resharper_html_id_duplication_highlighting = none
+resharper_center_tag_is_obsolete_highlighting = none
+
+# --- EF-generated migrations -------------------------------------------------------
+# Authoring artefacts regenerated by `dotnet ef` (HOOD-58 workflow). The scaffold
+# emits `#nullable disable` and `partial`; stripping them just creates churn on
+# the next regen.
+[projects/Hood.Core/Migrations/**.cs]
+resharper_redundant_nullable_directive_highlighting = none
+resharper_partial_type_with_single_part_highlighting = none

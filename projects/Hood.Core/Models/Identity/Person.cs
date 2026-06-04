@@ -3,7 +3,7 @@ using Hood.Interfaces;
 
 namespace Hood.Models
 {
-    public class Person : IName, IAddress, IPerson
+    public class Person : IPerson
     {
         [Display(Name = "First name")]
         public string FirstName { get; set; }

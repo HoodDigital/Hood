@@ -1,4 +1,4 @@
-﻿namespace Hood.Models
+namespace Hood.Models
 {
     public class PostcodeValidation
     {

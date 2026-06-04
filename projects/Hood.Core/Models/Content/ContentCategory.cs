@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace Hood.Models
 {
-    public partial class ContentCategory : BaseEntity
+    public class ContentCategory : BaseEntity
     {
         [Required]
         [Display(Name = "Title / Name", Description = "Display name for your category.")]
@@ -43,7 +43,7 @@ namespace Hood.Models
         public int Count { get; set; }
     }
 
-    public partial class ContentCategoryJoin
+    public class ContentCategoryJoin
     {
         public int CategoryId { get; set; }
         public ContentCategory Category { get; set; }

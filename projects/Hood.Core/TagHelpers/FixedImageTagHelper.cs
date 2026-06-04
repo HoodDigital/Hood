@@ -1,4 +1,4 @@
-﻿using Hood.Core;
+using Hood.Core;
 using Hood.Extensions;
 using Hood.Models;
 using Microsoft.AspNetCore.Razor.TagHelpers;

@@ -2,13 +2,12 @@
 using System.ComponentModel.DataAnnotations;
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Interfaces;
 using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.ViewModels
 {
-    public class MediaListModel : PagedList<MediaObject>, IPageableModel
+    public class MediaListModel : PagedList<MediaObject>
     {
         public MediaListModel()
         {

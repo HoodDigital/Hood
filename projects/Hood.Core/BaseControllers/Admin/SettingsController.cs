@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Geocoding.Google;
 using Hood.BaseControllers;
 using Hood.BaseTypes;
@@ -9,18 +6,13 @@ using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
-using Hood.Services;
-using Hood.ViewModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Hood.Admin.BaseControllers
 {
     public abstract class BaseSettingsController : BaseController
     {
-        public BaseSettingsController()
-            : base() { }
+        public BaseSettingsController() { }
 
         [Route("admin/settings/basics/")]
         public virtual IActionResult Basics()

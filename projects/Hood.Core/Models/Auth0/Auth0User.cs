@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Security.Claims;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Identity;
-using Newtonsoft.Json;
 
 namespace Hood.Models
 {
-    public partial class Auth0User : IHoodIdentity
+    public class Auth0User : IHoodIdentity
     {
         /// <summary>
         ///     Constructor which creates a new Guid for the Id

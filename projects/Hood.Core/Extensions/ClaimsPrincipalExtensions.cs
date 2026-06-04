@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using Hood.Identity;
 using Hood.Models;
 
 namespace Hood.Extensions
@@ -70,23 +69,17 @@ namespace Hood.Extensions
             var userId = principal.GetUserId();
             if (user.Id != userId)
             {
-                principal.AddOrUpdateClaimValue(
-                    Hood.Constants.Identity.ClaimTypes.LocalUserId,
-                    user.Id
-                );
+                principal.AddOrUpdateClaimValue(Constants.Identity.ClaimTypes.LocalUserId, user.Id);
             }
 
             // Make sure the User.Identity.Name is set to the user's email.
-            principal.AddOrUpdateClaimValue(
-                Hood.Constants.Identity.ClaimTypes.UserName,
-                user.Email
-            );
+            principal.AddOrUpdateClaimValue(Constants.Identity.ClaimTypes.UserName, user.Email);
 
             // Set the picture -if one is set in the user, then add the url to picture claim.
             if (user.AvatarJson.IsSet())
             {
                 principal.AddOrUpdateClaimValue(
-                    Hood.Constants.Identity.ClaimTypes.Picture,
+                    Constants.Identity.ClaimTypes.Picture,
                     user.Avatar.LargeUrl
                 );
             }
@@ -102,36 +95,35 @@ namespace Hood.Extensions
                 principal.AddOrUpdateClaimValue(ClaimTypes.Surname, user.LastName);
             }
 
-            principal.RemoveClaim(Hood.Constants.Identity.ClaimTypes.Nickname);
+            principal.RemoveClaim(Constants.Identity.ClaimTypes.Nickname);
             if (user.DisplayName.IsSet())
             {
                 principal.AddOrUpdateClaimValue(
-                    Hood.Constants.Identity.ClaimTypes.Nickname,
+                    Constants.Identity.ClaimTypes.Nickname,
                     user.DisplayName
                 );
             }
 
             principal.AddOrUpdateClaimValue(
-                Hood.Constants.Identity.ClaimTypes.Anonymous,
+                Constants.Identity.ClaimTypes.Anonymous,
                 user.Anonymous.ToString()
             );
         }
 
         public static string GetAvatar(this ClaimsPrincipal principal)
         {
-            return principal.GetClaimValue(Hood.Constants.Identity.ClaimTypes.Picture);
+            return principal.GetClaimValue(Constants.Identity.ClaimTypes.Picture);
         }
 
         public static bool IsEmailConfirmed(this ClaimsPrincipal principal)
         {
-            return principal
-                    .GetClaimValue(Hood.Constants.Identity.ClaimTypes.EmailConfirmed)
-                    ?.ToLower() == "true";
+            return principal.GetClaimValue(Constants.Identity.ClaimTypes.EmailConfirmed)?.ToLower()
+                == "true";
         }
 
         public static bool IsAnonymous(this ClaimsPrincipal principal)
         {
-            return principal.GetClaimValue(Hood.Constants.Identity.ClaimTypes.Anonymous)?.ToLower()
+            return principal.GetClaimValue(Constants.Identity.ClaimTypes.Anonymous)?.ToLower()
                 == "true";
         }
 
@@ -145,9 +137,7 @@ namespace Hood.Extensions
                 throw new ArgumentNullException(nameof(principal));
             }
             bool anonymous = principal.IsAnonymous();
-            string displayName = principal.GetClaimValue(
-                Hood.Constants.Identity.ClaimTypes.Nickname
-            );
+            string displayName = principal.GetClaimValue(Constants.Identity.ClaimTypes.Nickname);
             string firstName = principal.GetClaimValue(ClaimTypes.GivenName);
             string lastName = principal.GetClaimValue(ClaimTypes.Surname);
 
@@ -176,9 +166,7 @@ namespace Hood.Extensions
                 throw new ArgumentNullException(nameof(principal));
             }
             bool anonymous = principal.IsAnonymous();
-            string displayName = principal.GetClaimValue(
-                Hood.Constants.Identity.ClaimTypes.Nickname
-            );
+            string displayName = principal.GetClaimValue(Constants.Identity.ClaimTypes.Nickname);
             string firstName = principal.GetClaimValue(ClaimTypes.GivenName);
             string lastName = principal.GetClaimValue(ClaimTypes.Surname);
             string email = principal.GetClaimValue(ClaimTypes.Email);
@@ -199,7 +187,7 @@ namespace Hood.Extensions
             {
                 throw new ArgumentNullException(nameof(principal));
             }
-            Claim claim = principal.FindFirst(Hood.Constants.Identity.ClaimTypes.LocalUserId);
+            Claim claim = principal.FindFirst(Constants.Identity.ClaimTypes.LocalUserId);
             if (claim != null)
             {
                 return claim.Value;
@@ -220,13 +208,13 @@ namespace Hood.Extensions
 
         public static bool RequiresConnection(this ClaimsPrincipal principal)
         {
-            return principal.GetClaimValue(Hood.Constants.Identity.ClaimTypes.AccountNotConnected)
+            return principal.GetClaimValue(Constants.Identity.ClaimTypes.AccountNotConnected)
                 != null;
         }
 
         public static bool IsActive(this ClaimsPrincipal principal)
         {
-            return principal.GetClaimValue(Hood.Constants.Identity.ClaimTypes.Active) != null;
+            return principal.GetClaimValue(Constants.Identity.ClaimTypes.Active) != null;
         }
 
         public static bool IsImpersonating(this ClaimsPrincipal principal)
@@ -235,7 +223,7 @@ namespace Hood.Extensions
             {
                 throw new ArgumentNullException(nameof(principal));
             }
-            return principal.HasClaim(Hood.Constants.Identity.ClaimTypes.IsImpersonating, "true");
+            return principal.HasClaim(Constants.Identity.ClaimTypes.IsImpersonating, "true");
         }
 
         public static List<string> GetRoles(this ClaimsPrincipal principal)
@@ -245,7 +233,7 @@ namespace Hood.Extensions
                 throw new ArgumentNullException(nameof(principal));
             }
             var identity = (ClaimsIdentity)principal.Identity;
-            var roles = identity.FindAll(System.Security.Claims.ClaimTypes.Role);
+            var roles = identity.FindAll(ClaimTypes.Role);
             return roles.Select(r => r.Value).ToList();
         }
 

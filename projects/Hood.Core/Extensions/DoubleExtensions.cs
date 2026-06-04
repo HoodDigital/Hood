@@ -21,7 +21,7 @@ namespace Hood.Extensions
 
         public static string ToCurrencyString(this decimal amount)
         {
-            return ((decimal)amount / 100).ToString("N2");
+            return (amount / 100).ToString("N2");
         }
 
         public static string ToCurrencyString(this long amount)

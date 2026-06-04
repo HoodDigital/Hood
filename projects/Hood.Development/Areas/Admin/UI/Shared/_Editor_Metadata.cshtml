@@ -1,4 +1,4 @@
-@model IMetadata
+﻿@model IMetadata
 @switch (Model.Name)
 {
 
@@ -86,14 +86,14 @@
         {                 
             dateTime = Model.GetValue<DateTime>();
         }
-        catch (System.Exception)
+        catch (Exception)
         { 
             try
             {
                 var dateTimeString = Model.GetValue<string>();
                 dateTime = DateTime.Parse(dateTimeString);
             }
-            catch (System.Exception)
+            catch (Exception)
             { }
         }
 

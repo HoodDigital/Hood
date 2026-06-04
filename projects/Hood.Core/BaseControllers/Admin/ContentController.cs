@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,7 +25,6 @@ namespace Hood.Admin.BaseControllers
         protected readonly IHoodAccountRepository _account;
 
         public BaseContentController()
-            : base()
         {
             _contentDb = Engine.Services.Resolve<ContentContext>();
             _content = Engine.Services.Resolve<IContentRepository>();
@@ -534,7 +533,7 @@ namespace Hood.Admin.BaseControllers
 
                 await _contentDb.SaveChangesAsync();
 
-                string cacheKey = typeof(Content).ToString() + ".Single." + id;
+                string cacheKey = typeof(Content) + ".Single." + id;
                 _cache.Remove(cacheKey);
 
                 return new Response(true, media, $"The media has been attached successfully.");
@@ -562,7 +561,7 @@ namespace Hood.Admin.BaseControllers
                     .Content.Where(p => p.Id == id)
                     .FirstOrDefaultAsync();
                 MediaObject media = _db.Media.SingleOrDefault(m => m.Id == model.MediaId);
-                string cacheKey = typeof(Content).ToString() + ".Single." + id;
+                string cacheKey = typeof(Content) + ".Single." + id;
 
                 switch (model.FieldName)
                 {

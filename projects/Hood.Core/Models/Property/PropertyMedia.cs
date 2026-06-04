@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Hood.Models
 {
-    public partial class PropertyMedia : MediaBase
+    public class PropertyMedia : MediaBase
     {
         [JsonIgnore]
         public PropertyListing Property { get; set; }
@@ -13,8 +13,7 @@ namespace Hood.Models
         public PropertyListingView PropertyListingView { get; set; }
         public int PropertyId { get; set; }
 
-        public PropertyMedia()
-            : base() { }
+        public PropertyMedia() { }
 
         public PropertyMedia(IMediaObject media)
             : base(media) { }
@@ -31,7 +30,7 @@ namespace Hood.Models
         public static new IMediaObject Blank => MediaBase.Blank;
     }
 
-    public partial class PropertyFloorplan : MediaBase
+    public class PropertyFloorplan : MediaBase
     {
         [JsonIgnore]
         public PropertyListing Property { get; set; }
@@ -40,8 +39,7 @@ namespace Hood.Models
         public PropertyListingView PropertyListingView { get; set; }
         public int PropertyId { get; set; }
 
-        public PropertyFloorplan()
-            : base() { }
+        public PropertyFloorplan() { }
 
         public PropertyFloorplan(IMediaObject media)
             : base(media) { }

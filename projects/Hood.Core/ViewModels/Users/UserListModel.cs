@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Hood.Extensions;
-using Hood.Interfaces;
 using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,7 +11,7 @@ namespace Hood.ViewModels
         public UserListModel() { }
     }
 
-    public class UserListModel<TUserProfile> : PagedList<TUserProfile>, IPageableModel
+    public class UserListModel<TUserProfile> : PagedList<TUserProfile>
     {
         public UserListModel() { }
 

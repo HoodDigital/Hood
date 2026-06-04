@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using Hood.Interfaces;
-
-namespace Hood.Models
+﻿namespace Hood.Models
 {
     public interface IHoodIdentity
     {

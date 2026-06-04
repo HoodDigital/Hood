@@ -1,15 +1,10 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Hood.Caching;
 using Hood.Contexts;
 using Hood.Core;
-using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace Hood.Api.BaseControllers
 {
@@ -22,7 +17,6 @@ namespace Hood.Api.BaseControllers
         protected readonly ContentCategoryCache _contentCategoryCache;
 
         public ContentController()
-            : base()
         {
             _contentDb = Engine.Services.Resolve<ContentContext>();
             _content = Engine.Services.Resolve<IContentRepository>();

@@ -19,7 +19,7 @@ namespace Hood.ViewModels
             Name = "Create Validated Account",
             Description = "Create the user, and mark the email address and phone number as valid. This will override the requirement for the user to validate their email when logging in. This is not recommended to maintain account security."
         )]
-        public bool CreateValidated { get; set; } = false;
+        public bool CreateValidated { get; set; }
 
         [Display(
             Name = "Notify the user",
@@ -57,7 +57,7 @@ namespace Hood.ViewModels
         public override string LastName { get; set; }
     }
 
-    public class RegisterViewModel : SpamPreventionModel, IName, IAddress, IPerson
+    public class RegisterViewModel : SpamPreventionModel, IPerson
     {
         [Required]
         [EmailAddress]

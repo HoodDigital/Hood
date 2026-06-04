@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using Hood.Attributes;
 using Hood.Enums;
 using Hood.Extensions;
@@ -48,7 +47,7 @@ namespace Hood.Models
         public UserProfile() { }
     }
 
-    public class UserProfileBase : IUserProfile, IName
+    public class UserProfileBase : IUserProfile
     {
         public virtual string Id { get; set; }
 

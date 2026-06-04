@@ -1,33 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using Auth0.AspNetCore.Authentication;
-using Auth0.AuthenticationApi;
-using Auth0.AuthenticationApi.Models;
-using Auth0.Core.Exceptions;
-using Hood.Attributes;
 using Hood.BaseTypes;
 using Hood.Constants.Identity;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Identity;
-using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
-using Unsplasharp;
 
 namespace Hood.BaseControllers
 {
@@ -452,7 +437,7 @@ namespace Hood.BaseControllers
             {
                 var user = await GetCurrentUserOrThrow();
                 await SendVerificationEmail(
-                    (ApplicationUser)user,
+                    user,
                     User.GetUserId(),
                     Url.AbsoluteAction("Login", "Account")
                 );

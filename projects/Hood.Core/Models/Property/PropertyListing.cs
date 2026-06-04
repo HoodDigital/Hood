@@ -15,7 +15,7 @@ namespace Hood.Models
 {
     public class PropertyListing : BasePropertyListing { }
 
-    public partial class BasePropertyListing : BaseEntity, IAddress, IMetaObect<PropertyMeta>
+    public class BasePropertyListing : BaseEntity, IAddress, IMetaObect<PropertyMeta>
     {
         // Content
         [FormUpdatable]

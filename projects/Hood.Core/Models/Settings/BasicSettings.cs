@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Hood.BaseTypes;
 using Hood.Core;
 using Hood.Extensions;
@@ -73,7 +72,7 @@ namespace Hood.Models
         }
     }
 
-    public partial class SiteAddress : IAddress
+    public class SiteAddress : IAddress
     {
         public string ContactName { get; set; }
 

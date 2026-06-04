@@ -6,12 +6,8 @@ using System.Security.Claims;
 using Hood.Caching;
 using Hood.Extensions;
 using Hood.Interfaces;
-using Hood.Models;
 using Hood.Services;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
 namespace Hood.Core
@@ -246,7 +242,7 @@ namespace Hood.Core
             {
                 if (Settings["Hood.SiteUrl"] != null)
                 {
-                    return Settings["Hood.SiteUrl"].ToString();
+                    return Settings["Hood.SiteUrl"];
                 }
                 return null;
             }
@@ -258,7 +254,7 @@ namespace Hood.Core
             {
                 if (Settings["Hood.Api.SystemPrivateKey"] != null)
                 {
-                    return Settings["Hood.Api.SystemPrivateKey"].ToString();
+                    return Settings["Hood.Api.SystemPrivateKey"];
                 }
                 return null;
             }

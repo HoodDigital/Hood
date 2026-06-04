@@ -1,4 +1,4 @@
-﻿namespace Hood.Interfaces
+namespace Hood.Interfaces
 {
     public interface IPageableModel
     {

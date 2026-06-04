@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
@@ -282,7 +281,7 @@ namespace Hood.Services
         {
             HttpClient client = new HttpClient();
             var response = await client.GetAsync(media.Url);
-            using (var fs = new System.IO.MemoryStream())
+            using (var fs = new MemoryStream())
             {
                 await response.Content.CopyToAsync(fs);
                 media.ThumbUrl = await GenerateThumb(media, fs, ".xs", 250);
@@ -314,7 +313,7 @@ namespace Hood.Services
                     // now lives on Metadata, and Save takes an encoder rather than a format (HOOD-57).
                     IImageFormat format = image.Metadata.DecodedImageFormat;
                     image.Mutate(x => x.Resize(size, 0));
-                    using (Stream outputStream = new System.IO.MemoryStream())
+                    using (Stream outputStream = new MemoryStream())
                     {
                         IImageEncoder encoder = image.Configuration.ImageFormatsManager.GetEncoder(
                             format

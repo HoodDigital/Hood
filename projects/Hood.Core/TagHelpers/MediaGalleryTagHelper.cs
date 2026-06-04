@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Hood.Core;
+﻿using Hood.Core;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;

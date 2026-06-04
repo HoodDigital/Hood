@@ -7,8 +7,7 @@ namespace Hood.Models
 {
     public class ContentMedia : MediaBase
     {
-        public ContentMedia()
-            : base() { }
+        public ContentMedia() { }
 
         public ContentMedia(IMediaObject mediaResult)
             : base(mediaResult) { }

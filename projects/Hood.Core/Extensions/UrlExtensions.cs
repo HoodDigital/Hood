@@ -102,7 +102,6 @@ namespace Hood.Extensions
                 "/",
                 slug
             );
-            ;
         }
     }
 }

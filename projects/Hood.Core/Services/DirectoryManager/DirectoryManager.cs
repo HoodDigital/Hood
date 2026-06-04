@@ -159,8 +159,7 @@ namespace Hood.Services
         {
             List<string> links = new List<string>();
 
-            LinkGenerator linkGenerator =
-                Hood.Core.Engine.Services.Resolve<Microsoft.AspNetCore.Routing.LinkGenerator>();
+            LinkGenerator linkGenerator = Core.Engine.Services.Resolve<LinkGenerator>();
             string baseUrl = linkGenerator.GetPathByAction("List", "Media", new { area = "Admin" });
 
             MediaListModel linkModel = new MediaListModel();

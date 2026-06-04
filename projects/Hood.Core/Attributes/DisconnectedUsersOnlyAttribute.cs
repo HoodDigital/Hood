@@ -2,11 +2,9 @@
 using System.Threading.Tasks;
 using Hood.Core;
 using Hood.Extensions;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 
 namespace Hood.Attributes
 {

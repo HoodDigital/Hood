@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Hood.Models;
+﻿using Hood.Models;
 using Microsoft.Extensions.Configuration;
 
 namespace Hood.Services

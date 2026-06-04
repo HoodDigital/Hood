@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Hood.Core;
-using Hood.Models;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 

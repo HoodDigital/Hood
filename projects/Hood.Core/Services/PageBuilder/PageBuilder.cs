@@ -186,8 +186,8 @@ namespace Hood.Services
 
         private void BundleMinifier_ErrorMinifyingFile(object sender, MinifyFileEventArgs e)
         {
-            var logger = Hood.Core.Engine.Services.Resolve<ILogService>();
-            var logWriter = new System.IO.StringWriter();
+            var logger = Core.Engine.Services.Resolve<ILogService>();
+            var logWriter = new StringWriter();
             logWriter.WriteLine(
                 $"Bundle errors from {e.Result.FileName} - {DateTime.UtcNow.ToDisplay()}"
             );

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
-using SendGrid.Helpers.Mail;
 
 namespace Hood.Services
 {

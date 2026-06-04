@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Hood.Enums;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Razor.TagHelpers;

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,17 +6,13 @@ using Hood.Core;
 using Hood.Extensions;
 using Hood.Models;
 using Hood.ViewModels;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Unsplasharp;
 
 namespace Hood.BaseControllers
 {
     public abstract class HoodController : BaseController
     {
-        public HoodController()
-            : base() { }
+        public HoodController() { }
 
         [HttpPost]
         [Route("hood/contact/send/")]
@@ -53,7 +48,7 @@ namespace Hood.BaseControllers
             }
             catch (Exception ex)
             {
-                return new Models.Response(ex);
+                return new Response(ex);
             }
         }
 
