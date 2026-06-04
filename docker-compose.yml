@@ -12,7 +12,7 @@ services:
       - MSSQL_PID=Express
     ports:
       # Host 14331 → container 1433, avoiding clashes with a native SQL Server
-      # (1433) or other dev stacks (bma-live uses 14330).
+      # (1433) or other dev stacks.
       - "14331:1433"
     volumes:
       - sqlserver-data:/var/opt/mssql
@@ -52,7 +52,7 @@ services:
       # Persist the Data Protection key ring so antiforgery tokens / auth cookies survive rebuilds.
       - Hood__DataProtectionKeyPath=/keys
     ports:
-      # Host 5070 → container 8080 (bma-live uses 5050; keep Hood distinct).
+      # Host 5070 → container 8080 (avoids clashing with other local dev stacks).
       - "5070:8080"
     volumes:
       - hood-keys:/keys
