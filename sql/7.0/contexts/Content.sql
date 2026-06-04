@@ -1,18 +1,6 @@
-IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
-BEGIN
-    CREATE TABLE [__EFMigrationsHistory] (
-        [MigrationId] nvarchar(150) NOT NULL,
-        [ProductVersion] nvarchar(32) NOT NULL,
-        CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
-    );
-END;
-GO
-
-BEGIN TRANSACTION;
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
+-- Content tables — idempotent: the whole block runs only on a database that doesn't
+-- already have it. DbUp journals this script; no EF migration-history table is used.
+IF OBJECT_ID(N'[HoodContent]', 'U') IS NULL
 BEGIN
     CREATE TABLE [HoodContent] (
         [Id] int NOT NULL IDENTITY,
@@ -38,13 +26,7 @@ BEGIN
         [ShareImageJson] nvarchar(max) NULL,
         CONSTRAINT [PK_HoodContent] PRIMARY KEY ([Id])
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodContentCategories] (
         [ContentCategoryId] int NOT NULL IDENTITY,
         [DisplayName] nvarchar(max) NOT NULL,
@@ -54,13 +36,7 @@ BEGIN
         CONSTRAINT [PK_HoodContentCategories] PRIMARY KEY ([ContentCategoryId]),
         CONSTRAINT [FK_HoodContentCategories_HoodContentCategories_ParentCategoryId] FOREIGN KEY ([ParentCategoryId]) REFERENCES [HoodContentCategories] ([ContentCategoryId])
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodContentMedia] (
         [Id] int NOT NULL IDENTITY,
         [ContentId] int NOT NULL,
@@ -81,13 +57,7 @@ BEGIN
         CONSTRAINT [PK_HoodContentMedia] PRIMARY KEY ([Id]),
         CONSTRAINT [FK_HoodContentMedia_HoodContent_ContentId] FOREIGN KEY ([ContentId]) REFERENCES [HoodContent] ([Id]) ON DELETE NO ACTION
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodContentMetadata] (
         [Id] int NOT NULL IDENTITY,
         [ContentId] int NOT NULL,
@@ -98,13 +68,7 @@ BEGIN
         CONSTRAINT [AK_HoodContentMetadata_ContentId_Name] UNIQUE ([ContentId], [Name]),
         CONSTRAINT [FK_HoodContentMetadata_HoodContent_ContentId] FOREIGN KEY ([ContentId]) REFERENCES [HoodContent] ([Id]) ON DELETE CASCADE
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodContentCategoryJoins] (
         [CategoryId] int NOT NULL,
         [ContentId] int NOT NULL,
@@ -112,41 +76,10 @@ BEGIN
         CONSTRAINT [FK_HoodContentCategoryJoins_HoodContentCategories_CategoryId] FOREIGN KEY ([CategoryId]) REFERENCES [HoodContentCategories] ([ContentCategoryId]) ON DELETE CASCADE,
         CONSTRAINT [FK_HoodContentCategoryJoins_HoodContent_ContentId] FOREIGN KEY ([ContentId]) REFERENCES [HoodContent] ([Id]) ON DELETE CASCADE
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_HoodContentCategories_ParentCategoryId] ON [HoodContentCategories] ([ParentCategoryId]);
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_HoodContentCategoryJoins_CategoryId] ON [HoodContentCategoryJoins] ([CategoryId]);
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_HoodContentMedia_ContentId] ON [HoodContentMedia] ([ContentId]);
 END;
-
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172831_v7_baseline'
-)
-BEGIN
-    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20260602172831_v7_baseline', N'10.0.8');
-END;
-
-COMMIT;
-GO
-

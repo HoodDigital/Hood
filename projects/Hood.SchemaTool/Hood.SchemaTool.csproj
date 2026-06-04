@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>hood-schema</AssemblyName>
+    <PackageId>Hood.SchemaTool</PackageId>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>hood-schema</ToolCommandName>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Description>CLI to apply the Hood CMS database schema (idempotent, forward-only) in a deploy pipeline.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Hood.Core pulls the ASP.NET Core shared framework (Razor support), so the tool needs it too. -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
+  </ItemGroup>
+
+</Project>

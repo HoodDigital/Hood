@@ -1,18 +1,6 @@
-IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
-BEGIN
-    CREATE TABLE [__EFMigrationsHistory] (
-        [MigrationId] nvarchar(150) NOT NULL,
-        [ProductVersion] nvarchar(32) NOT NULL,
-        CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
-    );
-END;
-GO
-
-BEGIN TRANSACTION;
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172835_v7_baseline'
-)
+-- Property tables — idempotent: the whole block runs only on a database that doesn't
+-- already have it. DbUp journals this script; no EF migration-history table is used.
+IF OBJECT_ID(N'[HoodProperties]', 'U') IS NULL
 BEGIN
     CREATE TABLE [HoodProperties] (
         [Id] int NOT NULL IDENTITY,
@@ -75,13 +63,7 @@ BEGIN
         [Floors] nvarchar(max) NULL,
         CONSTRAINT [PK_HoodProperties] PRIMARY KEY ([Id])
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172835_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodPropertyFloorplans] (
         [Id] int NOT NULL IDENTITY,
         [PropertyId] int NOT NULL,
@@ -102,13 +84,7 @@ BEGIN
         CONSTRAINT [PK_HoodPropertyFloorplans] PRIMARY KEY ([Id]),
         CONSTRAINT [FK_HoodPropertyFloorplans_HoodProperties_PropertyId] FOREIGN KEY ([PropertyId]) REFERENCES [HoodProperties] ([Id]) ON DELETE NO ACTION
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172835_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodPropertyMedia] (
         [Id] int NOT NULL IDENTITY,
         [PropertyId] int NOT NULL,
@@ -129,13 +105,7 @@ BEGIN
         CONSTRAINT [PK_HoodPropertyMedia] PRIMARY KEY ([Id]),
         CONSTRAINT [FK_HoodPropertyMedia_HoodProperties_PropertyId] FOREIGN KEY ([PropertyId]) REFERENCES [HoodProperties] ([Id]) ON DELETE NO ACTION
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172835_v7_baseline'
-)
-BEGIN
     CREATE TABLE [HoodPropertyMetadata] (
         [Id] int NOT NULL IDENTITY,
         [PropertyId] int NOT NULL,
@@ -146,33 +116,8 @@ BEGIN
         CONSTRAINT [AK_HoodPropertyMetadata_PropertyId_Name] UNIQUE ([PropertyId], [Name]),
         CONSTRAINT [FK_HoodPropertyMetadata_HoodProperties_PropertyId] FOREIGN KEY ([PropertyId]) REFERENCES [HoodProperties] ([Id]) ON DELETE NO ACTION
     );
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172835_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_HoodPropertyFloorplans_PropertyId] ON [HoodPropertyFloorplans] ([PropertyId]);
-END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172835_v7_baseline'
-)
-BEGIN
     CREATE INDEX [IX_HoodPropertyMedia_PropertyId] ON [HoodPropertyMedia] ([PropertyId]);
 END;
-
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20260602172835_v7_baseline'
-)
-BEGIN
-    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20260602172835_v7_baseline', N'10.0.8');
-END;
-
-COMMIT;
-GO
-
