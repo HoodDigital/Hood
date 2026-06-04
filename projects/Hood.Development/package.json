@@ -21,7 +21,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/HoodDigital/hoodcms.git"
+    "url": "git+https://github.com/HoodDigital/Hood.git",
+    "directory": "projects/Hood.Development"
   },
   "license": "GPL-3.0",
   "author": "George Whysall",
