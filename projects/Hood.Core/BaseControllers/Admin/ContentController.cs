@@ -747,7 +747,14 @@ namespace Hood.Admin.BaseControllers
                         }
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    _ = _logService.AddExceptionAsync<BaseContentController>(
+                        "Failed to parse a content template directory entry.",
+                        ex,
+                        LogType.Warning
+                    );
+                }
             }
 
             model.Templates = templates

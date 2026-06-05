@@ -9,8 +9,6 @@ namespace Hood.ViewModels
     {
         public LogListModel()
         {
-            PageSize = 20;
-            PageIndex = 1;
         }
 
         [FromQuery(Name = "userId")]

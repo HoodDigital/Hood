@@ -21,11 +21,7 @@ namespace System.Collections.Generic
         /// <summary>
         /// Constructor
         /// </summary>
-        public PagedList()
-        {
-            PageSize = 20;
-            PageIndex = 1;
-        }
+        public PagedList() { }
 
         /// <summary>
         /// Constructor
@@ -44,7 +40,7 @@ namespace System.Collections.Generic
         [FromQuery(Name = "page")]
         [JsonProperty("page")]
         [Display(Name = "Current Page")]
-        public virtual int PageIndex { get; set; }
+        public int PageIndex { get; set; } = 1;
 
         /// <summary>
         /// Page size
@@ -52,7 +48,7 @@ namespace System.Collections.Generic
         [FromQuery(Name = "pageSize")]
         [JsonProperty("pageSize")]
         [Display(Name = "Page Size")]
-        public virtual int PageSize { get; set; }
+        public virtual int PageSize { get; set; } = 20;
 
         /// <summary>
         /// Total count

@@ -126,7 +126,14 @@ namespace Hood.Admin.BaseControllers
                 {
                     await _media.DeleteStoredMedia(media);
                 }
-                catch (Exception) { }
+                catch (Exception ex)
+                {
+                    await _logService.AddExceptionAsync<BaseMediaController>(
+                        "Failed to delete stored media file.",
+                        ex,
+                        LogType.Warning
+                    );
+                }
                 _db.Media.Remove(media);
                 await _db.SaveChangesAsync();
                 _directoryManager.ResetCache();
@@ -316,7 +323,14 @@ namespace Hood.Admin.BaseControllers
                         {
                             await _media.DeleteStoredMedia(media);
                         }
-                        catch (Exception) { }
+                        catch (Exception ex)
+                        {
+                            await _logService.AddExceptionAsync<BaseMediaController>(
+                                "Failed to delete stored media file.",
+                                ex,
+                                LogType.Warning
+                            );
+                        }
                         _db.Entry(media).State = EntityState.Deleted;
                     }
                 }

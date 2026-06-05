@@ -11,10 +11,10 @@ namespace Hood.ViewModels
     {
         public PropertyListModel()
         {
-            PageSize = Engine.Settings.Property.DefaultPageSize;
-            if (PageSize <= 0)
-                PageSize = 20;
-            PageIndex = 1;
+            var pageSize = Engine.Settings.Property.DefaultPageSize;
+            // ReSharper disable once VirtualMemberCallInConstructor — PageSize stays virtual
+            // for ContentModel's override; no subclass overrides it on the property path.
+            PageSize = pageSize > 0 ? pageSize : 20;
 
             PublishStatus = ContentStatus.Published;
 

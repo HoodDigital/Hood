@@ -175,18 +175,24 @@ namespace Hood.Services
                         if (outputStream != null)
                             outputStream.Close();
                     }
+                    // ReSharper disable once EmptyGeneralCatchClause — best-effort cleanup of an
+                    // already-failed/finished transfer; close failures carry no information.
                     catch (Exception) { }
                     try
                     {
                         if (outputStream != null)
                             outputStream.Close();
                     }
+                    // ReSharper disable once EmptyGeneralCatchClause — best-effort cleanup of an
+                    // already-failed/finished transfer; close failures carry no information.
                     catch (Exception) { }
                     try
                     {
                         if (response != null)
                             response.Close();
                     }
+                    // ReSharper disable once EmptyGeneralCatchClause — best-effort cleanup of an
+                    // already-failed/finished transfer; close failures carry no information.
                     catch (Exception) { }
                 }
             }

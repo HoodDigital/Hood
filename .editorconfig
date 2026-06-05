@@ -144,12 +144,10 @@ resharper_not_accessed_variable_highlighting = none
 resharper_redundant_assignment_highlighting = none
 resharper_possible_multiple_enumeration_highlighting = none
 resharper_empty_constructor_highlighting = none
-resharper_empty_general_catch_clause_highlighting = none
 resharper_unused_member_local_highlighting = none
 resharper_not_accessed_field_local_highlighting = none
 resharper_unused_parameter_local_highlighting = none
 resharper_unused_parameter_global_highlighting = none
-resharper_virtual_member_call_in_constructor_highlighting = none
 resharper_invalid_xml_doc_comment_highlighting = none
 
 # --- Markup / web noise ------------------------------------------------------------

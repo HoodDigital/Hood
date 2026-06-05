@@ -368,7 +368,14 @@ namespace Hood.Services
                                         {
                                             await _media.DeleteStoredMedia(m);
                                         }
-                                        catch (Exception) { }
+                                        catch (Exception ex)
+                                        {
+                                            await _logService.AddExceptionAsync<BlmFileImporter>(
+                                                "Failed to delete stored property media.",
+                                                ex,
+                                                LogType.Warning
+                                            );
+                                        }
                                     _db.Entry(m).State = EntityState.Deleted;
                                 });
                                 await SaveChangesToDatabaseAsync();
@@ -383,7 +390,14 @@ namespace Hood.Services
                                         {
                                             await _media.DeleteStoredMedia(m);
                                         }
-                                        catch (Exception) { }
+                                        catch (Exception ex)
+                                        {
+                                            await _logService.AddExceptionAsync<BlmFileImporter>(
+                                                "Failed to delete stored property media.",
+                                                ex,
+                                                LogType.Warning
+                                            );
+                                        }
                                     _db.Entry(m).State = EntityState.Deleted;
                                 });
                                 await SaveChangesToDatabaseAsync();

@@ -86,7 +86,14 @@ namespace Hood.Services
                 _db.Users.Add(user);
                 return await _db.SaveChangesAsync() == 1;
             }
-            catch (Exception) { }
+            catch (Exception ex)
+            {
+                await Engine.Logs.AddExceptionAsync<Auth0AccountRepository>(
+                    "Auth0 account operation failed.",
+                    ex,
+                    LogType.Warning
+                );
+            }
             return false;
         }
 
@@ -562,7 +569,14 @@ namespace Hood.Services
                 {
                     await _auth0.DeleteRole(Auth0Role.RemoteId);
                 }
-                catch (Exception) { }
+                catch (Exception ex)
+                {
+                    await Engine.Logs.AddExceptionAsync<Auth0AccountRepository>(
+                        "Auth0 account operation failed.",
+                        ex,
+                        LogType.Warning
+                    );
+                }
             }
             await _db.SaveChangesAsync();
         }
