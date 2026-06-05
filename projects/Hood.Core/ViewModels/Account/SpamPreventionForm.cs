@@ -11,8 +11,6 @@ namespace Hood.ViewModels
 {
     public class SpamPreventionModel : SaveableModel, IValidatableObject
     {
-        public SpamPreventionModel() { }
-
         public const string HoneypotFieldName = "full_enquiry";
 
         [FromForm(Name = HoneypotFieldName)]

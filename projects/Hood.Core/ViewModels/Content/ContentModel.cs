@@ -8,8 +8,6 @@ namespace Hood.ViewModels
 {
     public class ContentModel : PagedList<ContentView>
     {
-        public ContentModel() { }
-
         public override int PageSize
         {
             get

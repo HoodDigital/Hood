@@ -6,8 +6,5 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin")]
-    public class SettingsController : BaseSettingsController
-    {
-        public SettingsController() { }
-    }
+    public class SettingsController : BaseSettingsController { }
 }

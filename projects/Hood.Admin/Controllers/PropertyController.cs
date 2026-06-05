@@ -6,8 +6,5 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin,Editor")]
-    public class PropertyController : BasePropertyController
-    {
-        public PropertyController() { }
-    }
+    public class PropertyController : BasePropertyController { }
 }

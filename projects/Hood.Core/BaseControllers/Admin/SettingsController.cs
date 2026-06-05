@@ -12,8 +12,6 @@ namespace Hood.Admin.BaseControllers
 {
     public abstract class BaseSettingsController : BaseController
     {
-        public BaseSettingsController() { }
-
         [Route("admin/settings/basics/")]
         public virtual IActionResult Basics()
         {

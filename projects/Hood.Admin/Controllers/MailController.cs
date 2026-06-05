@@ -6,8 +6,5 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin")]
-    public class MailController : BaseMailController
-    {
-        public MailController() { }
-    }
+    public class MailController : BaseMailController { }
 }

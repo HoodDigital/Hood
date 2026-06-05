@@ -9,8 +9,6 @@ namespace Hood.BaseControllers
     [Route("error")]
     public abstract class ErrorController : BaseController
     {
-        public ErrorController() { }
-
         [Route("500")]
         public virtual async System.Threading.Tasks.Task<IActionResult> AppError()
         {

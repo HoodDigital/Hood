@@ -10,8 +10,6 @@ namespace Hood.Services
 {
     public class AddressService : IAddressService
     {
-        public AddressService() { }
-
         public GoogleAddress GeocodeAddress(IAddress address)
         {
             var key = Engine.Settings.Integrations.GoogleMapsApiKey;

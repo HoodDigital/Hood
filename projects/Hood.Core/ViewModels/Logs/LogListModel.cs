@@ -7,9 +7,6 @@ namespace Hood.ViewModels
 {
     public class LogListModel : PagedList<Log>
     {
-        public LogListModel()
-        {
-        }
 
         [FromQuery(Name = "userId")]
         public string UserId { get; set; }

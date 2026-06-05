@@ -42,10 +42,7 @@ namespace Hood.Models
         public bool PhoneNumberConfirmed { get; set; }
     }
 
-    public class UserProfile : UserProfileBase
-    {
-        public UserProfile() { }
-    }
+    public class UserProfile : UserProfileBase { }
 
     public class UserProfileBase : IUserProfile
     {

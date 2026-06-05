@@ -6,8 +6,5 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin")]
-    public class ThemesController : BaseThemesController
-    {
-        public ThemesController() { }
-    }
+    public class ThemesController : BaseThemesController { }
 }

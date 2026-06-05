@@ -10,8 +10,6 @@ namespace Hood.Admin.BaseControllers
 {
     public abstract class BaseMailController : BaseController
     {
-        public BaseMailController() { }
-
         [Route("admin/mail/preview/plain/")]
         public virtual IActionResult Plain()
         {

@@ -6,15 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.ViewModels
 {
-    public class UserListModel : UserListModel<IUserProfile>
-    {
-        public UserListModel() { }
-    }
+    public class UserListModel : UserListModel<IUserProfile> { }
 
     public class UserListModel<TUserProfile> : PagedList<TUserProfile>
     {
-        public UserListModel() { }
-
         [FromQuery(Name = "role")]
         public string Role { get; set; }
 

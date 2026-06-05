@@ -10,8 +10,6 @@ namespace Hood.Services
     {
         private IEnumerable<string> locs;
 
-        public ViewLocationExpander() { }
-
         public void PopulateValues(ViewLocationExpanderContext context)
         {
             string theme =

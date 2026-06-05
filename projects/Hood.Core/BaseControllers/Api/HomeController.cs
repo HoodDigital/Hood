@@ -7,8 +7,6 @@ namespace Hood.Api.BaseControllers
     [ApiController]
     public abstract class HomeController : ControllerBase
     {
-        public HomeController() { }
-
         private const string publicMessage =
             "The API doesn't require an access token to share this message.";
         private const string protectedMessage = "The API successfully validated your access token.";
