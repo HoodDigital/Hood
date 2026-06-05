@@ -1,6 +1,6 @@
 name: Backend
 
-# Builds, tests and publishes the 7 Hood NuGet packages.
+# Builds, tests and publishes the 8 Hood NuGet packages.
 # Versioning is automatic via MinVer (git tags) — no version is set here:
 #   • merge to master  → 7.0.0-rc.N  → NuGet.org prerelease
 #   • GitHub Release v7.0.0 → 7.0.0   → NuGet.org stable
@@ -15,6 +15,10 @@ on:
       - 'Directory.Build.props'
       - 'global.json'
       - '.github/workflows/backend.yml'
+      - 'validate_code.sh'
+      - '.editorconfig'
+      - 'Hood.sln.DotSettings'
+      - '.config/**'
   pull_request:
     paths:
       - 'projects/**'
@@ -22,10 +26,27 @@ on:
       - 'Directory.Build.props'
       - 'global.json'
       - '.github/workflows/backend.yml'
+      - 'validate_code.sh'
+      - '.editorconfig'
+      - 'Hood.sln.DotSettings'
+      - '.config/**'
   release:
     types: [published]
 
 jobs:
+  validate:
+    name: Validate code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/setup-dotnet@9a946fdbd5fb07b82b2f5a4466058b876ab72bb2 # v5.3.0
+        with:
+          global-json-file: global.json
+      - run: dotnet restore Hood.sln
+      - run: dotnet tool restore
+      # CSharpier check + InspectCode; fails on ANY reported issue (HOOD-62/HOOD-79).
+      - run: ./validate_code.sh
+
   build-test:
     name: Build & test
     runs-on: ubuntu-latest
