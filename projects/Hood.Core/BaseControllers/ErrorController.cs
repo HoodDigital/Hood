@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using Hood.Core;
 using Hood.Extensions;
 using Hood.Models;
 using Microsoft.AspNetCore.Diagnostics;

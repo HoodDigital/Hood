@@ -299,7 +299,7 @@ namespace Hood.Services
         {
             try
             {
-                string url = "";
+                string url;
 
                 string fileName = Path.GetFileNameWithoutExtension(media.Url);
                 string fileExt = Path.GetExtension(media.Url);

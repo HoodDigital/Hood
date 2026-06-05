@@ -1,20 +1,15 @@
 ﻿@{
     Layout = null;
-    bool fullwidth = true;
-    bool.TryParse(Context.Request.Query["fullwidth"], out fullwidth);
+    bool.TryParse(Context.Request.Query["fullwidth"], out bool fullwidth);
     var container = "container";
     if (fullwidth)
     {
         container = "";
     }
-    bool icons = true;
-    bool.TryParse(Context.Request.Query["icons"], out icons);
-    bool buttons = true;
-    bool.TryParse(Context.Request.Query["buttons"], out buttons);
-    int rows = 1;
-    int.TryParse(Context.Request.Query["rows"], out rows);
-    int cols = 3;
-    int.TryParse(Context.Request.Query["cols"], out cols);
+    bool.TryParse(Context.Request.Query["icons"], out bool icons);
+    bool.TryParse(Context.Request.Query["buttons"], out bool buttons);
+    int.TryParse(Context.Request.Query["rows"], out int rows);
+    int.TryParse(Context.Request.Query["cols"], out int cols);
     var align = Context.Request.Query["align"];
     var cssClass = Context.Request.Query["class"];
 }

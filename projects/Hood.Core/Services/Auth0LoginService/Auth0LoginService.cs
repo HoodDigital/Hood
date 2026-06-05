@@ -81,7 +81,7 @@ namespace Hood.Services
 
             var principal = e.Principal;
             var userId = e.Principal.GetUserId();
-            var returnUrl = e.ReturnUri;
+            string returnUrl;
 
             var identity = (ClaimsIdentity)principal.Identity;
 

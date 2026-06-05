@@ -55,8 +55,8 @@ namespace Hood.TagHelpers
             }
             output.Attributes.SetAttribute("class", classValue);
 
-            string LabelClass = "";
-            string FieldDivClass = "";
+            string LabelClass;
+            string FieldDivClass;
             if (FormLayout == "horizontal")
             {
                 LabelClass = "col-sm-4 control-label";

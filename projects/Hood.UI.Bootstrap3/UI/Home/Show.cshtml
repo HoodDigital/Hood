@@ -29,7 +29,7 @@
         ViewData["ExitDesignerUrl"] = Model.Content.Url;
     }
 
-    var View = "_View";
+    string View;
 
     @switch (Model.ContentType.BaseName)
     {

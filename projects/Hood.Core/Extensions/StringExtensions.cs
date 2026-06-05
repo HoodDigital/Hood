@@ -74,11 +74,9 @@ namespace Hood.Extensions
 
         public static string ToUrl(this string url)
         {
-            Uri formattedUrl = null;
             try
             {
-                formattedUrl = new UriBuilder(url).Uri;
-                return formattedUrl.ToString();
+                return new UriBuilder(url).Uri.ToString();
             }
             catch (ArgumentNullException)
             {

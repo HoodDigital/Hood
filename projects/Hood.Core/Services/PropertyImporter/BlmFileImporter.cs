@@ -657,7 +657,7 @@ namespace Hood.Services
                         Lock.ReleaseWriterLock();
 
                         string imageFile = TempFolder + data[key];
-                        IMediaObject mediaResult = null;
+                        IMediaObject mediaResult;
                         FileInfo fi = new FileInfo(imageFile);
                         using (FileStream s = File.OpenRead(imageFile))
                         {
@@ -751,7 +751,7 @@ namespace Hood.Services
                         if (!HasFileError())
                         {
                             string imageFile = TempFolder + data[key];
-                            MediaObject mediaResult = null;
+                            MediaObject mediaResult;
                             FileInfo fi = new FileInfo(imageFile);
                             using (FileStream s = File.OpenRead(imageFile))
                             {
@@ -840,7 +840,7 @@ namespace Hood.Services
                                 StatusMessage =
                                     $"Thumbnailing and processing image ({data[key]})...";
                                 Lock.ReleaseWriterLock();
-                                MediaObject mediaResult = null;
+                                MediaObject mediaResult;
                                 FileInfo fi = new FileInfo(imageFile);
                                 using (FileStream s = File.OpenRead(imageFile))
                                 {
@@ -903,7 +903,7 @@ namespace Hood.Services
                             Lock.ReleaseWriterLock();
 
                             string imageFile = TempFolder + data[key];
-                            MediaObject mediaResult = null;
+                            MediaObject mediaResult;
                             FileInfo fi = new FileInfo(imageFile);
                             string fileName = data[key].ToLower().Replace(".jpg", ".pdf");
                             using (FileStream s = File.OpenRead(imageFile))
@@ -1092,7 +1092,6 @@ namespace Hood.Services
                 .Trim(Environment.NewLine.ToCharArray())
                 .Trim()
                 .Split(new[] { '^' }, StringSplitOptions.RemoveEmptyEntries);
-            List<string> defs = definitions.ToList();
 
             string stringData = fileContents
                 .ExtractTextBetween("#DATA#", "#END#")
@@ -1614,9 +1613,8 @@ namespace Hood.Services
 
         private bool HasFileError()
         {
-            bool fileError = false;
             Lock.AcquireWriterLock(Timeout.Infinite);
-            fileError = FileError;
+            bool fileError = FileError;
             Lock.ReleaseWriterLock();
             return fileError;
         }

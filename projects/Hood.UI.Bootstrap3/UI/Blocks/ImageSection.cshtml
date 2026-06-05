@@ -1,7 +1,6 @@
 @{
     Layout = null;
-    bool fullwidth = true;
-    bool.TryParse(Context.Request.Query["fullwidth"], out fullwidth);
+    bool.TryParse(Context.Request.Query["fullwidth"], out bool fullwidth);
     var container = "container";
     if (fullwidth)
     {

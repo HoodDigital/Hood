@@ -258,7 +258,7 @@ namespace Hood.Admin.BaseControllers
                 var modelToUpdate = Engine.Settings.Content.GetContentType(id);
 
                 var updatedFields = Request.Form.Keys.ToHashSet();
-                modelToUpdate = modelToUpdate.UpdateFromFormModel(model, updatedFields);
+                modelToUpdate.UpdateFromFormModel(model, updatedFields);
 
                 modelToUpdate = SaveContentType(model, id);
                 if (model.Type != id)

@@ -346,7 +346,7 @@ namespace Hood.Services
                 throw new ArgumentException(
                     "There is not enough characters to create a string without repeats"
                 );
-            string result = ""; // This string will contain the result
+            string result; // This string will contain the result
             if (PatternDriven)
             {
                 // Using the pattern to generate a string
@@ -384,7 +384,7 @@ namespace Hood.Services
             List<char> Characters = new List<char>();
             foreach (char character in Pattern.ToCharArray())
             {
-                char newChar = ' ';
+                char newChar;
                 switch (character)
                 {
                     case 'L':
@@ -563,7 +563,7 @@ namespace Hood.Services
         /// <returns>A random character from the array</returns>
         private char GetRandomCharFromArray(char[] array, List<char> existentItems)
         {
-            char Character = ' ';
+            char Character;
             do
             {
                 Character = array[GetRandomInt() % array.Length];

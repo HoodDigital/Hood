@@ -227,7 +227,7 @@ namespace Hood.Services
             if (parts == null || parts.Length == 0)
                 throw new ArgumentException("parts");
 
-            var hash = "";
+            string hash;
             using (SHA256 sha = SHA256.Create())
             {
                 var hashInput = "";

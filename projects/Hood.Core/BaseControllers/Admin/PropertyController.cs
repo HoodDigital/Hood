@@ -83,7 +83,7 @@ namespace Hood.Admin.BaseControllers
 
                 if (model.AutoGeocode)
                 {
-                    var StatusMessage = "";
+                    string StatusMessage;
                     try
                     {
                         try
@@ -651,14 +651,6 @@ namespace Hood.Admin.BaseControllers
                 if (property == null)
                 {
                     throw new Exception("Property not found.");
-                }
-
-                int? count = await _propertyDb
-                    .PropertyMetadata.Where(m => m.Name.Contains($"{name}"))
-                    .CountAsync();
-                if (!count.HasValue)
-                {
-                    count = 0;
                 }
 
                 PropertyMeta meta = new PropertyMeta()

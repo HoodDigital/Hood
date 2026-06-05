@@ -700,7 +700,7 @@ namespace Hood.Startup
                     : null;
             });
 
-            int sessionTimeout = 60;
+            int sessionTimeout;
             services.AddSession(options =>
             {
                 options.Cookie.IsEssential = true;

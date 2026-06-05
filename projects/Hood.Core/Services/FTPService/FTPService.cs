@@ -83,7 +83,7 @@ namespace Hood.Services
         // iterate through every registered user, and send them a copy of the email.
         private void GetFile(object data)
         {
-            bool cancelled = false;
+            bool cancelled;
             // Unpack the parameter objects.
             object[] parameters = (object[])data;
             string server = (string)parameters[0];
@@ -101,7 +101,7 @@ namespace Hood.Services
             {
                 FtpWebResponse response = null;
                 FileStream outputStream = null;
-                Stream ftpStream = null;
+                Stream ftpStream;
                 try
                 {
                     // Set the Total to 0, starting point.
@@ -130,8 +130,7 @@ namespace Hood.Services
                     StatusMessage = "Downloading file, " + filename + "...";
                     Lock.ReleaseWriterLock();
 
-                    int readCount = 0;
-                    readCount = ftpStream.Read(Buffer, 0, BufferSize);
+                    int readCount = ftpStream.Read(Buffer, 0, BufferSize);
                     BytesTransferred += readCount;
                     while (readCount > 0)
                     {
