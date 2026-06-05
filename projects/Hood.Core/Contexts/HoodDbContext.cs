@@ -98,7 +98,8 @@ namespace Hood.Models
         {
             try
             {
-                Option option = await Options.FirstOrDefaultAsync();
+                // Probe read — succeeds only when the database/tables exist.
+                await Options.FirstOrDefaultAsync();
             }
             catch (SqlException ex)
             {
@@ -506,7 +507,7 @@ namespace Hood.Models
 
                         // ExecuteSql (FormattableString) parameterises the interpolated values
                         // automatically — replaces the deprecated ExecuteSqlRaw (HOOD-48 #3).
-                        int affectedRows = Database.ExecuteSql(
+                        Database.ExecuteSql(
                             $"UPDATE HoodMedia SET DirectoryId = {propertyDir.Id} WHERE DirectoryId IS NULL AND Directory = 'Property'"
                         );
 
@@ -519,12 +520,12 @@ namespace Hood.Models
                             // Bug fix (HOOD-48 #3): the old raw SQL had '@Directory' quoted as a string
                             // literal, so the parameter was never substituted and only 'Property' media
                             // was ever re-pointed. Interpolation makes type.TypeName a real parameter.
-                            affectedRows = Database.ExecuteSql(
+                            Database.ExecuteSql(
                                 $"UPDATE HoodMedia SET DirectoryId = {contentDir.Id} WHERE DirectoryId IS NULL AND Directory = {type.TypeName}"
                             );
                         }
 
-                        affectedRows = Database.ExecuteSql(
+                        Database.ExecuteSql(
                             $"UPDATE HoodMedia SET DirectoryId = {defaultDir.Id} WHERE DirectoryId IS NULL"
                         );
                     }

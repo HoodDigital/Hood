@@ -45,7 +45,6 @@ namespace Hood.ViewModels
             var hasher = new PasswordHasher(this.Salt);
             hasher = hasher.HashPasswordWithSalt(this.Timestamp);
             var hash = hasher.HashedPassword;
-            var salt = hasher.Base64Salt;
 
             if (hash != this.Hash)
             {

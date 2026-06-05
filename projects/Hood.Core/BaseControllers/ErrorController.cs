@@ -34,8 +34,6 @@ namespace Hood.BaseControllers
         [Route("404")]
         public virtual async System.Threading.Tasks.Task<IActionResult> PageNotFound()
         {
-            BasicSettings basicSettings = Engine.Settings.Basic;
-
             ErrorModel model = new ErrorModel { OriginalUrl = "unknown", Code = 404 };
 
             model.OriginalUrl = HttpContext.GetSiteUrl().TrimEnd('/');

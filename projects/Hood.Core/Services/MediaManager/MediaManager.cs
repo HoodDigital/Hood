@@ -102,11 +102,9 @@ namespace Hood.Services
         public async Task<string> GetSafeFilename(string directory, string filename)
         {
             filename = Guid.NewGuid().ToString() + Path.GetExtension(filename);
-            int counter = 1;
             while (await Exists(directory, filename))
             {
                 filename = Guid.NewGuid().ToString() + Path.GetExtension(filename);
-                counter++;
             }
             return filename;
         }

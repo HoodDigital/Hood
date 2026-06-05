@@ -82,12 +82,8 @@ namespace Hood.Core
             // (TLS 1.2+ is the runtime/OS default on net10 and ServicePointManager no longer
             // affects HttpClient, so the old ServicePointManager.SecurityProtocol set is removed.)
 
-            //set base application path
-            var provider = services.BuildServiceProvider();
-            var hostingEnvironment = provider.GetRequiredService<IWebHostEnvironment>();
-
             //initialize plugins
-            var mvcCoreBuilder = services.AddMvcCore();
+            services.AddMvcCore();
         }
 
         public T Resolve<T>()

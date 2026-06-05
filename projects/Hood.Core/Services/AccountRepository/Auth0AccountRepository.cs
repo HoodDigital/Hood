@@ -180,7 +180,6 @@ namespace Hood.Services
             string picture
         )
         {
-            var authProviderName = fullAuthUserId.Split('|')[0];
             var authUserId = fullAuthUserId.Split('|')[1];
             Auth0.ManagementApi.Models.User newAuthUser = null;
             try

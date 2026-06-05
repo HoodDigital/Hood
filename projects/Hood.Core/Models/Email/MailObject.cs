@@ -101,7 +101,6 @@ namespace Hood.Models
 
         public MailObject()
         {
-            BasicSettings basicSettings = Engine.Settings.Basic;
             MailSettings mailSettings = Engine.Settings.Mail;
 
             _textBody = new StringWriter();

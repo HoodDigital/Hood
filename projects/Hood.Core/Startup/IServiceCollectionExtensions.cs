@@ -276,7 +276,7 @@ namespace Hood.Startup
             //create, initialize and configure the engine
             IHoodServiceProvider engine = Engine.CreateHoodServiceProvider();
             engine.Initialize(services);
-            IServiceProvider serviceProvider = engine.ConfigureServices(services, configuration);
+            engine.ConfigureServices(services, configuration);
 
             return services;
         }

@@ -145,7 +145,6 @@ namespace Hood.BaseControllers
             string returnUrl = null
         )
         {
-            AccountSettings accountSettings = Engine.Settings.Account;
             ViewData["ReturnUrl"] = returnUrl;
 
             if (ModelState.IsValid)

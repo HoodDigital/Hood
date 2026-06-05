@@ -53,11 +53,6 @@
         }
     }
 
-    string url = Context.GetSiteUrl(true, true);
-    if (_seoSettings.CanonicalUrl.IsSet())
-    {
-        url = string.Format("{0}{1}", _seoSettings.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
-    }
 }
 @section metas {
     <meta name="description" content="@description" />

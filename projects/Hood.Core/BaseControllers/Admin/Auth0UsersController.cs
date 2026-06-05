@@ -685,9 +685,6 @@ namespace Hood.Admin.BaseControllers
                 UserManager<Auth0User> userManager = Engine.Services.Resolve<
                     UserManager<Auth0User>
                 >();
-                SignInManager<Auth0User> signInManager = Engine.Services.Resolve<
-                    SignInManager<Auth0User>
-                >();
                 Auth0User user = await userManager.FindByIdAsync(id);
                 string token = await userManager.GeneratePasswordResetTokenAsync(user);
                 IdentityResult result = await userManager.ResetPasswordAsync(user, token, password);

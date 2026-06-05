@@ -14,7 +14,7 @@ namespace Hood.Extensions
 
         public static bool IsAbsoluteUrl(this string url)
         {
-            return Uri.TryCreate(url, UriKind.Absolute, out Uri result);
+            return Uri.TryCreate(url, UriKind.Absolute, out _);
         }
 
         public static bool IsValidEmail(this string email)

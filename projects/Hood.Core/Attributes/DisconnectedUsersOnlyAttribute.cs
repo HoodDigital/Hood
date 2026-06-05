@@ -21,7 +21,6 @@ namespace Hood.Attributes
     {
         public Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
-            var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
             if (
                 !context.HttpContext.User.Identity.IsAuthenticated
                 || !context.HttpContext.User.RequiresConnection()

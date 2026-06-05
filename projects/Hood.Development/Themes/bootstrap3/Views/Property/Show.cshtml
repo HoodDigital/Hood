@@ -6,27 +6,16 @@
     PropertySettings _propertySettings = Engine.Settings.Property;
 
     var cmTitle = Model.Property.GetMeta("SEO.Meta.Title");
-    var cmDesc = Model.Property.GetMeta("SEO.Meta.Description");
     string metaTitle = Model.Property.Title + " - " + _basicSettings.FullTitle;
-    string metaDesc = Model.Property.ShortDescription;
     if (!cmTitle.GetStringValue().IsNullOrEmpty())
     {
         metaTitle = cmTitle.GetStringValue();
-    }
-    if (!cmDesc.GetStringValue().IsNullOrEmpty())
-    {
-        metaDesc = cmDesc.GetStringValue();
     }
     ViewBag.Title = metaTitle;
     ViewData["EditUrl"] = Url.Action("Edit", "Property", new { area = "Admin", id = Model.Property.Id });
 
     Layout = "_Layout";
 
-    string url = Context.GetSiteUrl(true, true);
-    if (_seoSettings.CanonicalUrl.IsSet())
-    {
-        url = string.Format("{0}{1}", _seoSettings.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
-    }
 }
 @section metas {
     <meta name="description" content="@Model.Property.ShortDescription" />

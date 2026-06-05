@@ -69,7 +69,6 @@ namespace Hood.Services
             );
             msg.ReplyTo = replyTo;
             var response = await client.SendEmailAsync(msg);
-            var body = await response.DeserializeResponseBodyAsync(response.Body);
             if (
                 response.StatusCode == HttpStatusCode.Accepted
                 || response.StatusCode == HttpStatusCode.OK
@@ -112,7 +111,6 @@ namespace Hood.Services
                 );
                 msg.ReplyTo = replyTo;
                 var response = await client.SendEmailAsync(msg);
-                var body = await response.DeserializeResponseBodyAsync(response.Body);
                 if (
                     response.StatusCode == HttpStatusCode.Accepted
                     || response.StatusCode == HttpStatusCode.OK

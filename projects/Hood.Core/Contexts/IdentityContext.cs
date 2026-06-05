@@ -88,7 +88,7 @@ namespace Hood.Contexts
                     var keygen = new KeyGenerator();
                     var password = keygen.Generate(16);
 
-                    IdentityResult ir = await repo.CreateAsync(userToInsert, password);
+                    await repo.CreateAsync(userToInsert, password);
 
                     var tempPasswordFile =
                         Engine.Services.Resolve<IWebHostEnvironment>().ContentRootPath

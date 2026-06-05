@@ -444,8 +444,6 @@ namespace Hood.Admin.BaseControllers
                     throw new Exception("Could not load property to remove media.");
                 }
 
-                MediaObject media = _db.Media.SingleOrDefault(m => m.Id == model.MediaId);
-
                 switch (model.FieldName)
                 {
                     case nameof(PropertyListing.FeaturedImage):
@@ -507,7 +505,7 @@ namespace Hood.Admin.BaseControllers
                         throw new Exception("There are no files selected!");
                     }
 
-                    var directory = await _property.GetDirectoryAsync();
+                    await _property.GetDirectoryAsync(); // throws if the site directory is missing
                     foreach (int mediaId in media)
                     {
                         // load the media object from db
@@ -589,7 +587,7 @@ namespace Hood.Admin.BaseControllers
                         throw new Exception("There are no files selected!");
                     }
 
-                    var directory = await _property.GetDirectoryAsync();
+                    await _property.GetDirectoryAsync(); // throws if the site directory is missing
                     foreach (int mediaId in media)
                     {
                         // load the media object from db

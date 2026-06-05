@@ -1093,9 +1093,6 @@ namespace Hood.Services
                 .Trim()
                 .Split(new[] { '^' }, StringSplitOptions.RemoveEmptyEntries);
             List<string> defs = definitions.ToList();
-            int imageTasks = defs.Count(c => c.Contains("MEDIA_IMAGE") && !c.Contains("TEXT"));
-            int docTasks = defs.Count(c => c.Contains("MEDIA_FLOOR_PLAN") && !c.Contains("TEXT"));
-            int fpTasks = defs.Count(c => c.Contains("MEDIA_DOCUMENT") && !c.Contains("TEXT"));
 
             string stringData = fileContents
                 .ExtractTextBetween("#DATA#", "#END#")
@@ -1197,8 +1194,6 @@ namespace Hood.Services
             }
 
             property.Bedrooms = bedrooms;
-
-            string furnished = PropertyDetails.Furnished[int.Parse(data["LET_FURN_ID"])];
 
             string propertyType = PropertyDetails.PropertyTypes[int.Parse(data["PROP_SUB_ID"])];
             property.PropertyType = propertyType;

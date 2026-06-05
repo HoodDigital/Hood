@@ -71,7 +71,6 @@ namespace Hood.Admin.BaseControllers
         public virtual async Task<IActionResult> BlmImporterStart()
         {
             _blm.Kill();
-            var user = Engine.Account.GetLocalUserId();
             await _blm.RunUpdate(HttpContext, "none", "none");
             return Json(new { success = true });
         }
