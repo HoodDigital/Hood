@@ -25,7 +25,7 @@ namespace Hood.BaseControllers
         [Route("/install")]
         public IActionResult Install()
         {
-            if (Engine.Services.Installed)
+            if (Engine.Services.Installed && Engine.Services.Seeded)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -42,7 +42,7 @@ namespace Hood.BaseControllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Install(InstallModel model)
         {
-            if (Engine.Services.Installed)
+            if (Engine.Services.Installed && Engine.Services.Seeded)
             {
                 return RedirectToAction("Index", "Home");
             }

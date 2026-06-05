@@ -16,11 +16,13 @@ namespace Hood.Services
     {
         private readonly HoodDbContext _db;
         private readonly IHoodCache _cache;
+        private readonly IEventsService _events;
 
-        public SettingsRepository(HoodDbContext db, IHoodCache cache)
+        public SettingsRepository(HoodDbContext db, IHoodCache cache, IEventsService events)
         {
             _db = db;
             _cache = cache;
+            _events = events;
         }
 
         #region Private Accessors
@@ -69,6 +71,8 @@ namespace Hood.Services
                 }
                 _db.SaveChanges();
                 _cache.Remove(key);
+                // Settings changed — let subscribers (content/type caches) rebuild (HOOD-82).
+                _events.TriggerOptionsChanged(this);
             }
             catch (DbUpdateException ex)
             {

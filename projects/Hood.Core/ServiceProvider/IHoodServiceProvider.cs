@@ -16,6 +16,12 @@ namespace Hood.Core
 
         bool Installed { get; }
 
+        /// <summary>
+        /// True once the database has been seeded by the install flow (site owner + default
+        /// settings present). A schema-complete but unseeded database is Installed but not Seeded.
+        /// </summary>
+        bool Seeded { get; }
+
         List<StartupException> GetStartupExceptionsByType(StartupError type);
 
         /// <summary>

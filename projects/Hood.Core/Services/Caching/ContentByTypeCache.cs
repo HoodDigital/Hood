@@ -26,6 +26,8 @@ namespace Hood.Caching
                 ResetCache();
             };
             _events.ContentChanged += resetContentByTypeCache;
+            // Settings saves must rebuild the type-keyed cache too (HOOD-82).
+            _events.OptionsChanged += resetContentByTypeCache;
             ResetCache();
         }
 
@@ -46,6 +48,11 @@ namespace Hood.Caching
 
             ContentSettings contentSettings = Engine.Settings.Content;
             bySlug = new Dictionary<string, Lazy<Dictionary<int, Content>>>();
+            if (contentSettings?.Types == null)
+            {
+                // Unseeded database — empty cache; install gate handles routing (HOOD-81).
+                return;
+            }
             foreach (var type in contentSettings.Types.Where(t => t.Enabled && t.CachedByType))
             {
                 bySlug.Add(
