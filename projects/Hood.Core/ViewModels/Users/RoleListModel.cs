@@ -2,8 +2,5 @@
 
 namespace Hood.ViewModels
 {
-    public class RoleListModel<TRole> : PagedList<TRole>
-    {
-        public RoleListModel() { }
-    }
+    public class RoleListModel<TRole> : PagedList<TRole> { }
 }

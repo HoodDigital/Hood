@@ -8,7 +8,6 @@ using Hood.Services;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 namespace Hood.BaseControllers
@@ -16,22 +15,17 @@ namespace Hood.BaseControllers
     public class InstallController : Controller
     {
         private readonly IHostApplicationLifetime _applicationLifetime;
-        private readonly IConfiguration _config;
 
-        public InstallController(
-            IHostApplicationLifetime applicationLifetime,
-            IConfiguration config
-        )
+        public InstallController(IHostApplicationLifetime applicationLifetime)
         {
             _applicationLifetime = applicationLifetime;
-            _config = config;
         }
 
         [HttpGet]
         [Route("/install")]
         public IActionResult Install()
         {
-            if (Engine.Services.Installed)
+            if (Engine.Services.Installed && Engine.Services.Seeded)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -48,7 +42,7 @@ namespace Hood.BaseControllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Install(InstallModel model)
         {
-            if (Engine.Services.Installed)
+            if (Engine.Services.Installed && Engine.Services.Seeded)
             {
                 return RedirectToAction("Index", "Home");
             }

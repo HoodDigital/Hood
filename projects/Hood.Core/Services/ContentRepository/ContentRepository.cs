@@ -25,13 +25,11 @@ namespace Hood.Services
         private readonly HoodDbContext _hoodDb;
         private readonly IHoodCache _cache;
         private readonly IEventsService _eventService;
-        private readonly IWebHostEnvironment _env;
 
         public ContentRepository(
             ContentContext db,
             HoodDbContext hoodDb,
             IHoodCache cache,
-            IWebHostEnvironment env,
             IEventsService eventService
         )
         {
@@ -39,7 +37,6 @@ namespace Hood.Services
             _hoodDb = hoodDb;
             _cache = cache;
             _eventService = eventService;
-            _env = env;
         }
 
         #region Content CRUD
@@ -239,11 +236,7 @@ namespace Hood.Services
             return content;
         }
 
-        public async Task<Content> GetContentByIdAsync(
-            int id,
-            bool clearCache = false,
-            bool track = true
-        )
+        public async Task<Content> GetContentByIdAsync(int id, bool clearCache = false)
         {
             string cacheKey = typeof(Content) + ".Single." + id;
             if (!_cache.TryGetValue(cacheKey, out Content content) || clearCache)
@@ -265,11 +258,7 @@ namespace Hood.Services
             return content;
         }
 
-        public async Task<ContentView> GetContentViewByIdAsync(
-            int id,
-            bool clearCache = false,
-            bool track = true
-        )
+        public async Task<ContentView> GetContentViewByIdAsync(int id, bool clearCache = false)
         {
             string cacheKey = typeof(ContentView) + ".Single." + id;
             if (!_cache.TryGetValue(cacheKey, out ContentView content) || clearCache)

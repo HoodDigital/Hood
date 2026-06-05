@@ -9,8 +9,6 @@ namespace Hood.Core
 {
     public class PagesRouteConstraint : IRouteConstraint
     {
-        private readonly object codeLock = new Object();
-
         public bool Match(
             HttpContext httpContext,
             IRouter route,

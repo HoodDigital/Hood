@@ -145,7 +145,6 @@ namespace Hood.BaseControllers
             string returnUrl = null
         )
         {
-            AccountSettings accountSettings = Engine.Settings.Account;
             ViewData["ReturnUrl"] = returnUrl;
 
             if (ModelState.IsValid)
@@ -175,11 +174,7 @@ namespace Hood.BaseControllers
                     ApplicationUser user = await _userManager.FindByNameAsync(model.Username);
                     if (Engine.Settings.Account.RequireEmailConfirmation && !user.EmailConfirmed)
                     {
-                        await SendVerificationEmail(
-                            user,
-                            User.GetUserId(),
-                            Url.AbsoluteAction("Login", "Account")
-                        );
+                        await SendVerificationEmail(user, Url.AbsoluteAction("Login", "Account"));
                         return RedirectToAction(nameof(ConfirmRequired), new { user = user.Id });
                     }
 
@@ -304,11 +299,7 @@ namespace Hood.BaseControllers
 
                     if (Engine.Settings.Account.RequireEmailConfirmation)
                     {
-                        await SendVerificationEmail(
-                            user,
-                            User.GetUserId(),
-                            Url.AbsoluteAction("Login", "Account")
-                        );
+                        await SendVerificationEmail(user, Url.AbsoluteAction("Login", "Account"));
                         return RedirectToAction(
                             nameof(AccountController.ConfirmRequired),
                             "Account"
@@ -436,11 +427,7 @@ namespace Hood.BaseControllers
             try
             {
                 var user = await GetCurrentUserOrThrow();
-                await SendVerificationEmail(
-                    user,
-                    User.GetUserId(),
-                    Url.AbsoluteAction("Login", "Account")
-                );
+                await SendVerificationEmail(user, Url.AbsoluteAction("Login", "Account"));
                 SaveMessage = $"Email verification has been resent.";
                 MessageType = AlertType.Success;
             }
@@ -670,7 +657,6 @@ namespace Hood.BaseControllers
 
         protected virtual async Task SendVerificationEmail(
             ApplicationUser localUser,
-            string userId,
             string returnUrl
         )
         {

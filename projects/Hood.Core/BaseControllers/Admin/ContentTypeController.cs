@@ -112,7 +112,7 @@ namespace Hood.Admin.BaseControllers
                 fields.Add(model);
                 contentType.CustomFields = fields;
 
-                ContentType modelToUpdate = SaveContentType(contentType, id);
+                SaveContentType(contentType, id);
 
                 return new Response(true, $"The field was added successfully.");
             }
@@ -137,7 +137,7 @@ namespace Hood.Admin.BaseControllers
                 fields.RemoveAll(f => f.Name == name);
                 contentType.CustomFields = fields;
 
-                ContentType modelToUpdate = SaveContentType(contentType, id);
+                SaveContentType(contentType, id);
 
                 return new Response(true, $"The field was removed successfully.");
             }
@@ -258,7 +258,7 @@ namespace Hood.Admin.BaseControllers
                 var modelToUpdate = Engine.Settings.Content.GetContentType(id);
 
                 var updatedFields = Request.Form.Keys.ToHashSet();
-                modelToUpdate = modelToUpdate.UpdateFromFormModel(model, updatedFields);
+                modelToUpdate.UpdateFromFormModel(model, updatedFields);
 
                 modelToUpdate = SaveContentType(model, id);
                 if (model.Type != id)

@@ -2,10 +2,8 @@
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using Microsoft.Extensions.Hosting;
 
 namespace Hood.TagHelpers
 {
@@ -13,23 +11,14 @@ namespace Hood.TagHelpers
     public class RecapcthaTagHelper : TagHelper
     {
         private readonly IHtmlHelper _htmlHelper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IHostEnvironment _env;
 
         /// <summary>
         /// Ctor
         /// </summary>
         /// <param name="htmlHelper">HTML helper</param>
-        /// <param name="httpContextAccessor">HTTP context accessor</param>
-        public RecapcthaTagHelper(
-            IHtmlHelper htmlHelper,
-            IHttpContextAccessor httpContextAccessor,
-            IHostEnvironment env
-        )
+        public RecapcthaTagHelper(IHtmlHelper htmlHelper)
         {
             _htmlHelper = htmlHelper;
-            _httpContextAccessor = httpContextAccessor;
-            _env = env;
         }
 
         public override int Order { get; } = int.MaxValue;

@@ -2,7 +2,6 @@
 @inject ContentCategoryCache _categories
 @{
     Layout = null;
-    var categories = _categories.TopLevel(Model.ContentType.Type);
 }
 <div class="card mb-3">
     <div class="card-header position-relative" id="content-category-panel-heading">
@@ -17,7 +16,7 @@
         <div class='list-group list-group-flush'>
             @if (_categories.Count(Model.ContentType.Type) > 0)
             {
-                @_categories.AdminContentCategoryTree(_categories.TopLevel(Model.ContentType.Type), Model.ContentType.Type, Model.Categories)
+                @_categories.AdminContentCategoryTree(_categories.TopLevel(Model.ContentType.Type), Model.Categories)
             }
             else
             {

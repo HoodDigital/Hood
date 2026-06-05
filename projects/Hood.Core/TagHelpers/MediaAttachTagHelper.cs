@@ -105,11 +105,6 @@ namespace Hood.TagHelpers
             if (For.ModelExplorer.Metadata.DisplayName.IsSet())
                 fieldDisplayName = For.ModelExplorer.Metadata.DisplayName;
 
-            string fieldDescription;
-            if (For.ModelExplorer.Metadata.Description.IsSet())
-                fieldDescription =
-                    $"<small class='form-text text-info'>{For.ModelExplorer.Metadata.Description}</small>";
-
             string fieldId = Guid.NewGuid().ToString();
 
             string fieldValue = For.Model != null ? For.Model.ToString() : "";

@@ -56,7 +56,7 @@ namespace Hood.Admin.BaseControllers
         [Route("admin/property/{id}/edit/")]
         public virtual async Task<IActionResult> Edit(int id)
         {
-            PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
+            PropertyListing model = await _property.GetPropertyByIdAsync(id);
             model = await LoadAgents(model);
             model.AutoGeocode = true;
             return View(model);
@@ -83,7 +83,7 @@ namespace Hood.Admin.BaseControllers
 
                 if (model.AutoGeocode)
                 {
-                    var StatusMessage = "";
+                    string StatusMessage;
                     try
                     {
                         try
@@ -444,8 +444,6 @@ namespace Hood.Admin.BaseControllers
                     throw new Exception("Could not load property to remove media.");
                 }
 
-                MediaObject media = _db.Media.SingleOrDefault(m => m.Id == model.MediaId);
-
                 switch (model.FieldName)
                 {
                     case nameof(PropertyListing.FeaturedImage):
@@ -481,7 +479,7 @@ namespace Hood.Admin.BaseControllers
         [Route("admin/property/{id}/gallery/")]
         public virtual async Task<IActionResult> Gallery(int id)
         {
-            PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
+            PropertyListing model = await _property.GetPropertyByIdAsync(id);
             return View("_List_PropertyMedia", model);
         }
 
@@ -507,7 +505,7 @@ namespace Hood.Admin.BaseControllers
                         throw new Exception("There are no files selected!");
                     }
 
-                    var directory = await _property.GetDirectoryAsync();
+                    await _property.GetDirectoryAsync(); // throws if the site directory is missing
                     foreach (int mediaId in media)
                     {
                         // load the media object from db
@@ -564,7 +562,7 @@ namespace Hood.Admin.BaseControllers
         [Route("admin/property/{id}/floorplans/")]
         public virtual async Task<IActionResult> FloorPlans(int id)
         {
-            PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
+            PropertyListing model = await _property.GetPropertyByIdAsync(id);
             return View("_List_PropertyFloorplans", model);
         }
 
@@ -589,7 +587,7 @@ namespace Hood.Admin.BaseControllers
                         throw new Exception("There are no files selected!");
                     }
 
-                    var directory = await _property.GetDirectoryAsync();
+                    await _property.GetDirectoryAsync(); // throws if the site directory is missing
                     foreach (int mediaId in media)
                     {
                         // load the media object from db
@@ -653,14 +651,6 @@ namespace Hood.Admin.BaseControllers
                 if (property == null)
                 {
                     throw new Exception("Property not found.");
-                }
-
-                int? count = await _propertyDb
-                    .PropertyMetadata.Where(m => m.Name.Contains($"{name}"))
-                    .CountAsync();
-                if (!count.HasValue)
-                {
-                    count = 0;
                 }
 
                 PropertyMeta meta = new PropertyMeta()

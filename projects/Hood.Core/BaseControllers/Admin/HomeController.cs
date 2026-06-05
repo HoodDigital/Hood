@@ -7,8 +7,6 @@ namespace Hood.Admin.BaseControllers
 {
     public abstract class BaseHomeController : BaseController
     {
-        public BaseHomeController() { }
-
         [Route("admin/")]
         public virtual IActionResult Index()
         {

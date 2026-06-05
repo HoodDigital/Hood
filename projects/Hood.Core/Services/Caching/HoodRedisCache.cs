@@ -79,6 +79,7 @@ namespace Hood.Caching
             await Database.KeyDeleteAsync(key);
         }
 
+        // ReSharper disable once UnusedParameter.Global — IHoodCache contract; this Redis implementation is not implemented yet.
         public void RemoveByType(Type type)
         {
             throw new NotImplementedException();

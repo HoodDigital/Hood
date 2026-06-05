@@ -16,8 +16,6 @@ namespace Hood.Admin.BaseControllers
 {
     public abstract class BaseMediaController : BaseController
     {
-        public BaseMediaController() { }
-
         [Route("admin/media/list/")]
         public virtual async Task<IActionResult> List(
             MediaListModel model,

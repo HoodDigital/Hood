@@ -21,7 +21,6 @@ namespace Hood.Services
         private readonly IHoodCache _cache;
         private readonly BundleFileProcessor _bundleFileProcessor;
 
-        private readonly Dictionary<ResourceLocation, List<FileReferenceMetadata>> _css;
         private readonly Dictionary<ResourceLocation, List<FileReferenceMetadata>> _scripts;
         private readonly Dictionary<ResourceLocation, List<string>> _inlineScripts;
 
@@ -31,7 +30,6 @@ namespace Hood.Services
             _cache = cache;
             _scripts = new Dictionary<ResourceLocation, List<FileReferenceMetadata>>();
             _inlineScripts = new Dictionary<ResourceLocation, List<string>>();
-            _css = new Dictionary<ResourceLocation, List<FileReferenceMetadata>>();
             _bundleFileProcessor = new BundleFileProcessor();
         }
 
@@ -205,7 +203,7 @@ namespace Hood.Services
             logWriter.Dispose();
         }
 
-        public virtual string GenerateInlineScripts(IUrlHelper urlHelper, ResourceLocation location)
+        public virtual string GenerateInlineScripts(ResourceLocation location)
         {
             if (!_inlineScripts.ContainsKey(location) || _inlineScripts[location] == null)
                 return "";
@@ -227,7 +225,7 @@ namespace Hood.Services
             if (parts == null || parts.Length == 0)
                 throw new ArgumentException("parts");
 
-            var hash = "";
+            string hash;
             using (SHA256 sha = SHA256.Create())
             {
                 var hashInput = "";

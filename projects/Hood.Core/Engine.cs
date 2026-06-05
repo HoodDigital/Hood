@@ -164,7 +164,7 @@ namespace Hood.Core
         }
 
         /// <summary>
-        /// Gets the current resolvable version of the IMediaManager<MediaObject>.
+        /// Gets the current resolvable version of the IMediaManager service.
         /// </summary>
         public static IMediaManager Media
         {

@@ -14,8 +14,6 @@ namespace Hood.ViewModels
         )]
         public bool HideDisabled { get; set; }
 
-        public ContentTypeListModel() { }
-
         public override string GetPageUrl(int pageIndex)
         {
             var query = base.GetPageUrl(pageIndex);

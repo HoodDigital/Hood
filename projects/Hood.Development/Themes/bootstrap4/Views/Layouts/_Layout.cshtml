@@ -18,13 +18,13 @@
     @RenderSection("metas", required: false)
 
     @Html.RenderScripts(Url, ResourceLocation.BeforeCss)
-    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeCss)
+    @Html.RenderInlineScripts(ResourceLocation.BeforeCss)
 
     <partial name="_Styles" />
     @RenderSection("styles", required: false)
 
     @Html.RenderScripts(Url, ResourceLocation.AfterCss)
-    @Html.RenderInlineScripts(Url, ResourceLocation.AfterCss)
+    @Html.RenderInlineScripts(ResourceLocation.AfterCss)
 
 </head>
 <body class="@(!production ? "dev-mode" : "")">
@@ -51,12 +51,12 @@
 
 
     @Html.RenderScripts(Url, ResourceLocation.BeforeScripts, production)
-    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeScripts)
+    @Html.RenderInlineScripts(ResourceLocation.BeforeScripts)
 
     <partial name="_Scripts" />
 
     @Html.RenderScripts(Url, ResourceLocation.AfterScripts, production)
-    @Html.RenderInlineScripts(Url, ResourceLocation.AfterScripts)
+    @Html.RenderInlineScripts(ResourceLocation.AfterScripts)
 
     @RenderSection("scripts", required: false)
 

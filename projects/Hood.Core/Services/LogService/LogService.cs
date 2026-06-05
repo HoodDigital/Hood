@@ -9,8 +9,6 @@ namespace Hood.Services
 {
     public class LogService : ILogService
     {
-        public LogService() { }
-
         public Task AddLogAsync<TSource>(
             string message,
             object logObject = null,

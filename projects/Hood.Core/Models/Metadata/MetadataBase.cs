@@ -8,8 +8,6 @@ namespace Hood.Models
 {
     public abstract class MetadataBase : BaseEntity, IMetadata
     {
-        public MetadataBase() { }
-
         public string BaseValue { get; internal set; }
         public string Name { get; set; }
         public string Type { get; set; }

@@ -138,8 +138,6 @@ namespace Hood.Extensions
             }
             bool anonymous = principal.IsAnonymous();
             string displayName = principal.GetClaimValue(Constants.Identity.ClaimTypes.Nickname);
-            string firstName = principal.GetClaimValue(ClaimTypes.GivenName);
-            string lastName = principal.GetClaimValue(ClaimTypes.Surname);
 
             if (anonymous && allowAnonymous)
                 return "Anonymous";
@@ -165,8 +163,6 @@ namespace Hood.Extensions
             {
                 throw new ArgumentNullException(nameof(principal));
             }
-            bool anonymous = principal.IsAnonymous();
-            string displayName = principal.GetClaimValue(Constants.Identity.ClaimTypes.Nickname);
             string firstName = principal.GetClaimValue(ClaimTypes.GivenName);
             string lastName = principal.GetClaimValue(ClaimTypes.Surname);
             string email = principal.GetClaimValue(ClaimTypes.Email);

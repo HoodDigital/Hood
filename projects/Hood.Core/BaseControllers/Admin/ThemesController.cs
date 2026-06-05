@@ -11,8 +11,6 @@ namespace Hood.Admin.BaseControllers
 {
     public abstract class BaseThemesController : BaseController
     {
-        public BaseThemesController() { }
-
         [Route("admin/theme/")]
         public virtual IActionResult Index(ThemeListView model) => List(model, "Index");
 

@@ -35,7 +35,7 @@ namespace Hood.Admin.BaseControllers
                 && !_blm.IsRunning()
             )
             {
-                await _blm.RunUpdate(HttpContext, "none", "none");
+                await _blm.RunUpdate("none", "none");
                 return StatusCode(200);
             }
 
@@ -71,8 +71,7 @@ namespace Hood.Admin.BaseControllers
         public virtual async Task<IActionResult> BlmImporterStart()
         {
             _blm.Kill();
-            var user = Engine.Account.GetLocalUserId();
-            await _blm.RunUpdate(HttpContext, "none", "none");
+            await _blm.RunUpdate("none", "none");
             return Json(new { success = true });
         }
 

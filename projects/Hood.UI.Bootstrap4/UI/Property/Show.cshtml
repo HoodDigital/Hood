@@ -6,16 +6,10 @@
     PropertySettings _propertySettings = Engine.Settings.Property;
 
     var cmTitle = Model.Property.GetMeta("SEO.Meta.Title");
-    var cmDesc = Model.Property.GetMeta("SEO.Meta.Description");
     string metaTitle = Model.Property.Title + " - " + _basicSettings.FullTitle;
-    string metaDesc = Model.Property.ShortDescription;
     if (!cmTitle.GetStringValue().IsNullOrEmpty())
     {
         metaTitle = cmTitle.GetStringValue();
-    }
-    if (!cmDesc.GetStringValue().IsNullOrEmpty())
-    {
-        metaDesc = cmDesc.GetStringValue();
     }
     ViewBag.Title = metaTitle;
     ViewBag.PageTitle = Model.Property.Title;

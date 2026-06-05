@@ -6,8 +6,6 @@ namespace Hood.Models
 {
     public class ContentMeta : MetadataBase
     {
-        public ContentMeta() { }
-
         public int ContentId { get; set; }
 
         [JsonIgnore]

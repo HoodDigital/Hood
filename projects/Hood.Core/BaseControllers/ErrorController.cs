@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using Hood.Core;
 using Hood.Extensions;
 using Hood.Models;
 using Microsoft.AspNetCore.Diagnostics;
@@ -10,8 +9,6 @@ namespace Hood.BaseControllers
     [Route("error")]
     public abstract class ErrorController : BaseController
     {
-        public ErrorController() { }
-
         [Route("500")]
         public virtual async System.Threading.Tasks.Task<IActionResult> AppError()
         {
@@ -34,8 +31,6 @@ namespace Hood.BaseControllers
         [Route("404")]
         public virtual async System.Threading.Tasks.Task<IActionResult> PageNotFound()
         {
-            BasicSettings basicSettings = Engine.Settings.Basic;
-
             ErrorModel model = new ErrorModel { OriginalUrl = "unknown", Code = 404 };
 
             model.OriginalUrl = HttpContext.GetSiteUrl().TrimEnd('/');

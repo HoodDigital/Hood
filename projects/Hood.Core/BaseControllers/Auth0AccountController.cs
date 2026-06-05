@@ -551,7 +551,7 @@ namespace Hood.BaseControllers
         [Route("account/auth/disconnected")]
         public virtual async Task<IActionResult> DisconnectAccountComplete()
         {
-            var user = await GetCurrentUserOrThrow();
+            await GetCurrentUserOrThrow();
             return View();
         }
 
@@ -671,7 +671,7 @@ namespace Hood.BaseControllers
             }
             if (remoteUser.Provider == Authentication.AuthProviderName)
             {
-                var ticket = await _auth0.CreatePasswordChangeTicket(remoteUser);
+                await _auth0.CreatePasswordChangeTicket(remoteUser);
             }
             else
             {

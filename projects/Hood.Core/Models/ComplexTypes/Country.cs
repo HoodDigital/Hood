@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -70,11 +71,7 @@ namespace Hood.Models
                     "TR",
                     "GB",
                 };
-                europe.ForEach(e => e = e.ToLower());
-                if (europe.Contains(Iso2.ToLower()))
-                    return true;
-                else
-                    return false;
+                return europe.Contains(Iso2, StringComparer.OrdinalIgnoreCase);
             }
         }
 
@@ -89,7 +86,7 @@ namespace Hood.Models
         )
         {
             Iso2 = iso2;
-            Iso3 = iso2;
+            Iso3 = iso3;
             IsoNumeric = numeric;
             Name = name;
             FullName = fullName;

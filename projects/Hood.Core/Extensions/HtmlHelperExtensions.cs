@@ -24,6 +24,7 @@ namespace Hood.Extensions
             }
         }
 
+        // ReSharper disable once UnusedParameter.Global — extension receiver, required for @Html.X() / Url.X() call syntax.
         public static void AddInlineScript(
             this IHtmlHelper html,
             ResourceLocation location,
@@ -34,6 +35,7 @@ namespace Hood.Extensions
             pageBuilder.AddInlineScript(location, script);
         }
 
+        // ReSharper disable once UnusedParameter.Global — extension receiver, required for @Html.X() / Url.X() call syntax.
         public static void AddScript(
             this IHtmlHelper html,
             ResourceLocation location,
@@ -47,6 +49,7 @@ namespace Hood.Extensions
             pageBuilder.AddScript(location, src, bundle, isAsync, isDefer);
         }
 
+        // ReSharper disable once UnusedParameter.Global — extension receiver, required for @Html.X() / Url.X() call syntax.
         public static IHtmlContent RenderScripts(
             this IHtmlHelper html,
             IUrlHelper urlHelper,
@@ -58,18 +61,19 @@ namespace Hood.Extensions
             return new HtmlString(pageBuilder.GenerateScripts(urlHelper, location, bundleFiles));
         }
 
+        // ReSharper disable once UnusedParameter.Global — extension receiver, required for @Html.X() / Url.X() call syntax.
         public static IHtmlContent RenderInlineScripts(
             this IHtmlHelper html,
-            IUrlHelper urlHelper,
             ResourceLocation location
         )
         {
             var pageBuilder = Engine.Services.Resolve<IPageBuilder>();
-            return new HtmlString(pageBuilder.GenerateInlineScripts(urlHelper, location));
+            return new HtmlString(pageBuilder.GenerateInlineScripts(location));
         }
 
         #endregion
 
+        // ReSharper disable once UnusedParameter.Global — extension receiver, required for @Html.X() / Url.X() call syntax.
         public static IHtmlContent RenderHoneypotField<TModel>(this IHtmlHelper<TModel> html)
             where TModel : SpamPreventionModel
         {

@@ -1,7 +1,6 @@
 @model UserProfileView<Auth0Role>
 @{
     ViewBag.Title = "Edit User: " + Model.UserName;
-    BasicSettings _basicSettings = Engine.Settings.Basic;
 }
 @section buttons {
     <a href="javascript:document.getElementById('edit-user-form').submit()" class="btn btn-success"><i class="fa fa-save"></i> Save Profile</a>

@@ -30,8 +30,6 @@ namespace Hood.Core
 
     public class Auth0Configuration
     {
-        public Auth0Configuration() { }
-
         public string Domain { get; set; }
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }

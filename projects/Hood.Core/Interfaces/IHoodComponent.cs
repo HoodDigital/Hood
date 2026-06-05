@@ -16,7 +16,9 @@ namespace Hood.Interfaces
         /// <summary>
         /// Register services and interfaces
         /// </summary>
-        /// <param name="builder">Services collection</param>
+        /// <param name="services">Services collection</param>
+        /// <param name="config">Application configuration</param>
+        // ReSharper disable once UnusedParameter.Global — plugin hook contract; components may ignore the configuration.
         void ConfigureServices(IServiceCollection services, IConfiguration config);
 
         /// <summary>
@@ -25,9 +27,11 @@ namespace Hood.Interfaces
         int ServiceConfigurationOrder { get; }
 
         /// <summary>
-        /// Register services and interfaces
+        /// Configure the application pipeline for this component
         /// </summary>
-        /// <param name="builder">Services collection</param>
+        /// <param name="app">Application builder</param>
+        /// <param name="env">Hosting environment</param>
+        /// <param name="config">Application configuration</param>
         void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config);
     }
 }

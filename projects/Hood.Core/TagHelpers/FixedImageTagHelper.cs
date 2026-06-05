@@ -23,8 +23,6 @@ namespace Hood.TagHelpers
         [HtmlAttributeName("color")]
         public string Colour { get; set; }
 
-        public FixedImageTagHelper() { }
-
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             output.TagName = "div";

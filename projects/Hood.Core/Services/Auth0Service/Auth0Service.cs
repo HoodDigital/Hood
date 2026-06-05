@@ -151,7 +151,7 @@ namespace Hood.Services
             var authProviderName = fullAuthUserId.Split('|')[0];
             var authUserId = fullAuthUserId.Split('|')[1];
             var client = await GetClientAsync();
-            var response = await client.Users.LinkAccountAsync(
+            await client.Users.LinkAccountAsync(
                 primaryAccount.Id,
                 new UserAccountLinkRequest() { Provider = authProviderName, UserId = authUserId }
             );
@@ -163,7 +163,7 @@ namespace Hood.Services
         )
         {
             var client = await GetClientAsync();
-            var response = await client.Users.UnlinkAccountAsync(
+            await client.Users.UnlinkAccountAsync(
                 primaryAccount.Id,
                 identityToDisconnect.Provider,
                 identityToDisconnect.LocalUserId

@@ -10,7 +10,6 @@ using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -26,12 +25,10 @@ namespace Hood.Services
         private MediaSettings _mediaSettings;
         private string _container;
         private string _key;
-        private readonly IWebHostEnvironment _env;
         private readonly IConfiguration _config;
 
-        public MediaManager(IWebHostEnvironment env, IConfiguration config)
+        public MediaManager(IConfiguration config)
         {
-            _env = env;
             _config = config;
         }
 
@@ -102,16 +99,14 @@ namespace Hood.Services
         public async Task<string> GetSafeFilename(string directory, string filename)
         {
             filename = Guid.NewGuid().ToString() + Path.GetExtension(filename);
-            int counter = 1;
             while (await Exists(directory, filename))
             {
                 filename = Guid.NewGuid().ToString() + Path.GetExtension(filename);
-                counter++;
             }
             return filename;
         }
 
-        public string GetCleanFilename(string directory, string filename)
+        public string GetCleanFilename(string filename)
         {
             filename = filename.Trim(Path.GetInvalidFileNameChars());
             filename = filename.Trim(Path.GetInvalidPathChars());
@@ -239,7 +234,6 @@ namespace Hood.Services
             Stream file,
             string filename,
             string filetype,
-            long size,
             string directoryPath
         )
         {
@@ -301,7 +295,7 @@ namespace Hood.Services
         {
             try
             {
-                string url = "";
+                string url;
 
                 string fileName = Path.GetFileNameWithoutExtension(media.Url);
                 string fileExt = Path.GetExtension(media.Url);

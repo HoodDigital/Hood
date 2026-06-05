@@ -14,7 +14,6 @@ using Hood.Models;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -24,15 +23,12 @@ namespace Hood.Services
     public class BlmFileImporter : IPropertyImporter
     {
         private readonly IFTPService _ftp;
-        private readonly IWebHostEnvironment _env;
         private readonly IConfiguration _config;
         private readonly IDirectoryManager _directoryManager;
-        private readonly IHttpContextAccessor _context;
 
         public BlmFileImporter(
             IFTPService ftp,
             IWebHostEnvironment env,
-            IHttpContextAccessor context,
             IConfiguration config,
             IAddressService address,
             ILogService logService,
@@ -40,7 +36,6 @@ namespace Hood.Services
         )
         {
             _ftp = ftp;
-            _env = env;
             _config = config;
             _directoryManager = directoryManager;
             Lock = new ReaderWriterLock();
@@ -64,7 +59,6 @@ namespace Hood.Services
 
             LocalFolder =
                 env.ContentRootPath + "\\" + _propertySettings.FTPImporterSettings.LocalFolder;
-            _context = context;
             _address = address;
             _logService = logService;
         }
@@ -100,7 +94,7 @@ namespace Hood.Services
         private readonly ILogService _logService;
         private string DirectoryPath { get; set; }
 
-        public async Task RunUpdate(HttpContext context, string userId, string userName)
+        public async Task RunUpdate(string userId, string userName)
         {
             try
             {
@@ -136,7 +130,7 @@ namespace Hood.Services
                 propertyDbOptions.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
                 _db = new PropertyContext(propertyDbOptions.Options);
 
-                _media = new MediaManager(_env, _config);
+                _media = new MediaManager(_config);
 
                 MediaDirectory propertyDirectory = _hoodDb.MediaDirectories.SingleOrDefault(md =>
                     md.Slug == MediaManager.PropertyDirectorySlug && md.Type == DirectoryType.System
@@ -657,7 +651,7 @@ namespace Hood.Services
                         Lock.ReleaseWriterLock();
 
                         string imageFile = TempFolder + data[key];
-                        IMediaObject mediaResult = null;
+                        IMediaObject mediaResult;
                         FileInfo fi = new FileInfo(imageFile);
                         using (FileStream s = File.OpenRead(imageFile))
                         {
@@ -665,7 +659,6 @@ namespace Hood.Services
                                 s,
                                 fi.Name,
                                 MimeTypes.GetMimeType(fi.Extension),
-                                fi.Length,
                                 DirectoryPath
                             );
                         }
@@ -751,7 +744,7 @@ namespace Hood.Services
                         if (!HasFileError())
                         {
                             string imageFile = TempFolder + data[key];
-                            MediaObject mediaResult = null;
+                            MediaObject mediaResult;
                             FileInfo fi = new FileInfo(imageFile);
                             using (FileStream s = File.OpenRead(imageFile))
                             {
@@ -760,7 +753,6 @@ namespace Hood.Services
                                         s,
                                         fi.Name,
                                         MimeTypes.GetMimeType(fi.Extension),
-                                        fi.Length,
                                         DirectoryPath
                                     ) as MediaObject;
                             }
@@ -840,7 +832,7 @@ namespace Hood.Services
                                 StatusMessage =
                                     $"Thumbnailing and processing image ({data[key]})...";
                                 Lock.ReleaseWriterLock();
-                                MediaObject mediaResult = null;
+                                MediaObject mediaResult;
                                 FileInfo fi = new FileInfo(imageFile);
                                 using (FileStream s = File.OpenRead(imageFile))
                                 {
@@ -849,7 +841,6 @@ namespace Hood.Services
                                             s,
                                             fi.Name,
                                             MimeTypes.GetMimeType(fi.Extension),
-                                            fi.Length,
                                             DirectoryPath
                                         ) as MediaObject;
                                 }
@@ -903,8 +894,7 @@ namespace Hood.Services
                             Lock.ReleaseWriterLock();
 
                             string imageFile = TempFolder + data[key];
-                            MediaObject mediaResult = null;
-                            FileInfo fi = new FileInfo(imageFile);
+                            MediaObject mediaResult;
                             string fileName = data[key].ToLower().Replace(".jpg", ".pdf");
                             using (FileStream s = File.OpenRead(imageFile))
                             {
@@ -913,7 +903,6 @@ namespace Hood.Services
                                         s,
                                         fileName,
                                         MimeTypes.GetMimeType("pdf"),
-                                        fi.Length,
                                         DirectoryPath
                                     ) as MediaObject;
                             }
@@ -1092,10 +1081,6 @@ namespace Hood.Services
                 .Trim(Environment.NewLine.ToCharArray())
                 .Trim()
                 .Split(new[] { '^' }, StringSplitOptions.RemoveEmptyEntries);
-            List<string> defs = definitions.ToList();
-            int imageTasks = defs.Count(c => c.Contains("MEDIA_IMAGE") && !c.Contains("TEXT"));
-            int docTasks = defs.Count(c => c.Contains("MEDIA_FLOOR_PLAN") && !c.Contains("TEXT"));
-            int fpTasks = defs.Count(c => c.Contains("MEDIA_DOCUMENT") && !c.Contains("TEXT"));
 
             string stringData = fileContents
                 .ExtractTextBetween("#DATA#", "#END#")
@@ -1164,7 +1149,9 @@ namespace Hood.Services
         /// <summary>
         /// Takes the dictionary object and translates it into a full PropertyListing object, ready to insert to db.
         /// </summary>
-        /// <param name="data">Property</param>
+        /// <param name="property">The PropertyListing to populate.</param>
+        /// <param name="data">The BLM field dictionary for the property.</param>
+        /// <param name="validatingOnly">When true, parse/validate without side effects like media downloads.</param>
         /// <returns></returns>
         private async Task<PropertyListing> ProcessPropertyAsync(
             PropertyListing property,
@@ -1195,8 +1182,6 @@ namespace Hood.Services
             }
 
             property.Bedrooms = bedrooms;
-
-            string furnished = PropertyDetails.Furnished[int.Parse(data["LET_FURN_ID"])];
 
             string propertyType = PropertyDetails.PropertyTypes[int.Parse(data["PROP_SUB_ID"])];
             property.PropertyType = propertyType;
@@ -1617,9 +1602,8 @@ namespace Hood.Services
 
         private bool HasFileError()
         {
-            bool fileError = false;
             Lock.AcquireWriterLock(Timeout.Infinite);
-            fileError = FileError;
+            bool fileError = FileError;
             Lock.ReleaseWriterLock();
             return fileError;
         }

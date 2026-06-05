@@ -51,7 +51,7 @@ namespace Hood.Admin.BaseControllers
         [Route("admin/content/{id}/edit/")]
         public virtual async Task<IActionResult> Edit(int id)
         {
-            var model = await _content.GetContentByIdAsync(id, true, false);
+            var model = await _content.GetContentByIdAsync(id, true);
             model = await GetEditorModel(model);
             if (model == null)
                 return NotFound();
@@ -65,7 +65,7 @@ namespace Hood.Admin.BaseControllers
         {
             try
             {
-                var modelToUpdate = await _content.GetContentByIdAsync(model.Id, true, false);
+                var modelToUpdate = await _content.GetContentByIdAsync(model.Id, true);
                 modelToUpdate = await GetEditorModel(modelToUpdate);
 
                 var updatedFields = Request.Form.Keys.ToHashSet();
@@ -288,7 +288,7 @@ namespace Hood.Admin.BaseControllers
         [Route("admin/content/categories/list-content/{id}/")]
         public virtual async Task<IActionResult> CategoriesContentAsync(int id)
         {
-            var model = await _content.GetContentByIdAsync(id, true, false);
+            var model = await _content.GetContentByIdAsync(id, true);
             return View("_List_Categories_Content", model);
         }
 
@@ -314,7 +314,7 @@ namespace Hood.Admin.BaseControllers
                     throw new Exception("You need to enter a category!");
                 }
 
-                ContentCategory categoryResult = await _content.AddCategoryAsync(category);
+                await _content.AddCategoryAsync(category);
                 _contentCategoryCache.ResetCache();
 
                 return new Response(true, "Added the category.");
@@ -403,7 +403,6 @@ namespace Hood.Admin.BaseControllers
             try
             {
                 await _content.SetStatusAsync(id, status);
-                Content content = await _content.GetContentByIdAsync(id);
                 return new Response(true, "Content status has been updated successfully.");
             }
             catch (Exception ex)
@@ -561,7 +560,6 @@ namespace Hood.Admin.BaseControllers
                 Content content = await _contentDb
                     .Content.Where(p => p.Id == id)
                     .FirstOrDefaultAsync();
-                MediaObject media = _db.Media.SingleOrDefault(m => m.Id == model.MediaId);
                 string cacheKey = typeof(Content) + ".Single." + id;
 
                 switch (model.FieldName)
@@ -624,7 +622,7 @@ namespace Hood.Admin.BaseControllers
                         throw new Exception("There are no files selected!");
                     }
 
-                    var directory = await _content.GetDirectoryAsync();
+                    await _content.GetDirectoryAsync(); // throws if the site directory is missing
                     foreach (int mediaId in media)
                     {
                         // load the media object from db

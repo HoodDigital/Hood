@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Hood.Enums;
 using Hood.Interfaces;
+using Hood.Models;
 using Hood.Services;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,6 +23,38 @@ namespace Hood.Core
         public bool Installed
         {
             get { return !StartupExceptions.Any(); }
+        }
+
+        private bool _seeded;
+        public bool Seeded
+        {
+            get
+            {
+                if (_seeded)
+                {
+                    return true;
+                }
+                if (!Installed)
+                {
+                    return false;
+                }
+                try
+                {
+                    // The install flow's Seed() writes the SiteOwner option — its presence is the
+                    // marker that settings/owner have been seeded. Sticky once true; the install
+                    // flow restarts the host after seeding, so this re-evaluates exactly once.
+                    var config = Resolve<IConfiguration>();
+                    var options = new DbContextOptionsBuilder<HoodDbContext>();
+                    options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]);
+                    using var db = new HoodDbContext(options.Options);
+                    _seeded = db.Options.Any(o => o.Id == "Hood.Settings.SiteOwner");
+                    return _seeded;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
         }
 
         public List<StartupException> GetStartupExceptionsByType(StartupError type)
@@ -82,12 +115,8 @@ namespace Hood.Core
             // (TLS 1.2+ is the runtime/OS default on net10 and ServicePointManager no longer
             // affects HttpClient, so the old ServicePointManager.SecurityProtocol set is removed.)
 
-            //set base application path
-            var provider = services.BuildServiceProvider();
-            var hostingEnvironment = provider.GetRequiredService<IWebHostEnvironment>();
-
             //initialize plugins
-            var mvcCoreBuilder = services.AddMvcCore();
+            services.AddMvcCore();
         }
 
         public T Resolve<T>()

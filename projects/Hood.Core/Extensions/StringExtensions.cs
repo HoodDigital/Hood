@@ -14,7 +14,7 @@ namespace Hood.Extensions
 
         public static bool IsAbsoluteUrl(this string url)
         {
-            return Uri.TryCreate(url, UriKind.Absolute, out Uri result);
+            return Uri.TryCreate(url, UriKind.Absolute, out _);
         }
 
         public static bool IsValidEmail(this string email)
@@ -74,11 +74,9 @@ namespace Hood.Extensions
 
         public static string ToUrl(this string url)
         {
-            Uri formattedUrl = null;
             try
             {
-                formattedUrl = new UriBuilder(url).Uri;
-                return formattedUrl.ToString();
+                return new UriBuilder(url).Uri.ToString();
             }
             catch (ArgumentNullException)
             {
@@ -453,7 +451,7 @@ namespace Hood.Extensions
                         if (!quoted)
                         {
                             sb.AppendLine();
-                            Enumerable.Range(0, ++indent).ForEach(item => sb.Append(indentString));
+                            Enumerable.Range(0, ++indent).ForEach(_ => sb.Append(indentString));
                         }
                         break;
                     case '}':
@@ -461,7 +459,7 @@ namespace Hood.Extensions
                         if (!quoted)
                         {
                             sb.AppendLine();
-                            Enumerable.Range(0, --indent).ForEach(item => sb.Append(indentString));
+                            Enumerable.Range(0, --indent).ForEach(_ => sb.Append(indentString));
                         }
                         sb.Append(ch);
                         break;
@@ -485,7 +483,7 @@ namespace Hood.Extensions
                         if (!quoted)
                         {
                             sb.AppendLine();
-                            Enumerable.Range(0, indent).ForEach(item => sb.Append(indentString));
+                            Enumerable.Range(0, indent).ForEach(_ => sb.Append(indentString));
                         }
                         break;
                     case ':':

@@ -1,5 +1,4 @@
 @model PagedList<ContentView>
-@inject IContentRepository _content
 @if (Model != null && Model.List.Count > 0)
 {
             @foreach (ContentView content in Model.List)

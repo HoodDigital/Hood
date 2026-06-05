@@ -1,4 +1,3 @@
-﻿using System;
 using System.Threading.Tasks;
 using Hood.Core;
 using Hood.Enums;
@@ -15,7 +14,6 @@ namespace Hood.Startup
         {
             using (IServiceScope scope = host.Services.CreateScope())
             {
-                IServiceProvider services = scope.ServiceProvider;
                 // Get the database from the services provider
                 HoodDbContext db = scope.ServiceProvider.GetService<HoodDbContext>();
                 try

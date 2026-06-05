@@ -24,7 +24,7 @@
 
     ViewData["EditUrl"] = Url.Action("Edit", "Content", new { area = "Admin", id = Model.Content.Id });
 
-    var View = "_View";
+    string View;
 
     @switch (Model.ContentType.BaseName)
     {

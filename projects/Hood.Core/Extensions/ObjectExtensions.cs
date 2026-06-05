@@ -18,6 +18,7 @@ namespace Hood.Extensions
         /// </summary>
         /// <param name="source">The source.</param>
         /// <param name="destination">The destination.</param>
+        /// <param name="allowedKeys">The form keys that are allowed to be copied.</param>
         public static T UpdateFromFormModel<T, TSource>(
             this T destination,
             TSource source,
@@ -87,7 +88,6 @@ namespace Hood.Extensions
         /// Will return a string representation of the object and all it's child members. In JSON format.
         /// </summary>
         /// <param name="element">The object or class you want to print to JSON.</param>
-        /// <param name="indentSize">The number of tab characters inserted onto each sub line.</param>
         /// <returns>String Json content</returns>
         public static string ToJson(this object element)
         {
@@ -113,11 +113,10 @@ namespace Hood.Extensions
         }
 
         /// <summary>
-        /// Will return a string representation of the object and all it's child members. In JSON format.
+        /// Returns a cache key for the entity — its JSON-serialised representation.
         /// </summary>
-        /// <param name="element">The object or class you want to print to JSON.</param>
-        /// <param name="indentSize">The number of tab characters inserted onto each sub line.</param>
-        /// <returns>String Json content</returns>
+        /// <param name="element">The entity to generate a cache key for.</param>
+        /// <returns>String cache key</returns>
         public static string GetCacheKey(this BaseEntity element)
         {
             try
@@ -135,6 +134,7 @@ namespace Hood.Extensions
         /// </summary>
         /// <param name="source">The source.</param>
         /// <param name="destination">The destination.</param>
+        /// <param name="updateOnly">When true, only set properties whose value has changed.</param>
         public static void CopyProperties(
             this object source,
             object destination,

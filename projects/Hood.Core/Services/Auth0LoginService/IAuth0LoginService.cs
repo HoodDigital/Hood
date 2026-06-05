@@ -26,6 +26,10 @@ namespace Hood.Services
 #nullable disable
 
         OpenIdConnectEvents AsOpenIdConnectEvents();
+
+        // OIDC event hook contract — the context parameter is part of the callback shape
+        // whether or not the default implementation reads it.
+        // ReSharper disable UnusedParameter.Global
         Task OnAccessDenied(AccessDeniedContext e);
         Task OnAuthenticationFailed(AuthenticationFailedContext e);
         Task OnAuthorizationCodeReceived(AuthorizationCodeReceivedContext e);
@@ -38,6 +42,8 @@ namespace Hood.Services
         Task OnTicketReceived(TicketReceivedContext e);
         Task OnTokenResponseReceived(TokenResponseReceivedContext e);
         Task OnTokenValidated(TokenValidatedContext e);
+
+        // ReSharper restore UnusedParameter.Global
         Task OnUserInformationReceived(UserInformationReceivedContext e);
     }
 }

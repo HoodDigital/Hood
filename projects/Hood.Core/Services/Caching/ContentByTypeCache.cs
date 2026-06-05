@@ -15,23 +15,19 @@ namespace Hood.Caching
         private readonly IConfiguration _config;
 
         private Dictionary<string, Lazy<Dictionary<int, Content>>> bySlug;
-        private readonly ContentCategoryCache _categories;
         private readonly IEventsService _events;
 
-        public ContentByTypeCache(
-            IConfiguration config,
-            ContentCategoryCache categories,
-            IEventsService events
-        )
+        public ContentByTypeCache(IConfiguration config, IEventsService events)
         {
             _config = config;
-            _categories = categories;
             _events = events;
-            EventHandler<EventArgs> resetContentByTypeCache = (sender, eventArgs) =>
+            EventHandler<EventArgs> resetContentByTypeCache = (_, _) =>
             {
                 ResetCache();
             };
             _events.ContentChanged += resetContentByTypeCache;
+            // Settings saves must rebuild the type-keyed cache too (HOOD-82).
+            _events.OptionsChanged += resetContentByTypeCache;
             ResetCache();
         }
 
@@ -52,6 +48,11 @@ namespace Hood.Caching
 
             ContentSettings contentSettings = Engine.Settings.Content;
             bySlug = new Dictionary<string, Lazy<Dictionary<int, Content>>>();
+            if (contentSettings?.Types == null)
+            {
+                // Unseeded database — empty cache; install gate handles routing (HOOD-81).
+                return;
+            }
             foreach (var type in contentSettings.Types.Where(t => t.Enabled && t.CachedByType))
             {
                 bySlug.Add(

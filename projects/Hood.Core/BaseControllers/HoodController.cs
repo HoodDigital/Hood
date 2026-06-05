@@ -12,8 +12,6 @@ namespace Hood.BaseControllers
 {
     public abstract class HoodController : BaseController
     {
-        public HoodController() { }
-
         [HttpPost]
         [Route("hood/contact/send/")]
         [Route("hood/process-contact-form/")]

@@ -23,11 +23,14 @@ namespace Hood.Caching
         public ContentCategoryCache(IConfiguration config, IEventsService events)
         {
             _config = config;
-            EventHandler<EventArgs> resetContentByTypeCache = (sender, eventArgs) =>
+            EventHandler<EventArgs> resetContentByTypeCache = (_, _) =>
             {
                 ResetCache();
             };
             events.ContentChanged += resetContentByTypeCache;
+            // Settings saves (e.g. enabling a content type) must also rebuild the type-keyed
+            // dictionaries, or newly-enabled types 500 until an app restart (HOOD-82).
+            events.OptionsChanged += resetContentByTypeCache;
             ResetCache();
         }
 
@@ -48,7 +51,7 @@ namespace Hood.Caching
         public int Count(string type)
         {
             if (type.IsSet())
-                return bySlug[type].Value.Count;
+                return bySlug.TryGetValue(type, out var categories) ? categories.Value.Count : 0;
             else
                 return byKey.Value.Count;
         }
@@ -84,6 +87,13 @@ namespace Hood.Caching
 
             ContentSettings contentSettings = Engine.Settings.Content;
             bySlug = new Dictionary<string, Lazy<Dictionary<string, ContentCategory>>>();
+            if (contentSettings?.Types == null)
+            {
+                // Schema-complete but unseeded database (pre-install) — leave the caches empty
+                // rather than throwing; the install gate routes traffic to /install (HOOD-81).
+                topLevel = new Lazy<ContentCategory[]>(Array.Empty<ContentCategory>);
+                return;
+            }
             foreach (var type in contentSettings.Types.Where(t => t.Enabled))
             {
                 bySlug.Add(
@@ -157,7 +167,9 @@ namespace Hood.Caching
 
         public IEnumerable<ContentCategory> GetSuggestions(string type)
         {
-            return bySlug[type].Value.Values;
+            return bySlug.TryGetValue(type, out var categories)
+                ? categories.Value.Values
+                : Enumerable.Empty<ContentCategory>();
         }
 
         // Html
@@ -242,7 +254,6 @@ namespace Hood.Caching
 
         public IHtmlContent AdminContentCategoryTree(
             IEnumerable<ContentCategory> startLevel,
-            string contentType,
             List<string> categoriesSelected,
             int startingLevel = 0
         )
@@ -297,7 +308,6 @@ namespace Hood.Caching
 
                     htmlOutput += AdminContentCategoryTree(
                         category.Children,
-                        contentType,
                         categoriesSelected,
                         startingLevel + 1
                     );

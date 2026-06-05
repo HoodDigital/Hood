@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Hood.Core;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Routing;
 
 namespace Hood.Attributes
 {
@@ -21,7 +19,6 @@ namespace Hood.Attributes
     {
         public Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
-            var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
             if (
                 !context.HttpContext.User.Identity.IsAuthenticated
                 || !context.HttpContext.User.RequiresConnection()

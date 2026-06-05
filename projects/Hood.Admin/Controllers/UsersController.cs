@@ -7,8 +7,5 @@ namespace Hood.Areas.Admin.Controllers
     [Authorize(Roles = "SuperUser,Admin")]
     // Standard ASP.NET Identity is the default backend; this admin controller derives from the
     // standard base. Auth0 deployments substitute Hood.Admin.BaseControllers.Auth0UsersController.
-    public class UsersController : Hood.Admin.BaseControllers.UsersController
-    {
-        public UsersController() { }
-    }
+    public class UsersController : Hood.Admin.BaseControllers.UsersController { }
 }

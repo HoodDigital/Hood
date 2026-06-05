@@ -6,8 +6,5 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin,Editor")]
-    public class MediaController : BaseMediaController
-    {
-        public MediaController() { }
-    }
+    public class MediaController : BaseMediaController { }
 }

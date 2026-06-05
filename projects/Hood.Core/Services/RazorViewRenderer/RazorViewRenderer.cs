@@ -17,17 +17,11 @@ namespace Hood.Services
     {
         private readonly IRazorViewEngine _viewEngine;
         private readonly ITempDataProvider _tempDataProvider;
-        private readonly IServiceProvider _serviceProvider;
 
-        public RazorViewRenderer(
-            IRazorViewEngine viewEngine,
-            ITempDataProvider tempDataProvider,
-            IServiceProvider serviceProvider
-        )
+        public RazorViewRenderer(IRazorViewEngine viewEngine, ITempDataProvider tempDataProvider)
         {
             _viewEngine = viewEngine;
             _tempDataProvider = tempDataProvider;
-            _serviceProvider = serviceProvider;
         }
 
         public async Task<string> Render(string viewPath)

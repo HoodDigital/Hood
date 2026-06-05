@@ -15,12 +15,7 @@ namespace Hood.Extensions
             try
             {
                 var genericType = inherited.GetGenericTypeDefinition();
-                foreach (
-                    var implementedInterface in type.FindInterfaces(
-                        (objType, objCriteria) => true,
-                        null
-                    )
-                )
+                foreach (var implementedInterface in type.FindInterfaces((_, _) => true, null))
                 {
                     if (!implementedInterface.IsGenericType)
                         continue;

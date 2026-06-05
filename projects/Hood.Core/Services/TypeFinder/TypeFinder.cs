@@ -9,8 +9,6 @@ namespace Hood.Core
 {
     public class TypeFinder : ITypeFinder
     {
-        public TypeFinder() { }
-
         #region Methods
 
         /// <summary>

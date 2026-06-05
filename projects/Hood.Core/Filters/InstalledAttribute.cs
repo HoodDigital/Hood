@@ -15,7 +15,7 @@ namespace Hood.Filters
             ActionExecutionDelegate next
         )
         {
-            if (!Engine.Services.Installed)
+            if (!Engine.Services.Installed || !Engine.Services.Seeded)
             {
                 context.Result = new RedirectToRouteResult(
                     new RouteValueDictionary(new { controller = "Install", action = "Install" })

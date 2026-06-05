@@ -46,7 +46,7 @@ namespace Hood.Startup
             try
             {
                 // Register core stuff.
-                services.ConfigureHoodBasics(config, env);
+                services.ConfigureHoodBasics(config);
                 services.ConfigureHoodSite(config, env);
                 services.ConfigureHoodEngine(config);
             }
@@ -56,13 +56,12 @@ namespace Hood.Startup
 
         public static IServiceCollection ConfigureHoodApi(
             this IServiceCollection services,
-            IConfiguration config,
-            IWebHostEnvironment env
+            IConfiguration config
         )
         {
             try
             {
-                services.ConfigureHoodCore(config, env);
+                services.ConfigureHoodCore(config);
 
                 services.AddCors(options =>
                 {
@@ -119,14 +118,13 @@ namespace Hood.Startup
 
         public static IServiceCollection ConfigureHoodCore(
             this IServiceCollection services,
-            IConfiguration config,
-            IWebHostEnvironment env
+            IConfiguration config
         )
         {
             try
             {
                 // Register core stuff.
-                services.ConfigureHoodBasics(config, env);
+                services.ConfigureHoodBasics(config);
                 services.ConfigureHoodEngine(config);
             }
             catch (StartupException) { }
@@ -135,8 +133,7 @@ namespace Hood.Startup
 
         private static IServiceCollection ConfigureHoodBasics(
             this IServiceCollection services,
-            IConfiguration config,
-            IWebHostEnvironment env
+            IConfiguration config
         )
         {
             services.Configure<HoodConfiguration>(config.GetSection("Hood"));
@@ -151,7 +148,7 @@ namespace Hood.Startup
             services.ConfigureProperty(config);
             services.ConfigureContent(config);
 
-            services.ConfigureCache(config);
+            services.ConfigureCache();
             services.ConfigureCacheProfiles();
 
             services.ConfigureDataProtection(config);
@@ -276,17 +273,14 @@ namespace Hood.Startup
             //create, initialize and configure the engine
             IHoodServiceProvider engine = Engine.CreateHoodServiceProvider();
             engine.Initialize(services);
-            IServiceProvider serviceProvider = engine.ConfigureServices(services, configuration);
+            engine.ConfigureServices(services, configuration);
 
             return services;
         }
 
         #region Caching
 
-        public static IServiceCollection ConfigureCache(
-            this IServiceCollection services,
-            IConfiguration config
-        )
+        public static IServiceCollection ConfigureCache(this IServiceCollection services)
         {
             // Caching
             //if (config["ConnectionStrings:RedisCache"].IsSet())
@@ -437,7 +431,7 @@ namespace Hood.Startup
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => consentRequired;
+                options.CheckConsentNeeded = _ => consentRequired;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
                 options.ConsentCookie.Name = $"{cookieName}_consent";
                 options.ConsentCookie.Domain = config["Identity:Cookies:Domain"].IsSet()
@@ -700,7 +694,7 @@ namespace Hood.Startup
                     : null;
             });
 
-            int sessionTimeout = 60;
+            int sessionTimeout;
             services.AddSession(options =>
             {
                 options.Cookie.IsEssential = true;

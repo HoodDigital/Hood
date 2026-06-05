@@ -87,7 +87,7 @@ namespace Hood.Startup
 
             app.UseHoodComponents(env, config);
 
-            app.UseHoodDefaultRoutes(config);
+            app.UseHoodDefaultRoutes();
 
             return app;
         }
@@ -121,10 +121,7 @@ namespace Hood.Startup
             return app;
         }
 
-        public static IApplicationBuilder UseHoodDefaultRoutes(
-            this IApplicationBuilder app,
-            IConfiguration config
-        )
+        public static IApplicationBuilder UseHoodDefaultRoutes(this IApplicationBuilder app)
         {
             app.UseEndpoints(endpoints =>
             {

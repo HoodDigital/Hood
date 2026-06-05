@@ -43,13 +43,13 @@
     </div>
 
     @Html.RenderScripts(Url, ResourceLocation.BeforeScripts)
-    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeScripts)
+    @Html.RenderInlineScripts(ResourceLocation.BeforeScripts)
 
     <partial name="_Scripts_Login" />
     @RenderSection("scripts", required: false)
 
     @Html.RenderScripts(Url, ResourceLocation.AfterScripts)
-    @Html.RenderInlineScripts(Url, ResourceLocation.AfterScripts)
+    @Html.RenderInlineScripts(ResourceLocation.AfterScripts)
 
     @Html.Raw(Engine.Settings.Seo.GoogleAnalytics)
 

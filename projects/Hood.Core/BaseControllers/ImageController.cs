@@ -9,8 +9,6 @@ namespace Hood.BaseControllers
 {
     public class ImagesController : Controller
     {
-        public ImagesController() { }
-
         #region Login Page Backgrounds
 
         [HttpGet]

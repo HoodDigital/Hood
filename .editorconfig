@@ -133,22 +133,6 @@ resharper_identifier_typo_highlighting = none
 resharper_markup_attribute_typo_highlighting = none
 resharper_markup_text_typo_highlighting = none
 
-# --- Known code smells — ticketed, not hidden silently --------------------------
-# Real findings (unused locals, multiple enumeration, dead assignments, empty
-# catches, modified-closure captures, virtual calls in ctors). Fixing them is
-# behavioural-risk work the HOOD-62 mechanical sweep must not do. Tracked to
-# re-enable + fix category-by-category in HOOD-78.
-resharper_unused_variable_highlighting = none
-resharper_unused_local_variable_highlighting = none
-resharper_not_accessed_variable_highlighting = none
-resharper_redundant_assignment_highlighting = none
-resharper_empty_constructor_highlighting = none
-resharper_unused_member_local_highlighting = none
-resharper_not_accessed_field_local_highlighting = none
-resharper_unused_parameter_local_highlighting = none
-resharper_unused_parameter_global_highlighting = none
-resharper_invalid_xml_doc_comment_highlighting = none
-
 # --- Markup / web noise ------------------------------------------------------------
 # Legacy theme markup renders fine; paths are theme-relative; ids resolve at
 # runtime through Hood's composition.

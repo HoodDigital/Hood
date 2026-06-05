@@ -1,5 +1,4 @@
 @{ 
-    BasicSettings _basicSettings = Engine.Settings.Basic;
     SeoSettings _seoSettings = Engine.Settings.Seo;
     var OgTitle = _seoSettings.OgTitle.IsSet() ? _seoSettings.OgTitle : ViewData["Title"];
     var OgImageUrl = _seoSettings.OgImageUrl.IsSet() ? _seoSettings.OgImageUrl : "http://placehold.it/1200x630";
