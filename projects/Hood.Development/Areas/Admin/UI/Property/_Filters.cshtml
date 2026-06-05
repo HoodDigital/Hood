@@ -1,4 +1,4 @@
-@model PropertyListModel
+﻿@model PropertyListModel
 
 @{
     PropertySettings _propertySettings = Engine.Settings.Property;
@@ -98,7 +98,8 @@
                             <option value="">Show All</option>
                             @for (int i = 0; i < 13; i++)
                             {
-                                <option value="@i">@(i)</option>
+                                var val = i;
+                                <option value="@val">@(val)</option>
                             }
                         </select>
                         <label asp-for="Bedrooms"></label>
@@ -111,7 +112,8 @@
                             <option value="">Show All</option>
                             @for (int i = 0; i < 13; i++)
                             {
-                                <option value="@i">@(i)</option>
+                                var val = i;
+                                <option value="@val">@(val)</option>
                             }
                         </select>
                         <label asp-for="MaxBedrooms"></label>
@@ -141,7 +143,8 @@
                             <option value="">Show All</option>
                             @for (int i = _propertySettings.RentMinimum; i <= _propertySettings.RentMaximum; i = i + _propertySettings.RentIncrement)
                             {
-                                <option value="@i">£ @(string.Format(_propertySettings.ShowRentDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                                var val = i;
+                                <option value="@val">£ @(string.Format(_propertySettings.ShowRentDecimals ? "{0:n}" : "{0:n0}", val))</option>
                             }
                         </select>
                         <label asp-for="MinRent"></label>
@@ -154,7 +157,8 @@
                             <option value="">Show All</option>
                             @for (int i = _propertySettings.RentMinimum; i <= _propertySettings.RentMaximum; i = i + _propertySettings.RentIncrement)
                             {
-                                <option value="@i">£ @(string.Format(_propertySettings.ShowRentDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                                var val = i;
+                                <option value="@val">£ @(string.Format(_propertySettings.ShowRentDecimals ? "{0:n}" : "{0:n0}", val))</option>
                             }
                         </select>
                         <label asp-for="MaxRent"></label>
@@ -172,7 +176,8 @@
                             <option value="">Show All</option>
                             @for (int i = _propertySettings.AskingPriceMinimum; i <= _propertySettings.AskingPriceMaximum; i = i + _propertySettings.AskingPriceIncrement)
                             {
-                                <option value="@i">£ @(string.Format(_propertySettings.ShowAskingPriceDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                                var val = i;
+                                <option value="@val">£ @(string.Format(_propertySettings.ShowAskingPriceDecimals ? "{0:n}" : "{0:n0}", val))</option>
                             }
                         </select>
                         <label asp-for="MinPrice"></label>
@@ -185,7 +190,8 @@
                             <option value="">Show All</option>
                             @for (int i = _propertySettings.AskingPriceMinimum; i <= _propertySettings.AskingPriceMaximum; i = i + _propertySettings.AskingPriceIncrement)
                             {
-                                <option value="@i">£ @(string.Format(_propertySettings.ShowAskingPriceDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                                var val = i;
+                                <option value="@val">£ @(string.Format(_propertySettings.ShowAskingPriceDecimals ? "{0:n}" : "{0:n0}", val))</option>
                             }
                         </select>
                         <label asp-for="MaxPrice"></label>
@@ -203,7 +209,8 @@
                             <option value="">Show All</option>
                             @for (int i = _propertySettings.PremiumMinimum; i <= _propertySettings.PremiumMaximum; i = i + _propertySettings.PremiumIncrement)
                             {
-                                <option value="@i">£ @(string.Format(_propertySettings.ShowPremiumDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                                var val = i;
+                                <option value="@val">£ @(string.Format(_propertySettings.ShowPremiumDecimals ? "{0:n}" : "{0:n0}", val))</option>
                             }
                         </select>
                         <label asp-for="MinPremium"></label>
@@ -216,7 +223,8 @@
                             <option value="">Show All</option>
                             @for (int i = _propertySettings.PremiumMinimum; i <= _propertySettings.PremiumMaximum; i = i + _propertySettings.PremiumIncrement)
                             {
-                                <option value="@i">£ @(string.Format(_propertySettings.ShowPremiumDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                                var val = i;
+                                <option value="@val">£ @(string.Format(_propertySettings.ShowPremiumDecimals ? "{0:n}" : "{0:n0}", val))</option>
                             }
                         </select>
                         <label asp-for="MaxPremium"></label>

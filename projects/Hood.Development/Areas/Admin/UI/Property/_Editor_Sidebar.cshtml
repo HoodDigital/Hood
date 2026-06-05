@@ -1,4 +1,4 @@
-@model PropertyListing
+﻿@model PropertyListing
 @{
     PropertySettings _propertySettings = Engine.Settings.Property;
 }
@@ -58,7 +58,8 @@
                     <option value="0">Studio</option>
                     @for (int i = 1; i < 15; i++)
                     {
-                        <option value="@i">@i.ToString("0")</option>
+                        var val = i;
+                        <option value="@val">@val.ToString("0")</option>
                     }
                 </select>
                 <label asp-for="Bedrooms"></label>

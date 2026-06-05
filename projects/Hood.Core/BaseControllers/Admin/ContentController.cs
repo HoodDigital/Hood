@@ -152,8 +152,9 @@ namespace Hood.Admin.BaseControllers
                 SaveMessage = "There was a problem saving: " + ex.Message;
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<BaseContentController>(SaveMessage, ex);
+                var contentId = model.Id;
                 model.Metadata = await _contentDb
-                    .ContentMetadata.Where(cm => cm.ContentId == model.Id)
+                    .ContentMetadata.Where(cm => cm.ContentId == contentId)
                     .ToListAsync();
                 model = await GetEditorModel(model);
                 return View(model);

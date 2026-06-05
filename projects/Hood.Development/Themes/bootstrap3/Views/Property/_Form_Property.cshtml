@@ -1,4 +1,4 @@
-@model PropertyListModel
+﻿@model PropertyListModel
 
 @{
     PropertySettings _propertySettings = Engine.Settings.Property;
@@ -38,7 +38,8 @@
                     <option value="">Show All</option>
                     @for (int i = 0; i < 13; i++)
                 {
-                    <option value="@i">@(i)</option>
+                    var val = i;
+                    <option value="@val">@(val)</option>
             }
                 </select>
             </div>
