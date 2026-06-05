@@ -2,7 +2,11 @@
 using System.IO;
 using System.Linq;
 using Hood.Core;
+using Hood.Extensions;
 using Hood.Services;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 
@@ -10,6 +14,70 @@ namespace Hood
 {
     public static class UserInterfaceProvider
     {
+        public const string Bootstrap3Assembly = "Hood.UI.Bootstrap3";
+        public const string Bootstrap4Assembly = "Hood.UI.Bootstrap4";
+
+        /// <summary>
+        /// Resolves the active UI flavour assembly name at startup time — before the engine is
+        /// built — replicating GetProvider's precedence (theme.UI overrides Hood:UI config). The
+        /// theme name is read straight from the database; if the database isn't available yet
+        /// (pre-install) the configuration value wins. Defaults to Bootstrap4.
+        /// </summary>
+        public static string GetActiveUIAssembly(IConfiguration config, IWebHostEnvironment env)
+        {
+            string ui = config["Hood:UI"];
+            try
+            {
+                string themeName = null;
+                string connectionString = config["ConnectionStrings:DefaultConnection"];
+                if (connectionString.IsSet())
+                {
+                    using var connection = new SqlConnection(connectionString);
+                    connection.Open();
+                    using var command = new SqlCommand(
+                        "SELECT [Value] FROM [HoodOptions] WHERE [Id] = 'Hood.Settings.Theme'",
+                        connection
+                    );
+                    themeName = (command.ExecuteScalar() as string)?.Trim('"');
+                }
+                if (themeName.IsSet())
+                {
+                    Theme theme = new ThemesService(env).Get(themeName);
+                    if (theme != null && theme.UI.IsSet())
+                    {
+                        ui = theme.UI;
+                    }
+                }
+            }
+            // ReSharper disable once EmptyGeneralCatchClause — pre-install / unreachable database
+            // probe; the configuration fallback below is the intended behaviour.
+            catch { }
+            return ui == "Bootstrap3" ? Bootstrap3Assembly : Bootstrap4Assembly;
+        }
+
+        /// <summary>
+        /// Removes the inactive bootstrap flavours' application parts so only the active
+        /// flavour's compiled /UI/* views participate in view resolution. Switching flavour
+        /// (changing theme UI) requires an application restart (HOOD-54).
+        /// </summary>
+        public static void FilterInactiveUI(
+            ApplicationPartManager partManager,
+            IConfiguration config,
+            IWebHostEnvironment env
+        )
+        {
+            string active = GetActiveUIAssembly(config, env);
+            string[] flavours = { Bootstrap3Assembly, Bootstrap4Assembly };
+            foreach (
+                ApplicationPart part in partManager
+                    .ApplicationParts.Where(p => flavours.Contains(p.Name) && p.Name != active)
+                    .ToList()
+            )
+            {
+                partManager.ApplicationParts.Remove(part);
+            }
+        }
+
         /// <summary>
         /// Gets a directory listing from the embedded files in the Hood assembly.
         /// WARNING, this should only be used for loading files in known definite locations. as the

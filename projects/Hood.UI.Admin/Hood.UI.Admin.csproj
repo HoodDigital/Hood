@@ -1,20 +1,24 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <AssemblyName>Hood.UI.Admin</AssemblyName>
     <PackageId>Hood.UI.Admin</PackageId>
     <OutputType>Library</OutputType>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="node_modules\**" />
-    <EmbeddedResource Remove="node_modules\**" />
-    <None Remove="node_modules\**" />
+    <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
   </ItemGroup>
+  <!-- Views compile into the assembly (RCL). Template *sources* stay embedded so the
+       content template field-parser (GetMetasForTemplate) can read them; json configs
+       are runtime-read via the embedded provider as before (HOOD-54). -->
   <ItemGroup>
-    <EmbeddedResource Include="Areas\**\*.cshtml" />
     <EmbeddedResource Include="Areas\**\*.json" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
+    <Compile Remove="node_modules\**" />
+    <Content Remove="node_modules\**" />
+    <EmbeddedResource Remove="node_modules\**" />
+    <None Remove="node_modules\**" />
   </ItemGroup>
 </Project>

@@ -140,6 +140,7 @@ namespace Hood.Startup
             services.Configure<Auth0Configuration>(config.GetSection("Identity:Auth0"));
 
             services.AddSingleton<ILogService, LogService>();
+            services.AddSingleton<ITemplateProvider, TemplateProvider>();
             services.AddSingleton<IAddressService, AddressService>();
 
             services.ConfigureHoodDatabase(config);
@@ -217,7 +218,7 @@ namespace Hood.Startup
                 services.AddDatabaseDeveloperPageExceptionFilter();
             }
 
-            services.ConfigureViewEngine(config);
+            services.ConfigureViewEngine(config, env);
 
             services.ConfigureAntiForgery(config);
 
@@ -227,9 +228,8 @@ namespace Hood.Startup
 
             services.ConfigureHoodSlugRouteConstraints();
 
-            services
+            IMvcBuilder mvcBuilder = services
                 .AddControllersWithViews()
-                .AddRazorRuntimeCompilation()
                 .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.ContractResolver = new DefaultContractResolver()
@@ -239,6 +239,23 @@ namespace Hood.Startup
                 })
                 .AddApplicationPart(typeof(Engine).Assembly)
                 .AddApplicationPart(typeof(IServiceCollectionExtensions).Assembly);
+
+            // Views ship precompiled (RCL, HOOD-54); runtime compilation is a dev-loop tool.
+            // Hood:AllowRuntimeViewCompilation restores live server-side view editing for
+            // consumers who depend on it.
+            if (
+                env.EnvironmentName == "Development"
+                || config.GetValue<bool>("Hood:AllowRuntimeViewCompilation")
+            )
+            {
+                mvcBuilder.AddRazorRuntimeCompilation();
+            }
+
+            // Only the active UI flavour's compiled views participate in view resolution;
+            // switching flavour requires an app restart (HOOD-54).
+            mvcBuilder.ConfigureApplicationPartManager(partManager =>
+                UserInterfaceProvider.FilterInactiveUI(partManager, config, env)
+            );
 
             services.AddRazorPages();
             return services;
@@ -740,7 +757,8 @@ namespace Hood.Startup
 
         public static IServiceCollection ConfigureViewEngine(
             this IServiceCollection services,
-            IConfiguration config
+            IConfiguration config,
+            IWebHostEnvironment env
         )
         {
             services.Configure<MvcRazorRuntimeCompilationOptions>(options =>
@@ -754,12 +772,18 @@ namespace Hood.Startup
                         "ComponentLib"
                     )
                 );
-                if (Engine.Services.Installed)
+
+                // In-repo dev loop (Hood.Development): watch the sibling UI package sources so
+                // package views live-edit straight from their canonical homes — no copy step
+                // (HOOD-54). Only wired when the source folders exist next to the content root.
+                string repoRoot = Path.GetFullPath(Path.Combine(env.ContentRootPath, ".."));
+                string activeUI = UserInterfaceProvider.GetActiveUIAssembly(config, env);
+                foreach (string package in new[] { "Hood.UI.Core", "Hood.UI.Admin", activeUI })
                 {
-                    EmbeddedFileProvider defaultUI = UserInterfaceProvider.GetProvider(config);
-                    if (defaultUI != null)
+                    string packageDir = Path.Combine(repoRoot, package);
+                    if (Directory.Exists(packageDir))
                     {
-                        options.FileProviders.Add(defaultUI);
+                        options.FileProviders.Add(new PhysicalFileProvider(packageDir));
                     }
                 }
             });
