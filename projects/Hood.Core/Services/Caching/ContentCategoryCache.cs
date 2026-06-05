@@ -147,8 +147,9 @@ namespace Hood.Caching
             IEnumerable<ContentCategory> categories
         )
         {
-            return categories.Union(
-                categories
+            var allCategories = categories.ToList();
+            return allCategories.Union(
+                allCategories
                     .Where(c => c.Children != null)
                     .SelectMany(c => GetAllCategoriesIncludingChildren(c.Children))
             );
@@ -169,10 +170,11 @@ namespace Hood.Caching
         {
             string htmlOutput = string.Empty;
 
-            if (startLevel != null && startLevel.Count() > 0)
+            var categories = startLevel?.ToList();
+            if (categories != null && categories.Count > 0)
             {
                 htmlOutput += $"<ul class='{listClass}'>";
-                foreach (var key in startLevel.Select(c => c.Id))
+                foreach (var key in categories.Select(c => c.Id))
                 {
                     // Have to reload from the cache to use the count.
                     var category = FromKey(key);
@@ -206,9 +208,10 @@ namespace Hood.Caching
         )
         {
             string htmlOutput = string.Empty;
-            if (startLevel != null && startLevel.Count() > 0)
+            var categories = startLevel?.ToList();
+            if (categories != null && categories.Count > 0)
             {
-                foreach (var key in startLevel.Select(c => c.Id))
+                foreach (var key in categories.Select(c => c.Id))
                 {
                     // Have to reload from the cache to use the count.
                     var category = FromKey(key);
@@ -246,9 +249,10 @@ namespace Hood.Caching
         {
             string htmlOutput = string.Empty;
 
-            if (startLevel != null && startLevel.Count() > 0)
+            var categories = startLevel?.ToList();
+            if (categories != null && categories.Count > 0)
             {
-                foreach (var key in startLevel.Select(c => c.Id))
+                foreach (var key in categories.Select(c => c.Id))
                 {
                     // Have to reload from the cache to use the count.
                     var category = FromKey(key);
@@ -312,9 +316,10 @@ namespace Hood.Caching
         {
             string htmlOutput = string.Empty;
 
-            if (startLevel != null && startLevel.Count() > 0)
+            var categories = startLevel?.ToList();
+            if (categories != null && categories.Count > 0)
             {
-                foreach (var key in startLevel.Select(c => c.Id))
+                foreach (var key in categories.Select(c => c.Id))
                 {
                     // Have to reload from the cache to use the count.
                     var category = FromKey(key);

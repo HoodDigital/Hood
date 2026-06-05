@@ -125,8 +125,9 @@ namespace Hood.Services
             IEnumerable<MediaDirectory> startLevel
         )
         {
-            return startLevel.Union(
-                startLevel
+            var directories = startLevel.ToList();
+            return directories.Union(
+                directories
                     .Where(c => c.Children != null)
                     .SelectMany(c => GetAllCategoriesIncludingChildren(c.Children))
             );
@@ -212,9 +213,10 @@ namespace Hood.Services
         )
         {
             string htmlOutput = string.Empty;
-            if (startLevel != null && startLevel.Count() > 0)
+            var directories = startLevel?.ToList();
+            if (directories != null && directories.Count > 0)
             {
-                foreach (int key in startLevel.Select(c => c.Id))
+                foreach (int key in directories.Select(c => c.Id))
                 {
                     // Have to reload from the cache to use the count.
                     MediaDirectory directory = GetDirectoryById(key);
@@ -251,9 +253,10 @@ namespace Hood.Services
         {
             string htmlOutput = string.Empty;
 
-            if (startLevel != null && startLevel.Count() > 0)
+            var directories = startLevel?.ToList();
+            if (directories != null && directories.Count > 0)
             {
-                foreach (int key in startLevel.Select(c => c.Id))
+                foreach (int key in directories.Select(c => c.Id))
                 {
                     // Have to reload from the cache to use the count.
                     MediaDirectory directory = GetDirectoryById(key);
@@ -308,9 +311,10 @@ namespace Hood.Services
         {
             string htmlOutput = string.Empty;
 
-            if (startLevel != null && startLevel.Count() > 0)
+            var directories = startLevel?.ToList();
+            if (directories != null && directories.Count > 0)
             {
-                foreach (int key in startLevel.Select(c => c.Id))
+                foreach (int key in directories.Select(c => c.Id))
                 {
                     // Have to reload from the cache to use the count.
                     MediaDirectory directory = GetDirectoryById(key);

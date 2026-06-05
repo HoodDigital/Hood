@@ -130,7 +130,8 @@ namespace System.Collections.Generic
 
         public IPagedList<T> Reload(IEnumerable<T> source, int pageIndex, int pageSize)
         {
-            int total = source.Count();
+            var items = source.ToList();
+            int total = items.Count;
             TotalCount = total;
             TotalPages = (int)Math.Ceiling((double)total / pageSize);
             if (pageIndex > TotalPages)
@@ -143,11 +144,11 @@ namespace System.Collections.Generic
             _list = new List<T>();
             if (PageSize > TotalCount)
             {
-                _list.AddRange(source.ToList());
+                _list.AddRange(items);
             }
             else
             {
-                _list.AddRange(source.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToList());
+                _list.AddRange(items.Skip((PageIndex - 1) * PageSize).Take(PageSize));
             }
 
             return this;

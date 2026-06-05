@@ -1,7 +1,7 @@
 ﻿@model ContentModel
 @inject ContentCategoryCache _categories
 @{
-    var categories = _categories.TopLevel(Model.ContentType.Type);
+    var categories = _categories.TopLevel(Model.ContentType.Type).ToList();
 }
 @if (Model.ContentType.ShowCategories)
 {
@@ -10,7 +10,7 @@
             <h6 class="m-0">Categories</h6>
         </div>
         <div class="card-body">
-            @if (categories.Count() > 0)
+            @if (categories.Count > 0)
             {
                 @_categories.ContentCategoryTree(categories, Model.ContentType.Slug)
             }

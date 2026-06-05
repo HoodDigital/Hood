@@ -61,16 +61,17 @@ namespace Hood.Models
             IEnumerable<GeoCoordinate> geoCoordinates
         )
         {
-            if (geoCoordinates.Count() == 1)
+            var coordinates = geoCoordinates.ToList();
+            if (coordinates.Count == 1)
             {
-                return geoCoordinates.Single();
+                return coordinates.Single();
             }
 
             double x = 0;
             double y = 0;
             double z = 0;
 
-            foreach (var geoCoordinate in geoCoordinates)
+            foreach (var geoCoordinate in coordinates)
             {
                 var latitude = geoCoordinate.Latitude * Math.PI / 180;
                 var longitude = geoCoordinate.Longitude * Math.PI / 180;
@@ -80,7 +81,7 @@ namespace Hood.Models
                 z += Math.Sin(latitude);
             }
 
-            var total = geoCoordinates.Count();
+            var total = coordinates.Count;
 
             x = x / total;
             y = y / total;
