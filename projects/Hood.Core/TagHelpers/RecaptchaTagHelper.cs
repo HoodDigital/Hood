@@ -21,6 +21,7 @@ namespace Hood.TagHelpers
         /// </summary>
         /// <param name="htmlHelper">HTML helper</param>
         /// <param name="httpContextAccessor">HTTP context accessor</param>
+        /// <param name="env">Host environment</param>
         public RecapcthaTagHelper(
             IHtmlHelper htmlHelper,
             IHttpContextAccessor httpContextAccessor,

@@ -1164,7 +1164,9 @@ namespace Hood.Services
         /// <summary>
         /// Takes the dictionary object and translates it into a full PropertyListing object, ready to insert to db.
         /// </summary>
-        /// <param name="data">Property</param>
+        /// <param name="property">The PropertyListing to populate.</param>
+        /// <param name="data">The BLM field dictionary for the property.</param>
+        /// <param name="validatingOnly">When true, parse/validate without side effects like media downloads.</param>
         /// <returns></returns>
         private async Task<PropertyListing> ProcessPropertyAsync(
             PropertyListing property,

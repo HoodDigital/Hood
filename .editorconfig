@@ -147,7 +147,6 @@ resharper_unused_member_local_highlighting = none
 resharper_not_accessed_field_local_highlighting = none
 resharper_unused_parameter_local_highlighting = none
 resharper_unused_parameter_global_highlighting = none
-resharper_invalid_xml_doc_comment_highlighting = none
 
 # --- Markup / web noise ------------------------------------------------------------
 # Legacy theme markup renders fine; paths are theme-relative; ids resolve at
