@@ -1,10 +1,10 @@
 @model Content
 @{
-    var typeFields = Model.Metadata.Where(c => c.Name.StartsWith("Content." + Model.Type.BaseName + "."));
+    var typeFields = Model.Metadata.Where(c => c.Name.StartsWith("Content." + Model.Type.BaseName + ".")).ToList();
 }
 <h5 class="mt-2 mb-0">@Model.Type.TypeName Settings &amp; Custom Fields</h5>
 <p>You can create custom fields in the <a asp-action="Content" asp-controller="Settings">content settings</a> area.</p>
-@if (typeFields.Count() > 0)
+@if (typeFields.Count > 0)
 {
     @foreach (ContentMeta cm in typeFields.OrderBy(cm => cm.Name))
     {
@@ -12,13 +12,13 @@
     }
 }
 @{
-    var customFields = Model.Metadata.Where(c => (c.Name.StartsWith("Content.") && !c.Name.StartsWith("Content." + Model.Type.BaseName + ".")) || c.Name.StartsWith("Custom.") || c.Name == "DisplayOrder");
+    var customFields = Model.Metadata.Where(c => (c.Name.StartsWith("Content.") && !c.Name.StartsWith("Content." + Model.Type.BaseName + ".")) || c.Name.StartsWith("Custom.") || c.Name == "DisplayOrder").ToList();
 }
-@if (customFields.Count() > 0 && typeFields.Count() > 0)
+@if (customFields.Count > 0 && typeFields.Count > 0)
 {
     <hr class="mt-4 mb-4" />
 }
-@if (customFields.Count() > 0)
+@if (customFields.Count > 0)
 {
     @foreach (ContentMeta cm in customFields.OrderBy(cm => cm.Name))
     {

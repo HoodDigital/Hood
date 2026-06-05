@@ -11,8 +11,6 @@ namespace Hood.ViewModels
     {
         public MediaListModel()
         {
-            PageSize = 20;
-            PageIndex = 1;
             Restrict = ".pdf,.gif,.png,.jpg,.jpeg";
         }
 

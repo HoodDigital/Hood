@@ -21,11 +21,7 @@ namespace System.Collections.Generic
         /// <summary>
         /// Constructor
         /// </summary>
-        public PagedList()
-        {
-            PageSize = 20;
-            PageIndex = 1;
-        }
+        public PagedList() { }
 
         /// <summary>
         /// Constructor
@@ -44,7 +40,7 @@ namespace System.Collections.Generic
         [FromQuery(Name = "page")]
         [JsonProperty("page")]
         [Display(Name = "Current Page")]
-        public virtual int PageIndex { get; set; }
+        public int PageIndex { get; set; } = 1;
 
         /// <summary>
         /// Page size
@@ -52,7 +48,7 @@ namespace System.Collections.Generic
         [FromQuery(Name = "pageSize")]
         [JsonProperty("pageSize")]
         [Display(Name = "Page Size")]
-        public virtual int PageSize { get; set; }
+        public virtual int PageSize { get; set; } = 20;
 
         /// <summary>
         /// Total count
@@ -134,7 +130,8 @@ namespace System.Collections.Generic
 
         public IPagedList<T> Reload(IEnumerable<T> source, int pageIndex, int pageSize)
         {
-            int total = source.Count();
+            var items = source.ToList();
+            int total = items.Count;
             TotalCount = total;
             TotalPages = (int)Math.Ceiling((double)total / pageSize);
             if (pageIndex > TotalPages)
@@ -147,11 +144,11 @@ namespace System.Collections.Generic
             _list = new List<T>();
             if (PageSize > TotalCount)
             {
-                _list.AddRange(source.ToList());
+                _list.AddRange(items);
             }
             else
             {
-                _list.AddRange(source.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToList());
+                _list.AddRange(items.Skip((PageIndex - 1) * PageSize).Take(PageSize));
             }
 
             return this;

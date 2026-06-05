@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
@@ -33,6 +33,8 @@ namespace Hood.Core
                     {
                         types = a.GetTypes();
                     }
+                    // ReSharper disable once EmptyGeneralCatchClause — reflection-only probe
+                    // (ReflectionTypeLoadException et al.); the null check below is the handler.
                     catch { }
 
                     if (types == null)

@@ -420,7 +420,14 @@ namespace Hood.Admin.BaseControllers
                     role.RemoteRole = await _auth0.GetRoleById(role.RemoteId);
                 }
             }
-            catch (Exception) { }
+            catch (Exception ex)
+            {
+                await _logService.AddExceptionAsync<Auth0UsersController>(
+                    "Failed to load the remote role from Auth0.",
+                    ex,
+                    LogType.Warning
+                );
+            }
             return View("../Auth0Users/EditRole", role);
         }
 
@@ -470,7 +477,14 @@ namespace Hood.Admin.BaseControllers
                     {
                         role.RemoteRole = await _auth0.GetRoleById(role.RemoteId);
                     }
-                    catch (Exception) { }
+                    catch (Exception ex)
+                    {
+                        await _logService.AddExceptionAsync<Auth0UsersController>(
+                            "Failed to load the remote role from Auth0.",
+                            ex,
+                            LogType.Warning
+                        );
+                    }
                     if (role.RemoteRole != null)
                     {
                         throw new Exception(

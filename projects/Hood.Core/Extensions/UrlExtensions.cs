@@ -43,6 +43,8 @@ namespace Hood.Extensions
                         hostname = mediaSettings.AzureHost.IsSet() ? mediaSettings.AzureHost : null;
                     }
                 }
+                // ReSharper disable once EmptyGeneralCatchClause — settings service may not be
+                // resolvable (startup/tests); no hostname override is the correct fallback.
                 catch (Exception) { }
             }
 

@@ -342,27 +342,62 @@ namespace Hood.Services
                 {
                     await Delete(media.BlobReference);
                 }
-                catch (Exception) { }
+                catch (Exception ex)
+                {
+                    await Engine.Logs.AddExceptionAsync<MediaManager>(
+                        "Failed to delete stored media file.",
+                        ex,
+                        LogType.Warning
+                    );
+                }
                 try
                 {
                     await Remove(media.SmallUrl);
                 }
-                catch (Exception) { }
+                catch (Exception ex)
+                {
+                    await Engine.Logs.AddExceptionAsync<MediaManager>(
+                        "Failed to delete stored media file.",
+                        ex,
+                        LogType.Warning
+                    );
+                }
                 try
                 {
                     await Remove(media.MediumUrl);
                 }
-                catch (Exception) { }
+                catch (Exception ex)
+                {
+                    await Engine.Logs.AddExceptionAsync<MediaManager>(
+                        "Failed to delete stored media file.",
+                        ex,
+                        LogType.Warning
+                    );
+                }
                 try
                 {
                     await Remove(media.LargeUrl);
                 }
-                catch (Exception) { }
+                catch (Exception ex)
+                {
+                    await Engine.Logs.AddExceptionAsync<MediaManager>(
+                        "Failed to delete stored media file.",
+                        ex,
+                        LogType.Warning
+                    );
+                }
                 try
                 {
                     await Remove(media.ThumbUrl);
                 }
-                catch (Exception) { }
+                catch (Exception ex)
+                {
+                    await Engine.Logs.AddExceptionAsync<MediaManager>(
+                        "Failed to delete stored media file.",
+                        ex,
+                        LogType.Warning
+                    );
+                }
             }
         }
 

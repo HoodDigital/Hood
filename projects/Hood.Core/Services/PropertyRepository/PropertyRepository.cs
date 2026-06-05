@@ -359,7 +359,14 @@ namespace Hood.Services
                 {
                     await _media.DeleteStoredMedia(m);
                 }
-                catch (Exception) { }
+                catch (Exception ex)
+                {
+                    await Engine.Logs.AddExceptionAsync<PropertyRepository>(
+                        "Failed to delete stored property media.",
+                        ex,
+                        LogType.Warning
+                    );
+                }
                 _db.Entry(m).State = EntityState.Deleted;
             });
             property.FloorPlans.ForEach(async m =>
@@ -368,7 +375,14 @@ namespace Hood.Services
                 {
                     await _media.DeleteStoredMedia(m);
                 }
-                catch (Exception) { }
+                catch (Exception ex)
+                {
+                    await Engine.Logs.AddExceptionAsync<PropertyRepository>(
+                        "Failed to delete stored property media.",
+                        ex,
+                        LogType.Warning
+                    );
+                }
                 _db.Entry(m).State = EntityState.Deleted;
             });
             property.Metadata.ForEach(m =>
@@ -400,7 +414,14 @@ namespace Hood.Services
                     {
                         await _media.DeleteStoredMedia(m);
                     }
-                    catch (Exception) { }
+                    catch (Exception ex)
+                    {
+                        await Engine.Logs.AddExceptionAsync<PropertyRepository>(
+                            "Failed to delete stored property media.",
+                            ex,
+                            LogType.Warning
+                        );
+                    }
                     _db.Entry(m).State = EntityState.Deleted;
                 });
                 p.FloorPlans.ForEach(async m =>
@@ -409,7 +430,14 @@ namespace Hood.Services
                     {
                         await _media.DeleteStoredMedia(m);
                     }
-                    catch (Exception) { }
+                    catch (Exception ex)
+                    {
+                        await Engine.Logs.AddExceptionAsync<PropertyRepository>(
+                            "Failed to delete stored property media.",
+                            ex,
+                            LogType.Warning
+                        );
+                    }
                     _db.Entry(m).State = EntityState.Deleted;
                 });
                 p.Metadata.ForEach(m =>
@@ -541,13 +569,17 @@ namespace Hood.Services
                 .ToListAsync();
 
             var createdByDate = data.GroupBy(p => p.date)
-                .Select(g => new { name = g.Key, count = g.Count() });
+                .Select(g => new { name = g.Key, count = g.Count() })
+                .ToList();
             var createdByMonth = data.GroupBy(p => p.month)
-                .Select(g => new { name = g.Key, count = g.Count() });
+                .Select(g => new { name = g.Key, count = g.Count() })
+                .ToList();
             var publishedByDate = data.GroupBy(p => p.pubdate)
-                .Select(g => new { name = g.Key, count = g.Count() });
+                .Select(g => new { name = g.Key, count = g.Count() })
+                .ToList();
             var publishedByMonth = data.GroupBy(p => p.pubmonth)
-                .Select(g => new { name = g.Key, count = g.Count() });
+                .Select(g => new { name = g.Key, count = g.Count() })
+                .ToList();
 
             List<KeyValuePair<string, int>> days = new List<KeyValuePair<string, int>>();
             List<KeyValuePair<string, int>> publishDays = new List<KeyValuePair<string, int>>();

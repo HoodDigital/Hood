@@ -210,6 +210,8 @@ namespace Hood.Core
                         return Configuration.CdnPath;
                     }
                 }
+                // ReSharper disable once EmptyGeneralCatchClause — config may be unavailable
+                // during startup, and logging from inside the engine here would recurse.
                 catch (Exception) { }
                 return "https://cdn.jsdelivr.net/npm/hoodcms";
             }

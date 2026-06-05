@@ -568,9 +568,11 @@ namespace Hood.Services
                 .ToListAsync();
 
             var createdByDate = data.GroupBy(p => p.date)
-                .Select(g => new { name = g.Key, count = g.Count() });
+                .Select(g => new { name = g.Key, count = g.Count() })
+                .ToList();
             var createdByMonth = data.GroupBy(p => p.month)
-                .Select(g => new { name = g.Key, count = g.Count() });
+                .Select(g => new { name = g.Key, count = g.Count() })
+                .ToList();
 
             List<KeyValuePair<string, int>> days = new List<KeyValuePair<string, int>>();
             foreach (

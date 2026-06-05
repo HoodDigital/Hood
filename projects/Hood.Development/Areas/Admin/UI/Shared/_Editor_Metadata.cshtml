@@ -88,13 +88,11 @@
         }
         catch (Exception)
         { 
-            try
+            var dateTimeString = Model.GetValue<string>();
+            if (DateTime.TryParse(dateTimeString, out var parsedDateTime))
             {
-                var dateTimeString = Model.GetValue<string>();
-                dateTime = DateTime.Parse(dateTimeString);
+                dateTime = parsedDateTime;
             }
-            catch (Exception)
-            { }
         }
 
         switch (Model.InputType)

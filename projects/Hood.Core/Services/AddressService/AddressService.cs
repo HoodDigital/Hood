@@ -19,7 +19,9 @@ namespace Hood.Services
                 return null;
 
             IGeocoder geocoder = new GoogleGeocoder() { ApiKey = key };
-            IEnumerable<Address> addresses = geocoder
+            // Materialise the geocoder results — re-enumerating a lazy result here could
+            // re-issue the HTTP geocode request.
+            List<Address> addresses = geocoder
                 .GeocodeAsync(
                     address.Number.IsSet()
                         ? string.Format("{0} {1}", address.Number, address.Address1)
@@ -29,11 +31,11 @@ namespace Hood.Services
                     address.Postcode,
                     address.Country
                 )
-                .Result;
-            if (addresses.Count() == 0)
+                .Result.ToList();
+            if (addresses.Count == 0)
             {
-                addresses = geocoder.GeocodeAsync(address.Postcode).Result;
-                if (addresses.Count() == 0)
+                addresses = geocoder.GeocodeAsync(address.Postcode).Result.ToList();
+                if (addresses.Count == 0)
                     return null;
             }
 

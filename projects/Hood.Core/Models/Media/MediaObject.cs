@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using Hood.Core;
 using Hood.Entities;
@@ -87,7 +87,7 @@ namespace Hood.Models
         public virtual string BlobReference { get; set; }
 
         [Display(Name = "Url")]
-        public virtual string Url { get; set; }
+        public string Url { get; set; }
 
         [Display(Name = "Uploaded On")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddThh:mm}")]
@@ -97,16 +97,16 @@ namespace Hood.Models
         public virtual string CreatedBy { get; set; }
 
         [Display(Name = "Thumbnail Url", Description = "Large URL for the file (250x250 Max Size)")]
-        public virtual string ThumbUrl { get; set; }
+        public string ThumbUrl { get; set; }
 
         [Display(Name = "Small Url", Description = "Large URL for the file (640x640 Max Size)")]
-        public virtual string SmallUrl { get; set; }
+        public string SmallUrl { get; set; }
 
         [Display(Name = "Medium Url", Description = "Large URL for the file (1280x1280 Max Size)")]
-        public virtual string MediumUrl { get; set; }
+        public string MediumUrl { get; set; }
 
         [Display(Name = "Large Url", Description = "Large URL for the file (1920x1920 Max Size)")]
-        public virtual string LargeUrl { get; set; }
+        public string LargeUrl { get; set; }
 
         [Display(
             Name = "Unique Id",

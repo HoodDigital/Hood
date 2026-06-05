@@ -230,30 +230,36 @@ namespace Hood.Services
                 }
 
                 // Now we have a list of properties, in the feed
-                IEnumerable<PropertyListing> newProperties = feedProperties.Where(p =>
-                    !siteProperties.Any(p2 => p2.Reference == p.Reference)
-                );
-                IEnumerable<PropertyListing> existingProperties = siteProperties.Where(site =>
-                    feedProperties.Any(feed => feed.Reference == site.Reference)
-                );
-                IEnumerable<PropertyListing> extraneous = siteProperties.Where(p =>
+                List<PropertyListing> newProperties = feedProperties
+                    .Where(p => !siteProperties.Any(p2 => p2.Reference == p.Reference))
+                    .ToList();
+                List<PropertyListing> existingProperties = siteProperties
+                    .Where(site => feedProperties.Any(feed => feed.Reference == site.Reference))
+                    .ToList();
+                IEnumerable<PropertyListing> extraneousQuery = siteProperties.Where(p =>
                     !feedProperties.Any(p2 => p2.Reference == p.Reference)
                 );
 
                 switch (_propertySettings.FTPImporterSettings.ExtraneousPropertyProcess)
                 {
                     case ExtraneousPropertyProcess.StatusArchive:
-                        extraneous = extraneous.Where(p => p.Status != ContentStatus.Archived);
+                        extraneousQuery = extraneousQuery.Where(p =>
+                            p.Status != ContentStatus.Archived
+                        );
                         break;
                     case ExtraneousPropertyProcess.StatusDelete:
-                        extraneous = extraneous.Where(p => p.Status != ContentStatus.Deleted);
+                        extraneousQuery = extraneousQuery.Where(p =>
+                            p.Status != ContentStatus.Deleted
+                        );
                         break;
                 }
 
+                List<PropertyListing> extraneous = extraneousQuery.ToList();
+
                 Lock.AcquireWriterLock(Timeout.Infinite);
-                ToAdd = newProperties.Count();
-                ToDelete = extraneous.Count();
-                ToUpdate = existingProperties.Count();
+                ToAdd = newProperties.Count;
+                ToDelete = extraneous.Count;
+                ToUpdate = existingProperties.Count;
                 Tasks = ToAdd + ToDelete + ToUpdate;
                 Lock.ReleaseWriterLock();
 
@@ -368,7 +374,14 @@ namespace Hood.Services
                                         {
                                             await _media.DeleteStoredMedia(m);
                                         }
-                                        catch (Exception) { }
+                                        catch (Exception ex)
+                                        {
+                                            await _logService.AddExceptionAsync<BlmFileImporter>(
+                                                "Failed to delete stored property media.",
+                                                ex,
+                                                LogType.Warning
+                                            );
+                                        }
                                     _db.Entry(m).State = EntityState.Deleted;
                                 });
                                 await SaveChangesToDatabaseAsync();
@@ -383,7 +396,14 @@ namespace Hood.Services
                                         {
                                             await _media.DeleteStoredMedia(m);
                                         }
-                                        catch (Exception) { }
+                                        catch (Exception ex)
+                                        {
+                                            await _logService.AddExceptionAsync<BlmFileImporter>(
+                                                "Failed to delete stored property media.",
+                                                ex,
+                                                LogType.Warning
+                                            );
+                                        }
                                     _db.Entry(m).State = EntityState.Deleted;
                                 });
                                 await SaveChangesToDatabaseAsync();
