@@ -203,7 +203,7 @@ namespace Hood.Services
             logWriter.Dispose();
         }
 
-        public virtual string GenerateInlineScripts(IUrlHelper urlHelper, ResourceLocation location)
+        public virtual string GenerateInlineScripts(ResourceLocation location)
         {
             if (!_inlineScripts.ContainsKey(location) || _inlineScripts[location] == null)
                 return "";

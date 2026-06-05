@@ -56,13 +56,12 @@ namespace Hood.Startup
 
         public static IServiceCollection ConfigureHoodApi(
             this IServiceCollection services,
-            IConfiguration config,
-            IWebHostEnvironment env
+            IConfiguration config
         )
         {
             try
             {
-                services.ConfigureHoodCore(config, env);
+                services.ConfigureHoodCore(config);
 
                 services.AddCors(options =>
                 {
@@ -119,8 +118,7 @@ namespace Hood.Startup
 
         public static IServiceCollection ConfigureHoodCore(
             this IServiceCollection services,
-            IConfiguration config,
-            IWebHostEnvironment env
+            IConfiguration config
         )
         {
             try
@@ -150,7 +148,7 @@ namespace Hood.Startup
             services.ConfigureProperty(config);
             services.ConfigureContent(config);
 
-            services.ConfigureCache(config);
+            services.ConfigureCache();
             services.ConfigureCacheProfiles();
 
             services.ConfigureDataProtection(config);
@@ -282,10 +280,7 @@ namespace Hood.Startup
 
         #region Caching
 
-        public static IServiceCollection ConfigureCache(
-            this IServiceCollection services,
-            IConfiguration config
-        )
+        public static IServiceCollection ConfigureCache(this IServiceCollection services)
         {
             // Caching
             //if (config["ConnectionStrings:RedisCache"].IsSet())

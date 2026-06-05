@@ -2,7 +2,6 @@ using System;
 using Hood.Enums;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -37,7 +36,6 @@ namespace Hood.TagHelpers
         /// Ctor
         /// </summary>
         /// <param name="htmlHelper">HTML helper</param>
-        /// <param name="httpContextAccessor">HTTP context accessor</param>
         public ScriptTagHelper(IHtmlHelper htmlHelper)
         {
             _htmlHelper = htmlHelper;

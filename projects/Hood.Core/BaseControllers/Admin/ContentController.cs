@@ -51,7 +51,7 @@ namespace Hood.Admin.BaseControllers
         [Route("admin/content/{id}/edit/")]
         public virtual async Task<IActionResult> Edit(int id)
         {
-            var model = await _content.GetContentByIdAsync(id, true, false);
+            var model = await _content.GetContentByIdAsync(id, true);
             model = await GetEditorModel(model);
             if (model == null)
                 return NotFound();
@@ -65,7 +65,7 @@ namespace Hood.Admin.BaseControllers
         {
             try
             {
-                var modelToUpdate = await _content.GetContentByIdAsync(model.Id, true, false);
+                var modelToUpdate = await _content.GetContentByIdAsync(model.Id, true);
                 modelToUpdate = await GetEditorModel(modelToUpdate);
 
                 var updatedFields = Request.Form.Keys.ToHashSet();
@@ -288,7 +288,7 @@ namespace Hood.Admin.BaseControllers
         [Route("admin/content/categories/list-content/{id}/")]
         public virtual async Task<IActionResult> CategoriesContentAsync(int id)
         {
-            var model = await _content.GetContentByIdAsync(id, true, false);
+            var model = await _content.GetContentByIdAsync(id, true);
             return View("_List_Categories_Content", model);
         }
 

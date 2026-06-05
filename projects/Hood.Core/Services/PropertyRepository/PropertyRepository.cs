@@ -286,7 +286,7 @@ namespace Hood.Services
             }
         }
 
-        public async Task<PropertyListing> GetPropertyByIdAsync(int id, bool nocache = false)
+        public async Task<PropertyListing> GetPropertyByIdAsync(int id)
         {
             PropertyListing property = await _db
                 .Properties.Include(p => p.Media)
@@ -298,10 +298,7 @@ namespace Hood.Services
             return property;
         }
 
-        public async Task<PropertyListingView> GetPropertyViewByIdAsync(
-            int id,
-            bool nocache = false
-        )
+        public async Task<PropertyListingView> GetPropertyViewByIdAsync(int id)
         {
             PropertyListingView property = await _db
                 .PropertyViews.Include(p => p.Media)

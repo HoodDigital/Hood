@@ -242,7 +242,6 @@ namespace Hood.Caching
 
         public IHtmlContent AdminContentCategoryTree(
             IEnumerable<ContentCategory> startLevel,
-            string contentType,
             List<string> categoriesSelected,
             int startingLevel = 0
         )
@@ -297,7 +296,6 @@ namespace Hood.Caching
 
                     htmlOutput += AdminContentCategoryTree(
                         category.Children,
-                        contentType,
                         categoriesSelected,
                         startingLevel + 1
                     );

@@ -56,7 +56,7 @@ namespace Hood.Admin.BaseControllers
         [Route("admin/property/{id}/edit/")]
         public virtual async Task<IActionResult> Edit(int id)
         {
-            PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
+            PropertyListing model = await _property.GetPropertyByIdAsync(id);
             model = await LoadAgents(model);
             model.AutoGeocode = true;
             return View(model);
@@ -479,7 +479,7 @@ namespace Hood.Admin.BaseControllers
         [Route("admin/property/{id}/gallery/")]
         public virtual async Task<IActionResult> Gallery(int id)
         {
-            PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
+            PropertyListing model = await _property.GetPropertyByIdAsync(id);
             return View("_List_PropertyMedia", model);
         }
 
@@ -562,7 +562,7 @@ namespace Hood.Admin.BaseControllers
         [Route("admin/property/{id}/floorplans/")]
         public virtual async Task<IActionResult> FloorPlans(int id)
         {
-            PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
+            PropertyListing model = await _property.GetPropertyByIdAsync(id);
             return View("_List_PropertyFloorplans", model);
         }
 

@@ -2,10 +2,8 @@
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using Microsoft.Extensions.Hosting;
 
 namespace Hood.TagHelpers
 {

@@ -21,10 +21,9 @@ namespace Hood.Services
         /// Gets a safe filename for use with Azure storage. Unsafe characters will be removed.
         /// If the filename is already present, a number will be postfixed.
         /// </summary>
-        /// <param name="path">The base path for the destination on storage. In the form {0}/{1}/</param>
         /// <param name="filename">The filename. The clean filename will be calculated from this.</param>
         /// <returns></returns>
-        string GetCleanFilename(string path, string filename);
+        string GetCleanFilename(string filename);
         Task<string> GetSafeFilename(string path, string filename);
 
         /// <summary>
@@ -88,14 +87,12 @@ namespace Hood.Services
         /// <param name="file">The file stream to upload.</param>
         /// <param name="filename">The original filename.</param>
         /// <param name="filetype">The content (MIME) type of the file.</param>
-        /// <param name="size">The file size in bytes.</param>
         /// <param name="directoryPath">The directory path on storage to upload into.</param>
         /// <returns></returns>
         Task<IMediaObject> ProcessUpload(
             Stream file,
             string filename,
             string filetype,
-            long size,
             string directoryPath
         );
 

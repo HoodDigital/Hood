@@ -10,7 +10,6 @@ using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -107,7 +106,7 @@ namespace Hood.Services
             return filename;
         }
 
-        public string GetCleanFilename(string directory, string filename)
+        public string GetCleanFilename(string filename)
         {
             filename = filename.Trim(Path.GetInvalidFileNameChars());
             filename = filename.Trim(Path.GetInvalidPathChars());
@@ -235,7 +234,6 @@ namespace Hood.Services
             Stream file,
             string filename,
             string filetype,
-            long size,
             string directoryPath
         )
         {

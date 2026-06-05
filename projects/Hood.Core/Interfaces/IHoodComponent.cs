@@ -18,6 +18,7 @@ namespace Hood.Interfaces
         /// </summary>
         /// <param name="services">Services collection</param>
         /// <param name="config">Application configuration</param>
+        // ReSharper disable once UnusedParameter.Global — plugin hook contract; components may ignore the configuration.
         void ConfigureServices(IServiceCollection services, IConfiguration config);
 
         /// <summary>

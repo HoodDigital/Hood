@@ -236,11 +236,7 @@ namespace Hood.Services
             return content;
         }
 
-        public async Task<Content> GetContentByIdAsync(
-            int id,
-            bool clearCache = false,
-            bool track = true
-        )
+        public async Task<Content> GetContentByIdAsync(int id, bool clearCache = false)
         {
             string cacheKey = typeof(Content) + ".Single." + id;
             if (!_cache.TryGetValue(cacheKey, out Content content) || clearCache)
@@ -262,11 +258,7 @@ namespace Hood.Services
             return content;
         }
 
-        public async Task<ContentView> GetContentViewByIdAsync(
-            int id,
-            bool clearCache = false,
-            bool track = true
-        )
+        public async Task<ContentView> GetContentViewByIdAsync(int id, bool clearCache = false)
         {
             string cacheKey = typeof(ContentView) + ".Single." + id;
             if (!_cache.TryGetValue(cacheKey, out ContentView content) || clearCache)

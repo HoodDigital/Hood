@@ -14,7 +14,6 @@ using Hood.Models;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -24,7 +23,6 @@ namespace Hood.Services
     public class BlmFileImporter : IPropertyImporter
     {
         private readonly IFTPService _ftp;
-        private readonly IWebHostEnvironment _env;
         private readonly IConfiguration _config;
         private readonly IDirectoryManager _directoryManager;
 
@@ -38,7 +36,6 @@ namespace Hood.Services
         )
         {
             _ftp = ftp;
-            _env = env;
             _config = config;
             _directoryManager = directoryManager;
             Lock = new ReaderWriterLock();
@@ -97,7 +94,7 @@ namespace Hood.Services
         private readonly ILogService _logService;
         private string DirectoryPath { get; set; }
 
-        public async Task RunUpdate(HttpContext context, string userId, string userName)
+        public async Task RunUpdate(string userId, string userName)
         {
             try
             {
@@ -662,7 +659,6 @@ namespace Hood.Services
                                 s,
                                 fi.Name,
                                 MimeTypes.GetMimeType(fi.Extension),
-                                fi.Length,
                                 DirectoryPath
                             );
                         }
@@ -757,7 +753,6 @@ namespace Hood.Services
                                         s,
                                         fi.Name,
                                         MimeTypes.GetMimeType(fi.Extension),
-                                        fi.Length,
                                         DirectoryPath
                                     ) as MediaObject;
                             }
@@ -846,7 +841,6 @@ namespace Hood.Services
                                             s,
                                             fi.Name,
                                             MimeTypes.GetMimeType(fi.Extension),
-                                            fi.Length,
                                             DirectoryPath
                                         ) as MediaObject;
                                 }
@@ -901,7 +895,6 @@ namespace Hood.Services
 
                             string imageFile = TempFolder + data[key];
                             MediaObject mediaResult;
-                            FileInfo fi = new FileInfo(imageFile);
                             string fileName = data[key].ToLower().Replace(".jpg", ".pdf");
                             using (FileStream s = File.OpenRead(imageFile))
                             {
@@ -910,7 +903,6 @@ namespace Hood.Services
                                         s,
                                         fileName,
                                         MimeTypes.GetMimeType("pdf"),
-                                        fi.Length,
                                         DirectoryPath
                                     ) as MediaObject;
                             }

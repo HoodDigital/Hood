@@ -3,7 +3,6 @@ using Hood.Core;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Configuration;
 
 namespace Hood.Attributes
 {

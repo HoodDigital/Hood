@@ -16,11 +16,7 @@ namespace Hood.Extensions
             HttpContextAccessor = httpContextAccessor;
         }
 
-        public static Uri AddParameterToUrl(
-            this string url,
-            Dictionary<string, string> parameters,
-            bool relative = true
-        )
+        public static Uri AddParameterToUrl(this string url, Dictionary<string, string> parameters)
         {
             var uriBuilder = new UriBuilder(url);
             var uri = uriBuilder.Uri;
@@ -93,6 +89,7 @@ namespace Hood.Extensions
         /// <param name="url">The Url Helper class.</param>
         /// <param name="slug">The url slug, ommitting the first / - i.e. http://xxx.com/test/test would be test/test/</param>
         /// <returns></returns>
+        // ReSharper disable once UnusedParameter.Global — extension receiver, required for @Html.X() / Url.X() call syntax.
         public static string AbsoluteUrl(this IUrlHelper url, string slug = "")
         {
             var request = HttpContextAccessor.HttpContext.Request;

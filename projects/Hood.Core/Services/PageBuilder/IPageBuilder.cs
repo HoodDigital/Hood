@@ -13,7 +13,7 @@ namespace Hood.Services
             bool isAsync,
             bool isDefer
         );
-        string GenerateInlineScripts(IUrlHelper urlHelper, ResourceLocation location);
+        string GenerateInlineScripts(ResourceLocation location);
         string GenerateScripts(
             IUrlHelper urlHelper,
             ResourceLocation location,

@@ -13,8 +13,8 @@ namespace Hood.Services
         Task<List<MapMarker>> GetLocationsAsync(PropertyListModel filters);
         Task<PropertyListModel> GetFeaturedAsync();
         Task<PropertyListModel> GetRecentAsync();
-        Task<PropertyListing> GetPropertyByIdAsync(int id, bool nocache = false);
-        Task<PropertyListingView> GetPropertyViewByIdAsync(int id, bool nocache = false);
+        Task<PropertyListing> GetPropertyByIdAsync(int id);
+        Task<PropertyListingView> GetPropertyViewByIdAsync(int id);
         Task<PropertyListing> ReloadReferences(PropertyListing property);
         Task<PropertyListing> AddAsync(PropertyListing property);
         Task UpdateAsync(PropertyListing property);

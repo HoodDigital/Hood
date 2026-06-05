@@ -21,12 +21,8 @@ namespace Hood.Services
         Task<IEnumerable<ContentCategory>> GetCategoriesAsync(int contentId);
         Task<ContentCategory> GetCategoryByIdAsync(int categoryId);
         Task<ContentModel> GetContentAsync(ContentModel model);
-        Task<Content> GetContentByIdAsync(int id, bool clearCache = false, bool track = true);
-        Task<ContentView> GetContentViewByIdAsync(
-            int id,
-            bool clearCache = false,
-            bool track = true
-        );
+        Task<Content> GetContentByIdAsync(int id, bool clearCache = false);
+        Task<ContentView> GetContentViewByIdAsync(int id, bool clearCache = false);
         Task<MediaDirectory> GetDirectoryAsync();
         Task<ContentModel> GetFeaturedAsync(string type, string category = null, int pageSize = 5);
         List<string> GetMetasForTemplate(string templateName, string folder);

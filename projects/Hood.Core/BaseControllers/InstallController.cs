@@ -8,7 +8,6 @@ using Hood.Services;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 namespace Hood.BaseControllers
