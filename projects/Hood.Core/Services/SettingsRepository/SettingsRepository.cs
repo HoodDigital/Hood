@@ -15,13 +15,11 @@ namespace Hood.Services
     public class SettingsRepository : ISettingsRepository
     {
         private readonly HoodDbContext _db;
-        private readonly IConfiguration _config;
         private readonly IHoodCache _cache;
 
-        public SettingsRepository(HoodDbContext db, IConfiguration config, IHoodCache cache)
+        public SettingsRepository(HoodDbContext db, IHoodCache cache)
         {
             _db = db;
-            _config = config;
             _cache = cache;
         }
 

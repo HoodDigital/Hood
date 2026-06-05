@@ -23,7 +23,7 @@ namespace Hood.Caching
         public ContentCategoryCache(IConfiguration config, IEventsService events)
         {
             _config = config;
-            EventHandler<EventArgs> resetContentByTypeCache = (sender, eventArgs) =>
+            EventHandler<EventArgs> resetContentByTypeCache = (_, _) =>
             {
                 ResetCache();
             };

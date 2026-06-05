@@ -12,13 +12,6 @@ namespace Hood.Attributes
     /// </summary>
     public class DisableForAuth0Attribute : ActionFilterAttribute
     {
-        private readonly IConfiguration _config;
-
-        public DisableForAuth0Attribute()
-        {
-            _config = Engine.Services.Resolve<IConfiguration>();
-        }
-
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             if (Engine.Auth0Enabled)

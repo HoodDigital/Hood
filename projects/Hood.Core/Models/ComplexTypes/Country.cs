@@ -86,7 +86,7 @@ namespace Hood.Models
         )
         {
             Iso2 = iso2;
-            Iso3 = iso2;
+            Iso3 = iso3;
             IsoNumeric = numeric;
             Name = name;
             FullName = fullName;

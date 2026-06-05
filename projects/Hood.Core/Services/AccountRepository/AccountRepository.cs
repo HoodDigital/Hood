@@ -32,8 +32,6 @@ namespace Hood.Services
         }
         private UserManager<ApplicationUser> UserManager =>
             Engine.Services.Resolve<UserManager<ApplicationUser>>();
-        private RoleManager<IdentityRole> RoleManager =>
-            Engine.Services.Resolve<RoleManager<IdentityRole>>();
 
         public AccountRepository()
         {

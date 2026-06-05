@@ -13,7 +13,6 @@ namespace Hood.TagHelpers
     public class ScriptTagHelper : TagHelper
     {
         private readonly IHtmlHelper _htmlHelper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
         /// <summary>
         /// Indicates where the script should be rendered
@@ -39,10 +38,9 @@ namespace Hood.TagHelpers
         /// </summary>
         /// <param name="htmlHelper">HTML helper</param>
         /// <param name="httpContextAccessor">HTTP context accessor</param>
-        public ScriptTagHelper(IHtmlHelper htmlHelper, IHttpContextAccessor httpContextAccessor)
+        public ScriptTagHelper(IHtmlHelper htmlHelper)
         {
             _htmlHelper = htmlHelper;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>

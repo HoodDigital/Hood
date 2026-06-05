@@ -25,13 +25,11 @@ namespace Hood.Services
         private readonly HoodDbContext _hoodDb;
         private readonly IHoodCache _cache;
         private readonly IEventsService _eventService;
-        private readonly IWebHostEnvironment _env;
 
         public ContentRepository(
             ContentContext db,
             HoodDbContext hoodDb,
             IHoodCache cache,
-            IWebHostEnvironment env,
             IEventsService eventService
         )
         {
@@ -39,7 +37,6 @@ namespace Hood.Services
             _hoodDb = hoodDb;
             _cache = cache;
             _eventService = eventService;
-            _env = env;
         }
 
         #region Content CRUD

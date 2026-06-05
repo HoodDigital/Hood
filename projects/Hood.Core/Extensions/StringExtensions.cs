@@ -451,7 +451,7 @@ namespace Hood.Extensions
                         if (!quoted)
                         {
                             sb.AppendLine();
-                            Enumerable.Range(0, ++indent).ForEach(item => sb.Append(indentString));
+                            Enumerable.Range(0, ++indent).ForEach(_ => sb.Append(indentString));
                         }
                         break;
                     case '}':
@@ -459,7 +459,7 @@ namespace Hood.Extensions
                         if (!quoted)
                         {
                             sb.AppendLine();
-                            Enumerable.Range(0, --indent).ForEach(item => sb.Append(indentString));
+                            Enumerable.Range(0, --indent).ForEach(_ => sb.Append(indentString));
                         }
                         sb.Append(ch);
                         break;
@@ -483,7 +483,7 @@ namespace Hood.Extensions
                         if (!quoted)
                         {
                             sb.AppendLine();
-                            Enumerable.Range(0, indent).ForEach(item => sb.Append(indentString));
+                            Enumerable.Range(0, indent).ForEach(_ => sb.Append(indentString));
                         }
                         break;
                     case ':':

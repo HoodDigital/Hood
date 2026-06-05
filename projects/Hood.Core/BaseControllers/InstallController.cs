@@ -16,15 +16,10 @@ namespace Hood.BaseControllers
     public class InstallController : Controller
     {
         private readonly IHostApplicationLifetime _applicationLifetime;
-        private readonly IConfiguration _config;
 
-        public InstallController(
-            IHostApplicationLifetime applicationLifetime,
-            IConfiguration config
-        )
+        public InstallController(IHostApplicationLifetime applicationLifetime)
         {
             _applicationLifetime = applicationLifetime;
-            _config = config;
         }
 
         [HttpGet]

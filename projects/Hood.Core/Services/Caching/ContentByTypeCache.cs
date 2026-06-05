@@ -15,19 +15,13 @@ namespace Hood.Caching
         private readonly IConfiguration _config;
 
         private Dictionary<string, Lazy<Dictionary<int, Content>>> bySlug;
-        private readonly ContentCategoryCache _categories;
         private readonly IEventsService _events;
 
-        public ContentByTypeCache(
-            IConfiguration config,
-            ContentCategoryCache categories,
-            IEventsService events
-        )
+        public ContentByTypeCache(IConfiguration config, IEventsService events)
         {
             _config = config;
-            _categories = categories;
             _events = events;
-            EventHandler<EventArgs> resetContentByTypeCache = (sender, eventArgs) =>
+            EventHandler<EventArgs> resetContentByTypeCache = (_, _) =>
             {
                 ResetCache();
             };

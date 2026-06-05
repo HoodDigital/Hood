@@ -27,12 +27,10 @@ namespace Hood.Services
         private readonly IWebHostEnvironment _env;
         private readonly IConfiguration _config;
         private readonly IDirectoryManager _directoryManager;
-        private readonly IHttpContextAccessor _context;
 
         public BlmFileImporter(
             IFTPService ftp,
             IWebHostEnvironment env,
-            IHttpContextAccessor context,
             IConfiguration config,
             IAddressService address,
             ILogService logService,
@@ -64,7 +62,6 @@ namespace Hood.Services
 
             LocalFolder =
                 env.ContentRootPath + "\\" + _propertySettings.FTPImporterSettings.LocalFolder;
-            _context = context;
             _address = address;
             _logService = logService;
         }
@@ -136,7 +133,7 @@ namespace Hood.Services
                 propertyDbOptions.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
                 _db = new PropertyContext(propertyDbOptions.Options);
 
-                _media = new MediaManager(_env, _config);
+                _media = new MediaManager(_config);
 
                 MediaDirectory propertyDirectory = _hoodDb.MediaDirectories.SingleOrDefault(md =>
                     md.Slug == MediaManager.PropertyDirectorySlug && md.Type == DirectoryType.System

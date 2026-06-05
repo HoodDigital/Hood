@@ -6,8 +6,6 @@ namespace Hood.Extensions
 {
     public static class IFormFileExtensions
     {
-        private const int Megabyte = 1048576;
-
         public static string GetFilename(this IFormFile file)
         {
             string filename = ContentDispositionHeaderValue

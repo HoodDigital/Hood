@@ -138,9 +138,6 @@ resharper_markup_text_typo_highlighting = none
 # catches, modified-closure captures, virtual calls in ctors). Fixing them is
 # behavioural-risk work the HOOD-62 mechanical sweep must not do. Tracked to
 # re-enable + fix category-by-category in HOOD-78.
-resharper_unused_member_local_highlighting = none
-resharper_not_accessed_field_local_highlighting = none
-resharper_unused_parameter_local_highlighting = none
 resharper_unused_parameter_global_highlighting = none
 
 # --- Markup / web noise ------------------------------------------------------------

@@ -13,24 +13,14 @@ namespace Hood.TagHelpers
     public class RecapcthaTagHelper : TagHelper
     {
         private readonly IHtmlHelper _htmlHelper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IHostEnvironment _env;
 
         /// <summary>
         /// Ctor
         /// </summary>
         /// <param name="htmlHelper">HTML helper</param>
-        /// <param name="httpContextAccessor">HTTP context accessor</param>
-        /// <param name="env">Host environment</param>
-        public RecapcthaTagHelper(
-            IHtmlHelper htmlHelper,
-            IHttpContextAccessor httpContextAccessor,
-            IHostEnvironment env
-        )
+        public RecapcthaTagHelper(IHtmlHelper htmlHelper)
         {
             _htmlHelper = htmlHelper;
-            _httpContextAccessor = httpContextAccessor;
-            _env = env;
         }
 
         public override int Order { get; } = int.MaxValue;

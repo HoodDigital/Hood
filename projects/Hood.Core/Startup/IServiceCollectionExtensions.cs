@@ -46,7 +46,7 @@ namespace Hood.Startup
             try
             {
                 // Register core stuff.
-                services.ConfigureHoodBasics(config, env);
+                services.ConfigureHoodBasics(config);
                 services.ConfigureHoodSite(config, env);
                 services.ConfigureHoodEngine(config);
             }
@@ -126,7 +126,7 @@ namespace Hood.Startup
             try
             {
                 // Register core stuff.
-                services.ConfigureHoodBasics(config, env);
+                services.ConfigureHoodBasics(config);
                 services.ConfigureHoodEngine(config);
             }
             catch (StartupException) { }
@@ -135,8 +135,7 @@ namespace Hood.Startup
 
         private static IServiceCollection ConfigureHoodBasics(
             this IServiceCollection services,
-            IConfiguration config,
-            IWebHostEnvironment env
+            IConfiguration config
         )
         {
             services.Configure<HoodConfiguration>(config.GetSection("Hood"));
@@ -437,7 +436,7 @@ namespace Hood.Startup
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => consentRequired;
+                options.CheckConsentNeeded = _ => consentRequired;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
                 options.ConsentCookie.Name = $"{cookieName}_consent";
                 options.ConsentCookie.Domain = config["Identity:Cookies:Domain"].IsSet()

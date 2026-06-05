@@ -26,15 +26,7 @@ namespace Hood.Extensions
 
         public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
         {
-            return source.OrderBy(x => Guid.NewGuid());
-        }
-
-        private delegate Func<A, R> Recursive<A, R>(Recursive<A, R> r);
-
-        private static Func<A, R> Y<A, R>(Func<Func<A, R>, Func<A, R>> f)
-        {
-            Recursive<A, R> rec = r => a => f(r(r))(a);
-            return rec(rec);
+            return source.OrderBy(_ => Guid.NewGuid());
         }
     }
 }

@@ -21,7 +21,6 @@ namespace Hood.Services
         private readonly IHoodCache _cache;
         private readonly BundleFileProcessor _bundleFileProcessor;
 
-        private readonly Dictionary<ResourceLocation, List<FileReferenceMetadata>> _css;
         private readonly Dictionary<ResourceLocation, List<FileReferenceMetadata>> _scripts;
         private readonly Dictionary<ResourceLocation, List<string>> _inlineScripts;
 
@@ -31,7 +30,6 @@ namespace Hood.Services
             _cache = cache;
             _scripts = new Dictionary<ResourceLocation, List<FileReferenceMetadata>>();
             _inlineScripts = new Dictionary<ResourceLocation, List<string>>();
-            _css = new Dictionary<ResourceLocation, List<FileReferenceMetadata>>();
             _bundleFileProcessor = new BundleFileProcessor();
         }
 
