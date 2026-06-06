@@ -16,7 +16,7 @@ help: ## Show this help
 build: ## Build the whole solution (Release)
 	dotnet build Hood.sln -c Release
 
-up: ## Build + start the full stack (app + SQL Server) in the background
+up: db-upgrade ## Start the full stack — DB created/upgraded first, then the app
 	$(COMPOSE) up -d --build
 
 db-up: ## Start SQL Server only and wait until healthy
@@ -25,6 +25,10 @@ db-up: ## Start SQL Server only and wait until healthy
 	@until [ "$$($(COMPOSE) ps -q $(DB_SERVICE) | xargs -r docker inspect -f '{{.State.Health.Status}}' 2>/dev/null)" = "healthy" ]; do \
 		printf '.'; sleep 2; \
 	done; echo " ready."
+
+db-upgrade: db-up ## Create (if absent) + upgrade the Docker database via hood-schema
+	dotnet run --project projects/Hood.SchemaTool -c Release -- upgrade \
+		--connection "Server=localhost,14331;Database=Hood.Web;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True;Encrypt=False"
 
 run: ## Run the app natively against the Docker SQL Server (port 14331)
 	ConnectionStrings__DefaultConnection="Server=localhost,14331;Database=Hood.Web;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True;MultipleActiveResultSets=True" \
@@ -43,4 +47,4 @@ logs: ## Tail app + DB container logs
 sql: ## Open a sqlcmd shell inside the SQL container
 	$(COMPOSE) exec $(DB_SERVICE) /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '$(SA_PASSWORD)' -C
 
-.PHONY: help build up db-up run down clean logs sql
+.PHONY: help build up db-up db-upgrade run down clean logs sql
