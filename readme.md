@@ -47,6 +47,22 @@ or
 
 > To use your own client side code, you will also need to update script/link references in your theme's HTML or Razor C# files to use your own version of the code, rather than the CDN.
 
+### Build preset
+
+Building your own frontend on Hood's toolchain? Don't clone the configs — extend them. The `hoodcms` package exports Hood's audited build process:
+
+```js
+// rollup.config.mjs
+import { hoodRollup } from 'hoodcms/build';
+export default hoodRollup({ entries: { site: 'src/ts/site.ts' }, externals: ['owl.carousel'] });
+
+// gulpfile.js
+const { registerHoodTasks } = require('hoodcms/build/gulp');
+registerHoodTasks(require('gulp'), { less: true });
+```
+
+Your tsconfigs `"extends": "hoodcms/tsconfig.base.json"` (declare your own `rootDir`/`outDir` — path options don't inherit across packages). The toolchain versions are published as **optional peer dependencies** — install the ones you use at Hood's audited versions.
+
 ## Database Installation/Update
 
 Hood's schema ships as plain, idempotent, forward-only SQL scripts. EF Core migrations are only

@@ -1,0 +1,23 @@
+{
+  "$comment": "hoodcms/tsconfig.base.json \u2014 Hood's audited compiler baseline (HOOD-83). Consumers `extends` this and declare their own rootDir/outDir (path options resolve relative to the file that declares them).",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "types": [
+      "bootstrap",
+      "dropzone",
+      "google.maps",
+      "jquery",
+      "jquery-toast-plugin",
+      "jquery.slimscroll",
+      "jquery.validation"
+    ],
+    "strict": false,
+    "noImplicitAny": true,
+    "module": "es6",
+    "target": "ES2017",
+    "jsx": "react",
+    "allowJs": false,
+    "moduleResolution": "bundler",
+    "sourceMap": false
+  }
+}

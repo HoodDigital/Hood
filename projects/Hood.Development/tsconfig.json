@@ -1,19 +1,13 @@
-{ 
-  "include": ["src/ts/index.ts"],
+{
+  "extends": "./tsconfig.base.json",
+  "include": [
+    "src/ts/index.ts"
+  ],
   "exclude": [],
   "compilerOptions": {
     "outDir": "./dist/js/",
-    "rootDir": "./src/ts",
-    "skipLibCheck": true,
-    "types": ["bootstrap", "dropzone", "google.maps", "jquery", "jquery-toast-plugin", "jquery.slimscroll", "jquery.validation"],
-    "strict": false,
-    "noImplicitAny": true,
-    "module": "es6",
     "target": "es6",
-    "jsx": "react",
-    "allowJs": false,
-    "moduleResolution": "bundler",
     "declaration": true,
-    "sourceMap": false
+    "rootDir": "./src/ts"
   }
 }
