@@ -1,18 +1,7 @@
 {
+  "extends": "./tsconfig.rollup.base.json",
   "compilerOptions": {
-    "outDir": "./wwwroot/dist/js/",
     "rootDir": "./src/ts",
-    "strict": false,
-    "skipLibCheck": true,
-    "types": ["bootstrap", "dropzone", "google.maps", "jquery", "jquery-toast-plugin", "jquery.slimscroll", "jquery.validation"],
-    "noImplicitAny": true,
-    "module": "es6",
-    "target": "ES2017",
-    "jsx": "react",
-    "allowJs": false,
-    "moduleResolution": "bundler",
-    "sourceMap": true,
-    "inlineSources": true,
-    "noEmit": true
+    "outDir": "./wwwroot/dist/js/"
   }
 }

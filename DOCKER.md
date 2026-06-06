@@ -32,7 +32,7 @@ docker compose up --build
 Or via the [`Makefile`](Makefile):
 
 ```bash
-make up        # build + start app + SQL Server (detached)
+make up        # start everything — creates/upgrades the database first, then the app
 make logs      # tail container logs
 make down      # stop (keeps the DB volume)
 make clean     # stop + drop the DB volume
@@ -43,7 +43,8 @@ make clean     # stop + drop the DB volume
 Start just the database in Docker and run the host on the host machine:
 
 ```bash
-make db-up     # SQL Server only, waits until healthy
+make db-up      # SQL Server only, waits until healthy
+make db-upgrade # create (if absent) + upgrade the database via hood-schema (idempotent)
 make run       # dotnet run, pointed at the Docker SQL Server on localhost,14331
 # App available at http://localhost:5070 (or the Kestrel default)
 ```

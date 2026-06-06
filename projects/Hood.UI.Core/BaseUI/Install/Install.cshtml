@@ -40,7 +40,7 @@
                     !Engine.Services.GetStartupExceptionsByType(StartupError.MigrationNotApplied).Any();
             }
 
-            @if (Engine.Services.Installed)
+            @if (Engine.Services.Installed && Engine.Services.Seeded)
             {
                 <div class="text-center">
                     <h4>
@@ -66,7 +66,10 @@
                 {
                     <form method="post" action="/install" class="setup-form mb-5">
                         @Html.AntiForgeryToken()
-                        @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+                        }
                         <div class="mb-3">
                             <label for="Email" class="form-label">Administrator email</label>
                             <input type="email" id="Email" name="Email" value="@Model?.Email" class="form-control" required autofocus />

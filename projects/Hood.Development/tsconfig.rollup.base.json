@@ -1,0 +1,9 @@
+{
+  "$comment": "hoodcms/tsconfig.rollup.base.json \u2014 debug rollup variant: inline sourcemaps, no emit (rollup's typescript plugin drives output).",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "sourceMap": true,
+    "inlineSources": true,
+    "noEmit": true
+  }
+}
