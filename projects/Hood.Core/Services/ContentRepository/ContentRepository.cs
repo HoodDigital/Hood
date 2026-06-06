@@ -12,7 +12,6 @@ using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
 using Hood.ViewModels;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -962,40 +961,13 @@ namespace Hood.Services
         public List<string> GetMetasForTemplate(string templateName, string folder)
         {
             templateName = templateName.Replace("Meta:", "");
-            var _env = Engine.Services.Resolve<IWebHostEnvironment>();
-            // get the right template file (from theme or if it doesnt appear there from base)
-            string templatePath =
-                _env.ContentRootPath
-                + "\\Themes\\"
-                + Engine.Settings["Hood.Settings.Theme"]
-                + "\\Views\\"
-                + folder
-                + "\\"
-                + templateName
-                + ".cshtml";
-            if (!System.IO.File.Exists(templatePath))
-                templatePath =
-                    _env.ContentRootPath + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
-            if (!System.IO.File.Exists(templatePath))
-                templatePath =
-                    _env.ContentRootPath + "\\UI\\" + folder + "\\" + templateName + ".cshtml";
-            if (!System.IO.File.Exists(templatePath))
+            // Template source comes from the unified provider: app physical -> active theme ->
+            // packaged (embedded) sources. Cross-platform, no files-on-server needed (HOOD-54).
+            var templateProvider = Engine.Services.Resolve<ITemplateProvider>();
+            string template = templateProvider.ReadTemplateSource(folder, templateName);
+            if (template == null)
             {
-                templatePath = null;
-            }
-            string template;
-            if (templatePath != null)
-            {
-                // get the file contents
-                template = System.IO.File.ReadAllText(templatePath);
-            }
-            else
-            {
-                var path = "~/UI/" + folder + "/" + templateName + ".cshtml";
-                if (UserInterfaceProvider.GetFiles(path).Length > 0)
-                    template = UserInterfaceProvider.ReadAllText(path);
-                else
-                    return null;
+                return null;
             }
 
             // pull out any instance of @TemplateData["XXX"]

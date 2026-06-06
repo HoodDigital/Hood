@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Hood.BaseControllers;
@@ -698,68 +697,10 @@ namespace Hood.Admin.BaseControllers
 
         protected virtual Content GetTemplates(Content model, string templateDirectory)
         {
-            Dictionary<string, string> templates = new Dictionary<string, string>();
-
-            // Add the base templates:
-            string[] files = UserInterfaceProvider.GetFiles("~/UI/" + templateDirectory + "/");
-            foreach (string temp in files)
-            {
-                if (temp.EndsWith(".cshtml"))
-                {
-                    string key = Path.GetFileNameWithoutExtension(temp);
-                    string value = key.TrimStart('_').Replace("_", " ").ToTitleCase();
-                    if (!templates.ContainsKey(key))
-                    {
-                        templates.Add(key, value);
-                    }
-                }
-            }
-
-            string[] templateDirs =
-            {
-                _env.ContentRootPath + "\\UI\\" + templateDirectory + "\\",
-                _env.ContentRootPath + "\\Views\\" + templateDirectory + "\\",
-                _env.ContentRootPath
-                    + "\\Themes\\"
-                    + Engine.Settings["Hood.Settings.Theme"]
-                    + "\\Views\\"
-                    + templateDirectory
-                    + "\\",
-            };
-
-            foreach (string str in templateDirs)
-            {
-                try
-                {
-                    files = Directory.GetFiles(str);
-                    foreach (string temp in files)
-                    {
-                        if (temp.EndsWith(".cshtml"))
-                        {
-                            string key = Path.GetFileNameWithoutExtension(temp);
-                            string value = key.TrimStart('_').Replace("_", " ").ToTitleCase();
-                            if (!templates.ContainsKey(key))
-                            {
-                                templates.Add(key, value);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _ = _logService.AddExceptionAsync<BaseContentController>(
-                        "Failed to parse a content template directory entry.",
-                        ex,
-                        LogType.Warning
-                    );
-                }
-            }
-
-            model.Templates = templates
-                .Distinct()
-                .OrderBy(s => s.Key)
-                .ToDictionary(t => t.Key, t => t.Value);
-
+            // Templates are listed from compiled views (RCL packages + the app) and any
+            // physical app/theme views — no files on the server required (HOOD-54).
+            var templateProvider = Engine.Services.Resolve<ITemplateProvider>();
+            model.Templates = templateProvider.GetTemplates(templateDirectory);
             return model;
         }
 

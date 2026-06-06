@@ -6,6 +6,9 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="Hood.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Auth0.AspNetCore.Authentication" Version="1.0.3" />
     <PackageReference Include="Auth0.AuthenticationApi" Version="7.17.0" />
     <PackageReference Include="Auth0.ManagementApi" Version="7.17.0" />

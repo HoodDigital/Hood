@@ -34,7 +34,7 @@
     "clean": "gulp clean",
     "copy": "gulp copy",
     "cssnano": "gulp cssnano",
-    "package": "npm-run-all clean build-production copy views",
+    "package": "npm-run-all clean build-production copy",
     "scss": "gulp scss",
     "scss-lint": "stylelint src/scss/ --fix",
     "tsc": "tsc && npm-run-all tsc-rollup",

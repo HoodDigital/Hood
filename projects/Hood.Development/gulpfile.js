@@ -78,43 +78,6 @@ gulp.task('cssnano', function() {
 });
 
 
-gulp.task('views:clean', function() {
-    return rimraf([
-        './../Hood.UI.Core/BaseUI/',
-        './../Hood.UI.Bootstrap3/UI/',
-        './../Hood.UI.Bootstrap4/UI/',
-        './../Hood.UI.Admin/Areas/Admin/UI/'
-    ]);
-});
-gulp.task('views:core', function() {
-    return gulp.src('./Views/**/*.*', { encoding: false })
-        .pipe(gulp.dest('./../Hood.UI.Core/BaseUI/'));
-});
-gulp.task('views:bootstrap3', function() {
-    return gulp.src('./Themes/bootstrap3/Views/**/*.*', { encoding: false })
-        .pipe(gulp.dest('./../Hood.UI.Bootstrap3/UI/'));
-});
-gulp.task('views:bootstrap4', function() {
-    return gulp.src('./Themes/bootstrap4/Views/**/*.*', { encoding: false })
-        .pipe(gulp.dest('./../Hood.UI.Bootstrap4/UI/'));
-});
-gulp.task('views:admin', function() {
-    return gulp.src('./Areas/Admin/UI/**/*.*', { encoding: false })
-        .pipe(gulp.dest('./../Hood.UI.Admin/Areas/Admin/UI/'));
-});
-gulp.task('views',
-    gulp.series(
-        'views:clean',
-        gulp.parallel(
-            'views:core',
-            'views:bootstrap3',
-            'views:bootstrap4',
-            'views:admin'
-        )
-    )
-);
-
-
 gulp.task('themes:clean', function() {
     return rimraf('./wwwroot/themes/*/css/', { glob: true });
 });
