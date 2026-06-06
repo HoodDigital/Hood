@@ -21,7 +21,8 @@ namespace Hood
         /// Resolves the active UI flavour assembly name at startup time — before the engine is
         /// built — replicating GetProvider's precedence (theme.UI overrides Hood:UI config). The
         /// theme name is read straight from the database; if the database isn't available yet
-        /// (pre-install) the configuration value wins. Defaults to Bootstrap4.
+        /// (pre-install) the configuration value wins. Returns null when no bootstrap flavour
+        /// is configured — the stock Core (Bootstrap 5) UI serves everything in that case.
         /// </summary>
         public static string GetActiveUIAssembly(IConfiguration config, IWebHostEnvironment env)
         {
@@ -52,13 +53,19 @@ namespace Hood
             // ReSharper disable once EmptyGeneralCatchClause — pre-install / unreachable database
             // probe; the configuration fallback below is the intended behaviour.
             catch { }
-            return ui == "Bootstrap3" ? Bootstrap3Assembly : Bootstrap4Assembly;
+            return ui switch
+            {
+                "Bootstrap3" => Bootstrap3Assembly,
+                "Bootstrap4" => Bootstrap4Assembly,
+                _ => null,
+            };
         }
 
         /// <summary>
         /// Removes the inactive bootstrap flavours' application parts so only the active
-        /// flavour's compiled /UI/* views participate in view resolution. Switching flavour
-        /// (changing theme UI) requires an application restart (HOOD-54).
+        /// flavour's compiled /UI/* views participate in view resolution — or both flavours
+        /// when none is configured (the stock Core UI). Switching flavour (changing theme UI)
+        /// requires an application restart (HOOD-54).
         /// </summary>
         public static void FilterInactiveUI(
             ApplicationPartManager partManager,

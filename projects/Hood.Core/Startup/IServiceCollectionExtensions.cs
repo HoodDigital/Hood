@@ -780,6 +780,10 @@ namespace Hood.Startup
                 string activeUI = UserInterfaceProvider.GetActiveUIAssembly(config, env);
                 foreach (string package in new[] { "Hood.UI.Core", "Hood.UI.Admin", activeUI })
                 {
+                    if (package == null)
+                    {
+                        continue;
+                    }
                     string packageDir = Path.Combine(repoRoot, package);
                     if (Directory.Exists(packageDir))
                     {
