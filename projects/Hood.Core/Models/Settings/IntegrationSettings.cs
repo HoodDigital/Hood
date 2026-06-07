@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using Hood.BaseTypes;
 using Hood.Extensions;
+using Newtonsoft.Json;
 
 namespace Hood.Models
 {
@@ -19,14 +20,20 @@ namespace Hood.Models
         [Display(Name = "Google API Key")]
         public string GoogleMapsApiKey { get; set; }
 
+        // Computed read-only flags — derived from the stored settings, never persisted.
+        [JsonIgnore]
         public bool IsGoogleMapsEnabled
         {
             get { return GoogleMapsApiKey.IsSet() && EnableGoogleMaps; }
         }
+
+        [JsonIgnore]
         public bool IsGoogleGeocodingEnabled
         {
             get { return GoogleMapsApiKey.IsSet() && EnableGoogleGeocoding; }
         }
+
+        [JsonIgnore]
         public bool IsGoogleRecaptchaEnabled
         {
             get
