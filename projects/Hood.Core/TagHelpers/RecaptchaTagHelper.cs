@@ -44,7 +44,7 @@ namespace Hood.TagHelpers
             );
             _htmlHelper.AddInlineScript(
                 ResourceLocation.BeforeScripts,
-                $"<script>function hood__getReCaptcha(key, recaptchaId, action) {{grecaptcha.enterprise.ready(function() {{grecaptcha.enterprise.execute(key, {{ 'action': action }}).then(function(token) {{document.getElementById(recaptchaId).value = token;}});}});}}</script>"
+                $"<script>function hood__getReCaptcha(key, recaptchaId, action) {{grecaptcha.enterprise.ready(function() {{grecaptcha.enterprise.execute(key, {{ 'action': action }}).then(function(token) {{document.getElementById(recaptchaId).value = token;}}).catch(function(e) {{console.error('reCAPTCHA could not run — check the site key is a reCAPTCHA Enterprise key for this domain.', e);}});}});}}</script>"
             );
             var scriptTemplate =
                 $@"<script>hood__getReCaptcha('{Engine.Settings.Integrations.GoogleRecaptchaSiteKey}','{recaptchaId}','{Action}');setInterval(function(){{hood__getReCaptcha('{Engine.Settings.Integrations.GoogleRecaptchaSiteKey}','{recaptchaId}','{Action}');}},150000);</script>";
