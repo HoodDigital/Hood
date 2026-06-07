@@ -25,7 +25,7 @@ namespace Hood.BaseControllers
                     return new Response("The submitted information is not valid.");
                 }
 
-                var recaptcha = await _recaptcha.Validate(Request);
+                var recaptcha = await _recaptcha.Validate(Request, "contact");
                 if (!recaptcha.Passed)
                     return new Response(
                         "You have failed to pass the reCaptcha check. Please refresh your page and try again."

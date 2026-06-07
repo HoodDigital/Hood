@@ -16,6 +16,7 @@
     <PackageReference Include="BundlerMinifier.Core" Version="3.2.449" />
     <PackageReference Include="Geocoding.Core" Version="4.0.1" />
     <PackageReference Include="Geocoding.Google" Version="4.0.1" />
+    <PackageReference Include="Google.Cloud.RecaptchaEnterprise.V1" Version="2.20.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
     <PackageReference
       Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore"

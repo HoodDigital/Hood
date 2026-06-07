@@ -32,7 +32,8 @@ namespace Hood.Models
             get
             {
                 return GoogleRecaptchaSiteKey.IsSet()
-                    && GoogleRecaptchaSecretKey.IsSet()
+                    && GoogleRecaptchaProjectId.IsSet()
+                    && GoogleRecaptchaApiKey.IsSet()
                     && EnableGoogleRecaptcha;
             }
         }
@@ -41,15 +42,18 @@ namespace Hood.Models
         [Display(Name = "Google Analytics Code")]
         public string GoogleAnalytics { get; set; }
 
-        // Google Recaptcha
+        // Google Recaptcha (Fraud Defence / reCAPTCHA Enterprise assessment API)
         [Display(Name = "Enable Google Recaptcha")]
         public bool EnableGoogleRecaptcha { get; set; }
 
         [Display(Name = "Google Recaptcha Site Key")]
         public string GoogleRecaptchaSiteKey { get; set; }
 
-        [Display(Name = "Google Recaptcha Secret Key")]
-        public string GoogleRecaptchaSecretKey { get; set; }
+        [Display(Name = "Google Cloud Project Id")]
+        public string GoogleRecaptchaProjectId { get; set; }
+
+        [Display(Name = "Google Cloud API Key")]
+        public string GoogleRecaptchaApiKey { get; set; }
 
         [Display(Name = "Google Recaptcha Security Threshold")]
         public decimal GoogleRecaptchaThreshold { get; set; }
