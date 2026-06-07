@@ -50,9 +50,14 @@ namespace Hood.Services
         {
             if (!Engine.Settings.Mail.SendGridKey.IsSet())
             {
-                throw new System.Exception(
-                    "SendGrid is not setup. Create a free account and set up an API key to send emails."
+                // Mail is not configured — log and silently skip so flows that send
+                // email (register, contact forms) still complete on unconfigured sites.
+                await Engine.Logs.AddLogAsync<EmailSender>(
+                    "Email not sent: SendGrid is not set up. Add an API key in mail settings to enable email sending.",
+                    message,
+                    LogType.Warning
                 );
+                return 0;
             }
 
             SendGridClient client = GetMailClient();
@@ -91,9 +96,14 @@ namespace Hood.Services
         {
             if (!Engine.Settings.Mail.SendGridKey.IsSet())
             {
-                throw new System.Exception(
-                    "SendGrid is not setup. Create a free account and set up an API key to send emails."
+                // Mail is not configured — log and silently skip so flows that send
+                // email (register, contact forms) still complete on unconfigured sites.
+                await Engine.Logs.AddLogAsync<EmailSender>(
+                    "Email not sent: SendGrid is not set up. Add an API key in mail settings to enable email sending.",
+                    subject,
+                    LogType.Warning
                 );
+                return 0;
             }
 
             SendGridClient client = GetMailClient();
