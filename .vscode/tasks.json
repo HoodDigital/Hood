@@ -26,16 +26,30 @@
             "problemMatcher": "$msCompile"
         },
         {
+            // Hot-reload run on the SAME port (5070) and DB as the debug profiles, so
+            // switching between F5 debug and watch needs no other changes. Stop the
+            // docker `app` container first to free 5070 (keep hood-sqlserver running).
             "label": "watch-dev",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "watch",
                 "run",
+                "--project",
                 "${workspaceFolder}/projects/Hood.Development/Hood.Development.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
+            "options": {
+                "env": {
+                    "ASPNETCORE_ENVIRONMENT": "Development",
+                    "ASPNETCORE_URLS": "http://localhost:5070",
+                    "ConnectionStrings__DefaultConnection": "Server=localhost,14331;Database=Hood.Web;User Id=sa;Password=Hood_Dev_Passw0rd!;TrustServerCertificate=True;Encrypt=False;MultipleActiveResultSets=True",
+                    "Hood:BypassCDN": "true",
+                    "Logging__LogLevel__Hood": "Information",
+                    "Logging__LogLevel__Hood.Services.RecaptchaService": "Information"
+                }
+            },
             "problemMatcher": "$msCompile"
         }
     ]

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 namespace Hood.TagHelpers
 {
     [HtmlTargetElement("recaptcha")]
-    public class RecapcthaTagHelper : TagHelper
+    public class RecaptchaTagHelper : TagHelper
     {
         private readonly IHtmlHelper _htmlHelper;
 
@@ -16,7 +16,7 @@ namespace Hood.TagHelpers
         /// Ctor
         /// </summary>
         /// <param name="htmlHelper">HTML helper</param>
-        public RecapcthaTagHelper(IHtmlHelper htmlHelper)
+        public RecaptchaTagHelper(IHtmlHelper htmlHelper)
         {
             _htmlHelper = htmlHelper;
         }
@@ -24,7 +24,8 @@ namespace Hood.TagHelpers
         public override int Order { get; } = int.MaxValue;
 
         /// <summary>
-        /// Set a Font-Awesome Icon here for example "fa-user-friends".
+        /// The recaptcha action this form reports to Google, e.g. "login" or "register".
+        /// Pass the same value as expectedAction when validating server-side.
         /// </summary>
         [HtmlAttributeName("action")]
         public string Action { get; set; } = "homepage";
@@ -39,11 +40,11 @@ namespace Hood.TagHelpers
             string recaptchaId = Guid.NewGuid().ToString();
             _htmlHelper.AddScript(
                 ResourceLocation.BeforeScripts,
-                $"https://www.google.com/recaptcha/api.js?render={Engine.Settings.Integrations.GoogleRecaptchaSiteKey}"
+                $"https://www.google.com/recaptcha/enterprise.js?render={Engine.Settings.Integrations.GoogleRecaptchaSiteKey}"
             );
             _htmlHelper.AddInlineScript(
                 ResourceLocation.BeforeScripts,
-                $"<script>function hood__getReCaptcha(key, recaptchaId, action) {{grecaptcha.ready(function() {{grecaptcha.execute(key, {{ 'action': action }}).then(function(token) {{document.getElementById(recaptchaId).value = token;}});}});}}</script>"
+                $"<script>function hood__getReCaptcha(key, recaptchaId, action) {{grecaptcha.enterprise.ready(function() {{grecaptcha.enterprise.execute(key, {{ 'action': action }}).then(function(token) {{document.getElementById(recaptchaId).value = token;}}).catch(function(e) {{console.error('reCAPTCHA could not run — check the site key is a reCAPTCHA Enterprise key for this domain.', e);}});}});}}</script>"
             );
             var scriptTemplate =
                 $@"<script>hood__getReCaptcha('{Engine.Settings.Integrations.GoogleRecaptchaSiteKey}','{recaptchaId}','{Action}');setInterval(function(){{hood__getReCaptcha('{Engine.Settings.Integrations.GoogleRecaptchaSiteKey}','{recaptchaId}','{Action}');}},150000);</script>";

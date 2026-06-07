@@ -1,5 +1,4 @@
 using System;
-using Newtonsoft.Json;
 
 namespace Hood.Services
 {
@@ -13,25 +12,18 @@ namespace Hood.Services
             Message = message;
         }
 
-        [JsonProperty(PropertyName = "success")]
         internal bool Success { get; set; }
 
-        [JsonProperty(PropertyName = "score")]
         internal decimal Score { get; set; }
 
-        [JsonProperty(PropertyName = "action")]
         internal string Action { get; set; }
 
-        [JsonProperty(PropertyName = "challenge_ts")]
         internal DateTime ChallengeTS { get; set; }
 
-        [JsonProperty(PropertyName = "hostname")]
         internal string HostName { get; set; }
 
-        [JsonIgnore]
         public bool Passed { get; internal set; }
 
-        [JsonIgnore]
         public string Message { get; internal set; }
     }
 }

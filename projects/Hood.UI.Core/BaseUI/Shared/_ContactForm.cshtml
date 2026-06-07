@@ -11,7 +11,7 @@
       data-redirect="@_contactSettings.ThankYouUrl"
       data-alert-message="@_contactSettings.ThankYouMessage">
     @Html.RenderHoneypotField()
-    <recaptcha />
+    <recaptcha action="contact" />
     <div class="thank-you">
         <h2>@_contactSettings.ThankYouTitle</h2>
         <p>@_contactSettings.ThankYouMessage</p>

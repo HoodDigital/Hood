@@ -149,7 +149,7 @@ namespace Hood.BaseControllers
 
             if (ModelState.IsValid)
             {
-                Services.RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
+                RecaptchaResponse recaptcha = await _recaptcha.Validate(Request, "login");
                 if (!recaptcha.Passed)
                 {
                     ModelState.AddModelError(
@@ -249,7 +249,7 @@ namespace Hood.BaseControllers
 
             if (ModelState.IsValid)
             {
-                Services.RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
+                RecaptchaResponse recaptcha = await _recaptcha.Validate(Request, "register");
                 if (!recaptcha.Passed)
                 {
                     ModelState.AddModelError(

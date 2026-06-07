@@ -35,6 +35,10 @@ namespace Hood.Contexts
                 typeBuilder.Property(o => o.Email).HasColumnName("Email");
                 typeBuilder.Property(o => o.PhoneNumber).HasColumnName("PhoneNumber");
 
+                // The generic IdentityUser<string> base does not generate an Id, so EF supplies a
+                // GUID string on Add when one isn't set. Explicitly-set ids still win.
+                typeBuilder.Property(o => o.Id).ValueGeneratedOnAdd();
+
                 typeBuilder
                     .HasOne(o => o.UserProfile)
                     .WithOne()

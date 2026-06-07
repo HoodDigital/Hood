@@ -81,5 +81,47 @@ namespace Hood.Tests
             ctx.SaveChanges();
             Assert.Empty(ctx.Content.Where(c => c.Id == content.Id));
         }
+
+        [SkippableFact]
+        public void ApplicationUser_id_is_generated_on_add()
+        {
+            Skip.IfNot(_db.Available, _db.UnavailableReason);
+
+            using var ctx = _db.NewIdentity();
+            using var tx = ctx.Database.BeginTransaction(); // rolled back on dispose
+
+            string email = "__smoke_user_" + Guid.NewGuid().ToString("N") + "@example.com";
+            var user = new ApplicationUser { UserName = email, Email = email };
+            Assert.Null(user.Id);
+
+            ctx.Users.Add(user);
+            ctx.SaveChanges();
+
+            Assert.False(string.IsNullOrEmpty(user.Id));
+            Assert.NotNull(ctx.Users.AsNoTracking().SingleOrDefault(u => u.Id == user.Id));
+        }
+
+        [SkippableFact]
+        public void ApplicationUser_explicit_id_is_preserved_on_add()
+        {
+            Skip.IfNot(_db.Available, _db.UnavailableReason);
+
+            using var ctx = _db.NewIdentity();
+            using var tx = ctx.Database.BeginTransaction(); // rolled back on dispose
+
+            string id = Guid.NewGuid().ToString();
+            string email = "__smoke_user_" + Guid.NewGuid().ToString("N") + "@example.com";
+            ctx.Users.Add(
+                new ApplicationUser
+                {
+                    Id = id,
+                    UserName = email,
+                    Email = email,
+                }
+            );
+            ctx.SaveChanges();
+
+            Assert.NotNull(ctx.Users.AsNoTracking().SingleOrDefault(u => u.Id == id));
+        }
     }
 }

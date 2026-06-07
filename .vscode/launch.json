@@ -1,82 +1,67 @@
 {
+    // Debug profiles for the Hood backend.
+    //
+    // These run Hood.Development LOCALLY (outside Docker) against the dockerised dev
+    // SQL Server, which the compose stack exposes on host port 14331. So you can keep
+    // `hood-sqlserver` running, but STOP the docker `app` container first to free port
+    // 5070 — only one process can bind it, and the reCAPTCHA key is registered for the
+    // `localhost` host (the port is irrelevant to reCAPTCHA's domain check).
     "version": "0.2.0",
     "configurations": [
         {
-            // Use IntelliSense to find out which attributes exist for C# debugging
-            // Use hover for the description of the existing attributes
-            // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
-            "name": "Hood.Development (Development)",
+            "name": "Hood.Development (Debug)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build-dev",
-            // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/projects/Hood.Development/bin/Debug/net6.0/Hood.Development.dll",
+            "program": "${workspaceFolder}/projects/Hood.Development/bin/Debug/net10.0/Hood.Development.dll",
             "args": [],
             "cwd": "${workspaceFolder}/projects/Hood.Development/",
             "stopAtEntry": false,
-            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             "serverReadyAction": {
                 "action": "openExternally",
                 "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
             },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
-                "ASPNETCORE_URLS": "https://localhost:5152",
-                "Hood:BypassCDN": "true"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceFolder}/projects/Hood.Development/Views"
+                "ASPNETCORE_URLS": "http://localhost:5070",
+                "ConnectionStrings__DefaultConnection": "Server=localhost,14331;Database=Hood.Web;User Id=sa;Password=Hood_Dev_Passw0rd!;TrustServerCertificate=True;Encrypt=False;MultipleActiveResultSets=True",
+                "Hood:BypassCDN": "true",
+                // Surface Hood's own logs (recaptcha pass/skip/fail/error lines) in the Debug Console.
+                "Logging__LogLevel__Hood": "Information",
+                "Logging__LogLevel__Hood.Services.RecaptchaService": "Information"
             }
         },
         {
-            // Use IntelliSense to find out which attributes exist for C# debugging
-            // Use hover for the description of the existing attributes
-            // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
-            "name": "Hood.Development (Production)",
+            // Same as above but with EF Core SQL echoed — use when you want to watch the
+            // queries (e.g. the settings read or the user/Id round-trip) as they run.
+            "name": "Hood.Development (Debug + EF SQL)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build-dev",
-            // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/projects/Hood.Development/bin/Debug/net6.0/Hood.Development.dll",
+            "program": "${workspaceFolder}/projects/Hood.Development/bin/Debug/net10.0/Hood.Development.dll",
             "args": [],
             "cwd": "${workspaceFolder}/projects/Hood.Development/",
             "stopAtEntry": false,
-            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
-            "serverReadyAction": {
-                "action": "openExternally",
-                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
-            },
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Production",
-                "ASPNETCORE_URLS": "https://localhost:5152",
-                "Hood:BypassCDN": "true"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceFolder}/projects/Hood.Development/Views"
-            }
-        },
-        {
-            // Use IntelliSense to find out which attributes exist for C# debugging
-            // Use hover for the description of the existing attributes
-            // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
-            "name": "Hood.Api",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build-dev",
-            // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/projects/Hood.Api/bin/Debug/net6.0/Hood.Api.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/projects/Hood.Api/",
-            "stopAtEntry": false,
-            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             "serverReadyAction": {
                 "action": "openExternally",
                 "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
             },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
-                "ASPNETCORE_URLS": "https://localhost:5154"
-            },
+                "ASPNETCORE_URLS": "http://localhost:5070",
+                "ConnectionStrings__DefaultConnection": "Server=localhost,14331;Database=Hood.Web;User Id=sa;Password=Hood_Dev_Passw0rd!;TrustServerCertificate=True;Encrypt=False;MultipleActiveResultSets=True",
+                "Hood:BypassCDN": "true",
+                "Logging__LogLevel__Hood": "Information",
+                "Logging__LogLevel__Hood.Services.RecaptchaService": "Information",
+                "Logging__LogLevel__Microsoft.EntityFrameworkCore.Database.Command": "Information"
+            }
+        },
+        {
+            // Attach to an already-running dotnet process (e.g. one started via the
+            // "watch-dev" task) — pick Hood.Development from the process list.
+            "name": "Hood.Development (Attach)",
+            "type": "coreclr",
+            "request": "attach"
         }
     ]
 }

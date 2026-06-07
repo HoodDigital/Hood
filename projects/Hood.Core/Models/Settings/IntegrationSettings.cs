@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using Hood.BaseTypes;
 using Hood.Extensions;
+using Newtonsoft.Json;
 
 namespace Hood.Models
 {
@@ -19,20 +20,27 @@ namespace Hood.Models
         [Display(Name = "Google API Key")]
         public string GoogleMapsApiKey { get; set; }
 
+        // Computed read-only flags — derived from the stored settings, never persisted.
+        [JsonIgnore]
         public bool IsGoogleMapsEnabled
         {
             get { return GoogleMapsApiKey.IsSet() && EnableGoogleMaps; }
         }
+
+        [JsonIgnore]
         public bool IsGoogleGeocodingEnabled
         {
             get { return GoogleMapsApiKey.IsSet() && EnableGoogleGeocoding; }
         }
+
+        [JsonIgnore]
         public bool IsGoogleRecaptchaEnabled
         {
             get
             {
                 return GoogleRecaptchaSiteKey.IsSet()
-                    && GoogleRecaptchaSecretKey.IsSet()
+                    && GoogleRecaptchaProjectId.IsSet()
+                    && GoogleRecaptchaApiKey.IsSet()
                     && EnableGoogleRecaptcha;
             }
         }
@@ -41,17 +49,32 @@ namespace Hood.Models
         [Display(Name = "Google Analytics Code")]
         public string GoogleAnalytics { get; set; }
 
-        // Google Recaptcha
+        // Google Recaptcha (Fraud Defence / reCAPTCHA Enterprise assessment API)
         [Display(Name = "Enable Google Recaptcha")]
         public bool EnableGoogleRecaptcha { get; set; }
 
-        [Display(Name = "Google Recaptcha Site Key")]
+        [Display(
+            Name = "Google Recaptcha Site Key",
+            Description = "The key ID from the reCAPTCHA Enterprise / Fraud Defence console. Rendered in the browser to mint tokens."
+        )]
         public string GoogleRecaptchaSiteKey { get; set; }
 
-        [Display(Name = "Google Recaptcha Secret Key")]
-        public string GoogleRecaptchaSecretKey { get; set; }
+        [Display(
+            Name = "Google Cloud Project Id",
+            Description = "The Google Cloud project that owns the key (from the console project picker, e.g. my-project-123456) — not the key ID."
+        )]
+        public string GoogleRecaptchaProjectId { get; set; }
 
-        [Display(Name = "Google Recaptcha Security Threshold")]
+        [Display(
+            Name = "Google Cloud API Key",
+            Description = "A Google Cloud API key (APIs & Services > Credentials) with the reCAPTCHA Enterprise API enabled and no HTTP-referrer restriction. Not the legacy secret key."
+        )]
+        public string GoogleRecaptchaApiKey { get; set; }
+
+        [Display(
+            Name = "Google Recaptcha Security Threshold",
+            Description = "Minimum score (0.0–1.0) a request must meet to pass. Lower is more permissive."
+        )]
         public decimal GoogleRecaptchaThreshold { get; set; }
 
         // Unsplash Api
