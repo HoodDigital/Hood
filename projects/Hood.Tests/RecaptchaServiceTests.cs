@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Google.Cloud.RecaptchaEnterprise.V1;
@@ -10,7 +11,7 @@ using Xunit;
 namespace Hood.Tests
 {
     /// <summary>
-    /// HOOD-92 — decision logic for the Fraud Defence (reCAPTCHA Enterprise) assessment flow.
+    /// Decision logic for the Fraud Defence (reCAPTCHA Enterprise) assessment flow.
     /// The Google call itself is faked via IRecaptchaAssessmentClient; these tests cover how
     /// the service maps an assessment onto RecaptchaResponse.Passed.
     /// </summary>
@@ -35,6 +36,15 @@ namespace Hood.Tests
                 LastEvent = assessmentEvent;
                 return Task.FromResult(_assessment);
             }
+        }
+
+        private class ThrowingAssessmentClient : IRecaptchaAssessmentClient
+        {
+            public Task<Assessment> CreateAssessmentAsync(
+                string projectId,
+                string apiKey,
+                Event assessmentEvent
+            ) => throw new InvalidOperationException("API key not valid.");
         }
 
         private static IntegrationSettings ConfiguredSettings(decimal threshold = 0.5m)
@@ -77,6 +87,34 @@ namespace Hood.Tests
                 new Dictionary<string, StringValues> { ["g-recaptcha-response"] = "a-token" }
             );
             return context.Request;
+        }
+
+        private class FakeLogService : ILogService
+        {
+            public List<(string Message, LogType Type)> Entries { get; } = new();
+
+            public Task AddLogAsync<TSource>(
+                string message,
+                object logObject = null,
+                LogType type = LogType.Info
+            )
+            {
+                Entries.Add((message, type));
+                return Task.CompletedTask;
+            }
+
+            public Task AddExceptionAsync<TSource>(
+                string message,
+                Exception ex,
+                LogType type = LogType.Error
+            ) => Task.CompletedTask;
+
+            public Task AddExceptionAsync<TSource>(
+                string message,
+                object logObject,
+                Exception ex,
+                LogType type = LogType.Error
+            ) => Task.CompletedTask;
         }
 
         private static RecaptchaService Service(Assessment assessment, IntegrationSettings settings)
@@ -159,6 +197,52 @@ namespace Hood.Tests
             Assert.Equal("a-token", client.LastEvent.Token);
             Assert.Equal("site-key", client.LastEvent.SiteKey);
             Assert.Equal("login", client.LastEvent.ExpectedAction);
+        }
+
+        [Fact]
+        public async Task Pass_logs_at_info()
+        {
+            FakeLogService logs = new FakeLogService();
+            RecaptchaService service = new RecaptchaService(
+                new FakeAssessmentClient(GoodAssessment()),
+                () => ConfiguredSettings(),
+                logs
+            );
+            await service.Validate(RequestWithToken(), "login");
+            Assert.Contains(
+                logs.Entries,
+                e => e.Type == LogType.Info && e.Message.Contains("passed")
+            );
+        }
+
+        [Fact]
+        public async Task Failure_logs_at_warning()
+        {
+            FakeLogService logs = new FakeLogService();
+            RecaptchaService service = new RecaptchaService(
+                new FakeAssessmentClient(GoodAssessment(score: 0.2f)),
+                () => ConfiguredSettings(threshold: 0.5m),
+                logs
+            );
+            await service.Validate(RequestWithToken());
+            Assert.Contains(
+                logs.Entries,
+                e => e.Type == LogType.Warning && e.Message.Contains("failed")
+            );
+        }
+
+        [Fact]
+        public async Task Assessment_error_fails_closed_and_logs_at_error()
+        {
+            FakeLogService logs = new FakeLogService();
+            RecaptchaService service = new RecaptchaService(
+                new ThrowingAssessmentClient(),
+                () => ConfiguredSettings(),
+                logs
+            );
+            RecaptchaResponse response = await service.Validate(RequestWithToken(), "login");
+            Assert.False(response.Passed);
+            Assert.Contains(logs.Entries, e => e.Type == LogType.Error);
         }
 
         [Fact]

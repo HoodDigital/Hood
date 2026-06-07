@@ -1,8 +1,10 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Google.Cloud.RecaptchaEnterprise.V1;
 using Hood.Core;
 using Hood.Extensions;
+using Hood.Models;
 using Microsoft.AspNetCore.Http;
 
 namespace Hood.Services
@@ -15,21 +17,28 @@ namespace Hood.Services
     public class RecaptchaService : IRecaptchaService
     {
         private readonly IRecaptchaAssessmentClient _assessmentClient;
-        private readonly System.Func<Models.IntegrationSettings> _settingsSource;
+        private readonly Func<IntegrationSettings> _settingsSource;
+        private readonly ILogService _logs;
 
         public RecaptchaService()
-            : this(new RecaptchaAssessmentClient(), () => Engine.Settings.Integrations) { }
+            : this(new RecaptchaAssessmentClient(), () => Engine.Settings.Integrations, Engine.Logs)
+        { }
 
-        // Test seam — lets Hood.Tests fake the Google assessment call and the
-        // settings store without bootstrapping the Engine singleton.
+        // Test seam — lets Hood.Tests fake the Google assessment call, the settings
+        // store and the log sink without bootstrapping the Engine singleton.
         internal RecaptchaService(
             IRecaptchaAssessmentClient assessmentClient,
-            System.Func<Models.IntegrationSettings> settingsSource
+            Func<IntegrationSettings> settingsSource,
+            ILogService logs = null
         )
         {
             _assessmentClient = assessmentClient;
             _settingsSource = settingsSource;
+            _logs = logs;
         }
+
+        private Task Log(string message, LogType type) =>
+            _logs?.AddLogAsync<RecaptchaService>(message, type: type) ?? Task.CompletedTask;
 
         public async Task<RecaptchaResponse> Validate(
             HttpRequest request,
@@ -38,14 +47,17 @@ namespace Hood.Services
         {
             try
             {
-                Models.IntegrationSettings settings = _settingsSource();
+                IntegrationSettings settings = _settingsSource();
 
                 // Only enforce recaptcha when it is fully configured (toggle on AND site key,
                 // project id and API key all set). Otherwise treat the check as passed so
                 // login / register / forms aren't blocked — callers gate on .Passed, so this
                 // must set Passed, not just Success.
                 if (!settings.IsGoogleRecaptchaEnabled)
+                {
+                    await Log("Recaptcha skipped — not enabled.", LogType.Info);
                     return new RecaptchaResponse() { Success = true, Passed = true };
+                }
 
                 if (!request.Form.ContainsKey("g-recaptcha-response")) // error if no reason to do anything, this is to alert developers they are calling it without reason.
                 {
@@ -98,7 +110,10 @@ namespace Hood.Services
                     throw new ValidationException("Recaptcha failed to pass security threshold.");
                 }
 
-                // Reached here? Fairly sure we are golden, mark as passed and return.
+                await Log(
+                    $"Recaptcha passed — action '{assessment.TokenProperties.Action}', score {score}.",
+                    LogType.Info
+                );
                 return new RecaptchaResponse()
                 {
                     Success = true,
@@ -111,7 +126,15 @@ namespace Hood.Services
             }
             catch (ValidationException ex)
             {
+                await Log($"Recaptcha failed — {ex.Message}", LogType.Warning);
                 return new RecaptchaResponse(false, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Assessment call failed (bad API key, quota, network). Fail closed —
+                // a broken check must not let traffic through unverified.
+                await Log($"Recaptcha assessment error — {ex.Message}", LogType.Error);
+                return new RecaptchaResponse(false, "Recaptcha could not be verified.");
             }
         }
     }
