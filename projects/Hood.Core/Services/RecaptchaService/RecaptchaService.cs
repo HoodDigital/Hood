@@ -107,7 +107,9 @@ namespace Hood.Services
                 decimal score = (decimal)(assessment.RiskAnalysis?.Score ?? 0);
                 if (score < settings.GoogleRecaptchaThreshold)
                 {
-                    throw new ValidationException("Recaptcha failed to pass security threshold.");
+                    throw new ValidationException(
+                        $"Recaptcha score {score} is below the configured threshold {settings.GoogleRecaptchaThreshold}."
+                    );
                 }
 
                 await Log(
