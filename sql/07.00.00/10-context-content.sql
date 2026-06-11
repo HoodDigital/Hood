@@ -1,3 +1,4 @@
+-- Apply key 07.00.00/10 | Hood v7.0.0 - Content context. Embedded; applied by hood-schema (DbUp) in LogicalName order.
 -- Content tables — idempotent: the whole block runs only on a database that doesn't
 -- already have it. DbUp journals this script; no EF migration-history table is used.
 IF OBJECT_ID(N'[HoodContent]', 'U') IS NULL

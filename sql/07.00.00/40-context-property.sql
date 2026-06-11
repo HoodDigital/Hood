@@ -1,3 +1,4 @@
+-- Apply key 07.00.00/40 | Hood v7.0.0 - Property context. Embedded; applied by hood-schema (DbUp) in LogicalName order.
 -- Property tables — idempotent: the whole block runs only on a database that doesn't
 -- already have it. DbUp journals this script; no EF migration-history table is used.
 IF OBJECT_ID(N'[HoodProperties]', 'U') IS NULL

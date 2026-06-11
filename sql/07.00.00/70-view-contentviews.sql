@@ -1,3 +1,4 @@
+-- Apply key 07.00.00/70 | Hood v7.0.0 - HoodContentViews reporting view (idempotent DROP/CREATE). Embedded; applied by hood-schema (DbUp) in LogicalName order.
 IF EXISTS(select * FROM sys.views where name = 'HoodContentViews') DROP VIEW HoodContentViews
 GO
 CREATE VIEW HoodContentViews AS
