@@ -30,7 +30,7 @@ sqlcmd -S <server> -d <db> -i sql/latest.sql
 
 `sql/latest.sql` creates all tables and the reporting views for the **standard ASP.NET Identity** backend.
 
-> Using the alternative **Auth0** backend instead? It's mutually exclusive with standard Identity (it recreates `AspNetUsers`). Apply `sql/7.0/contexts/Auth0.sql` + `sql/7.0/views/HoodAuth0UserProfiles.sql` instead of the Identity parts.
+> Using the alternative **Auth0** backend instead? It's mutually exclusive with standard Identity (it recreates `AspNetUsers`). Apply `sql/07.00.00/35-context-auth0.sql` + `sql/07.00.00/95-view-auth0userprofiles.sql` instead of the Identity parts.
 
 ## Upgrading an existing database
 
@@ -38,15 +38,17 @@ Prefer the runner above — it does fresh + upgrade in one step. To upgrade by h
 
 ```bash
 # 6.0.x only — bring the database to the 6.1 baseline first:
-sqlcmd -S <server> -d <db> -i sql/6.1/update.sql
+sqlcmd -S <server> -d <db> -i sql/06.01.00/10-update-from-6.0.sql
 # 6.0.x and 6.1.x — the 7.0 delta + views:
-sqlcmd -S <server> -d <db> -i sql/7.0/update.sql
-sqlcmd -S <server> -d <db> -i sql/7.0/views/HoodContentViews.sql
-sqlcmd -S <server> -d <db> -i sql/7.0/views/HoodUserProfiles.sql
-sqlcmd -S <server> -d <db> -i sql/7.0/views/HoodPropertyViews.sql
+sqlcmd -S <server> -d <db> -i sql/07.00.00/50-update-from-6.1.sql
+sqlcmd -S <server> -d <db> -i sql/07.00.00/70-view-contentviews.sql
+sqlcmd -S <server> -d <db> -i sql/07.00.00/80-view-propertyviews.sql
+sqlcmd -S <server> -d <db> -i sql/07.00.00/90-view-userprofiles.sql
 ```
 
-### What `sql/6.1/update.sql` does (6.0.x → 6.1)
+(Apply scripts in folder-then-filename order — the `MM.mm.pp/SS` key **is** the apply order.)
+
+### What `06.01.00/10-update-from-6.0.sql` does (6.0.x → 6.1)
 
 Idempotent + forward-only structural cleanup that 6.1 applied:
 
@@ -54,7 +56,7 @@ Idempotent + forward-only structural cleanup that 6.1 applied:
 - Drops the removed `HoodAddresses` table. **Destructive** — v7 has no such table; a 6.0 site with address data should migrate it out first (it's empty in the stock install).
 - Drops columns removed in 6.1: `AspNetUsers.Latitude` / `.Longitude` and `HoodContent.Notes` / `.SystemNotes` / `.UserVars` (nothing in v7 reads them).
 
-### What `sql/7.0/update.sql` does (6.1.x → 7.0)
+### What `07.00.00/50-update-from-6.1.sql` does (6.1.x → 7.0)
 
 The v7 delta is small and **drops no data-bearing base-table columns**:
 
@@ -63,7 +65,7 @@ The v7 delta is small and **drops no data-bearing base-table columns**:
 - Drops the unused `__HoodMigrationHistory` table (version is tracked in `HoodOptions`).
 - Stamps `HoodOptions['Hood.Version'] = '7.0.0'`.
 
-(The reporting views are applied separately — the `sql/7.0/views/*` scripts, idempotent DROP/CREATE — so they're shared by fresh installs, upgrades and the runner.)
+(The reporting views are applied separately — the `*-view-*.sql` scripts, idempotent DROP/CREATE — so they're shared by fresh installs, upgrades and the runner.)
 
 Consumers on the 6.1.x baseline take a **clean, zero-data-loss** upgrade — verified that nothing reads any removed field.
 
@@ -75,23 +77,34 @@ Consumers on the 6.1.x baseline take a **clean, zero-data-loss** upgrade — ver
    cd projects/Hood.Core
    dotnet ef migrations add <name> --context <Context> --output-dir Migrations/<Folder>
    ```
-3. Regenerate the idempotent per-context DDL and reassemble `latest.sql`:
+3. Regenerate the idempotent per-context DDL (overwrite the context's existing numbered script) and reassemble `latest.sql`:
    ```bash
-   dotnet ef migrations script --idempotent --context <Context> -o ../../sql/7.0/contexts/<Folder>.sql
+   dotnet ef migrations script --idempotent --context <Context> -o ../../sql/07.00.00/NN-context-<name>.sql
    ```
-   (Strip the UTF-8 BOM EF writes, and keep the `SET QUOTED_IDENTIFIER ON; SET ANSI_NULLS ON;` preamble at the top of `latest.sql` — the Identity filtered indexes and the views require it.)
-4. Hand-write the matching `update.sql` delta for the new tier and document it in the table above.
+   (Strip the UTF-8 BOM EF writes, re-add the `-- Apply key …` banner line, and keep the `SET QUOTED_IDENTIFIER ON; SET ANSI_NULLS ON;` preamble at the top of `latest.sql` — the Identity filtered indexes and the views require it.)
+4. Hand-write the matching upgrade delta as a **new** `MM.mm.pp/SS-<name>.sql` script (next free sequence, gapped) and document it above.
 
-## Layout
+## Script ordering & layout
+
+Scripts live in **zero-padded version folders** (`MM.mm.pp`) with a **gapped numeric sequence** per file (`SS-<name>.sql`), and that folder-then-sequence key **is** the apply order. Every component is padded (including the major, so `07.00.00` sorts before a future `10.00.00`, and `SS` so `90` sorts after `10`); the sequence is **gapped by 10s** so new scripts can be wedged between existing ones without renumbering. Ordering never relies on alphabetical accidents; the version is carried by the folder + the `-- Apply key …` header banner + the `HoodOptions['Hood.Version']` stamp.
 
 ```
 sql/
-  latest.sql            # full fresh install (standard Identity) — what new databases run
-  7.0/
-    update.sql          # 6.1.x -> 7.0 upgrade delta
-    contexts/*.sql      # per-context table DDL (generated, idempotent)
-    views/*.sql         # the four reporting views (idempotent DROP/CREATE)
-  6.1/
-    update.sql          # 6.0.x -> 6.1 upgrade delta (drop legacy FKs/columns/HoodAddresses)
-  6.0/                  # 6.0 baseline install (reference; the runner upgrades *from* it)
+  latest.sql                            # full fresh install (standard Identity) — what new databases run (NOT embedded in the runner)
+  06.01.00/
+    10-update-from-6.0.sql              # 6.0.x -> 6.1 upgrade delta (drop legacy FKs/columns/HoodAddresses)
+  07.00.00/
+    10-context-content.sql             # per-context table DDL (generated, idempotent)
+    20-context-hooddb.sql
+    30-context-identity.sql            # standard ASP.NET Identity backend
+    35-context-auth0.sql               # ALTERNATIVE Auth0 backend — NOT embedded; consumer applies instead of Identity
+    40-context-property.sql
+    50-update-from-6.1.sql             # 6.1.x -> 7.0 upgrade delta
+    60-…                               # (reserved) convergence delta — HOOD-104
+    70-view-contentviews.sql           # reporting views (idempotent DROP/CREATE)
+    80-view-propertyviews.sql
+    90-view-userprofiles.sql
+    95-view-auth0userprofiles.sql      # ALTERNATIVE Auth0 backend — NOT embedded; consumer applies instead of userprofiles
 ```
+
+The runner embeds these from `Hood.Core` (`Hood.Core.csproj`) and applies them by `LogicalName` order — i.e. the `MM.mm.pp/SS` key — **excluding** `latest.sql` and the two Auth0-backend scripts. Apply order: contexts → update → (`07.00.00/60` convergence delta, when present) → views.

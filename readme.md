@@ -87,12 +87,12 @@ Your own project SQL rides the same path via `--scripts <folder>` (applied after
 
 **Fresh install** — create the database, then execute `/sql/latest.sql` (standard ASP.NET Identity backend).
 
-**Upgrade** — run the `update.sql` for each tier above your current version, in order:
+**Upgrade** — run the upgrade-delta scripts for each tier above your current version, in folder-then-filename order (the `MM.mm.pp/SS` key is the apply order):
 
 | You're on | Run, in order |
 |---|---|
-| `6.0.x` | `/sql/6.1/update.sql` → `/sql/7.0/update.sql` → the `/sql/7.0/views/*` scripts |
-| `6.1.x` | `/sql/7.0/update.sql` → the `/sql/7.0/views/*` scripts |
+| `6.0.x` | `/sql/06.01.00/10-update-from-6.0.sql` → `/sql/07.00.00/50-update-from-6.1.sql` → the `/sql/07.00.00/*-view-*.sql` scripts |
+| `6.1.x` | `/sql/07.00.00/50-update-from-6.1.sql` → the `/sql/07.00.00/*-view-*.sql` scripts |
 
 The deltas are small and drop no data-bearing columns — see [`sql/README.md`](sql/README.md) for
 exactly what each tier changes.

@@ -1,3 +1,4 @@
+-- Apply key 07.00.00/50 | Hood v7.0.0 (6.1.x -> 7.0 upgrade delta). Embedded; applied by hood-schema (DbUp) in LogicalName order.
 -- =============================================================================
 -- Hood CMS — v6.1.x  ->  v7.0 upgrade delta
 -- =============================================================================

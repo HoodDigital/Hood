@@ -1,3 +1,4 @@
+-- Apply key 07.00.00/35 | Hood v7.0.0 - Auth0 context (ALTERNATIVE backend; NOT embedded - the consumer applies this instead of the Identity context).
 -- Auth0 tables — idempotent: the whole block runs only on a database that doesn't
 -- already have it. DbUp journals this script; no EF migration-history table is used.
 IF OBJECT_ID(N'[AspNetAuth0Identities]', 'U') IS NULL

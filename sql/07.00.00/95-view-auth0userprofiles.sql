@@ -1,3 +1,4 @@
+-- Apply key 07.00.00/95 | Hood v7.0.0 - HoodAuth0UserProfiles view (ALTERNATIVE backend; NOT embedded - the consumer applies this instead of HoodUserProfiles).
 IF EXISTS(select * FROM sys.views where name = 'HoodAuth0UserProfiles') DROP VIEW HoodAuth0UserProfiles
 GO
 CREATE VIEW HoodAuth0UserProfiles AS

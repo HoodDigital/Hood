@@ -1,3 +1,4 @@
+-- Apply key 06.01.00/10 | Hood v6.1.0 (6.0.x -> 6.1 upgrade delta). Embedded; applied by hood-schema (DbUp) in LogicalName order.
 -- =============================================================================
 -- Hood CMS — 6.0.x -> 6.1.x upgrade delta (structural)
 -- =============================================================================

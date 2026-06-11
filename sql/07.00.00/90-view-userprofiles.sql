@@ -1,3 +1,4 @@
+-- Apply key 07.00.00/90 | Hood v7.0.0 - HoodUserProfiles reporting view (idempotent DROP/CREATE). Embedded; applied by hood-schema (DbUp) in LogicalName order.
 IF EXISTS(select * FROM sys.views where name = 'HoodUserProfiles') DROP VIEW HoodUserProfiles
 GO
 CREATE VIEW HoodUserProfiles AS
