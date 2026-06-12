@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hood.Core.Migrations.HoodDb
 {
     [DbContext(typeof(HoodDbContext))]
-    [Migration("20260602173244_v7_baseline")]
+    [Migration("20260611194043_v7_baseline")]
     partial class v7_baseline
     {
         /// <inheritdoc />
@@ -52,9 +52,12 @@ namespace Hood.Core.Migrations.HoodDb
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("HoodLogs", (string)null);
                 });

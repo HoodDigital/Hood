@@ -34,7 +34,8 @@ namespace Hood.Core.Migrations.Content
                         .HasColumnType("bit");
 
                     b.Property<string>("AuthorId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Body")
                         .HasColumnType("nvarchar(max)");
@@ -93,6 +94,8 @@ namespace Hood.Core.Migrations.Content
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
 
                     b.ToTable("HoodContent", (string)null);
                 });

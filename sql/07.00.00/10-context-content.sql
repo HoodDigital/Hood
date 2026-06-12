@@ -22,7 +22,7 @@ BEGIN
         [AllowComments] bit NOT NULL,
         [Public] bit NOT NULL,
         [Featured] bit NOT NULL,
-        [AuthorId] nvarchar(max) NULL,
+        [AuthorId] nvarchar(450) NULL,
         [FeaturedImageJson] nvarchar(max) NULL,
         [ShareImageJson] nvarchar(max) NULL,
         CONSTRAINT [PK_HoodContent] PRIMARY KEY ([Id])
@@ -83,4 +83,6 @@ BEGIN
     CREATE INDEX [IX_HoodContentCategoryJoins_CategoryId] ON [HoodContentCategoryJoins] ([CategoryId]);
 
     CREATE INDEX [IX_HoodContentMedia_ContentId] ON [HoodContentMedia] ([ContentId]);
+
+    CREATE INDEX [IX_HoodContent_AuthorId] ON [HoodContent] ([AuthorId]);
 END;

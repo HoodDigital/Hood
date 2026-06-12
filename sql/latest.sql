@@ -22,6 +22,7 @@ BEGIN
         [Name] nvarchar(256) NULL,
         [NormalizedName] nvarchar(256) NULL,
         [ConcurrencyStamp] nvarchar(max) NULL,
+        [RemoteId] nvarchar(max) NULL,
         CONSTRAINT [PK_AspNetRoles] PRIMARY KEY ([Id])
     );
 
@@ -126,7 +127,7 @@ BEGIN
         [Title] nvarchar(max) NULL,
         [Detail] nvarchar(max) NULL,
         [Type] int NOT NULL,
-        [UserId] nvarchar(max) NULL,
+        [UserId] nvarchar(450) NULL,
         [Source] nvarchar(max) NULL,
         [SourceUrl] nvarchar(max) NULL,
         CONSTRAINT [PK_HoodLogs] PRIMARY KEY ([Id])
@@ -173,6 +174,8 @@ BEGIN
     CREATE INDEX [IX_HoodMedia_DirectoryId] ON [HoodMedia] ([DirectoryId]);
 
     CREATE INDEX [IX_HoodMediaDirectories_ParentId] ON [HoodMediaDirectories] ([ParentId]);
+
+    CREATE INDEX [IX_HoodLogs_UserId] ON [HoodLogs] ([UserId]);
 END;
 
 -- Content tables — idempotent: the whole block runs only on a database that doesn't
@@ -198,7 +201,7 @@ BEGIN
         [AllowComments] bit NOT NULL,
         [Public] bit NOT NULL,
         [Featured] bit NOT NULL,
-        [AuthorId] nvarchar(max) NULL,
+        [AuthorId] nvarchar(450) NULL,
         [FeaturedImageJson] nvarchar(max) NULL,
         [ShareImageJson] nvarchar(max) NULL,
         CONSTRAINT [PK_HoodContent] PRIMARY KEY ([Id])
@@ -259,6 +262,8 @@ BEGIN
     CREATE INDEX [IX_HoodContentCategoryJoins_CategoryId] ON [HoodContentCategoryJoins] ([CategoryId]);
 
     CREATE INDEX [IX_HoodContentMedia_ContentId] ON [HoodContentMedia] ([ContentId]);
+
+    CREATE INDEX [IX_HoodContent_AuthorId] ON [HoodContent] ([AuthorId]);
 END;
 
 -- Property tables — idempotent: the whole block runs only on a database that doesn't
@@ -322,7 +327,7 @@ BEGIN
         [QuickName] nvarchar(max) NULL,
         [Addressee] nvarchar(max) NULL,
         [Phone] nvarchar(max) NULL,
-        [AgentId] nvarchar(max) NULL,
+        [AgentId] nvarchar(450) NULL,
         [Floors] nvarchar(max) NULL,
         CONSTRAINT [PK_HoodProperties] PRIMARY KEY ([Id])
     );
@@ -383,6 +388,8 @@ BEGIN
     CREATE INDEX [IX_HoodPropertyFloorplans_PropertyId] ON [HoodPropertyFloorplans] ([PropertyId]);
 
     CREATE INDEX [IX_HoodPropertyMedia_PropertyId] ON [HoodPropertyMedia] ([PropertyId]);
+
+    CREATE INDEX [IX_HoodProperties_AgentId] ON [HoodProperties] ([AgentId]);
 END;
 
 -- ===========================================================================

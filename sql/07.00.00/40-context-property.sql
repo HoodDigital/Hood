@@ -60,7 +60,7 @@ BEGIN
         [QuickName] nvarchar(max) NULL,
         [Addressee] nvarchar(max) NULL,
         [Phone] nvarchar(max) NULL,
-        [AgentId] nvarchar(max) NULL,
+        [AgentId] nvarchar(450) NULL,
         [Floors] nvarchar(max) NULL,
         CONSTRAINT [PK_HoodProperties] PRIMARY KEY ([Id])
     );
@@ -121,4 +121,6 @@ BEGIN
     CREATE INDEX [IX_HoodPropertyFloorplans_PropertyId] ON [HoodPropertyFloorplans] ([PropertyId]);
 
     CREATE INDEX [IX_HoodPropertyMedia_PropertyId] ON [HoodPropertyMedia] ([PropertyId]);
+
+    CREATE INDEX [IX_HoodProperties_AgentId] ON [HoodProperties] ([AgentId]);
 END;

@@ -39,6 +39,9 @@ namespace Hood.Models
 
             builder.Entity<Option>().ToTable("HoodOptions");
             builder.Entity<Log>().ToTable("HoodLogs");
+            // UserId bounded + indexed to converge with the shape upgraded DBs carry.
+            builder.Entity<Log>().Property(l => l.UserId).HasMaxLength(450);
+            builder.Entity<Log>().HasIndex(l => l.UserId);
 
             // Media
             builder.Entity<MediaObject>().ToTable("HoodMedia");

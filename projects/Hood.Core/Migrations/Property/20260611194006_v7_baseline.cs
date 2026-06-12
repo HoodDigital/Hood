@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -84,7 +84,11 @@ namespace Hood.Core.Migrations.Property
                     QuickName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Addressee = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AgentId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgentId = table.Column<string>(
+                        type: "nvarchar(450)",
+                        maxLength: 450,
+                        nullable: true
+                    ),
                     Floors = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 },
                 constraints: table =>
@@ -192,6 +196,12 @@ namespace Hood.Core.Migrations.Property
                         onDelete: ReferentialAction.Restrict
                     );
                 }
+            );
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HoodProperties_AgentId",
+                table: "HoodProperties",
+                column: "AgentId"
             );
 
             migrationBuilder.CreateIndex(

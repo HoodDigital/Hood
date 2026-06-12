@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -16,6 +16,7 @@ namespace Hood.Core.Migrations.Identity
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RemoteId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Name = table.Column<string>(
                         type: "nvarchar(256)",
                         maxLength: 256,

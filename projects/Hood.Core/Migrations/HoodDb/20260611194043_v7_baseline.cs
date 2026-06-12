@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -22,7 +22,11 @@ namespace Hood.Core.Migrations.HoodDb
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Detail = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(
+                        type: "nvarchar(450)",
+                        maxLength: 450,
+                        nullable: true
+                    ),
                     Source = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SourceUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 },
@@ -105,6 +109,12 @@ namespace Hood.Core.Migrations.HoodDb
                         onDelete: ReferentialAction.Restrict
                     );
                 }
+            );
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HoodLogs_UserId",
+                table: "HoodLogs",
+                column: "UserId"
             );
 
             migrationBuilder.CreateIndex(

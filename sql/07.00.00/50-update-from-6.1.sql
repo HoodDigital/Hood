@@ -6,10 +6,10 @@
 -- the 6.0/6.1 update scripts first — see sql/README.md for the chain).
 --
 -- The v7 changes are small: the legacy duplicate user tables are removed (AspNetUsers
--- is now the single authoritative user store), the unused Auth0 role-mapping column and
--- the legacy script-migration table are dropped, and the four reporting views are
--- rebuilt (the 6.1 definitions referenced columns that never existed on the base
--- tables and were silently broken). No data-bearing base-table columns are dropped.
+-- is now the single authoritative user store) and the legacy script-migration + EF
+-- migration-history tables are dropped. No data-bearing base-table columns are dropped.
+-- (AspNetRoles.RemoteId is intentionally KEPT — it's nullable on both auth backends so the
+-- schema is one shape; the Auth0 backend maps local roles to Auth0 platform roles via it.)
 -- =============================================================================
 
 SET QUOTED_IDENTIFIER ON;
@@ -27,15 +27,11 @@ IF OBJECT_ID('[ApplicationUser]', 'U') IS NOT NULL DROP TABLE [ApplicationUser];
 IF OBJECT_ID('[UserProfiles]', 'U')   IS NOT NULL DROP TABLE [UserProfiles];
 GO
 
--- 3. Drop AspNetRoles.RemoteId — removed from the v7 role model (standard IdentityRole).
-IF COL_LENGTH('AspNetRoles', 'RemoteId') IS NOT NULL ALTER TABLE [AspNetRoles] DROP COLUMN [RemoteId];
-GO
-
--- 4. Drop the legacy Hood script-migration table — unused in v7 (version tracked in HoodOptions).
+-- 3. Drop the legacy Hood script-migration table — unused in v7 (version tracked in HoodOptions).
 IF OBJECT_ID('[__HoodMigrationHistory]', 'U') IS NOT NULL DROP TABLE [__HoodMigrationHistory];
 GO
 
--- 5. Drop the EF Core migrations-history table. v7 applies schema via DbUp (journalled in
+-- 4. Drop the EF Core migrations-history table. v7 applies schema via DbUp (journalled in
 --    dbo.SchemaVersions) and never runs EF migrations at runtime, so a fresh v7 install has
 --    no such table — dropping it here makes an upgraded database converge with a fresh one.
 IF OBJECT_ID('[__EFMigrationsHistory]', 'U') IS NOT NULL DROP TABLE [__EFMigrationsHistory];
@@ -43,7 +39,7 @@ GO
 
 -- (Views are applied separately by the runner / the sql/7.0/views scripts — not rebuilt here.)
 
--- 6. Stamp the schema version.
+-- 5. Stamp the schema version.
 IF EXISTS (SELECT 1 FROM [HoodOptions] WHERE [Id] = 'Hood.Version')
     UPDATE [HoodOptions] SET [Value] = '7.0.0' WHERE [Id] = 'Hood.Version';
 ELSE
