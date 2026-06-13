@@ -65,9 +65,9 @@ namespace Hood.Models
         )
         {
             ThumbUrl = thumbUrl.IsSet() ? thumbUrl : url;
-            SmallUrl = smallUrl.IsSet() ? thumbUrl : url;
-            MediumUrl = mediumUrl.IsSet() ? thumbUrl : url;
-            LargeUrl = largeUrl.IsSet() ? thumbUrl : url;
+            SmallUrl = smallUrl.IsSet() ? smallUrl : url;
+            MediumUrl = mediumUrl.IsSet() ? mediumUrl : url;
+            LargeUrl = largeUrl.IsSet() ? largeUrl : url;
             Url = url;
         }
 
