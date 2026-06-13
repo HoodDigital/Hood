@@ -8,7 +8,7 @@
     IntegrationSettings _plugins = Engine.Settings.Integrations;
 
 
-    bool maps = _plugins.GoogleMapsApiKey.IsSet() && (_plugins.EnableGoogleMaps || _plugins.EnableGoogleGeocoding);
+    bool maps = _plugins.GoogleCloudApiKey.IsSet() && (_plugins.EnableGoogleMaps || _plugins.EnableGoogleGeocoding);
 }
 
 @section metas {
@@ -65,5 +65,5 @@
 </div>
 @if (maps)
 {
-    <script asp-location="AfterScripts" async defer src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&callback=hood.property.initMap{1}", _plugins.GoogleMapsApiKey, _plugins.EnableGoogleGeocoding ? "&libraries=places" : "")"></script>
+    <script asp-location="AfterScripts" async defer src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&callback=hood.property.initMap{1}", _plugins.GoogleCloudApiKey, _plugins.EnableGoogleGeocoding ? "&libraries=places" : "")"></script>
 }

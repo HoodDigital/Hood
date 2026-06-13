@@ -13,7 +13,7 @@ namespace Hood.Services
     {
         public GoogleAddress GeocodeAddress(IAddress address)
         {
-            var key = Engine.Settings.Integrations.GoogleMapsApiKey;
+            var key = Engine.Settings.Integrations.GoogleCloudApiKey;
             if (!key.IsSet() || !Engine.Settings.Integrations.EnableGoogleGeocoding)
                 return null;
 
