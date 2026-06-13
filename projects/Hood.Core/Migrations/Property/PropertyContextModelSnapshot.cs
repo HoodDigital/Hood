@@ -104,7 +104,8 @@ namespace Hood.Core.Migrations.Property
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AgentId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("AgentInfo")
                         .HasColumnType("nvarchar(max)");
@@ -267,6 +268,8 @@ namespace Hood.Core.Migrations.Property
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AgentId");
 
                     b.ToTable("HoodProperties", (string)null);
                 });

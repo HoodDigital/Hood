@@ -8,6 +8,7 @@ BEGIN
         [Name] nvarchar(256) NULL,
         [NormalizedName] nvarchar(256) NULL,
         [ConcurrencyStamp] nvarchar(max) NULL,
+        [RemoteId] nvarchar(max) NULL,
         CONSTRAINT [PK_AspNetRoles] PRIMARY KEY ([Id])
     );
 

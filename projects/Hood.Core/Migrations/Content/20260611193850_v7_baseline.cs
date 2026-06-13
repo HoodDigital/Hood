@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -35,7 +35,11 @@ namespace Hood.Core.Migrations.Content
                     AllowComments = table.Column<bool>(type: "bit", nullable: false),
                     Public = table.Column<bool>(type: "bit", nullable: false),
                     Featured = table.Column<bool>(type: "bit", nullable: false),
-                    AuthorId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AuthorId = table.Column<string>(
+                        type: "nvarchar(450)",
+                        maxLength: 450,
+                        nullable: true
+                    ),
                     FeaturedImageJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ShareImageJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 },
@@ -162,6 +166,12 @@ namespace Hood.Core.Migrations.Content
                         onDelete: ReferentialAction.Cascade
                     );
                 }
+            );
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HoodContent_AuthorId",
+                table: "HoodContent",
+                column: "AuthorId"
             );
 
             migrationBuilder.CreateIndex(

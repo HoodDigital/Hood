@@ -28,6 +28,12 @@ namespace Hood.Contexts
         {
             base.OnModelCreating(builder);
 
+            // AspNetRoles carries a nullable RemoteId for BOTH auth backends so the schema is one
+            // shape regardless of backend. The Auth0 backend maps local roles to Auth0 platform roles via it; the
+            // standard backend never reads it, so it's a shadow property (no CLR member) — the column
+            // exists (always null on standard installs) and AspNetRoles is one shape across backends.
+            builder.Entity<IdentityRole>().Property<string>("RemoteId");
+
             builder.Entity<ApplicationUser>(typeBuilder =>
             {
                 typeBuilder.ToTable("AspNetUsers");

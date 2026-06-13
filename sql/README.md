@@ -61,13 +61,27 @@ Idempotent + forward-only structural cleanup that 6.1 applied:
 The v7 delta is small and **drops no data-bearing base-table columns**:
 
 - Removes the legacy duplicate user tables `ApplicationUser` and `UserProfiles` — `AspNetUsers` is now the single authoritative user store (nothing read or wrote the duplicates in 6.x).
-- Drops `AspNetRoles.RemoteId` (removed from the v7 role model).
-- Drops the unused `__HoodMigrationHistory` table (version is tracked in `HoodOptions`).
+- Drops the unused `__HoodMigrationHistory` and EF `__EFMigrationsHistory` tables (version is tracked in `HoodOptions`; the runner journals in `dbo.SchemaVersions`).
 - Stamps `HoodOptions['Hood.Version'] = '7.0.0'`.
+- `AspNetRoles.RemoteId` is **kept** — it's nullable on both auth backends so the schema is one shape (the Auth0 backend maps local roles to Auth0 platform roles via it; standard Identity leaves it null).
 
 (The reporting views are applied separately — the `*-view-*.sql` scripts, idempotent DROP/CREATE — so they're shared by fresh installs, upgrades and the runner.)
 
 Consumers on the 6.1.x baseline take a **clean, zero-data-loss** upgrade — verified that nothing reads any removed field.
+
+### What `07.00.00/60-converge.sql` does (upgrade → fresh parity)
+
+Idempotent convergence delta that runs after the update tier and before the views, so an **upgraded** 6.x database lands on the *same* schema as a **fresh** install. On a fresh install it's a no-op.
+
+- Relaxes `AspNetUsers.Anonymous` to nullable (6.x carried it `NOT NULL`; a fresh v7 install models it nullable).
+
+(The other historical drift converges via the fresh DDL itself — fresh installs now create the `AuthorId` / `UserId` / `AgentId` columns as `nvarchar(450)` **+ indexed**, the shape upgraded DBs already carry, and keep `AspNetRoles.RemoteId`. So there's nothing for the converge delta to alter for those.)
+
+## Convergence invariant & the parity guard
+
+Hood commits to **`fresh == upgrade`** — a database upgraded through the script chain is byte-for-byte identical to a fresh install, **within each auth backend**. Standard Identity and the Auth0 backend are *intentionally* different shapes (Auth0 omits the local-credential surface — password/security columns, the claims/logins/tokens tables — and adds `AspNetAuth0Identities`); that divergence is by design, not drift.
+
+`projects/Hood.Tests/SchemaParityTests.cs` enforces it: it provisions a fresh database via the runner and asserts the converged shape (bounded + indexed user-reference columns, a nullable `AspNetRoles.RemoteId`, a nullable `AspNetUsers.Anonymous`), plus that the converge delta relaxes `Anonymous` and is idempotent. It's `SkippableFact`-gated — runs in CI (where a SQL Server is provisioned), skips locally without one.
 
 ## Regenerating the SQL after a model change
 
@@ -100,7 +114,7 @@ sql/
     35-context-auth0.sql               # ALTERNATIVE Auth0 backend — NOT embedded; consumer applies instead of Identity
     40-context-property.sql
     50-update-from-6.1.sql             # 6.1.x -> 7.0 upgrade delta
-    60-…                               # (reserved) convergence delta — HOOD-104
+    60-converge.sql                    # convergence delta (upgraded 6.x -> fresh parity)
     70-view-contentviews.sql           # reporting views (idempotent DROP/CREATE)
     80-view-propertyviews.sql
     90-view-userprofiles.sql

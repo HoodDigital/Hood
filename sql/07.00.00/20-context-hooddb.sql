@@ -9,7 +9,7 @@ BEGIN
         [Title] nvarchar(max) NULL,
         [Detail] nvarchar(max) NULL,
         [Type] int NOT NULL,
-        [UserId] nvarchar(max) NULL,
+        [UserId] nvarchar(450) NULL,
         [Source] nvarchar(max) NULL,
         [SourceUrl] nvarchar(max) NULL,
         CONSTRAINT [PK_HoodLogs] PRIMARY KEY ([Id])
@@ -56,4 +56,6 @@ BEGIN
     CREATE INDEX [IX_HoodMedia_DirectoryId] ON [HoodMedia] ([DirectoryId]);
 
     CREATE INDEX [IX_HoodMediaDirectories_ParentId] ON [HoodMediaDirectories] ([ParentId]);
+
+    CREATE INDEX [IX_HoodLogs_UserId] ON [HoodLogs] ([UserId]);
 END;

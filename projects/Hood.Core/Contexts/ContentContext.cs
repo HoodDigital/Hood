@@ -21,6 +21,10 @@ namespace Hood.Contexts
             base.OnModelCreating(builder);
 
             builder.Entity<Content>().ToTable("HoodContent");
+            // User-reference columns are bounded + indexed (the shape upgraded DBs already carry) so
+            // fresh installs converge with them; nvarchar(max) cannot be indexed.
+            builder.Entity<Content>().Property(c => c.AuthorId).HasMaxLength(450);
+            builder.Entity<Content>().HasIndex(c => c.AuthorId);
 
             builder.Entity<ContentMedia>().ToTable("HoodContentMedia");
             builder

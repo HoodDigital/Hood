@@ -25,6 +25,7 @@ namespace Hood.Core.Migrations.Identity
             modelBuilder.Entity("Hood.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("AccessFailedCount")
@@ -251,6 +252,9 @@ namespace Hood.Core.Migrations.Identity
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("RemoteId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

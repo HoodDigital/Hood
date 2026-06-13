@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hood.Core.Migrations.Content
 {
     [DbContext(typeof(ContentContext))]
-    [Migration("20260602172831_v7_baseline")]
+    [Migration("20260611193850_v7_baseline")]
     partial class v7_baseline
     {
         /// <inheritdoc />
@@ -37,7 +37,8 @@ namespace Hood.Core.Migrations.Content
                         .HasColumnType("bit");
 
                     b.Property<string>("AuthorId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Body")
                         .HasColumnType("nvarchar(max)");
@@ -96,6 +97,8 @@ namespace Hood.Core.Migrations.Content
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
 
                     b.ToTable("HoodContent", (string)null);
                 });
