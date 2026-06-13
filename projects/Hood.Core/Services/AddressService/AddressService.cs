@@ -60,7 +60,12 @@ namespace Hood.Services
                         .GetAwaiter()
                         .GetResult();
                 }
-                catch { }
+                catch (Exception logEx)
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        $"AddressService: failed to log a geocoding error: {logEx.Message}"
+                    );
+                }
 
                 return null;
             }

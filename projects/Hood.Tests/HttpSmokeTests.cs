@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -222,7 +221,7 @@ namespace Hood.Tests
     /// post-build Hood bootstrap (LoadHoodAsync) that Program.Main runs — without altering production
     /// startup.
     /// </summary>
-    public class HoodWebApplicationFactory : WebApplicationFactory<Hood.Web.Program>
+    public class HoodWebApplicationFactory : WebApplicationFactory<Web.Program>
     {
         private readonly string _connectionString;
 
