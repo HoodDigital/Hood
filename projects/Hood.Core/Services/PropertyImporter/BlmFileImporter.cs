@@ -1281,7 +1281,10 @@ namespace Hood.Services
                 try
                 {
                     GoogleAddress loc = _address.GeocodeAddress(property);
-                    property.SetLocation(loc.Coordinates);
+                    if (loc != null)
+                    {
+                        property.SetLocation(loc.Coordinates);
+                    }
                 }
                 catch (GoogleGeocodingException ex)
                 {
