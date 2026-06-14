@@ -91,8 +91,8 @@ Your own project SQL rides the same path via `--scripts <folder>` (applied after
 
 | You're on | Run, in order |
 |---|---|
-| `6.0.x` | `/sql/06.01.00/10-update-from-6.0.sql` → `/sql/07.00.00/50-update-from-6.1.sql` → the `/sql/07.00.00/*-view-*.sql` scripts |
-| `6.1.x` | `/sql/07.00.00/50-update-from-6.1.sql` → the `/sql/07.00.00/*-view-*.sql` scripts |
+| `6.0.x` | `/sql/06.01.00/10-update-from-6.0.sql` → `/sql/07.00.00/202606021946-update-from-6.1.sql` → `/sql/07.00.00/202606131600-unify-google-apikey.sql` → the `/sql/07.00.00/9*-view-*.sql` scripts |
+| `6.1.x` | `/sql/07.00.00/202606021946-update-from-6.1.sql` → `/sql/07.00.00/202606131600-unify-google-apikey.sql` → the `/sql/07.00.00/9*-view-*.sql` scripts |
 
 The deltas are small and drop no data-bearing columns — see [`sql/README.md`](sql/README.md) for
 exactly what each tier changes.

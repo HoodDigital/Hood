@@ -24,7 +24,7 @@
     <partial name="_Editor_Images" />
     <h5 class="mt-4 mb-0">Property Address</h5>
     <p>Address and location information for this property listing.</p>
-    @if (_integrationSettings.EnableGoogleGeocoding && _integrationSettings.GoogleMapsApiKey.IsSet())
+    @if (_integrationSettings.EnableGoogleGeocoding && _integrationSettings.GoogleCloudApiKey.IsSet())
     {
         <div class="form-floating mb-3">
             <label for="address-autocomplete">Search for an address (Google Lookup)</label>

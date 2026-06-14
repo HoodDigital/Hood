@@ -53,16 +53,18 @@
     <PackageReference Include="unsplasharp.api" Version="0.7.0" />
   </ItemGroup>
   <!-- The repo-root sql tier scripts are embedded so the Hood.Core NuGet carries its own schema.
-       One glob; DbUp applies them in LogicalName order. Scripts live in zero-padded version folders
-       (MM.mm.pp) with a gapped numeric sequence per file (SS-<name>.sql, e.g.
-       07.00.00/50-update-from-6.1.sql) so apply order is explicit and never relies on alphabetical
-       accidents. Every component is padded so it sorts ordinally (07 before a future 10). Excluded:
-       latest.sql (the assembled fresh-install convenience file) and the Auth0 backend scripts (the
-       alternative backend, applied by the consumer, not the standard-Identity runner path). -->
+       One glob; DbUp applies them in ordinal LogicalName order. Scripts live in zero-padded version
+       folders (MM.mm.pp). Within a folder the prefix encodes a phase: structural snapshots use a low
+       fixed band (00-0x context DDL, regenerated), forward deltas + data-migrations use a yyyyMMddHHmm
+       timestamp (append-only, collision-free across branches, mirrors the authoring EF migration), and
+       reporting views use a high band (9x, regenerated). Ordinal sort gives 0x < 2026... < 9x, so the
+       bands bookend the timestamped middle. Excluded: latest.sql (the assembled fresh-install
+       convenience file) and the Auth0 backend scripts (the alternative backend, applied by the
+       consumer, not the standard-Identity runner path). -->
   <ItemGroup>
     <EmbeddedResource
       Include="$(MSBuildThisFileDirectory)../../sql/**/*.sql"
-      Exclude="$(MSBuildThisFileDirectory)../../sql/latest.sql;$(MSBuildThisFileDirectory)../../sql/07.00.00/35-context-auth0.sql;$(MSBuildThisFileDirectory)../../sql/07.00.00/95-view-auth0userprofiles.sql"
+      Exclude="$(MSBuildThisFileDirectory)../../sql/latest.sql;$(MSBuildThisFileDirectory)../../sql/07.00.00/03-context-auth0.sql;$(MSBuildThisFileDirectory)../../sql/07.00.00/93-view-auth0userprofiles.sql"
     >
       <LogicalName>Hood.Core.SchemaScripts.%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>

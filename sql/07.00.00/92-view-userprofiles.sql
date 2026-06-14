@@ -1,7 +1,7 @@
--- Apply key 07.00.00/95 | Hood v7.0.0 - HoodAuth0UserProfiles view (ALTERNATIVE backend; NOT embedded - the consumer applies this instead of HoodUserProfiles).
-IF EXISTS(select * FROM sys.views where name = 'HoodAuth0UserProfiles') DROP VIEW HoodAuth0UserProfiles
+-- Apply key 07.00.00/92 | Hood v7.0.0 - HoodUserProfiles reporting view (idempotent DROP/CREATE). Embedded; applied by hood-schema (DbUp) in LogicalName order.
+IF EXISTS(select * FROM sys.views where name = 'HoodUserProfiles') DROP VIEW HoodUserProfiles
 GO
-CREATE VIEW HoodAuth0UserProfiles AS
+CREATE VIEW HoodUserProfiles AS
 SELECT 
 	AspNetUsers.Id, 
 	AspNetUsers.UserName, 
@@ -24,16 +24,8 @@ SELECT
 	AspNetUsers.DeliveryAddressJson,	
 	AspNetUsers.CreatedOn,	
 	AspNetUsers.UserVars,
+	AspNetUsers.AccessFailedCount, 
 	COUNT(AspNetRoles.Name) AS RoleCount,
-	(
-		SELECT 
-			*
-		FROM 
-			AspNetAuth0Identities
-		WHERE 
-			AspNetAuth0Identities.LocalUserId = AspNetUsers.Id
-		FOR JSON AUTO
-	) AS Auth0UsersJson,
 	(
 		SELECT 
 			AspNetRoles.Id, AspNetRoles.Name, AspNetRoles.NormalizedName 
@@ -86,5 +78,6 @@ GROUP BY
 	AspNetUsers.BillingAddressJson,	
 	AspNetUsers.DeliveryAddressJson,	
 	AspNetUsers.CreatedOn,	
-	AspNetUsers.UserVars
+	AspNetUsers.UserVars,
+	AspNetUsers.AccessFailedCount
 GO

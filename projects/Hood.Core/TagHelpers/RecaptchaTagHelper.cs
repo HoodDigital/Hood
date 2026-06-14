@@ -32,7 +32,10 @@ namespace Hood.TagHelpers
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            if (!Engine.Settings.Integrations.EnableGoogleRecaptcha)
+            // Integrations is null when the IntegrationSettings option row doesn't exist yet (a site
+            // whose settings have never been saved / a partially-installed database). Treat that — and
+            // the recaptcha-disabled case — identically: render nothing rather than NRE the page.
+            if (Engine.Settings?.Integrations?.EnableGoogleRecaptcha != true)
                 return;
 
             output.TagName = "div";

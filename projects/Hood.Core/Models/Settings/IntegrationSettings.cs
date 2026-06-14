@@ -17,20 +17,23 @@ namespace Hood.Models
         [Display(Name = "Enable Google Maps")]
         public bool EnableGoogleMaps { get; set; }
 
-        [Display(Name = "Google API Key")]
-        public string GoogleMapsApiKey { get; set; }
+        [Display(
+            Name = "Google Cloud API Key",
+            Description = "A single Google Cloud API key used for Maps, Geocoding and reCAPTCHA Enterprise. Enable the Maps JavaScript, Geocoding and reCAPTCHA Enterprise APIs on it. It is rendered in the browser for maps, so referrer restrictions cannot be used (reCAPTCHA Enterprise also requires no referrer restriction) — restrict by API instead."
+        )]
+        public string GoogleCloudApiKey { get; set; }
 
         // Computed read-only flags — derived from the stored settings, never persisted.
         [JsonIgnore]
         public bool IsGoogleMapsEnabled
         {
-            get { return GoogleMapsApiKey.IsSet() && EnableGoogleMaps; }
+            get { return GoogleCloudApiKey.IsSet() && EnableGoogleMaps; }
         }
 
         [JsonIgnore]
         public bool IsGoogleGeocodingEnabled
         {
-            get { return GoogleMapsApiKey.IsSet() && EnableGoogleGeocoding; }
+            get { return GoogleCloudApiKey.IsSet() && EnableGoogleGeocoding; }
         }
 
         [JsonIgnore]
@@ -40,7 +43,7 @@ namespace Hood.Models
             {
                 return GoogleRecaptchaSiteKey.IsSet()
                     && GoogleRecaptchaProjectId.IsSet()
-                    && GoogleRecaptchaApiKey.IsSet()
+                    && GoogleCloudApiKey.IsSet()
                     && EnableGoogleRecaptcha;
             }
         }
@@ -64,12 +67,6 @@ namespace Hood.Models
             Description = "The Google Cloud project that owns the key (from the console project picker, e.g. my-project-123456) — not the key ID."
         )]
         public string GoogleRecaptchaProjectId { get; set; }
-
-        [Display(
-            Name = "Google Cloud API Key",
-            Description = "A Google Cloud API key (APIs & Services > Credentials) with the reCAPTCHA Enterprise API enabled and no HTTP-referrer restriction. Not the legacy secret key."
-        )]
-        public string GoogleRecaptchaApiKey { get; set; }
 
         [Display(
             Name = "Google Recaptcha Security Threshold",

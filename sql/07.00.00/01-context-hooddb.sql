@@ -1,4 +1,4 @@
--- Apply key 07.00.00/20 | Hood v7.0.0 - HoodDb context. Embedded; applied by hood-schema (DbUp) in LogicalName order.
+-- Apply key 07.00.00/01 | Hood v7.0.0 - HoodDb context. Embedded; applied by hood-schema (DbUp) in LogicalName order.
 -- HoodDb tables — idempotent: the whole block runs only on a database that doesn't
 -- already have it. DbUp journals this script; no EF migration-history table is used.
 IF OBJECT_ID(N'[HoodOptions]', 'U') IS NULL

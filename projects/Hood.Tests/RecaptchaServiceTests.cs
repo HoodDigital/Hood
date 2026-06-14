@@ -54,7 +54,7 @@ namespace Hood.Tests
                 EnableGoogleRecaptcha = true,
                 GoogleRecaptchaSiteKey = "site-key",
                 GoogleRecaptchaProjectId = "my-project",
-                GoogleRecaptchaApiKey = "api-key",
+                GoogleCloudApiKey = "api-key",
                 GoogleRecaptchaThreshold = threshold,
             };
         }

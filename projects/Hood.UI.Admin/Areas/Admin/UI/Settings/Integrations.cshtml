@@ -42,9 +42,9 @@
                     </div>
                 </div>
                 <div class="form-floating mb-3">
-                    <input asp-for="GoogleMapsApiKey" class="form-control">
-                    <label asp-for="GoogleMapsApiKey"></label>
-                    <small asp-for="GoogleMapsApiKey"></small>
+                    <input asp-for="GoogleCloudApiKey" class="form-control">
+                    <label asp-for="GoogleCloudApiKey"></label>
+                    <small asp-for="GoogleCloudApiKey"></small>
                 </div>
                 <hr class="mt-4 mb-4" />
                 <div class="mb-3">
@@ -64,10 +64,8 @@
                     <label asp-for="GoogleRecaptchaProjectId"></label>
                     <small asp-for="GoogleRecaptchaProjectId"></small>
                 </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="GoogleRecaptchaApiKey" class="form-control">
-                    <label asp-for="GoogleRecaptchaApiKey"></label>
-                    <small asp-for="GoogleRecaptchaApiKey"></small>
+                <div class="alert alert-info" role="alert">
+                    reCAPTCHA Enterprise authenticates with the shared <strong>Google Cloud API Key</strong> set above — enable the reCAPTCHA Enterprise API on that key.
                 </div>
                 <div class="form-floating">
                     <select asp-for="GoogleRecaptchaThreshold" class="form-select">

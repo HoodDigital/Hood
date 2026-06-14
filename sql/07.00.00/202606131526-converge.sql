@@ -1,4 +1,4 @@
--- Apply key 07.00.00/60 | Hood v7.0.0 convergence delta (upgraded 6.x -> fresh 7.0 parity). Embedded; applied by hood-schema (DbUp) in LogicalName order.
+-- Apply key 07.00.00/202606131526 | Hood v7.0.0 convergence delta (upgraded 6.x -> fresh 7.0 parity). Embedded; applied by hood-schema (DbUp) in LogicalName order.
 -- =============================================================================
 -- Hood CMS — v7.0 convergence delta
 -- =============================================================================

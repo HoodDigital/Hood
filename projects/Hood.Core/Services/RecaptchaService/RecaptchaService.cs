@@ -69,7 +69,7 @@ namespace Hood.Services
                 string token = request.Form["g-recaptcha-response"];
                 Assessment assessment = await _assessmentClient.CreateAssessmentAsync(
                     settings.GoogleRecaptchaProjectId,
-                    settings.GoogleRecaptchaApiKey,
+                    settings.GoogleCloudApiKey,
                     new Event
                     {
                         Token = token ?? string.Empty,

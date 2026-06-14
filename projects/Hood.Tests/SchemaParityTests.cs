@@ -203,7 +203,9 @@ namespace Hood.Tests
                     )
                 );
 
-                var converge = ReadEmbedded("Hood.Core.SchemaScripts.07.00.00/60-converge.sql");
+                var converge = ReadEmbedded(
+                    "Hood.Core.SchemaScripts.07.00.00/202606131526-converge.sql"
+                );
                 Exec(db, converge);
                 Assert.Equal(
                     "YES",

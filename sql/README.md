@@ -30,7 +30,7 @@ sqlcmd -S <server> -d <db> -i sql/latest.sql
 
 `sql/latest.sql` creates all tables and the reporting views for the **standard ASP.NET Identity** backend.
 
-> Using the alternative **Auth0** backend instead? It's mutually exclusive with standard Identity (it recreates `AspNetUsers`). Apply `sql/07.00.00/35-context-auth0.sql` + `sql/07.00.00/95-view-auth0userprofiles.sql` instead of the Identity parts.
+> Using the alternative **Auth0** backend instead? It's mutually exclusive with standard Identity (it recreates `AspNetUsers`). Apply `sql/07.00.00/03-context-auth0.sql` + `sql/07.00.00/93-view-auth0userprofiles.sql` instead of the Identity parts.
 
 ## Upgrading an existing database
 
@@ -39,11 +39,12 @@ Prefer the runner above — it does fresh + upgrade in one step. To upgrade by h
 ```bash
 # 6.0.x only — bring the database to the 6.1 baseline first:
 sqlcmd -S <server> -d <db> -i sql/06.01.00/10-update-from-6.0.sql
-# 6.0.x and 6.1.x — the 7.0 delta + views:
-sqlcmd -S <server> -d <db> -i sql/07.00.00/50-update-from-6.1.sql
-sqlcmd -S <server> -d <db> -i sql/07.00.00/70-view-contentviews.sql
-sqlcmd -S <server> -d <db> -i sql/07.00.00/80-view-propertyviews.sql
-sqlcmd -S <server> -d <db> -i sql/07.00.00/90-view-userprofiles.sql
+# 6.0.x and 6.1.x — the 7.0 delta, data migrations + views (in filename order):
+sqlcmd -S <server> -d <db> -i sql/07.00.00/202606021946-update-from-6.1.sql
+sqlcmd -S <server> -d <db> -i sql/07.00.00/202606131600-unify-google-apikey.sql
+sqlcmd -S <server> -d <db> -i sql/07.00.00/90-view-contentviews.sql
+sqlcmd -S <server> -d <db> -i sql/07.00.00/91-view-propertyviews.sql
+sqlcmd -S <server> -d <db> -i sql/07.00.00/92-view-userprofiles.sql
 ```
 
 (Apply scripts in folder-then-filename order — the `MM.mm.pp/SS` key **is** the apply order.)
@@ -56,7 +57,7 @@ Idempotent + forward-only structural cleanup that 6.1 applied:
 - Drops the removed `HoodAddresses` table. **Destructive** — v7 has no such table; a 6.0 site with address data should migrate it out first (it's empty in the stock install).
 - Drops columns removed in 6.1: `AspNetUsers.Latitude` / `.Longitude` and `HoodContent.Notes` / `.SystemNotes` / `.UserVars` (nothing in v7 reads them).
 
-### What `07.00.00/50-update-from-6.1.sql` does (6.1.x → 7.0)
+### What `07.00.00/202606021946-update-from-6.1.sql` does (6.1.x → 7.0)
 
 The v7 delta is small and **drops no data-bearing base-table columns**:
 
@@ -69,11 +70,15 @@ The v7 delta is small and **drops no data-bearing base-table columns**:
 
 Consumers on the 6.1.x baseline take a **clean, zero-data-loss** upgrade — verified that nothing reads any removed field.
 
-### What `07.00.00/60-converge.sql` does (upgrade → fresh parity)
+### What `07.00.00/202606131526-converge.sql` does (upgrade → fresh parity)
 
 Idempotent convergence delta that runs after the update tier and before the views, so an **upgraded** 6.x database lands on the *same* schema as a **fresh** install. On a fresh install it's a no-op.
 
 - Relaxes `AspNetUsers.Anonymous` to nullable (6.x carried it `NOT NULL`; a fresh v7 install models it nullable).
+
+### What `07.00.00/202606131600-unify-google-apikey.sql` does (data migration)
+
+Idempotent data migration for the stored `IntegrationSettings` JSON (HOOD-110). The reCAPTCHA Enterprise work added a second Google Cloud API key (`GoogleRecaptchaApiKey`) alongside the existing Maps/Geocoding key (`GoogleMapsApiKey`); v7 collapses both into one `GoogleCloudApiKey`. The script seeds the unified key from the first non-empty legacy value and strips the old keys. No-op on a fresh install (the settings row is created lazily on first save) and on re-run (only seeds when the unified key is unset).
 
 (The other historical drift converges via the fresh DDL itself — fresh installs now create the `AuthorId` / `UserId` / `AgentId` columns as `nvarchar(450)` **+ indexed**, the shape upgraded DBs already carry, and keep `AspNetRoles.RemoteId`. So there's nothing for the converge delta to alter for those.)
 
@@ -96,11 +101,17 @@ Hood commits to **`fresh == upgrade`** — a database upgraded through the scrip
    dotnet ef migrations script --idempotent --context <Context> -o ../../sql/07.00.00/NN-context-<name>.sql
    ```
    (Strip the UTF-8 BOM EF writes, re-add the `-- Apply key …` banner line, and keep the `SET QUOTED_IDENTIFIER ON; SET ANSI_NULLS ON;` preamble at the top of `latest.sql` — the Identity filtered indexes and the views require it.)
-4. Hand-write the matching upgrade delta as a **new** `MM.mm.pp/SS-<name>.sql` script (next free sequence, gapped) and document it above.
+4. Hand-write the matching upgrade delta as a **new** `MM.mm.pp/<yyyyMMddHHmm>-<name>.sql` script (timestamp-prefixed — typically mirroring the EF migration that authored it) and document it above. **While a version is in RC** the structural-snapshot scripts can be regenerated and the tier reorganised freely (nothing has run in production); **once it ships GA** the migrations are locked — only ever append a new timestamped script.
 
 ## Script ordering & layout
 
-Scripts live in **zero-padded version folders** (`MM.mm.pp`) with a **gapped numeric sequence** per file (`SS-<name>.sql`), and that folder-then-sequence key **is** the apply order. Every component is padded (including the major, so `07.00.00` sorts before a future `10.00.00`, and `SS` so `90` sorts after `10`); the sequence is **gapped by 10s** so new scripts can be wedged between existing ones without renumbering. Ordering never relies on alphabetical accidents; the version is carried by the folder + the `-- Apply key …` header banner + the `HoodOptions['Hood.Version']` stamp.
+Scripts live in **zero-padded version folders** (`MM.mm.pp`, padded so `07.00.00` sorts before a future `10.00.00`), and the folder-then-filename key **is** the apply order — DbUp applies embedded scripts in ordinal `LogicalName` order. **Within** a folder the filename prefix encodes a *phase*:
+
+- **Structural snapshots** — the per-context table DDL — use a low fixed band (`00`–`0x`). These are **regenerated** from the EF model, not point-in-time history, so they carry a stable ordinal, not a date.
+- **Forward deltas & data-migrations** — the true append-only migrations — use a **`yyyyMMddHHmm` timestamp** prefix, typically the timestamp of the EF migration that authored them. Timestamps never collide across parallel branches and never need renumbering.
+- **Reporting views** — also regenerated (idempotent DROP/CREATE) — use a high fixed band (`9x`) so they always apply last.
+
+Ordinal sort gives `0x` < `2026…` < `9x`, so the two fixed bands bookend the timestamped middle. Ordering never relies on alphabetical accidents; the version is carried by the folder + the `-- Apply key …` header banner + the `HoodOptions['Hood.Version']` stamp. While a tier is in RC the prefixes are renumbered to stay sequential; after GA they're append-only.
 
 ```
 sql/
@@ -108,17 +119,21 @@ sql/
   06.01.00/
     10-update-from-6.0.sql              # 6.0.x -> 6.1 upgrade delta (drop legacy FKs/columns/HoodAddresses)
   07.00.00/
-    10-context-content.sql             # per-context table DDL (generated, idempotent)
-    20-context-hooddb.sql
-    30-context-identity.sql            # standard ASP.NET Identity backend
-    35-context-auth0.sql               # ALTERNATIVE Auth0 backend — NOT embedded; consumer applies instead of Identity
-    40-context-property.sql
-    50-update-from-6.1.sql             # 6.1.x -> 7.0 upgrade delta
-    60-converge.sql                    # convergence delta (upgraded 6.x -> fresh parity)
-    70-view-contentviews.sql           # reporting views (idempotent DROP/CREATE)
-    80-view-propertyviews.sql
-    90-view-userprofiles.sql
-    95-view-auth0userprofiles.sql      # ALTERNATIVE Auth0 backend — NOT embedded; consumer applies instead of userprofiles
+    # structural snapshots — low band (00-0x), regenerated from the EF model
+    00-context-content.sql             # per-context table DDL (generated, idempotent)
+    01-context-hooddb.sql
+    02-context-identity.sql            # standard ASP.NET Identity backend
+    03-context-auth0.sql               # ALTERNATIVE Auth0 backend — NOT embedded; consumer applies instead of Identity
+    04-context-property.sql
+    # forward deltas & data-migrations — yyyyMMddHHmm timestamp, append-only
+    202606021946-update-from-6.1.sql   # 6.1.x -> 7.0 upgrade delta
+    202606131526-converge.sql          # convergence delta (upgraded 6.x -> fresh parity)
+    202606131600-unify-google-apikey.sql  # data migration — collapse the two Google keys into GoogleCloudApiKey
+    # reporting views — high band (9x), regenerated (idempotent DROP/CREATE)
+    90-view-contentviews.sql
+    91-view-propertyviews.sql
+    92-view-userprofiles.sql
+    93-view-auth0userprofiles.sql      # ALTERNATIVE Auth0 backend — NOT embedded; consumer applies instead of userprofiles
 ```
 
-The runner embeds these from `Hood.Core` (`Hood.Core.csproj`) and applies them by `LogicalName` order — i.e. the `MM.mm.pp/SS` key — **excluding** `latest.sql` and the two Auth0-backend scripts. Apply order: contexts → update → (`07.00.00/60` convergence delta, when present) → views.
+The runner embeds these from `Hood.Core` (`Hood.Core.csproj`) and applies them by ordinal `LogicalName` order **excluding** `latest.sql` and the two Auth0-backend scripts. Apply order: context snapshots → timestamped deltas (update → converge → data migrations) → views.

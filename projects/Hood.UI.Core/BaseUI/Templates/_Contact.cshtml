@@ -29,7 +29,7 @@
 <div class="py-5 mx-auto" style="max-width:500px">
     <partial name="_ContactForm" model="new ContactFormModel(true, true)" />
 </div>
-@if (_plugins.EnableGoogleMaps && _plugins.GoogleMapsApiKey.IsSet() && _basicSettings.Address.IsGeoLocated())
+@if (_plugins.EnableGoogleMaps && _plugins.GoogleCloudApiKey.IsSet() && _basicSettings.Address.IsGeoLocated())
 {
     <div class="google-map vh-100" data-lat="@_basicSettings.Address?.Latitude" data-long="@_basicSettings.Address?.Longitude" data-marker="@Engine.Settings.Basic.FullTitle" data-zoom="12"></div>
     <partial name="_Scripts_GoogleMaps" />
