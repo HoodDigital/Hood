@@ -7,18 +7,10 @@ name: Backend
 # PRs build + test only (the publish job is gated on push/release).
 
 on:
+  # No paths filter on push: every merge to master publishes an RC so the NuGet and
+  # npm prereleases stay in lockstep, regardless of which paths the merge touched.
   push:
     branches: [master]
-    paths:
-      - 'projects/**'
-      - 'Hood.sln'
-      - 'Directory.Build.props'
-      - 'global.json'
-      - '.github/workflows/backend.yml'
-      - 'validate_code.sh'
-      - '.editorconfig'
-      - 'Hood.sln.DotSettings'
-      - '.config/**'
   pull_request:
     paths:
       - 'projects/**'

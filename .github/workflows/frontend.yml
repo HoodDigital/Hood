@@ -8,17 +8,10 @@ name: Frontend
 # PRs build only (the publish job is gated on push/release).
 
 on:
+  # No paths filter on push: every merge to master publishes an RC so the npm and
+  # NuGet prereleases stay in lockstep, regardless of which paths the merge touched.
   push:
     branches: [master]
-    paths:
-      - 'projects/Hood.Development/src/**'
-      - 'projects/Hood.Development/Views/**'
-      - 'projects/Hood.Development/Themes/**'
-      - 'projects/Hood.Development/gulpfile.js'
-      - 'projects/Hood.Development/package.json'
-      - 'projects/Hood.Development/yarn.lock'
-      - 'projects/Hood.Development/tsconfig*.json'
-      - '.github/workflows/frontend.yml'
   pull_request:
     paths:
       - 'projects/Hood.Development/src/**'
