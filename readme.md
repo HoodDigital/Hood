@@ -98,6 +98,23 @@ The deltas are small and drop no data-bearing columns — see [`sql/README.md`](
 exactly what each tier changes.
 
 
+## Project layout
+
+Hood is split into focused packages under `projects/`, each published as its own NuGet package (except the test project):
+
+| Package | Purpose |
+|---|---|
+| `Hood` | Complete Hood CMS package — all default controllers, packaged with the Bootstrap 4 default theme. |
+| `Hood.Core` | DI / runtime engine — base controllers, attributes, contexts, extensions, filters. |
+| `Hood.Admin` | Admin-area controllers. |
+| `Hood.Development` | Dev-time helpers. |
+| `Hood.SchemaTool` | CLI to apply the database schema (idempotent, forward-only) in a deploy pipeline. |
+| `Hood.UI.Core` | Base UI scaffolding and shared view components. |
+| `Hood.UI.Admin` | Admin UI — Areas and views. |
+| `Hood.UI.Bootstrap3` / `Hood.UI.Bootstrap4` | Bootstrap 3 / 4 themed UI variants. |
+| `Hood.Tests` | Test suite (not published). |
+
+
 ## Full documentation
 
 Documentation is a work in progress. The most useful references today:
