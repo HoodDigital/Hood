@@ -1,6 +1,7 @@
 {
   "name": "hoodcms",
   "version": "7.0.0",
+  "packageManager": "pnpm@11.8.0",
   "description": "A fully customisable content management system for ASP.NET Core, built on .NET 10 and EF Core 10.",
   "keywords": [
     "hood",

@@ -1,0 +1,9 @@
+# pnpm settings live here as of pnpm 10+ (the package.json "pnpm" field is no longer read).
+# Unlike yarn 1.x — which ran every dependency's install scripts unconditionally — pnpm
+# requires each build-script dependency to be explicitly allowed (true) or denied (false),
+# otherwise install fails with ERR_PNPM_IGNORED_BUILDS.
+allowBuilds:
+  # Native file-watcher used by the dev `watch-scss` / `watch-tsc` gulp tasks.
+  '@parcel/watcher': true
+  # postinstall only prints a funding banner — nothing to compile.
+  core-js: false
