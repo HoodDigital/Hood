@@ -14,10 +14,12 @@
 /app.config
 /appsettings.json
 /azure-pipelines.yml
-/gulpfile.js
+/gulpfile.cjs
+/hood.dev.ts
+/.env.example
 /libman.json
 /.config
-/rollup.config.js
+/rollup.config.mjs
 /tsconfig.json
 /tsconfig.production.json
 /tsconfig.rollup.json

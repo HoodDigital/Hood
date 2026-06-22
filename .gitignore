@@ -3,6 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Hood local dev environment — secrets (SA password / connection string). Copied from
+# .env.example; never committed. See DOCKER.md.
+.env.local
+
 # User-specific files
 *.rsuser
 *.suo
