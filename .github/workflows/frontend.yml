@@ -19,7 +19,9 @@ on:
       - 'projects/Hood.Development/Themes/**'
       - 'projects/Hood.Development/gulpfile.js'
       - 'projects/Hood.Development/package.json'
-      - 'projects/Hood.Development/yarn.lock'
+      - 'projects/Hood.Development/pnpm-lock.yaml'
+      - 'projects/Hood.Development/pnpm-workspace.yaml'
+      - 'projects/Hood.Development/.npmrc'
       - 'projects/Hood.Development/tsconfig*.json'
       - '.github/workflows/frontend.yml'
   release:
@@ -27,7 +29,7 @@ on:
 
 jobs:
   build:
-    name: Build (npm run package)
+    name: Build (pnpm run package)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -37,9 +39,17 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 22
-      - run: corepack enable
-      - run: yarn install --frozen-lockfile
-      - run: yarn run package
+      - run: corepack enable # pins pnpm to the package.json "packageManager" field
+      - name: Resolve pnpm store path
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('projects/Hood.Development/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-store-
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run package
 
   publish:
     name: Publish to npm
@@ -71,11 +81,20 @@ jobs:
           VERSION="$("$HOME/.dotnet/tools/minver" --tag-prefix v --minimum-major-minor 7.0 --default-pre-release-identifiers rc)"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Resolved version: $VERSION"
-      - run: corepack enable
+      - run: corepack enable # pins pnpm to the package.json "packageManager" field
         working-directory: projects/Hood.Development
-      - run: yarn install --frozen-lockfile
+      - name: Resolve pnpm store path
+        id: pnpm-store
         working-directory: projects/Hood.Development
-      - run: yarn run package
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('projects/Hood.Development/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-store-
+      - run: pnpm install --frozen-lockfile
+        working-directory: projects/Hood.Development
+      - run: pnpm run package
         working-directory: projects/Hood.Development
       # No token: npm detects the GitHub OIDC environment, matches the trusted-publisher
       # config on npmjs, and publishes with provenance automatically.
