@@ -67,7 +67,7 @@ function fromAppSettings(config: ResolvedConfig): string | undefined {
 }
 
 /**
- * Resolve the one host-side connection string used by every native command (db upgrade,
+ * Resolve the one host-side connection string used by every native command (db-upgrade,
  * run). Precedence:
  *   1. `--connection <value>`
  *   2. `config.connection` (from `hood.dev.ts`)

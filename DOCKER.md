@@ -35,12 +35,10 @@ pnpm hood up         # start everything — DB created/upgraded first, then the 
 | `pnpm hood logs` | Tail app + DB container logs |
 | `pnpm hood sql` | `sqlcmd` shell inside the SQL container |
 | `pnpm hood run` | Run the app natively against the Docker DB (port `14331`) |
-| `pnpm hood "db up"` | Start SQL Server only, wait until healthy |
-| `pnpm hood "db upgrade"` | Create (if absent) + upgrade the database via the schema tool |
+| `pnpm hood db-up` | Start SQL Server only, wait until healthy |
+| `pnpm hood db-upgrade` | Create (if absent) + upgrade the database via the schema tool |
 | `pnpm hood dev` | Watch frontend + backend together — a single Ctrl+C stops both |
 | `pnpm hood setup` | Bootstrap: create `.env.local`, install JS deps, restore .NET (alias: `deps`) |
-
-> Two-word commands (`db up`, `db upgrade`) are quoted so the shell passes them through as a single argument: `pnpm hood "db upgrade"`.
 
 ## Configuration — `.env.local`
 
@@ -81,7 +79,7 @@ Start just the database in Docker and run the host on the host machine:
 
 ```bash
 cd projects/Hood.Development
-pnpm hood "db upgrade"   # SQL Server up + healthy, then create/upgrade the DB (idempotent)
+pnpm hood db-upgrade     # SQL Server up + healthy, then create/upgrade the DB (idempotent)
 pnpm hood run            # dotnet run, pointed at the Docker SQL Server on 127.0.0.1,14331
 # App available at http://localhost:5070 (or the Kestrel default)
 ```
@@ -94,7 +92,7 @@ pnpm hood run            # dotnet run, pointed at the Docker SQL Server on 127.0
 
 ## Database state
 
-The stack brings up an **empty** SQL Server. `pnpm hood up` (and `pnpm hood "db upgrade"`) apply the schema via the schema tool before the app starts; the app itself does **no** automatic migration or seeding at startup. The full schema/runner reference is in [`sql/README.md`](sql/README.md).
+The stack brings up an **empty** SQL Server. `pnpm hood up` (and `pnpm hood db-upgrade`) apply the schema via the schema tool before the app starts; the app itself does **no** automatic migration or seeding at startup. The full schema/runner reference is in [`sql/README.md`](sql/README.md).
 
 To open a SQL shell inside the container:
 

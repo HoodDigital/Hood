@@ -32,7 +32,7 @@ export interface DevConfig {
     /** The runnable web project for `run` / `dev` (default: `projects/Hood.Development`). */
     appProject?: string;
     /**
-     * Argv for the schema upgrade invoked by `db upgrade` — the resolved `--connection`
+     * Argv for the schema upgrade invoked by `db-upgrade` — the resolved `--connection`
      * is appended automatically (default: Hood's `Hood.SchemaTool` project, `upgrade`).
      */
     schemaUpgrade?: string[];
@@ -97,7 +97,7 @@ export interface TaskContext {
     compose(args: string[], opts?: SpawnOpts): Promise<void>;
     /** Start the DB service and block (Node poll loop) until its healthcheck passes. */
     waitForDb(): Promise<void>;
-    /** Run another target by name (resolves consumer overrides) — e.g. `up` calls `db upgrade`. */
+    /** Run another target by name (resolves consumer overrides) — e.g. `up` calls `db-upgrade`. */
     invoke(command: string): Promise<void>;
     /** Print a narrator line. */
     log(msg: string): void;

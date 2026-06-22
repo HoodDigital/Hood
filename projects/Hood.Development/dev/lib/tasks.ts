@@ -37,7 +37,7 @@ export function baseTasks(): Record<string, TaskDefinition> {
         up: {
             describe: 'Start the full stack — DB created/upgraded first, then the app.',
             run: async (ctx) => {
-                await ctx.invoke('db upgrade');
+                await ctx.invoke('db-upgrade');
                 await ctx.compose(['up', '-d', '--build']);
             },
         },
@@ -85,12 +85,12 @@ export function baseTasks(): Record<string, TaskDefinition> {
                 }),
         },
 
-        'db up': {
+        'db-up': {
             describe: 'Start SQL Server only and wait until healthy.',
             run: (ctx) => ctx.waitForDb(),
         },
 
-        'db upgrade': {
+        'db-upgrade': {
             describe: 'Create (if absent) + upgrade the Docker database via the schema tool.',
             run: async (ctx) => {
                 await ctx.waitForDb();

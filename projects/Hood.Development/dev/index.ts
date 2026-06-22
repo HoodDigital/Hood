@@ -166,11 +166,7 @@ export function parseArgs(argv: string[]): ParsedArgs {
         }
     }
 
-    let command = positionals.shift() ?? '';
-    // `db up` / `db upgrade` are two-word commands.
-    if (command === 'db' && positionals.length > 0) {
-        command = `db ${positionals.shift()}`;
-    }
+    const command = positionals.shift() ?? '';
     return { command, args: positionals, flags };
 }
 
