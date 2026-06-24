@@ -25,6 +25,7 @@ import { pathToFileURL } from 'node:url';
 import { loadEnv, resolveConnection } from './lib/connection';
 import { compose, waitForDb } from './lib/docker';
 import { parallel, run } from './lib/process';
+import { builtinRestoreProviders } from './lib/restore';
 import { BASE_TASK_ALIASES, baseTasks } from './lib/tasks';
 import type {
     DevConfig,
@@ -115,6 +116,8 @@ export function resolveConfig(config: DevConfig, cwd: string): ResolvedConfig {
         connection: config.connection,
         saPassword: config.saPassword ?? 'Hood_Dev_Passw0rd!',
         envFiles: config.envFiles ?? ['.env.local'],
+        // Built-ins first, consumer providers last — so a consumer can override an extension.
+        restoreProviders: [...builtinRestoreProviders(), ...(config.restoreProviders ?? [])],
         watch: {
             frontend: config.watch?.frontend ?? [
                 ['pnpm', 'run', 'watch-scss'],
@@ -166,7 +169,12 @@ export function parseArgs(argv: string[]): ParsedArgs {
         }
     }
 
-    const command = positionals.shift() ?? '';
+    let command = positionals.shift() ?? '';
+    // `db <sub>` namespace → the `db-<sub>` target (db up / db upgrade / db restore / db reset).
+    // The hyphenated names still work when typed directly, so this is purely additive.
+    if (command === 'db' && positionals.length > 0) {
+        command = `db-${positionals.shift()}`;
+    }
     return { command, args: positionals, flags };
 }
 

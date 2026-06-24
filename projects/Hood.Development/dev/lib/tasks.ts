@@ -9,6 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveSaPassword } from './connection';
+import { runRestore } from './restore';
 import type { TaskContext, TaskDefinition } from './types';
 
 // The native dev URL. Deliberately set via ASPNETCORE_URLS (env) rather than a "Urls" key in
@@ -107,6 +108,19 @@ export function baseTasks(): Record<string, TaskDefinition> {
                 await ctx.waitForDb();
                 const [cmd, ...args] = ctx.config.schemaUpgrade;
                 await ctx.run(cmd, [...args, '--connection', ctx.connection()]);
+            },
+        },
+
+        'db-restore': {
+            describe: 'Restore the DB from a file (`db restore <file>`; .bacpac built-in) — destructive, --force-guarded.',
+            run: (ctx) => runRestore(ctx),
+        },
+
+        'db-reset': {
+            describe: 'Nuclear option: drop the DB volume and recreate the stack (down -v, then up).',
+            run: async (ctx) => {
+                await ctx.compose(['down', '-v']);
+                await ctx.invoke('up');
             },
         },
 

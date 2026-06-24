@@ -63,6 +63,45 @@ npx hoodcms watch      # frontend + backend hot-reload together (one Ctrl+C stop
 npx hoodcms down
 ```
 
+Database commands share a `db <sub>` namespace (the hyphenated forms still work too):
+
+```bash
+npx hoodcms db up                       # start SQL Server only, wait until healthy
+npx hoodcms db upgrade                  # create-if-absent + apply the Hood schema (idempotent)
+npx hoodcms db restore dump.bacpac      # restore from a file, then run db upgrade to reconcile
+npx hoodcms db reset                    # nuclear option: drop the DB volume and recreate the stack
+```
+
+#### Restoring a database (`db restore`)
+
+`db restore <file>` is a **generic, file-based** restore: it dispatches by file extension to a
+`RestoreProvider`. The **file path is the entire contract** — where the file came from (a
+`hood cli az pull`, an S3 export, a teammate's dump) never enters this layer, and `hood-schema`
+stays a pure schema-migration tool. Hood ships a built-in `.bacpac` provider via the
+cross-platform `sqlpackage` .NET tool (`dotnet tool install --global microsoft.sqlpackage`),
+connecting over the host TCP port — no Docker coupling.
+
+Restore is **destructive** — it overwrites the target database — so it requires an interactive
+`yes`, or a `--force` flag in non-interactive shells. A restored database may be behind the
+current schema, so run `db upgrade` afterwards (DbUp's journal reconciles idempotently). If a
+restore leaves the database wedged, `db reset` is the nuclear recovery path.
+
+Register your own provider (e.g. `.bak`, `.sql`) without forking, in `hood.dev.ts`:
+
+```ts
+import { defineTasks } from 'hoodcms/dev';
+
+export default defineTasks({
+  restoreProviders: [
+    {
+      extensions: ['.sql'],
+      describe: 'Plain T-SQL script',
+      restore: ({ file, connection, task }) => task.run('sqlcmd', ['-S', '127.0.0.1,14331', '-i', file]),
+    },
+  ],
+});
+```
+
 It's zero-config by default; drop in an optional, fully-typed `hood.dev.ts` to override
 settings or register your own targets:
 
