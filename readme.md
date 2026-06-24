@@ -36,13 +36,13 @@ The client side code is not required to run Hood CMS as all required JS/CSS are 
 
 https://www.npmjs.com/package/hoodcms
 
-To install Hood CMS client side code via NPM.
+To install Hood CMS client side code via npm.
 ```
 > npm install hoodcms
 ```
 or
 ```
-> yarn add hoodcms
+> pnpm add hoodcms
 ```
 
 > To use your own client side code, you will also need to update script/link references in your theme's HTML or Razor C# files to use your own version of the code, rather than the CDN.

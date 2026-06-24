@@ -1,41 +1,80 @@
-# Hood CMS
-[![Build Status](https://dev.azure.com/hooddigital/Hood/_apis/build/status/HoodDigital.Hood?branchName=refs%2Fpull%2F21%2Fmerge)](https://dev.azure.com/hooddigital/Hood/_build/latest?definitionId=4&branchName=refs%2Fpull%2F21%2Fmerge)
-[![GitHub release (Latest by date including pre-releases)](https://img.shields.io/github/v/release/HoodDigital/Hood?include_prereleases&label=Latest%20Release)](https://github.com/HoodDigital/Hood/releases)
+# hoodcms
 
-A fully customisable content management system built in ASP.NET Core 5 & Bootstrap 5.
+[![npm stable](https://img.shields.io/npm/v/hoodcms?label=npm%20Stable)](https://www.npmjs.com/package/hoodcms)
+[![npm prerelease](https://img.shields.io/npm/v/hoodcms/next?label=npm%20Prerelease)](https://www.npmjs.com/package/hoodcms?activeTab=versions)
 
-## Nuget Installation 
-[![NuGet](https://img.shields.io/nuget/v/hood?label=NuGet%20Stable)](https://www.nuget.org/packages/Hood/)
-[![MyGet Latest](https://img.shields.io/myget/hood/vpre/hood?label=MyGet)](https://www.myget.org/feed/hood/package/nuget/Hood)
+The client-side toolkit for [**Hood CMS**](https://github.com/HoodDigital/Hood) — the
+distribution CSS/JS that Hood's UI runs on, the SCSS/TypeScript sources behind it, Hood's
+shared frontend build presets, and a cross-platform local-dev CLI.
 
-Install Hood CMS via Package Manager.
-```
-> Install-Package Hood
-```
-or via .NET CLI
-```
-> dotnet add package Hood
+## Installation
+
+```bash
+npm install hoodcms
+# or
+pnpm add hoodcms
 ```
 
-## Client Side Code
-[![npm Package](https://img.shields.io/npm/v/hoodcms)](https://www.npmjs.com/package/hoodcms)
+## Using it with Hood CMS
 
-The client side code is not required to run Hood CMS as all required JS/CSS are served via jsdelivr. However, if you want to extend or modify the client side code, you can download this npm package, which contains the required distribution CSS and JavaScript, as well as source SCSS and TypeScript files. 
+You don't need this package just to **run** Hood — the required CSS/JS are served from
+jsDelivr by default. Install `hoodcms` when you want to **extend or replace** the frontend.
 
-https://www.npmjs.com/package/hoodcms
+### Use your own assets
 
-To install Hood CMS client side code via NPM.
+Build your own CSS/JS from Hood's SCSS/TypeScript sources (shipped under the package's
+`src/`), then point your theme's `<script>` / `<link>` references at your own build instead
+of the CDN.
+
+### Extend Hood's build toolchain
+
+Don't fork Hood's build config — extend the published presets:
+
+```js
+// rollup.config.mjs
+import { hoodRollup } from 'hoodcms/build';
+export default hoodRollup({ entries: { site: 'src/ts/site.ts' }, externals: ['owl.carousel'] });
 ```
-> npm install hoodcms
-```
-or
-```
-> yarn add hoodcms
+
+```js
+// gulpfile.cjs
+const { registerHoodTasks } = require('hoodcms/build/gulp');
+registerHoodTasks(require('gulp'), { less: true });
 ```
 
-> To use your own client side code, you will also need to update script/link references in your theme's HTML or Razor C# files to use your own version of the code, rather than the CDN.
+```jsonc
+// tsconfig.json — declare your own rootDir/outDir (path options don't inherit across packages)
+{ "extends": "hoodcms/tsconfig.base.json" }
+```
 
-## Full documentation
-Documentation is a work in progress!
+The toolchain packages (rollup, gulp, sass, …) are **optional peer dependencies** — install
+the ones you use, at Hood's audited versions.
 
-Also, feel free to add your issues or pull requests to our GitHub, we always welcome contributions!
+## Local dev orchestration (`hoodcms`)
+
+The package also exposes a cross-platform local-dev CLI (the `hoodcms` bin) that runs a Hood
+project's full stack — Docker SQL Server, schema upgrade, the app, and frontend + backend
+watchers — with one command set on Windows, macOS and Linux:
+
+```bash
+npx hoodcms            # list all commands
+npx hoodcms up         # start the stack: DB created + upgraded, then the app
+npx hoodcms watch      # frontend + backend hot-reload together (one Ctrl+C stops both)
+npx hoodcms down
+```
+
+It's zero-config by default; drop in an optional, fully-typed `hood.dev.ts` to override
+settings or register your own targets:
+
+```ts
+import { defineTasks } from 'hoodcms/dev';
+
+export default defineTasks({
+  // override config and/or add custom targets here
+});
+```
+
+## Links
+
+- [Hood CMS on GitHub](https://github.com/HoodDigital/Hood)
+- [Hood CMS server package on NuGet](https://www.nuget.org/packages/Hood/)

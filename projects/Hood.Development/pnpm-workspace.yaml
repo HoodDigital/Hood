@@ -7,3 +7,6 @@ allowBuilds:
   '@parcel/watcher': true
   # postinstall only prints a funding banner — nothing to compile.
   core-js: false
+  # tsx bundles esbuild to run the `hoodcms/dev` TypeScript layer; its postinstall links the
+  # native binary for the host platform.
+  esbuild: true

@@ -2,7 +2,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build-dev",
+            // Debug build for the F5 debugger (launch.json runs bin/Debug/.../Hood.Development.dll).
+            // Stays native because it must build -c Debug; `pnpm hoodcms build` is -c Release.
+            "label": "build",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -14,7 +16,8 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "publish-dev",
+            // Native publish (no hoodcms equivalent) — produces the deployable output.
+            "label": "publish",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -26,31 +29,44 @@
             "problemMatcher": "$msCompile"
         },
         {
-            // Hot-reload run on the SAME port (5070) and DB as the debug profiles, so
-            // switching between F5 debug and watch needs no other changes. Stop the
-            // docker `app` container first to free 5070 (keep hood-sqlserver running).
-            "label": "watch-dev",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "watch",
-                "run",
-                "--project",
-                "${workspaceFolder}/projects/Hood.Development/Hood.Development.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
-            ],
-            "options": {
-                "env": {
-                    "ASPNETCORE_ENVIRONMENT": "Development",
-                    "ASPNETCORE_URLS": "http://localhost:5070",
-                    "ConnectionStrings__DefaultConnection": "Server=localhost,14331;Database=Hood.Web;User Id=sa;Password=Hood_Dev_Passw0rd!;TrustServerCertificate=True;Encrypt=False;MultipleActiveResultSets=True",
-                    "Hood:BypassCDN": "true",
-                    "Logging__LogLevel__Hood": "Information",
-                    "Logging__LogLevel__Hood.Services.RecaptchaService": "Information"
-                }
-            },
-            "problemMatcher": "$msCompile"
+            // Everything below is a thin wrapper over the hoodcms CLI — the CLI owns the
+            // env/connection/port contract (via appsettings.Development.json), so there is
+            // nothing to keep in sync here. Run them from "Tasks: Run Task".
+            "label": "watch",
+            "detail": "pnpm hoodcms watch — frontend + backend hot reload (Ctrl+C stops both)",
+            "type": "shell",
+            "command": "pnpm",
+            "args": ["hoodcms", "watch"],
+            "options": { "cwd": "${workspaceFolder}/projects/Hood.Development" },
+            "problemMatcher": "$msCompile",
+            "isBackground": true
+        },
+        {
+            "label": "up",
+            "detail": "pnpm hoodcms up — DB upgrade, then build + start the full stack (detached)",
+            "type": "shell",
+            "command": "pnpm",
+            "args": ["hoodcms", "up"],
+            "options": { "cwd": "${workspaceFolder}/projects/Hood.Development" },
+            "problemMatcher": []
+        },
+        {
+            "label": "down",
+            "detail": "pnpm hoodcms down — stop containers (keeps the DB volume)",
+            "type": "shell",
+            "command": "pnpm",
+            "args": ["hoodcms", "down"],
+            "options": { "cwd": "${workspaceFolder}/projects/Hood.Development" },
+            "problemMatcher": []
+        },
+        {
+            "label": "db-up",
+            "detail": "pnpm hoodcms db-up — start SQL Server only and wait until healthy",
+            "type": "shell",
+            "command": "pnpm",
+            "args": ["hoodcms", "db-up"],
+            "options": { "cwd": "${workspaceFolder}/projects/Hood.Development" },
+            "problemMatcher": []
         }
     ]
 }
