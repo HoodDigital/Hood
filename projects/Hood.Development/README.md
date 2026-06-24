@@ -15,6 +15,30 @@ npm install hoodcms
 pnpm add hoodcms
 ```
 
+## Adopting Hood tooling — one mental model
+
+`hoodcms` exposes three tooling surfaces, and they all adopt the **same way** — so once you've
+learned one, you've learned all three:
+
+| Surface | Entry | Extend with |
+|---|---|---|
+| **Build** presets (rollup + gulp) | `hoodcms/build` | `hoodRollup({ … })` · `registerHoodTasks(gulp, { … })` |
+| **Dev** command layer | `hoodcms/dev` | `defineTasks({ … })` |
+| **Database** (schema + restore) | `hoodcms` bin → `db <sub>` | `defineTasks({ schemaUpgrade, restoreProviders })` |
+
+Every surface follows the same three rules:
+
+- **Zero-config by default.** A vanilla consumer (e.g. **Wards**) runs on Hood's defaults with
+  no config file — `hoodcms up`, `hoodRollup({ entries })`, `db upgrade` all just work.
+- **Extend, don't clone.** You pass a typed factory an options/overrides object; you never copy
+  Hood's gulpfile, rollup config, dev tasks, or schema runner into your repo. An extension
+  consumer (e.g. **CMEL**) overrides only what differs and inherits the rest.
+- **Conventional & consistent.** The same config-resolution model and override shape across all
+  three, so build, dev, and db feel like one coherent toolkit rather than three bolt-ons.
+
+The rest of this README walks each surface; they're intentionally repetitive because the
+ergonomics are deliberately identical.
+
 ## Using it with Hood CMS
 
 You don't need this package just to **run** Hood — the required CSS/JS are served from
