@@ -11,6 +11,11 @@ import path from 'node:path';
 import { resolveSaPassword } from './connection';
 import type { TaskContext, TaskDefinition } from './types';
 
+// The native dev URL. Deliberately set via ASPNETCORE_URLS (env) rather than a "Urls" key in
+// appsettings.Development.json: in the Generic Host an appsettings "Urls" value OVERRIDES
+// ASPNETCORE_URLS, which would hijack the container's own ASPNETCORE_URLS=http://+:8080 binding.
+const DEV_APP_URL = 'http://localhost:5070';
+
 /** Copy `.env.example` → `.env.local` when the latter is missing (idempotent bootstrap). */
 function ensureEnvLocal(ctx: TaskContext): void {
     const example = path.resolve(ctx.cwd, '.env.example');
@@ -85,6 +90,7 @@ export function baseTasks(): Record<string, TaskDefinition> {
                 ctx.run('dotnet', ['run', '--project', ctx.config.appProject, '--no-launch-profile'], {
                     env: {
                         ASPNETCORE_ENVIRONMENT: 'Development',
+                        ASPNETCORE_URLS: DEV_APP_URL,
                         ConnectionStrings__DefaultConnection: ctx.connection(),
                     },
                 }),
@@ -125,6 +131,7 @@ export function baseTasks(): Record<string, TaskDefinition> {
                         opts: {
                             env: {
                                 ASPNETCORE_ENVIRONMENT: 'Development',
+                                ASPNETCORE_URLS: DEV_APP_URL,
                                 ConnectionStrings__DefaultConnection: ctx.connection(),
                                 // The frontend watchers emit into wwwroot while dotnet watch runs;
                                 // without this, Hot Reload's static-file handler crashes with

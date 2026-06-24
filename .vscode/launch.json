@@ -21,10 +21,12 @@
                 "action": "openExternally",
                 "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
             },
-            // Connection, URLs (5070) and Hood logging come from the committed
-            // appsettings.Development.json — selecting the environment is all that's needed.
+            // Connection + Hood logging come from the committed appsettings.Development.json.
+            // ASPNETCORE_URLS must stay here (not appsettings): a "Urls" key in appsettings
+            // overrides ASPNETCORE_URLS in the Generic Host and would break the container binding.
             "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "http://localhost:5070"
             }
         },
         {
@@ -42,10 +44,11 @@
                 "action": "openExternally",
                 "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
             },
-            // Base dev config (connection, URLs, Hood logging) comes from
-            // appsettings.Development.json; this profile only adds EF Core SQL echo.
+            // Connection + Hood logging come from appsettings.Development.json; ASPNETCORE_URLS
+            // stays here (see the Debug profile above). This profile adds EF Core SQL echo.
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "http://localhost:5070",
                 "Logging__LogLevel__Microsoft.EntityFrameworkCore.Database.Command": "Information"
             }
         },
