@@ -1,37 +1,80 @@
-# Hood.Development
-
-The runnable Hood CMS web host — an ASP.NET Core app on **.NET 10** that dogfoods the
-framework for local development. It's also the home of the **`hoodcms`** npm package
-(Hood's client-side SCSS/TypeScript, plus the published `build` and `dev` tooling).
-
-## Local development
-
-From this directory:
-
-```bash
-pnpm install          # restore the JS tooling
-pnpm hoodcms setup    # bootstrap: .env.local, JS deps, dotnet restore
-pnpm hoodcms up       # create + upgrade the DB, then build + start the full stack
-```
-
-`hoodcms` is the cross-platform local-dev CLI (the `./dev` subpath of the `hoodcms`
-package, run via [tsx](https://tsx.is)). Run `pnpm hoodcms` with no args for the full
-command list. The complete walkthrough — containers, ports, the connection-resolution
-chain, and every command — is in [`DOCKER.md`](../../DOCKER.md). Debugging from VS Code
-is wired up in [`.vscode/launch.json`](../../.vscode/launch.json).
-
-## The `hoodcms` client package
+# hoodcms
 
 [![npm stable](https://img.shields.io/npm/v/hoodcms?label=npm%20Stable)](https://www.npmjs.com/package/hoodcms)
+[![npm prerelease](https://img.shields.io/npm/v/hoodcms/next?label=npm%20Prerelease)](https://www.npmjs.com/package/hoodcms?activeTab=versions)
 
-Hood's client-side code (distribution CSS/JS + source SCSS/TypeScript) is published to npm
-as [`hoodcms`](https://www.npmjs.com/package/hoodcms). It isn't required to run Hood — the
-assets are served from jsDelivr by default — but you can install it to extend or rebuild
-the frontend:
+The client-side toolkit for [**Hood CMS**](https://github.com/HoodDigital/Hood) — the
+distribution CSS/JS that Hood's UI runs on, the SCSS/TypeScript sources behind it, Hood's
+shared frontend build presets, and a cross-platform local-dev CLI.
+
+## Installation
 
 ```bash
-> pnpm add hoodcms   # or: npm install hoodcms
+npm install hoodcms
+# or
+pnpm add hoodcms
 ```
 
-See the [root README](../../readme.md) for the build-preset extension points
-(`hoodcms/build`, `hoodcms/build/gulp`, and the shared tsconfig).
+## Using it with Hood CMS
+
+You don't need this package just to **run** Hood — the required CSS/JS are served from
+jsDelivr by default. Install `hoodcms` when you want to **extend or replace** the frontend.
+
+### Use your own assets
+
+Build your own CSS/JS from Hood's SCSS/TypeScript sources (shipped under the package's
+`src/`), then point your theme's `<script>` / `<link>` references at your own build instead
+of the CDN.
+
+### Extend Hood's build toolchain
+
+Don't fork Hood's build config — extend the published presets:
+
+```js
+// rollup.config.mjs
+import { hoodRollup } from 'hoodcms/build';
+export default hoodRollup({ entries: { site: 'src/ts/site.ts' }, externals: ['owl.carousel'] });
+```
+
+```js
+// gulpfile.cjs
+const { registerHoodTasks } = require('hoodcms/build/gulp');
+registerHoodTasks(require('gulp'), { less: true });
+```
+
+```jsonc
+// tsconfig.json — declare your own rootDir/outDir (path options don't inherit across packages)
+{ "extends": "hoodcms/tsconfig.base.json" }
+```
+
+The toolchain packages (rollup, gulp, sass, …) are **optional peer dependencies** — install
+the ones you use, at Hood's audited versions.
+
+## Local dev orchestration (`hoodcms`)
+
+The package also exposes a cross-platform local-dev CLI (the `hoodcms` bin) that runs a Hood
+project's full stack — Docker SQL Server, schema upgrade, the app, and frontend + backend
+watchers — with one command set on Windows, macOS and Linux:
+
+```bash
+npx hoodcms            # list all commands
+npx hoodcms up         # start the stack: DB created + upgraded, then the app
+npx hoodcms watch      # frontend + backend hot-reload together (one Ctrl+C stops both)
+npx hoodcms down
+```
+
+It's zero-config by default; drop in an optional, fully-typed `hood.dev.ts` to override
+settings or register your own targets:
+
+```ts
+import { defineTasks } from 'hoodcms/dev';
+
+export default defineTasks({
+  // override config and/or add custom targets here
+});
+```
+
+## Links
+
+- [Hood CMS on GitHub](https://github.com/HoodDigital/Hood)
+- [Hood CMS server package on NuGet](https://www.nuget.org/packages/Hood/)
