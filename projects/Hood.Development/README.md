@@ -1,41 +1,37 @@
-# Hood CMS
-[![Build Status](https://dev.azure.com/hooddigital/Hood/_apis/build/status/HoodDigital.Hood?branchName=refs%2Fpull%2F21%2Fmerge)](https://dev.azure.com/hooddigital/Hood/_build/latest?definitionId=4&branchName=refs%2Fpull%2F21%2Fmerge)
-[![GitHub release (Latest by date including pre-releases)](https://img.shields.io/github/v/release/HoodDigital/Hood?include_prereleases&label=Latest%20Release)](https://github.com/HoodDigital/Hood/releases)
+# Hood.Development
 
-A fully customisable content management system built in ASP.NET Core 5 & Bootstrap 5.
+The runnable Hood CMS web host — an ASP.NET Core app on **.NET 10** that dogfoods the
+framework for local development. It's also the home of the **`hoodcms`** npm package
+(Hood's client-side SCSS/TypeScript, plus the published `build` and `dev` tooling).
 
-## Nuget Installation 
-[![NuGet](https://img.shields.io/nuget/v/hood?label=NuGet%20Stable)](https://www.nuget.org/packages/Hood/)
-[![MyGet Latest](https://img.shields.io/myget/hood/vpre/hood?label=MyGet)](https://www.myget.org/feed/hood/package/nuget/Hood)
+## Local development
 
-Install Hood CMS via Package Manager.
-```
-> Install-Package Hood
-```
-or via .NET CLI
-```
-> dotnet add package Hood
+From this directory:
+
+```bash
+pnpm install          # restore the JS tooling
+pnpm hoodcms setup    # bootstrap: .env.local, JS deps, dotnet restore
+pnpm hoodcms up       # create + upgrade the DB, then build + start the full stack
 ```
 
-## Client Side Code
-[![npm Package](https://img.shields.io/npm/v/hoodcms)](https://www.npmjs.com/package/hoodcms)
+`hoodcms` is the cross-platform local-dev CLI (the `./dev` subpath of the `hoodcms`
+package, run via [tsx](https://tsx.is)). Run `pnpm hoodcms` with no args for the full
+command list. The complete walkthrough — containers, ports, the connection-resolution
+chain, and every command — is in [`DOCKER.md`](../../DOCKER.md). Debugging from VS Code
+is wired up in [`.vscode/launch.json`](../../.vscode/launch.json).
 
-The client side code is not required to run Hood CMS as all required JS/CSS are served via jsdelivr. However, if you want to extend or modify the client side code, you can download this npm package, which contains the required distribution CSS and JavaScript, as well as source SCSS and TypeScript files. 
+## The `hoodcms` client package
 
-https://www.npmjs.com/package/hoodcms
+[![npm stable](https://img.shields.io/npm/v/hoodcms?label=npm%20Stable)](https://www.npmjs.com/package/hoodcms)
 
-To install Hood CMS client side code via NPM.
+Hood's client-side code (distribution CSS/JS + source SCSS/TypeScript) is published to npm
+as [`hoodcms`](https://www.npmjs.com/package/hoodcms). It isn't required to run Hood — the
+assets are served from jsDelivr by default — but you can install it to extend or rebuild
+the frontend:
+
+```bash
+> pnpm add hoodcms   # or: npm install hoodcms
 ```
-> npm install hoodcms
-```
-or
-```
-> yarn add hoodcms
-```
 
-> To use your own client side code, you will also need to update script/link references in your theme's HTML or Razor C# files to use your own version of the code, rather than the CDN.
-
-## Full documentation
-Documentation is a work in progress!
-
-Also, feel free to add your issues or pull requests to our GitHub, we always welcome contributions!
+See the [root README](../../readme.md) for the build-preset extension points
+(`hoodcms/build`, `hoodcms/build/gulp`, and the shared tsconfig).
