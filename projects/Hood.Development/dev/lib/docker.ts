@@ -16,7 +16,7 @@ const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve,
 /**
  * The environment compose is spawned with. Guarantees `HOOD_SA_PASSWORD` is set so the
  * `${HOOD_SA_PASSWORD}` substitutions in the compose file always resolve — that keeps
- * `hood-dev` zero-config even without a `.env.local` (a real env / `.env.local` value wins).
+ * `hoodcms` zero-config even without a `.env.local` (a real env / `.env.local` value wins).
  */
 function composeEnv(config: ResolvedConfig, extra?: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
     return { HOOD_SA_PASSWORD: resolveSaPassword(config), ...extra };
@@ -24,7 +24,7 @@ function composeEnv(config: ResolvedConfig, extra?: NodeJS.ProcessEnv): NodeJS.P
 
 /**
  * The leading `compose` argv. Absolute paths + an explicit `--project-directory` keep the
- * build context and `${VAR}` substitution correct no matter which directory `hood-dev` was
+ * build context and `${VAR}` substitution correct no matter which directory `hoodcms` was
  * invoked from (Hood's compose file lives at the repo root, above the package dir).
  */
 export function composePrefix(config: ResolvedConfig): string[] {

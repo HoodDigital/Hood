@@ -31,7 +31,7 @@
   "main": "./dist/js/index.js",
   "types": "./dist/js/index.d.ts",
   "bin": {
-    "hood-dev": "./dev/hood-dev.mjs"
+    "hoodcms": "./dev/hoodcms.mjs"
   },
   "exports": {
     ".": {
@@ -49,7 +49,7 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "hood": "node dev/hood-dev.mjs",
+    "hoodcms": "node dev/hoodcms.mjs",
     "build": "npm-run-all scss tsc",
     "build-production": "npm-run-all scss cssnano tsc tsc-production",
     "clean": "gulp clean",

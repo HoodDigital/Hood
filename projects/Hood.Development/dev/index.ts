@@ -15,7 +15,7 @@
  *     },
  *   });
  *
- * The `hood-dev` bin discovers that file (or `--config <path>`), merges it over Hood's
+ * The `hoodcms` bin discovers that file (or `--config <path>`), merges it over Hood's
  * defaults, and dispatches. Everything runs through tsx, so the config and any custom
  * targets are written in TypeScript with full type-checking against `DevConfig`.
  */
@@ -58,7 +58,7 @@ export function defineTasks(config: DevConfig): DevConfig {
 /**
  * Walk up from the invocation directory to the project root — the directory that holds the
  * compose file (or, failing that, a `.sln` / `.git`). This is what lets a vanilla consumer
- * run `hood-dev` from any subdirectory, and lets Hood dogfood it from the nested `hoodcms`
+ * run `hoodcms` from any subdirectory, and lets Hood dogfood it from the nested `hoodcms`
  * package dir with zero config (the defaults below describe Hood's root layout).
  */
 export function findRoot(start: string, composeFileName = 'docker-compose.yml'): string {
@@ -120,7 +120,7 @@ export function resolveConfig(config: DevConfig, cwd: string): ResolvedConfig {
                 ['pnpm', 'run', 'watch-scss'],
                 ['pnpm', 'run', 'watch-tsc'],
             ],
-            backend: config.watch?.backend ?? ['dotnet', 'watch', '--project', appProject],
+            backend: config.watch?.backend ?? ['dotnet', 'watch', '--project', appProject, '--no-launch-profile'],
         },
         tasks: config.tasks ?? {},
     };
@@ -203,8 +203,8 @@ function makeContext(
 function printHelp(registry: Map<string, TaskDefinition>): void {
     const names = [...registry.keys()].sort();
     const width = Math.max(...names.map((n) => n.length), ...Object.keys(BASE_TASK_ALIASES).map((a) => a.length));
-    console.log('hood-dev — Hood CMS local dev commands\n');
-    console.log('Usage: hood-dev <command> [--connection <str>] [--config <hood.dev.ts>]\n');
+    console.log('hoodcms — Hood CMS local dev commands\n');
+    console.log('Usage: hoodcms <command> [--connection <str>] [--config <hood.dev.ts>]\n');
     console.log('Commands:');
     for (const name of names) {
         console.log(`  ${name.padEnd(width)}  ${registry.get(name)!.describe}`);

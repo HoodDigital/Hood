@@ -22,8 +22,9 @@ package-lock.json
 /wwwroot/themes/**/*.min.js
 /wwwroot/themes/**/lib
 
-# Ignore local settings files, apart from the base settings
+# Ignore local settings files, apart from the base settings and the committed dev defaults
 appsettings.*.json
+!appsettings.Development.json
 
 # Ignore temp password file, if exists
 temp.txt

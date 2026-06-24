@@ -80,8 +80,13 @@ export function baseTasks(): Record<string, TaskDefinition> {
         run: {
             describe: 'Run the app natively against the Docker SQL Server.',
             run: (ctx) =>
-                ctx.run('dotnet', ['run', '--project', ctx.config.appProject], {
-                    env: { ConnectionStrings__DefaultConnection: ctx.connection() },
+                // --no-launch-profile: the app's only launchSettings profiles are Windows-only
+                // IIS Express ones, unusable by `dotnet run`. The CLI supplies env directly instead.
+                ctx.run('dotnet', ['run', '--project', ctx.config.appProject, '--no-launch-profile'], {
+                    env: {
+                        ASPNETCORE_ENVIRONMENT: 'Development',
+                        ConnectionStrings__DefaultConnection: ctx.connection(),
+                    },
                 }),
         },
 
@@ -99,7 +104,7 @@ export function baseTasks(): Record<string, TaskDefinition> {
             },
         },
 
-        dev: {
+        watch: {
             describe: 'Watch frontend + backend together (single Ctrl+C stops both).',
             run: async (ctx) => {
                 await ctx.waitForDb();
@@ -119,6 +124,7 @@ export function baseTasks(): Record<string, TaskDefinition> {
                         args: backend.slice(1),
                         opts: {
                             env: {
+                                ASPNETCORE_ENVIRONMENT: 'Development',
                                 ConnectionStrings__DefaultConnection: ctx.connection(),
                                 // The frontend watchers emit into wwwroot while dotnet watch runs;
                                 // without this, Hot Reload's static-file handler crashes with

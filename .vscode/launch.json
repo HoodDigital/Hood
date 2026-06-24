@@ -12,7 +12,7 @@
             "name": "Hood.Development (Debug)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build-dev",
+            "preLaunchTask": "build",
             "program": "${workspaceFolder}/projects/Hood.Development/bin/Debug/net10.0/Hood.Development.dll",
             "args": [],
             "cwd": "${workspaceFolder}/projects/Hood.Development/",
@@ -21,14 +21,10 @@
                 "action": "openExternally",
                 "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
             },
+            // Connection, URLs (5070) and Hood logging come from the committed
+            // appsettings.Development.json — selecting the environment is all that's needed.
             "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development",
-                "ASPNETCORE_URLS": "http://localhost:5070",
-                "ConnectionStrings__DefaultConnection": "Server=localhost,14331;Database=Hood.Web;User Id=sa;Password=Hood_Dev_Passw0rd!;TrustServerCertificate=True;Encrypt=False;MultipleActiveResultSets=True",
-                "Hood:BypassCDN": "true",
-                // Surface Hood's own logs (recaptcha pass/skip/fail/error lines) in the Debug Console.
-                "Logging__LogLevel__Hood": "Information",
-                "Logging__LogLevel__Hood.Services.RecaptchaService": "Information"
+                "ASPNETCORE_ENVIRONMENT": "Development"
             }
         },
         {
@@ -37,7 +33,7 @@
             "name": "Hood.Development (Debug + EF SQL)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build-dev",
+            "preLaunchTask": "build",
             "program": "${workspaceFolder}/projects/Hood.Development/bin/Debug/net10.0/Hood.Development.dll",
             "args": [],
             "cwd": "${workspaceFolder}/projects/Hood.Development/",
@@ -46,19 +42,16 @@
                 "action": "openExternally",
                 "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
             },
+            // Base dev config (connection, URLs, Hood logging) comes from
+            // appsettings.Development.json; this profile only adds EF Core SQL echo.
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
-                "ASPNETCORE_URLS": "http://localhost:5070",
-                "ConnectionStrings__DefaultConnection": "Server=localhost,14331;Database=Hood.Web;User Id=sa;Password=Hood_Dev_Passw0rd!;TrustServerCertificate=True;Encrypt=False;MultipleActiveResultSets=True",
-                "Hood:BypassCDN": "true",
-                "Logging__LogLevel__Hood": "Information",
-                "Logging__LogLevel__Hood.Services.RecaptchaService": "Information",
                 "Logging__LogLevel__Microsoft.EntityFrameworkCore.Database.Command": "Information"
             }
         },
         {
             // Attach to an already-running dotnet process (e.g. one started via the
-            // "watch-dev" task) — pick Hood.Development from the process list.
+            // "watch" task) — pick Hood.Development from the process list.
             "name": "Hood.Development (Attach)",
             "type": "coreclr",
             "request": "attach"

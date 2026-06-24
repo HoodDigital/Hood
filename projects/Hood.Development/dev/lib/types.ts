@@ -8,13 +8,13 @@
 
 /** A single dev target — Hood's base targets and any a consumer registers. */
 export interface TaskDefinition {
-    /** One-line help text shown by `hood-dev help`. */
+    /** One-line help text shown by `hoodcms help`. */
     describe: string;
     /** Implementation. Throw (or let a spawned process exit non-zero) to fail the command. */
     run: (ctx: TaskContext) => Promise<void> | void;
 }
 
-/** Frontend + backend watch commands wired together by the `dev` target. */
+/** Frontend + backend watch commands wired together by the `watch` target. */
 export interface WatchConfig {
     /** Long-lived frontend watchers, each `[cmd, ...args]` (default: scss + tsc watch via pnpm). */
     frontend?: string[][];

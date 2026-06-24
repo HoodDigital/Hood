@@ -1,10 +1,10 @@
 # Hood CMS — local dev stack: the Hood.Development web host + SQL Server.
-# Quick start:  pnpm hood up            (from projects/Hood.Development — wraps this compose)
+# Quick start:  pnpm hoodcms up            (from projects/Hood.Development — wraps this compose)
 # Raw compose:  cp .env.example .env.local && docker compose --env-file .env.local up --build
 #               (app on http://localhost:5070)
 #
 # The SA password is read from ${HOOD_SA_PASSWORD} — there are no hardcoded credentials here.
-# `hood-dev` always supplies it (default + .env.local overlay); for raw `docker compose` you
+# `hoodcms` always supplies it (default + .env.local overlay); for raw `docker compose` you
 # must provide it via --env-file .env.local (copied from .env.example) or your environment.
 # See DOCKER.md for the full walkthrough.
 services:
