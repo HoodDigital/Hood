@@ -14,6 +14,29 @@ export interface TaskDefinition {
     run: (ctx: TaskContext) => Promise<void> | void;
 }
 
+/**
+ * A restore source plugged into `db restore <file>` (HOOD-132), dispatched by file extension.
+ * Hood ships a built-in `.bacpac` provider; a consumer registers more through `hood.dev.ts`.
+ */
+export interface RestoreProvider {
+    /** Lower-case extensions (with the dot) this provider handles, e.g. `['.bacpac']`. */
+    extensions: string[];
+    /** One-line description shown in help and dispatch errors. */
+    describe: string;
+    /** Restore `file` into the resolved database. Throw to fail the command. */
+    restore(ctx: RestoreContext): Promise<void> | void;
+}
+
+/** What a `RestoreProvider` receives — the producer→file→provider contract, nothing source-specific. */
+export interface RestoreContext {
+    /** Absolute path to the dump/export file being restored. */
+    file: string;
+    /** The resolved, loopback-pinned host connection string (shared `resolveConnection()` chain). */
+    connection: string;
+    /** The full task context (`run`, `log`, `config`, …). */
+    task: TaskContext;
+}
+
 /** Frontend + backend watch commands wired together by the `watch` target. */
 export interface WatchConfig {
     /** Long-lived frontend watchers, each `[cmd, ...args]` (default: scss + tsc watch via pnpm). */
@@ -56,6 +79,11 @@ export interface DevConfig {
     saPassword?: string;
     /** `.env` files loaded (in order) before resolving config (default: `['.env.local']`). */
     envFiles?: string[];
+    /**
+     * Extra `db restore` providers, or overrides of a built-in by extension (last match wins).
+     * Merged after Hood's built-ins (the `.bacpac` provider) — see HOOD-132.
+     */
+    restoreProviders?: RestoreProvider[];
     /** Watch commands wired together by `dev`. */
     watch?: WatchConfig;
     /** Extra targets, or overrides of a base target by name. */

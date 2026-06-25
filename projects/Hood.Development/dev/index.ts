@@ -25,6 +25,7 @@ import { pathToFileURL } from 'node:url';
 import { loadEnv, resolveConnection } from './lib/connection';
 import { compose, waitForDb } from './lib/docker';
 import { parallel, run } from './lib/process';
+import { builtinRestoreProviders } from './lib/restore';
 import { BASE_TASK_ALIASES, baseTasks } from './lib/tasks';
 import type {
     DevConfig,
@@ -115,6 +116,8 @@ export function resolveConfig(config: DevConfig, cwd: string): ResolvedConfig {
         connection: config.connection,
         saPassword: config.saPassword ?? 'Hood_Dev_Passw0rd!',
         envFiles: config.envFiles ?? ['.env.local'],
+        // Built-ins first, consumer providers last — so a consumer can override an extension.
+        restoreProviders: [...builtinRestoreProviders(), ...(config.restoreProviders ?? [])],
         watch: {
             frontend: config.watch?.frontend ?? [
                 ['pnpm', 'run', 'watch-scss'],
@@ -166,7 +169,12 @@ export function parseArgs(argv: string[]): ParsedArgs {
         }
     }
 
-    const command = positionals.shift() ?? '';
+    let command = positionals.shift() ?? '';
+    // `db <sub>` namespace → the `db-<sub>` target (db up / db upgrade / db restore / db reset).
+    // The hyphenated names still work when typed directly, so this is purely additive.
+    if (command === 'db' && positionals.length > 0) {
+        command = `db-${positionals.shift()}`;
+    }
     return { command, args: positionals, flags };
 }
 
@@ -199,18 +207,33 @@ function makeContext(
     return ctx;
 }
 
-/** Print the available commands. */
+/** Display a registry key as it's typed: `db-restore` → `db restore`, so help mirrors the CLI. */
+function displayName(name: string): string {
+    return name.startsWith('db-') ? `db ${name.slice(3)}` : name;
+}
+
+/** Print the available commands, with the `db <sub>` family grouped under its own heading. */
 function printHelp(registry: Map<string, TaskDefinition>): void {
     const names = [...registry.keys()].sort();
-    const width = Math.max(...names.map((n) => n.length), ...Object.keys(BASE_TASK_ALIASES).map((a) => a.length));
+    const dbNames = names.filter((n) => n.startsWith('db-'));
+    const general = names.filter((n) => !n.startsWith('db-'));
+
+    const width = Math.max(
+        ...names.map((n) => displayName(n).length),
+        ...Object.keys(BASE_TASK_ALIASES).map((a) => a.length),
+    );
+    const line = (name: string, describe: string) => console.log(`  ${name.padEnd(width)}  ${describe}`);
+
     console.log('hoodcms — Hood CMS local dev commands\n');
     console.log('Usage: hoodcms <command> [--connection <str>] [--config <hood.dev.ts>]\n');
+
     console.log('Commands:');
-    for (const name of names) {
-        console.log(`  ${name.padEnd(width)}  ${registry.get(name)!.describe}`);
-    }
-    for (const [alias, target] of Object.entries(BASE_TASK_ALIASES)) {
-        console.log(`  ${alias.padEnd(width)}  Alias for "${target}".`);
+    for (const name of general) line(displayName(name), registry.get(name)!.describe);
+    for (const [alias, target] of Object.entries(BASE_TASK_ALIASES)) line(alias, `Alias for "${target}".`);
+
+    if (dbNames.length > 0) {
+        console.log('\nDatabase (db <sub>):');
+        for (const name of dbNames) line(displayName(name), registry.get(name)!.describe);
     }
 }
 
