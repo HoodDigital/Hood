@@ -286,8 +286,9 @@ namespace Hood.Core
         {
             get
             {
-                var informational = typeof(Engine).Assembly
-                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+                var informational = typeof(Engine)
+                    .Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                    ?.InformationalVersion;
                 return informational.IsSet() ? StripBuildMetadata(informational) : Version;
             }
         }

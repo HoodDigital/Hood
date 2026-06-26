@@ -12,11 +12,11 @@ namespace Hood.Tests
     {
         [Theory]
         [InlineData("7.0.0-rc.24+a6e2131958031874dbe85ef489b78d", "7.0.0-rc.24")] // prerelease + build metadata
-        [InlineData("7.0.0+a6e2131958031874dbe85ef489b78d", "7.0.0")]            // stable + build metadata
-        [InlineData("7.0.0-rc.24", "7.0.0-rc.24")]                               // prerelease, no metadata
-        [InlineData("7.0.0", "7.0.0")]                                           // stable, no metadata
-        [InlineData("", "")]                                                     // empty passthrough
-        [InlineData(null, null)]                                                 // null passthrough
+        [InlineData("7.0.0+a6e2131958031874dbe85ef489b78d", "7.0.0")] // stable + build metadata
+        [InlineData("7.0.0-rc.24", "7.0.0-rc.24")] // prerelease, no metadata
+        [InlineData("7.0.0", "7.0.0")] // stable, no metadata
+        [InlineData("", "")] // empty passthrough
+        [InlineData(null, null)] // null passthrough
         public void StripBuildMetadata_DropsBuildKeepsPrereleaseTag(string input, string expected)
         {
             Assert.Equal(expected, Engine.StripBuildMetadata(input));
