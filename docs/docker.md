@@ -1,8 +1,8 @@
 # Docker setup — local dev for Hood CMS
 
-The repo ships a [`docker-compose.yml`](docker-compose.yml) that runs **SQL Server + the Hood web host** in containers, so you can build and run the app end-to-end locally in a few minutes. This is the supported way to build & test every PR before it lands.
+The repo ships a [`docker-compose.yml`](../docker-compose.yml) that runs **SQL Server + the Hood web host** in containers, so you can build and run the app end-to-end locally in a few minutes. This is the supported way to build & test every PR before it lands.
 
-This file covers **local dev only**. For repo basics see [readme.md](readme.md).
+This file covers **local dev only**. For repo basics see [readme.md](../readme.md).
 
 > **Framework note:** Hood targets **net10.0 + EF Core 10**. The .NET SDK is pinned via `global.json` and the target framework is centralised in `Directory.Build.props`. Database schema seeding is tracked in HOOD-53.
 
@@ -67,7 +67,7 @@ Even with **no** `.env.local`, `hoodcms` works out of the box: it supplies the d
 | Service | Container | Host port | Purpose |
 |---|---|---|---|
 | `sqlserver` | `hood-sqlserver` | `14331` → 1433 | SQL Server 2022 Express. Data persists in the `sqlserver-data` named volume. |
-| `app` | `hood-app` | `5070` → 8080 | The `Hood.Development` ASP.NET Core host, built from [`Dockerfile`](Dockerfile). |
+| `app` | `hood-app` | `5070` → 8080 | The `Hood.Development` ASP.NET Core host, built from [`Dockerfile`](../Dockerfile). |
 
 Host port `14331` avoids clashes with a native SQL Server (`1433`) or other local dev stacks.
 
@@ -84,7 +84,7 @@ pnpm hoodcms run            # dotnet run, pointed at the Docker SQL Server on 12
 # App available at http://localhost:5070 (or the Kestrel default)
 ```
 
-`pnpm hoodcms run` sets `ConnectionStrings__DefaultConnection` to target the container. Without it, [`appsettings.json`](projects/Hood.Development/appsettings.json) points at `localhost\SQLEXPRESS` for a native SQL Server install.
+`pnpm hoodcms run` sets `ConnectionStrings__DefaultConnection` to target the container. Without it, [`appsettings.json`](../projects/Hood.Development/appsettings.json) points at `localhost\SQLEXPRESS` for a native SQL Server install.
 
 ### Watch mode
 
@@ -92,7 +92,7 @@ pnpm hoodcms run            # dotnet run, pointed at the Docker SQL Server on 12
 
 ## Database state
 
-The stack brings up an **empty** SQL Server. `pnpm hoodcms up` (and `pnpm hoodcms db-upgrade`) apply the schema via the schema tool before the app starts; the app itself does **no** automatic migration or seeding at startup. The full schema/runner reference is in [`sql/README.md`](sql/README.md).
+The stack brings up an **empty** SQL Server. `pnpm hoodcms up` (and `pnpm hoodcms db-upgrade`) apply the schema via the schema tool before the app starts; the app itself does **no** automatic migration or seeding at startup. The full schema/runner reference is in [`sql/README.md`](../sql/README.md).
 
 To open a SQL shell inside the container:
 
