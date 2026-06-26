@@ -188,7 +188,15 @@ namespace Hood.Core
         }
 
         /// <summary>
-        /// Loads a Hood CMS resource, if BypassCDN is not set in appsettings.json, the resource will load from jsdelivr. Otherwise it will load from the given local path.
+        /// Resolves the URL for a Hood CMS asset, in this resolution order:
+        /// <list type="number">
+        /// <item><c>BypassCDN: true</c> — returns <paramref name="localPath"/> to serve from the app's own <c>wwwroot</c>.</item>
+        /// <item><c>CdnFullPath</c> set — returns <c>{CdnFullPath}{localPath}</c> verbatim; Hood appends no version, so the consumer owns the version pin (use for self-hosting, mirrors, or pinning a specific version).</item>
+        /// <item>Default — returns <c>{CdnPath}@{ResourceVersion}{localPath}</c>, with <see cref="ResourceVersion"/> carrying the prerelease tag so rc builds resolve on jsDelivr.</item>
+        /// </list>
+        /// Note: <c>asp-append-version</c> is a silent no-op on these CDN URLs — the tag helper can only hash local
+        /// <c>wwwroot</c> files, not remote CDN URLs, so it must not be relied on for cache-busting Hood resources.
+        /// Content-hashed cache-busting is deferred to the manifest pipeline (≥7.1, HOOD-109).
         /// </summary>
         public static string Resource(string localPath)
         {
@@ -196,7 +204,11 @@ namespace Hood.Core
             {
                 return localPath;
             }
-            return $"{CdnPath}@{Version}{localPath}";
+            if (CdnFullPath.IsSet())
+            {
+                return $"{CdnFullPath}{localPath}";
+            }
+            return $"{CdnPath}@{ResourceVersion}{localPath}";
         }
 
         public static string CdnPath
@@ -214,6 +226,30 @@ namespace Hood.Core
                 // during startup, and logging from inside the engine here would recurse.
                 catch (Exception) { }
                 return "https://cdn.jsdelivr.net/npm/hoodcms";
+            }
+        }
+
+        /// <summary>
+        /// Optional complete CDN base URL used verbatim by <see cref="Resource(string)"/> — Hood appends no
+        /// <c>@{version}</c> segment, so the consumer owns the version pin. Empty unless the consumer sets
+        /// <c>Hood:CdnFullPath</c>. Use for self-hosting/mirroring Hood assets or pinning a specific version
+        /// without overriding the <c>_Scripts</c>/<c>_Styles</c> views.
+        /// </summary>
+        public static string CdnFullPath
+        {
+            get
+            {
+                try
+                {
+                    if (Configuration.CdnFullPath.IsSet())
+                    {
+                        return Configuration.CdnFullPath;
+                    }
+                }
+                // ReSharper disable once EmptyGeneralCatchClause — config may be unavailable
+                // during startup, and logging from inside the engine here would recurse.
+                catch (Exception) { }
+                return null;
             }
         }
 
@@ -236,6 +272,39 @@ namespace Hood.Core
                 var version = typeof(Engine).Assembly.GetName().Version;
                 return $"{version.Major}.{version.Minor}.{version.Build}";
             }
+        }
+
+        /// <summary>
+        /// The version used to compose CDN asset URLs. Reads <c>AssemblyInformationalVersion</c> (truncated of
+        /// any <c>+build</c> metadata) so prerelease builds carry the <c>-rc.N</c> tag — without it, rc consumers
+        /// request <c>hoodcms@7.0.0</c> from jsDelivr while npm only has <c>7.0.0-rc.N</c>, 404-ing the admin UI.
+        /// Falls back to <see cref="Version"/> (<c>Major.Minor.Build</c>) if the informational version is absent.
+        /// Distinct from <see cref="Version"/>, which stays clean for footers, the <c>/version</c> endpoint and the
+        /// persisted <c>Hood.Version</c> DB marker.
+        /// </summary>
+        public static string ResourceVersion
+        {
+            get
+            {
+                var informational = typeof(Engine).Assembly
+                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+                return informational.IsSet() ? StripBuildMetadata(informational) : Version;
+            }
+        }
+
+        /// <summary>
+        /// Strips the <c>+{build}</c> metadata SemVer appends to an informational version, keeping any
+        /// <c>-rc.N</c> prerelease tag (e.g. <c>7.0.0-rc.24+abc123 → 7.0.0-rc.24</c>). Returns the input
+        /// unchanged when there is no build metadata.
+        /// </summary>
+        internal static string StripBuildMetadata(string informationalVersion)
+        {
+            if (!informationalVersion.IsSet())
+            {
+                return informationalVersion;
+            }
+            var plus = informationalVersion.IndexOf('+');
+            return plus >= 0 ? informationalVersion.Substring(0, plus) : informationalVersion;
         }
 
         public static string Url

@@ -6,7 +6,7 @@
 # The SA password is read from ${HOOD_SA_PASSWORD} — there are no hardcoded credentials here.
 # `hoodcms` always supplies it (default + .env.local overlay); for raw `docker compose` you
 # must provide it via --env-file .env.local (copied from .env.example) or your environment.
-# See DOCKER.md for the full walkthrough.
+# See docs/docker.md for the full walkthrough.
 services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest

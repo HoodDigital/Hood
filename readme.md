@@ -63,6 +63,8 @@ registerHoodTasks(require('gulp'), { less: true });
 
 Your tsconfigs `"extends": "hoodcms/tsconfig.base.json"` (declare your own `rootDir`/`outDir` — path options don't inherit across packages). The toolchain versions are published as **optional peer dependencies** — install the ones you use at Hood's audited versions.
 
+By default Hood serves its admin/UI assets from jsDelivr; you can serve them from your own `wwwroot` or a self-hosted CDN instead. See [CDN asset delivery](docs/configuration.md#cdn-asset-delivery).
+
 ## Database Installation/Update
 
 Hood's schema ships as plain, idempotent, forward-only SQL scripts. EF Core migrations are only
@@ -119,7 +121,8 @@ Hood is split into focused packages under `projects/`, each published as its own
 
 Documentation is a work in progress. The most useful references today:
 
+- [`docs/configuration.md`](docs/configuration.md) — consumer `appsettings.json` reference, including CDN asset delivery.
 - [`sql/README.md`](sql/README.md) — database schema, the `hood-schema` runner, upgrade tiers, and how to regenerate the SQL.
-- [`DOCKER.md`](DOCKER.md) — the containerised local dev rig (`docker compose up`).
+- [`docs/docker.md`](docs/docker.md) — the containerised local dev rig (`docker compose up`).
 
 Also, feel free to add your issues or pull requests to our GitHub — we always welcome contributions!
