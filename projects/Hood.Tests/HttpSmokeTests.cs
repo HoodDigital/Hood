@@ -20,9 +20,9 @@ namespace Hood.Tests
 {
     /// <summary>
     /// Boots the real Hood web app in-process via <see cref="WebApplicationFactory{TEntryPoint}"/>
-    /// against the test SQL database and drives HTTP smoke checks (HOOD-72): the anonymous login page
-    /// renders, and after a genuine cookie login the standard-Identity admin pages (the HOOD-66 role
-    /// views included) render without 500s.
+    /// against the test SQL database and drives HTTP smoke checks: the anonymous login page renders, and
+    /// after a genuine cookie login the standard-Identity admin pages (the role views included) render
+    /// without 500s.
     ///
     /// Engine initialisation already happens inside the host pipeline (ConfigureHood / UseHood), which
     /// WebApplicationFactory runs — so the WAF-hosted app behaves like the real one. The only piece
@@ -60,6 +60,28 @@ namespace Hood.Tests
             var resp = await client.GetAsync("/account/login");
 
             Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
+        }
+
+        [SkippableFact]
+        public async Task Anonymous_account_index_redirects_to_login_not_500()
+        {
+            Skip.IfNot(_fx.Db.Available, _fx.Db.UnavailableReason);
+
+            using var client = NewClient();
+            var resp = await client.GetAsync("/account/");
+
+            // An identity-less request to /account/ must be bounced to login by the [Authorize] gate,
+            // never 500 via GetCurrentUserOrThrow.
+            Assert.True(
+                resp.StatusCode == HttpStatusCode.Redirect
+                    || resp.StatusCode == HttpStatusCode.Found,
+                $"GET /account/ anonymous expected a 302 to login but got {(int)resp.StatusCode} {resp.StatusCode}."
+            );
+            Assert.Contains(
+                "login",
+                resp.Headers.Location?.ToString() ?? "",
+                System.StringComparison.OrdinalIgnoreCase
+            );
         }
 
         [SkippableFact]
