@@ -80,7 +80,7 @@ namespace Hood.Tests
             Assert.Contains(
                 "login",
                 resp.Headers.Location?.ToString() ?? "",
-                System.StringComparison.OrdinalIgnoreCase
+                StringComparison.OrdinalIgnoreCase
             );
         }
 
