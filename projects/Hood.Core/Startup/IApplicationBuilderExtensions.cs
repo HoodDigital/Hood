@@ -32,7 +32,15 @@ namespace Hood.Startup
             }
             else
             {
-                app.UseExceptionHandler("/error/500");
+                // AllowStatusCode404Response stops the handler escalating a 404 from the re-executed
+                // /error/500 path into an unhandled InvalidOperationException.
+                app.UseExceptionHandler(
+                    new ExceptionHandlerOptions
+                    {
+                        ExceptionHandlingPath = "/error/500",
+                        AllowStatusCode404Response = true,
+                    }
+                );
                 app.UseStatusCodePagesWithReExecute("/error/{0}");
             }
 

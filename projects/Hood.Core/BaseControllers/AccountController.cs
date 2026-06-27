@@ -29,11 +29,20 @@ namespace Hood.BaseControllers
 
         // #region Account Home
 
+        [Authorize]
         [HttpGet]
         [Route("account/")]
         public virtual async Task<IActionResult> Index(string returnUrl, bool created = false)
         {
-            var user = await GetCurrentUserOrThrow();
+            var user = await _account.GetUserByIdAsync(User.GetLocalUserId());
+            if (user?.UserProfile == null)
+            {
+                // Authenticated principal we can't resolve to a usable user (a stale or half-populated
+                // cookie, e.g. an empty email claim) — sign it out and redirect to login rather than throw.
+                var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
+                await signInManager.SignOutAsync();
+                return RedirectToAction(nameof(Login), new { returnUrl });
+            }
             var model = new ManageAccountViewModel
             {
                 LocalUserId = user.Id,
@@ -48,6 +57,7 @@ namespace Hood.BaseControllers
             return View(model);
         }
 
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("account/")]
