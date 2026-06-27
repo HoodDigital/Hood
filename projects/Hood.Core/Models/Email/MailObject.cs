@@ -133,6 +133,16 @@ namespace Hood.Models
             }
         }
 
+        /// <summary>
+        /// A plain-text rendering of the message — the builder-API <see cref="Text"/> body, or the
+        /// <see cref="Html"/> body converted to text. Never returns the type name, so it is safe even if a
+        /// caller passes the MailObject itself where a string is expected (HOOD-139).
+        /// </summary>
+        public override string ToString()
+        {
+            return Text.IsSet() ? Text : Html.HtmlToPlainText();
+        }
+
         public void AddCustomHtml(string htmlContent, string textContent)
         {
             if (textContent.IsSet())
