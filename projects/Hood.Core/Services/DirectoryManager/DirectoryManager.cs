@@ -87,7 +87,9 @@ namespace Hood.Services
             _topLevel = new Lazy<MediaDirectory[]>(() =>
                 _directoriesById
                     .Value.Values.Where(c =>
-                        c.Parent.Type == DirectoryType.User && c.OwnerId == userId
+                        c.ParentId != null
+                        && c.Parent.Type == DirectoryType.User
+                        && c.OwnerId == userId
                     )
                     .ToArray()
             );
@@ -104,6 +106,14 @@ namespace Hood.Services
 
         public IEnumerable<MediaDirectory> GetHierarchy(int id, int? stopAtId = null)
         {
+            // Reload the cache when the requested directory is absent — picks up
+            // directories created after the singleton was initialised without
+            // forcing a full DB round-trip on every call.
+            if (!_directoriesById.Value.ContainsKey(id))
+            {
+                ResetCache();
+            }
+
             List<MediaDirectory> result = new List<MediaDirectory>();
             MediaDirectory directory = GetDirectoryById(id);
             while (directory != null)
