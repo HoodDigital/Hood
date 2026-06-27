@@ -65,7 +65,7 @@ namespace Hood
         /// Removes the inactive bootstrap flavours' application parts so only the active
         /// flavour's compiled /UI/* views participate in view resolution — or both flavours
         /// when none is configured (the stock Core UI). Switching flavour (changing theme UI)
-        /// requires an application restart (HOOD-54).
+        /// requires an application restart.
         /// </summary>
         public static void FilterInactiveUI(
             ApplicationPartManager partManager,

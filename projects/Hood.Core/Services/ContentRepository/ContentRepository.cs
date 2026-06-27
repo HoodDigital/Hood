@@ -320,7 +320,7 @@ namespace Hood.Services
 
         // The page list that backs the public route constraint (PagesRouteConstraint -> GetPages) is cached
         // for 60 minutes. Without invalidation, a newly created/edited page isn't routable until the cache
-        // expires (HOOD-70: 404 when previewing a freshly created page). Clear every ".Pages" variant
+        // expires (404 when previewing a freshly created page). Clear every ".Pages" variant
         // (base + per-category) on any content mutation so the route resolves immediately.
         private void ClearPageCaches()
         {
@@ -962,7 +962,7 @@ namespace Hood.Services
         {
             templateName = templateName.Replace("Meta:", "");
             // Template source comes from the unified provider: app physical -> active theme ->
-            // packaged (embedded) sources. Cross-platform, no files-on-server needed (HOOD-54).
+            // packaged (embedded) sources. Cross-platform, no files-on-server needed.
             var templateProvider = Engine.Services.Resolve<ITemplateProvider>();
             string template = templateProvider.ReadTemplateSource(folder, templateName);
             if (template == null)

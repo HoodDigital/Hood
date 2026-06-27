@@ -2,7 +2,7 @@
 # Hood CMS — Docker build (local dev / containerised run)
 # Runs the Hood.Development web host (the runnable app; the rest are libraries).
 # Usage: docker compose up --build
-# Target framework: net10.0 (HOOD-57).
+# Target framework: net10.0.
 # =============================================================================
 #
 # Frontend assets: Hood's core CSS/JS ship as the external `hoodcms` npm package

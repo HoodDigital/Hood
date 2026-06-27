@@ -38,7 +38,7 @@ jobs:
           global-json-file: global.json
       - run: dotnet restore Hood.sln
       - run: dotnet tool restore
-      # CSharpier check + InspectCode; fails on ANY reported issue (HOOD-62/HOOD-79).
+      # CSharpier check + InspectCode; fails on ANY reported issue.
       - run: ./validate_code.sh
 
   build-test:

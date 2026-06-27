@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * hoodcms/dev — the `hoodcms` bin (HOOD-131).
+ * hoodcms/dev — the `hoodcms` bin.
  *
  * Registers tsx's ESM loader in-process, then imports the TypeScript CLI. Running in a single
  * process (rather than spawning a tsx child) keeps Ctrl+C handling intact for the `watch`

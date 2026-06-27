@@ -304,7 +304,7 @@ namespace Hood.Services
                 using (Image image = Image.Load(stream))
                 {
                     // ImageSharp 3.x: the out-format Load overload was removed — the decoded format
-                    // now lives on Metadata, and Save takes an encoder rather than a format (HOOD-57).
+                    // now lives on Metadata, and Save takes an encoder rather than a format.
                     IImageFormat format = image.Metadata.DecodedImageFormat;
                     image.Mutate(x => x.Resize(size, 0));
                     using (Stream outputStream = new MemoryStream())

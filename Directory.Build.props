@@ -1,6 +1,6 @@
 <Project>
   <!--
-    Central build + versioning foundation for the Hood solution (HOOD-51).
+    Central build + versioning foundation for the Hood solution.
     - Single source of truth for the target framework.
     - Shared package metadata (per-project keeps only PackageId / AssemblyName / Description).
     - MinVer derives the package version from git tags (prefix `v`), so no csproj hardcodes <Version>.
@@ -30,7 +30,7 @@
   <!--
     Hood's theming / view-override model relies on Razor runtime compilation, which net10 deprecates
     (ASPDEPR003). The dependency is intentional and load-bearing; a migration off runtime compilation
-    is tracked separately (HOOD-54). Suppress the obsolete-API warning rather than churn the architecture.
+    is tracked separately. Suppress the obsolete-API warning rather than churn the architecture.
   -->
   <PropertyGroup>
     <NoWarn>$(NoWarn);ASPDEPR003</NoWarn>

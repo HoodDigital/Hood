@@ -71,7 +71,7 @@ namespace Hood.Services
                 }
                 _db.SaveChanges();
                 _cache.Remove(key);
-                // Settings changed — let subscribers (content/type caches) rebuild (HOOD-82).
+                // Settings changed — let subscribers (content/type caches) rebuild.
                 _events.TriggerOptionsChanged(this);
             }
             catch (DbUpdateException ex)

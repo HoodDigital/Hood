@@ -1,5 +1,5 @@
 /**
- * hoodcms/dev — the `db restore <file>` provider seam (HOOD-132).
+ * hoodcms/dev — the `db restore <file>` provider seam.
  *
  * A generic, file-based restore primitive: a producer (e.g. `hood cli az pull`, an S3 export,
  * a teammate's dump) writes a local file, and `db restore <file>` dispatches by extension to a

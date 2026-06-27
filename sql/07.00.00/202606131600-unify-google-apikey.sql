@@ -1,8 +1,8 @@
 -- Apply key 07.00.00/202606131600 | Hood v7.0.0 (unify the Google Cloud API key). Embedded; applied by hood-schema (DbUp) in LogicalName order.
 -- =============================================================================
--- Hood CMS — unify the duplicated Google API key (HOOD-110)
+-- Hood CMS — unify the duplicated Google API key
 -- =============================================================================
--- Idempotent. The reCAPTCHA Enterprise work (HOOD-92) introduced a second Google
+-- Idempotent. The reCAPTCHA Enterprise work introduced a second Google
 -- Cloud API key (GoogleRecaptchaApiKey) alongside the existing one used for Maps +
 -- Geocoding (GoogleMapsApiKey). v7 collapses both into a single GoogleCloudApiKey.
 --

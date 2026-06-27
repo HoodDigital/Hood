@@ -509,7 +509,7 @@ namespace Hood.Models
                         SaveChanges();
 
                         // ExecuteSql (FormattableString) parameterises the interpolated values
-                        // automatically — replaces the deprecated ExecuteSqlRaw (HOOD-48 #3).
+                        // automatically.
                         Database.ExecuteSql(
                             $"UPDATE HoodMedia SET DirectoryId = {propertyDir.Id} WHERE DirectoryId IS NULL AND Directory = 'Property'"
                         );
@@ -520,9 +520,9 @@ namespace Hood.Models
                         );
                         foreach (var type in contentSettings.Types)
                         {
-                            // Bug fix (HOOD-48 #3): the old raw SQL had '@Directory' quoted as a string
-                            // literal, so the parameter was never substituted and only 'Property' media
-                            // was ever re-pointed. Interpolation makes type.TypeName a real parameter.
+                            // Interpolation via ExecuteSql makes type.TypeName a real SQL parameter, so each
+                            // content type's media is re-pointed — a quoted string literal would only
+                            // ever match 'Property'.
                             Database.ExecuteSql(
                                 $"UPDATE HoodMedia SET DirectoryId = {contentDir.Id} WHERE DirectoryId IS NULL AND Directory = {type.TypeName}"
                             );

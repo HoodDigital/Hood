@@ -1,5 +1,5 @@
 {
-  "$comment": "hoodcms/tsconfig.base.json \u2014 Hood's audited compiler baseline (HOOD-83). Consumers `extends` this and declare their own rootDir/outDir (path options resolve relative to the file that declares them).",
+  "$comment": "hoodcms/tsconfig.base.json \u2014 Hood's audited compiler baseline. Consumers `extends` this and declare their own rootDir/outDir (path options resolve relative to the file that declares them).",
   "compilerOptions": {
     "skipLibCheck": true,
     "types": [

@@ -240,7 +240,7 @@ namespace Hood.Startup
                 .AddApplicationPart(typeof(Engine).Assembly)
                 .AddApplicationPart(typeof(IServiceCollectionExtensions).Assembly);
 
-            // Views ship precompiled (RCL, HOOD-54); runtime compilation is a dev-loop tool.
+            // Views ship precompiled (RCL); runtime compilation is a dev-loop tool.
             // Hood:AllowRuntimeViewCompilation restores live server-side view editing for
             // consumers who depend on it.
             if (
@@ -252,7 +252,7 @@ namespace Hood.Startup
             }
 
             // Only the active UI flavour's compiled views participate in view resolution;
-            // switching flavour requires an app restart (HOOD-54).
+            // switching flavour requires an app restart.
             mvcBuilder.ConfigureApplicationPartManager(partManager =>
                 UserInterfaceProvider.FilterInactiveUI(partManager, config, env)
             );
@@ -774,8 +774,8 @@ namespace Hood.Startup
                 );
 
                 // In-repo dev loop (Hood.Development): watch the sibling UI package sources so
-                // package views live-edit straight from their canonical homes — no copy step
-                // (HOOD-54). Only wired when the source folders exist next to the content root.
+                // package views live-edit straight from their canonical homes — no copy step.
+                // Only wired when the source folders exist next to the content root.
                 string repoRoot = Path.GetFullPath(Path.Combine(env.ContentRootPath, ".."));
                 string activeUI = UserInterfaceProvider.GetActiveUIAssembly(config, env);
                 foreach (string package in new[] { "Hood.UI.Core", "Hood.UI.Admin", activeUI })

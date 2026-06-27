@@ -1,5 +1,5 @@
 /**
- * hoodcms/dev — cross-platform process spawning (HOOD-131).
+ * hoodcms/dev — cross-platform process spawning.
  *
  * Every spawn goes through `cross-spawn` so `.cmd`/`.bat` shims (pnpm, dotnet on Windows)
  * don't blow up with `spawn EINVAL`. The parallel runner tears the whole process tree down

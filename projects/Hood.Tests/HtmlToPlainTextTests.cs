@@ -4,7 +4,7 @@ using Xunit;
 namespace Hood.Tests
 {
     /// <summary>
-    /// HOOD-139: emails must ship a real text/plain alternative instead of the C# type name. The text part is
+    /// emails must ship a real text/plain alternative instead of the C# type name. The text part is
     /// derived from the rendered HTML via <see cref="StringExtensions.HtmlToPlainText"/> when a builder-API
     /// MailObject.Text is not available — these cover that conversion.
     /// </summary>

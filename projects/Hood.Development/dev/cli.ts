@@ -1,5 +1,5 @@
 /**
- * hoodcms/dev — CLI entry (HOOD-131).
+ * hoodcms/dev — CLI entry.
  *
  * Loaded under tsx by the `hoodcms` bin, so the consumer's `hood.dev.ts` and any custom
  * targets compile on the fly. Discovers config, dispatches the command, and maps the result

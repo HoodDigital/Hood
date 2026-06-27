@@ -1,5 +1,5 @@
 /**
- * hoodcms/dev — Hood's base targets (HOOD-131).
+ * hoodcms/dev — Hood's base targets.
  *
  * The cross-platform replacement for the old bash `Makefile`. Every target is defined here
  * once; a consumer registers extra targets (or overrides one of these by name) through

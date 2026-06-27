@@ -1,4 +1,4 @@
-// Hood.Development's own build, expressed through the published preset (dogfood, HOOD-83).
+// Hood.Development's own build, expressed through the published preset (dogfood).
 // The self-referencing 'hoodcms/build' import exercises the package exports map exactly
 // as a consumer would.
 import { hoodRollup } from 'hoodcms/build';

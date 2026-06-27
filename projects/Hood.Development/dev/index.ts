@@ -1,5 +1,5 @@
 /**
- * hoodcms/dev — the public, consumer-facing entry point (HOOD-131).
+ * hoodcms/dev — the public, consumer-facing entry point.
  *
  * A consumer adopts Hood's dev orchestration without cloning it:
  *

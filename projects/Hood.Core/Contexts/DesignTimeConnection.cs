@@ -9,7 +9,7 @@ namespace Hood.Contexts
     /// <para>
     /// <c>TrustServerCertificate=True</c> is required because Microsoft.Data.SqlClient 5.x+ (pulled by
     /// EF Core 7+) defaults <c>Encrypt=true</c>; without it, design-time connections to a local server
-    /// with no valid TLS certificate fail (HOOD-48 breaking-change #9).
+    /// with no valid TLS certificate fail.
     /// </para>
     /// </summary>
     internal static class DesignTimeConnection

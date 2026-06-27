@@ -5,7 +5,7 @@ namespace Hood.Tests
 {
     /// <summary>
     /// Pure unit tests for the <see cref="MediaBase"/> convenience constructor's URL fallback
-    /// logic (HOOD-80). No database — exercises the ctor in isolation.
+    /// logic. No database — exercises the ctor in isolation.
     /// </summary>
     public class MediaObjectTests
     {

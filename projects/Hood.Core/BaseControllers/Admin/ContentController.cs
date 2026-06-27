@@ -698,7 +698,7 @@ namespace Hood.Admin.BaseControllers
         protected virtual Content GetTemplates(Content model, string templateDirectory)
         {
             // Templates are listed from compiled views (RCL packages + the app) and any
-            // physical app/theme views — no files on the server required (HOOD-54).
+            // physical app/theme views — no files on the server required.
             var templateProvider = Engine.Services.Resolve<ITemplateProvider>();
             model.Templates = templateProvider.GetTemplates(templateDirectory);
             return model;

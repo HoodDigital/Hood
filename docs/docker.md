@@ -4,7 +4,7 @@ The repo ships a [`docker-compose.yml`](../docker-compose.yml) that runs **SQL S
 
 This file covers **local dev only**. For repo basics see [readme.md](../readme.md).
 
-> **Framework note:** Hood targets **net10.0 + EF Core 10**. The .NET SDK is pinned via `global.json` and the target framework is centralised in `Directory.Build.props`. Database schema seeding is tracked in HOOD-53.
+> **Framework note:** Hood targets **net10.0 + EF Core 10**. The .NET SDK is pinned via `global.json` and the target framework is centralised in `Directory.Build.props`.
 
 ## Prerequisites
 

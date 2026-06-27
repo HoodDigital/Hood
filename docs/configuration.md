@@ -3,8 +3,6 @@
 Reference for the `Hood` configuration section a consumer app provides. Only settings you need to
 override have to be present; sensible defaults apply otherwise.
 
-> More of this section (the full minimal-consumer reference) is being filled in under HOOD-100.
-
 ## CDN asset delivery
 
 Hood's admin and UI CSS/JS are served from a CDN so a consumer doesn't have to publish Hood's

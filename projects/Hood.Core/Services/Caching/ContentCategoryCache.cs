@@ -29,7 +29,7 @@ namespace Hood.Caching
             };
             events.ContentChanged += resetContentByTypeCache;
             // Settings saves (e.g. enabling a content type) must also rebuild the type-keyed
-            // dictionaries, or newly-enabled types 500 until an app restart (HOOD-82).
+            // dictionaries, or newly-enabled types 500 until an app restart.
             events.OptionsChanged += resetContentByTypeCache;
             ResetCache();
         }
@@ -90,7 +90,7 @@ namespace Hood.Caching
             if (contentSettings?.Types == null)
             {
                 // Schema-complete but unseeded database (pre-install) — leave the caches empty
-                // rather than throwing; the install gate routes traffic to /install (HOOD-81).
+                // rather than throwing; the install gate routes traffic to /install.
                 topLevel = new Lazy<ContentCategory[]>(Array.Empty<ContentCategory>);
                 return;
             }
