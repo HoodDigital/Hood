@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
@@ -172,6 +173,74 @@ namespace Hood.Extensions
         {
             string encoded = HtmlEncoder.Default.Encode(content);
             return encoded;
+        }
+
+        /// <summary>
+        /// Converts an HTML fragment or document into a readable plain-text approximation, suitable for the
+        /// text/plain MIME alternative of an email. Drops script/style/head blocks, renders &lt;a href&gt; as
+        /// "label (url)", turns &lt;br&gt; and block-level closing tags into line breaks, strips the remaining
+        /// tags, decodes HTML entities and collapses runs of whitespace/blank lines.
+        /// </summary>
+        public static string HtmlToPlainText(this string html)
+        {
+            if (!html.IsSet())
+            {
+                return html;
+            }
+
+            string text = html;
+
+            // Remove non-content blocks entirely, including their inner text.
+            text = Regex.Replace(
+                text,
+                @"<(script|style|head)\b[^>]*>.*?</\1>",
+                " ",
+                RegexOptions.Singleline | RegexOptions.IgnoreCase
+            );
+
+            // Preserve links as "label (href)" so URLs survive the tag strip.
+            text = Regex.Replace(
+                text,
+                @"<a\b[^>]*?href\s*=\s*[""']([^""']*)[""'][^>]*>(.*?)</a>",
+                m =>
+                {
+                    string label = Regex.Replace(m.Groups[2].Value, "<[^>]+>", string.Empty).Trim();
+                    string href = m.Groups[1].Value.Trim();
+                    if (!label.IsSet())
+                        return href;
+                    return
+                        href.IsSet()
+                        && !string.Equals(label, href, StringComparison.OrdinalIgnoreCase)
+                        ? $"{label} ({href})"
+                        : label;
+                },
+                RegexOptions.Singleline | RegexOptions.IgnoreCase
+            );
+
+            // Line/section breaks from <br>, <hr> and block-level closing tags.
+            text = Regex.Replace(text, @"<br\s*/?>", "\n", RegexOptions.IgnoreCase);
+            text = Regex.Replace(
+                text,
+                @"<hr\s*/?>",
+                "\n--------------------\n",
+                RegexOptions.IgnoreCase
+            );
+            text = Regex.Replace(
+                text,
+                @"</(p|div|tr|li|h[1-6]|table|ul|ol|blockquote)>",
+                "\n",
+                RegexOptions.IgnoreCase
+            );
+
+            // Strip all remaining tags, then decode entities (&amp; &nbsp; …).
+            text = Regex.Replace(text, "<[^>]+>", string.Empty);
+            text = WebUtility.HtmlDecode(text);
+
+            // Collapse whitespace: single spaces inline, trim each line, cap blank-line runs.
+            text = Regex.Replace(text, @"[ \t]+", " ");
+            text = Regex.Replace(text, @" *\n *", "\n");
+            text = Regex.Replace(text, @"\n{3,}", "\n\n");
+            return text.Trim();
         }
 
         public static bool IsNullOrEmpty(this string str)
