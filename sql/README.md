@@ -78,7 +78,7 @@ Idempotent convergence delta that runs after the update tier and before the view
 
 ### What `07.00.00/202606131600-unify-google-apikey.sql` does (data migration)
 
-Idempotent data migration for the stored `IntegrationSettings` JSON (HOOD-110). The reCAPTCHA Enterprise work added a second Google Cloud API key (`GoogleRecaptchaApiKey`) alongside the existing Maps/Geocoding key (`GoogleMapsApiKey`); v7 collapses both into one `GoogleCloudApiKey`. The script seeds the unified key from the first non-empty legacy value and strips the old keys. No-op on a fresh install (the settings row is created lazily on first save) and on re-run (only seeds when the unified key is unset).
+Idempotent data migration for the stored `IntegrationSettings` JSON. The reCAPTCHA Enterprise work added a second Google Cloud API key (`GoogleRecaptchaApiKey`) alongside the existing Maps/Geocoding key (`GoogleMapsApiKey`); v7 collapses both into one `GoogleCloudApiKey`. The script seeds the unified key from the first non-empty legacy value and strips the old keys. No-op on a fresh install (the settings row is created lazily on first save) and on re-run (only seeds when the unified key is unset).
 
 (The other historical drift converges via the fresh DDL itself — fresh installs now create the `AuthorId` / `UserId` / `AgentId` columns as `nvarchar(450)` **+ indexed**, the shape upgraded DBs already carry, and keep `AspNetRoles.RemoteId`. So there's nothing for the converge delta to alter for those.)
 

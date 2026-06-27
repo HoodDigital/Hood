@@ -1,5 +1,5 @@
 /**
- * hoodcms/build/gulp — Hood's gulp task registration (HOOD-83).
+ * hoodcms/build/gulp — Hood's gulp task registration.
  *
  * Consumers register Hood's asset tasks instead of cloning the gulpfile:
  *

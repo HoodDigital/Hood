@@ -14,7 +14,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
-    <!-- The web host (SUT) for the WebApplicationFactory HTTP smoke tests (HOOD-72). -->
+    <!-- The web host (SUT) for the WebApplicationFactory HTTP smoke tests. -->
     <ProjectReference Include="..\Hood.Development\Hood.Development.csproj" />
   </ItemGroup>
 </Project>

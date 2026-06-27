@@ -5,7 +5,7 @@ using Xunit;
 namespace Hood.Tests
 {
     /// <summary>
-    /// HOOD-54 — template discovery logic. The pure path/dedupe internals are tested directly;
+    /// template discovery logic. The pure path/dedupe internals are tested directly;
     /// end-to-end enumeration (compiled views + physical providers) is covered by the docker
     /// e2e pass since it needs a composed MVC application.
     /// </summary>

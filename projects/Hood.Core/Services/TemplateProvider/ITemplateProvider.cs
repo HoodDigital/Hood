@@ -6,7 +6,7 @@ namespace Hood.Services
     /// Single source of truth for content templates. Lists the selectable templates for a
     /// content type and reads a template's Razor source for meta-field parsing — covering
     /// compiled package views (RCL), the consumer application and the active theme, with no
-    /// physical files required for packaged templates (HOOD-54).
+    /// physical files required for packaged templates.
     /// </summary>
     public interface ITemplateProvider
     {

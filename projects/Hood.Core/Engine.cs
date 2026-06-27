@@ -196,7 +196,7 @@ namespace Hood.Core
         /// </list>
         /// Note: <c>asp-append-version</c> is a silent no-op on these CDN URLs — the tag helper can only hash local
         /// <c>wwwroot</c> files, not remote CDN URLs, so it must not be relied on for cache-busting Hood resources.
-        /// Content-hashed cache-busting is deferred to the manifest pipeline (≥7.1, HOOD-109).
+        /// Content-hashed cache-busting is not applied to these CDN URLs.
         /// </summary>
         public static string Resource(string localPath)
         {

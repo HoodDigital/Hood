@@ -51,7 +51,7 @@ namespace Hood.Contexts
                 .HasForeignKey(pt => pt.ContentId);
 
             builder.Entity<ContentMeta>().ToTable("HoodContentMetadata");
-            // Alternate-key columns must be non-nullable under EF Core 9+ (HOOD-48 #12).
+            // Alternate-key columns must be non-nullable under EF Core 9+.
             builder.Entity<ContentMeta>().Property(o => o.Name).IsRequired();
             builder.Entity<ContentMeta>().HasAlternateKey(ol => new { ol.ContentId, ol.Name });
             builder

@@ -24,7 +24,7 @@ namespace Hood.Contexts
             builder.Entity<PropertyListing>().Property(p => p.AgentId).HasMaxLength(450);
             builder.Entity<PropertyListing>().HasIndex(p => p.AgentId);
             // HasSentinel(-1) so a real (0,0) coordinate is INSERTed explicitly instead of being
-            // treated as "unset" and omitted under the EF Core 8+ sentinel rules (HOOD-48 #4).
+            // treated as "unset" and omitted under the EF Core 8+ sentinel rules.
             // The DB-side DEFAULT (0.0) is unchanged, so there is no schema delta.
             builder
                 .Entity<PropertyListing>()
@@ -38,7 +38,7 @@ namespace Hood.Contexts
                 .HasSentinel(-1d);
 
             builder.Entity<PropertyMeta>().ToTable("HoodPropertyMetadata");
-            // Alternate-key columns must be non-nullable under EF Core 9+ (HOOD-48 #12).
+            // Alternate-key columns must be non-nullable under EF Core 9+.
             builder.Entity<PropertyMeta>().Property(o => o.Name).IsRequired();
             builder.Entity<PropertyMeta>().HasAlternateKey(ol => new { ol.PropertyId, ol.Name });
             builder

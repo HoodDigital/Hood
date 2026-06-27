@@ -1,5 +1,5 @@
 // Hood.Development's gulpfile — the standard asset tasks come from the published preset
-// (dogfood, HOOD-83); only the Hood-specific themes pipeline lives here.
+// (dogfood); only the Hood-specific themes pipeline lives here.
 var gulp = require('gulp');
 var less = require('gulp-less');
 var path = require('path');

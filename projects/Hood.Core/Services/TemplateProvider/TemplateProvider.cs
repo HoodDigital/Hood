@@ -93,7 +93,7 @@ namespace Hood.Services
             }
 
             // Packaged template sources — embedded in the UI packages alongside the compiled
-            // views, specifically so this parser can read them (HOOD-54).
+            // views, specifically so this parser can read them.
             string flavour = _partManager
                 .ApplicationParts.Select(p => p.Name)
                 .FirstOrDefault(n =>

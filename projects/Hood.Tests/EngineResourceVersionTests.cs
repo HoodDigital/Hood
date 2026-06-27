@@ -4,7 +4,7 @@ using Xunit;
 namespace Hood.Tests
 {
     /// <summary>
-    /// HOOD-90: CDN asset URLs must carry the prerelease tag. <see cref="Engine.ResourceVersion"/> reads
+    /// CDN asset URLs must carry the prerelease tag. <see cref="Engine.ResourceVersion"/> reads
     /// AssemblyInformationalVersion and strips the <c>+build</c> metadata while keeping any <c>-rc.N</c> tag,
     /// so rc consumers request <c>hoodcms@7.0.0-rc.N</c> (which exists on npm) rather than <c>7.0.0</c> (404).
     /// </summary>

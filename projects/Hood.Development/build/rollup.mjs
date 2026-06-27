@@ -1,5 +1,5 @@
 /**
- * hoodcms/build — Hood's rollup config factory (HOOD-83).
+ * hoodcms/build — Hood's rollup config factory.
  *
  * Consumers extend Hood's build instead of cloning it:
  *

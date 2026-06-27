@@ -32,7 +32,7 @@ services:
       - hood-network
 
   # One-shot: create an empty Hood.Web database so the app boots (it tolerates an
-  # unseeded DB, but not a missing one). Schema + seed are applied separately (HOOD-53).
+  # unseeded DB, but not a missing one). Schema + seed are applied separately.
   db-init:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: hood-db-init

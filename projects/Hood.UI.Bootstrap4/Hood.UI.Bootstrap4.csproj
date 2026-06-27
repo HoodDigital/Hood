@@ -11,7 +11,7 @@
   </ItemGroup>
   <!-- Views compile into the assembly (RCL). Template *sources* stay embedded so the
        content template field-parser (GetMetasForTemplate) can read them; json configs
-       are runtime-read via the embedded provider as before (HOOD-54). -->
+       are runtime-read via the embedded provider as before. -->
   <ItemGroup>
     <EmbeddedResource Include="UI\Templates\**\*.cshtml" />
     <EmbeddedResource Include="Areas\**\*.json" />

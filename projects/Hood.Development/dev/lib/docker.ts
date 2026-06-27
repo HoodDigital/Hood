@@ -1,5 +1,5 @@
 /**
- * hoodcms/dev — docker compose helpers (HOOD-131).
+ * hoodcms/dev — docker compose helpers.
  *
  * The health wait is a plain Node poll loop — no `until`/`xargs` shell, so it runs the same
  * on PowerShell, cmd, bash and zsh. `--env-file` is wired in so `${VAR}` substitution in the

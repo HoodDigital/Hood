@@ -1,5 +1,5 @@
 /**
- * hoodcms/dev — environment + connection resolution (HOOD-131).
+ * hoodcms/dev — environment + connection resolution.
  *
  * One source of truth for the dev database connection, shared with the app: the same
  * `appsettings.Development.json` the app reads, plus the `.env.local` overlay. Host-side

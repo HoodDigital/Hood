@@ -67,8 +67,7 @@ namespace Hood.Services
             var html = await _renderer.Render(message.Template, message);
             // Build a real text/plain alternative. Builder-API emails already hold proper plain text in
             // message.Text; template-rendered emails (empty Text) derive it from the rendered HTML. Never
-            // pass message.ToString() — it returns the type name and trips the MPART_ALT_DIFF spam heuristic
-            // (HOOD-139).
+            // pass message.ToString() — it returns the type name and trips the MPART_ALT_DIFF spam heuristic.
             var plainText = message.Text.IsSet() ? message.Text : html.HtmlToPlainText();
             var msg = MailHelper.CreateSingleEmail(
                 from,

@@ -1,5 +1,5 @@
 /**
- * hoodcms/dev — shared types for the cross-platform dev-command layer (HOOD-131).
+ * hoodcms/dev — shared types for the cross-platform dev-command layer.
  *
  * These types are the public contract a consumer sees through `hoodcms/dev`. The
  * factory (`defineTasks`) is typed against `DevConfig`; custom targets receive a
@@ -15,7 +15,7 @@ export interface TaskDefinition {
 }
 
 /**
- * A restore source plugged into `db restore <file>` (HOOD-132), dispatched by file extension.
+ * A restore source plugged into `db restore <file>`, dispatched by file extension.
  * Hood ships a built-in `.bacpac` provider; a consumer registers more through `hood.dev.ts`.
  */
 export interface RestoreProvider {
@@ -81,7 +81,7 @@ export interface DevConfig {
     envFiles?: string[];
     /**
      * Extra `db restore` providers, or overrides of a built-in by extension (last match wins).
-     * Merged after Hood's built-ins (the `.bacpac` provider) — see HOOD-132.
+     * Merged after Hood's built-ins (the `.bacpac` provider).
      */
     restoreProviders?: RestoreProvider[];
     /** Watch commands wired together by `dev`. */
