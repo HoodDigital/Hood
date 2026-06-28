@@ -14,9 +14,14 @@ namespace Hood.Services
     public class DirectoryManager : IDirectoryManager
     {
         private readonly IConfiguration _config;
-        private Lazy<MediaDirectory[]> _topLevel;
-        private Lazy<MediaDirectory> _siteDirectory;
-        private Lazy<Dictionary<int, MediaDirectory>> _directoriesById;
+        private readonly object _cacheLock = new object();
+
+        // Ids confirmed absent after a reload — suppresses repeated full reloads for stale references.
+        private volatile HashSet<int> _confirmedAbsent = new HashSet<int>();
+
+        private volatile Lazy<MediaDirectory[]> _topLevel;
+        private volatile Lazy<MediaDirectory> _siteDirectory;
+        private volatile Lazy<Dictionary<int, MediaDirectory>> _directoriesById;
 
         public DirectoryManager(IConfiguration config)
         {
@@ -35,7 +40,8 @@ namespace Hood.Services
                 new DbContextOptionsBuilder<HoodDbContext>();
             options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
             HoodDbContext db = new HoodDbContext(options.Options);
-            _directoriesById = new Lazy<Dictionary<int, MediaDirectory>>(() =>
+
+            var newById = new Lazy<Dictionary<int, MediaDirectory>>(() =>
             {
                 IQueryable<MediaDirectory> q =
                     from d in db.MediaDirectories
@@ -52,14 +58,22 @@ namespace Hood.Services
                     };
                 return q.ToDictionary(c => c.Id);
             });
-            _topLevel = new Lazy<MediaDirectory[]>(() =>
-                _directoriesById.Value.Values.Where(c => c.ParentId == null).ToArray()
+            var newTopLevel = new Lazy<MediaDirectory[]>(() =>
+                newById.Value.Values.Where(c => c.ParentId == null).ToArray()
             );
-            _siteDirectory = new Lazy<MediaDirectory>(() =>
-                _directoriesById.Value.Values.SingleOrDefault(c =>
+            var newSiteDirectory = new Lazy<MediaDirectory>(() =>
+                newById.Value.Values.SingleOrDefault(c =>
                     c.Slug == MediaManager.SiteDirectorySlug && c.Type == DirectoryType.System
                 )
             );
+
+            lock (_cacheLock)
+            {
+                _directoriesById = newById;
+                _topLevel = newTopLevel;
+                _siteDirectory = newSiteDirectory;
+                _confirmedAbsent = new HashSet<int>();
+            }
         }
 
         public MediaDirectory GetDirectoryById(int id)
@@ -106,12 +120,20 @@ namespace Hood.Services
 
         public IEnumerable<MediaDirectory> GetHierarchy(int id, int? stopAtId = null)
         {
-            // Reload the cache when the requested directory is absent — picks up
-            // directories created after the singleton was initialised without
-            // forcing a full DB round-trip on every call.
-            if (!_directoriesById.Value.ContainsKey(id))
+            // Reload once when the id is absent — picks up newly-created directories.
+            // If the id is still missing after a reload it is recorded so subsequent
+            // calls skip the DB round-trip entirely.
+            if (!_directoriesById.Value.ContainsKey(id) && !_confirmedAbsent.Contains(id))
             {
                 ResetCache();
+                if (!_directoriesById.Value.ContainsKey(id))
+                {
+                    lock (_cacheLock)
+                    {
+                        var absent = new HashSet<int>(_confirmedAbsent) { id };
+                        _confirmedAbsent = absent;
+                    }
+                }
             }
 
             List<MediaDirectory> result = new List<MediaDirectory>();
