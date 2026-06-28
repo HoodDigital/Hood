@@ -41,7 +41,7 @@ namespace Hood.BaseControllers
             }
             catch
             {
-                return Content("https://source.unsplash.com/random");
+                return Content(Engine.Resource("/images/no-image.jpg"));
             }
         }
 
