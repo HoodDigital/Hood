@@ -9,9 +9,10 @@ export default hoodRollup({
         // bundled where used); the others take Hood's full base list.
         'app': {
             input: 'src/ts/app.ts',
-            externalsOverride: ['jQuery', 'bootstrap', 'sweetalert2', 'dropzone']
+            externalsOverride: ['jQuery', 'bootstrap', 'sweetalert2', 'dropzone'],
+            useHoodGlobals: true
         },
-        'app.property': 'src/ts/app.property.ts',
+        'app.property': { input: 'src/ts/app.property.ts', useHoodGlobals: true },
         'admin': { input: 'src/ts/admin.ts', useHoodGlobals: true },
         'login': { input: 'src/ts/login.ts', footer: '' }
     }
