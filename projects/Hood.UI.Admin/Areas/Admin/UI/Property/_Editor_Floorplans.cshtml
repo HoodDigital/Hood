@@ -3,9 +3,11 @@
     <h5 class="mt-2 mb-0">Floor plans</h5>
     <p>You can add images or PDFs to this, images will appear in a floor plan view in the template, or can be templated to appear however you want.</p>
     <div id="property-floorplan-list" class="refresh mb-3" data-url="@Url.Action("Floorplans", new { id = Model.Id })"></div>
-    <a class="btn btn-success text-white" 
-        media-gallery="property-floorplan-list"
-        media-url="@Url.Action("UploadFloorplan", new { id = Model.Id })">
+    <a class="btn btn-success text-white"
+        data-hood-media="gallery"
+        data-hood-media-list="@Url.Action("Action", "Media")"
+        data-hood-media-url="@Url.Action("UploadFloorplan", new { id = Model.Id })"
+        data-hood-media-target="property-floorplan-list">
         <i class="fa fa-plus-circle me-2"></i>
         <span>Add files...</span>
     </a>
