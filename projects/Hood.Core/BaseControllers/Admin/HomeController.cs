@@ -32,9 +32,9 @@ namespace Hood.Admin.BaseControllers
                 : auth0Account != null ? await auth0Account.GetStatisticsAsync()
                 : null;
 
-            PropertyStatistics properties = await HttpContext
-                .RequestServices.GetService<IPropertyRepository>()
-                ?.GetStatisticsAsync();
+            var propertyRepo = HttpContext.RequestServices.GetService<IPropertyRepository>();
+            PropertyStatistics properties =
+                propertyRepo != null ? await propertyRepo.GetStatisticsAsync() : null;
 
             return Json(new Statistics(content, users, properties));
         }
