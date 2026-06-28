@@ -47,11 +47,11 @@ export class Alerts {
     }
 
     static warning(message: string, title: string = null, hideAfter: number = null) {
-      
+
         $.toast({
             heading: title,
             text: message,
-            icon: 'error',
+            icon: 'warning',
             position: 'bottom-left',
             loader: false,
             bgColor: '#ef9007',
@@ -59,14 +59,14 @@ export class Alerts {
             hideAfter: hideAfter
         });
 
-    }       
+    }
 
     static message(message: string, title: string = null, hideAfter: number = null) {
-      
+
         $.toast({
             heading: title,
             text: message,
-            icon: 'error',
+            icon: 'info',
             position: 'bottom-left',
             loader: false,
             bgColor: '#222222',
@@ -74,14 +74,14 @@ export class Alerts {
             hideAfter: hideAfter
         });
 
-    }     
+    }
 
     static success(message: string, title: string = null, hideAfter: number = null) {
-      
+
         $.toast({
             heading: title,
             text: message,
-            icon: 'error',
+            icon: 'success',
             position: 'bottom-left',
             loader: false,
             bgColor: '#28a745',
@@ -89,7 +89,7 @@ export class Alerts {
             hideAfter: hideAfter
         });
 
-    }   
+    }
 
     static alert(message: string, title: string = null, icon: string = 'info', hideAfter: number = 10000) {
 
