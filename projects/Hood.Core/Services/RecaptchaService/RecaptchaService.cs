@@ -67,12 +67,21 @@ namespace Hood.Services
                 }
 
                 string token = request.Form["g-recaptcha-response"];
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    await Log(
+                        "Recaptcha failed — no token submitted (check the site key is an Enterprise key valid for this domain).",
+                        LogType.Warning
+                    );
+                    return new RecaptchaResponse { Passed = false };
+                }
+
                 Assessment assessment = await _assessmentClient.CreateAssessmentAsync(
                     settings.GoogleRecaptchaProjectId,
                     settings.GoogleCloudApiKey,
                     new Event
                     {
-                        Token = token ?? string.Empty,
+                        Token = token,
                         SiteKey = settings.GoogleRecaptchaSiteKey,
                         ExpectedAction = expectedAction ?? string.Empty,
                     }
