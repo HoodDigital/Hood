@@ -12,6 +12,7 @@ using Hood.Extensions;
 using Hood.Identity;
 using Hood.Models;
 using Hood.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -522,6 +523,12 @@ namespace Hood.Startup
                         // get the user profile and store important bits on the claim.
                         var repo = Engine.Services.Resolve<IPasswordAccountRepository>();
                         var user = await repo.GetUserByIdAsync(e.Principal.GetUserId());
+                        if (user?.UserProfile == null)
+                        {
+                            e.RejectPrincipal();
+                            await e.HttpContext.SignOutAsync();
+                            return;
+                        }
                         e.Principal.SetUserClaims(user.UserProfile);
                         if (user.EmailConfirmed)
                         {
