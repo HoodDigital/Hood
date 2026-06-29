@@ -41,7 +41,7 @@ namespace Hood.BaseControllers
             }
             catch
             {
-                return Content(Engine.Resource("/images/no-image.jpg"));
+                return Content("https://picsum.photos/1600/900");
             }
         }
 
