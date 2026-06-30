@@ -41,7 +41,7 @@ namespace Hood.BaseControllers
             }
             catch
             {
-                return Content("https://source.unsplash.com/random");
+                return Content("https://picsum.photos/1600/900");
             }
         }
 
