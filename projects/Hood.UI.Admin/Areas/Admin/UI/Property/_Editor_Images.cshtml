@@ -3,48 +3,44 @@
 <p>Set images for this content. You can enable/disable these images for this content type in <a asp-action="Content" asp-controller="Settings">content settings</a>.</p>
 <div class="form-group row align-items-center g-3 mb-3">
     <div class="col-2">
-        <div style="background-image:url(@Model.FeaturedImage.Icon)" class="img img-full img-square rounded m-0 FeaturedImage" id="property-feature-image"
-             media-attach="FeaturedImage"
-             media-refresh=".FeaturedImage"
-             media-url="@Url.Action("UploadMedia", new { id = Model.Id, field = nameof(Model.FeaturedImage) })"></div>
+        <div style="background-image:url(@Model.FeaturedImage.Icon)" class="img img-full img-square rounded m-0 FeaturedImage" id="property-feature-image"></div>
     </div>
     <div class="col">
         <h6>Featured Image</h6>
         <p>Choose a featured image for this property. This will appear in content lists, and as the main featured image.</p>
         <a class="btn btn-success btn-sm"
-           media-attach="FeaturedImage"
-           media-refresh=".FeaturedImage"
-           media-url="@Url.Action("UploadMedia", new { id = Model.Id, field = nameof(Model.FeaturedImage) })">
+           data-hood-media="attach"
+           data-hood-media-list="@Url.Action("Action", "Media")"
+           data-hood-media-url="@Url.Action("UploadMedia", new { id = Model.Id, field = nameof(Model.FeaturedImage) })"
+           data-hood-media-refresh=".FeaturedImage">
             Choose...
         </a>
         <a class="btn btn-danger btn-sm"
-           media-clear="FeaturedImage"
-           media-refresh=".FeaturedImage"
-           media-url="@Url.Action("RemoveMedia", new { id = Model.Id, field = nameof(Model.FeaturedImage) })">
+           data-hood-media="clear"
+           href="@Url.Action("RemoveMedia", new { id = Model.Id, field = nameof(Model.FeaturedImage) })"
+           data-hood-media-refresh=".FeaturedImage">
             <i class="fa fa-trash"></i>
         </a>
     </div>
 </div>
 <div class="form-group row align-items-center g-3 mb-3">
     <div class="col-2">
-        <div style="background-image:url(@Model.InfoDownload.Icon)" class="img img-full img-square rounded m-0 InfoDownload" id="property-info-download"
-             media-attach="InfoDownload"
-             media-refresh=".InfoDownload"
-             media-url="@Url.Action("UploadMedia", new { id = Model.Id, field = nameof(Model.InfoDownload) })"></div>
+        <div style="background-image:url(@Model.InfoDownload.Icon)" class="img img-full img-square rounded m-0 InfoDownload" id="property-info-download"></div>
     </div>
     <div class="col">
         <h6>Info Pack PDF / Document</h6>
         <p>Add a PDF downloadable information pack for this property listing.</p>
         <a class="btn btn-success btn-sm"
-           media-attach="InfoDownload"
-           media-refresh=".InfoDownload"
-           media-url="@Url.Action("UploadMedia", new { id = Model.Id, field = nameof(Model.InfoDownload) })">
+           data-hood-media="attach"
+           data-hood-media-list="@Url.Action("Action", "Media")"
+           data-hood-media-url="@Url.Action("UploadMedia", new { id = Model.Id, field = nameof(Model.InfoDownload) })"
+           data-hood-media-refresh=".InfoDownload">
             Choose...
         </a>
         <a class="btn btn-danger btn-sm"
-           media-clear="InfoDownload"
-           media-refresh=".InfoDownload"
-           media-url="@Url.Action("RemoveMedia", new { id = Model.Id, field = nameof(Model.InfoDownload) })">
+           data-hood-media="clear"
+           href="@Url.Action("RemoveMedia", new { id = Model.Id, field = nameof(Model.InfoDownload) })"
+           data-hood-media-refresh=".InfoDownload">
             <i class="fa fa-trash"></i>
         </a>
     </div>
