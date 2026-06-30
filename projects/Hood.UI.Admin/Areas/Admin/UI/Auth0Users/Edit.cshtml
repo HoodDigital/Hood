@@ -115,24 +115,22 @@
                             <hr class="mt-4 mb-4" />
                             <div class="form-group row align-items-center g-3 mb-3">
                                 <div class="col-2">
-                                    <div style="background-image:url(@Model.Avatar.SmallUrl)" class="img img-full img-square rounded m-0 Avatar" id="users-feature-image"
-                                         media-attach="Avatar"
-                                         media-refresh=".Avatar"
-                                         media-url="@Url.Action("UploadMedia", "Users", new { id = Model.Id, field = nameof(Model.Avatar) })"></div>
+                                    <div style="background-image:url(@Model.Avatar.SmallUrl)" class="img img-full img-square rounded m-0 Avatar" id="users-feature-image"></div>
                                 </div>
                                 <div class="col">
                                     <h6>Avatar Image</h6>
                                     <p>Set an avatar for this user.</p>
                                     <a class="btn btn-success btn-sm"
-                                       media-attach="Avatar"
-                                       media-refresh=".Avatar"
-                                       media-url="@Url.Action("UploadMedia", "Users", new { id = Model.Id, field = nameof(Model.Avatar) })">
+                                       data-hood-media="attach"
+                                       data-hood-media-list="@Url.Action("Action", "Media")"
+                                       data-hood-media-url="@Url.Action("UploadMedia", "Users", new { id = Model.Id, field = nameof(Model.Avatar) })"
+                                       data-hood-media-refresh=".Avatar">
                                         Choose...
                                     </a>
                                     <a class="btn btn-danger btn-sm"
-                                       media-clear="Avatar"
-                                       media-refresh=".Avatar"
-                                       media-url="@Url.Action("RemoveMedia", "Users", new { id = Model.Id, field = nameof(Model.Avatar) })">
+                                       data-hood-media="clear"
+                                       href="@Url.Action("RemoveMedia", "Users", new { id = Model.Id, field = nameof(Model.Avatar) })"
+                                       data-hood-media-refresh=".Avatar">
                                         <i class="fa fa-trash"></i>
                                     </a>
                                 </div>
