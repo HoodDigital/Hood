@@ -1,0 +1,54 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "mode": "full",
+  "dependencyDashboard": true,
+  "configMigration": true,
+  "semanticCommits": "disabled",
+  "commitMessageTopic": "{{depName}}",
+  "labels": ["dependencies"],
+  "minimumReleaseAge": "3 days",
+  "internalChecksFilter": "strict",
+  "prConcurrentLimit": 10,
+  "prHourlyLimit": 2,
+  "major": {
+    "dependencyDashboardApproval": true
+  },
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["dependencies", "security"]
+  },
+  "osvVulnerabilityAlerts": true,
+  "packageRules": [
+    {
+      "groupName": ".NET runtime",
+      "matchManagers": ["nuget"],
+      "matchPackageNames": ["/^Microsoft\\.AspNetCore\\./", "/^Microsoft\\.Extensions\\./"]
+    },
+    {
+      "groupName": ".NET runtime",
+      "matchDepNames": ["dotnet-sdk"]
+    },
+    {
+      "groupName": "Test and build tooling",
+      "matchPackageNames": ["/^xunit/", "Microsoft.NET.Test.Sdk", "Xunit.SkippableFact", "/csharpier/i", "/resharper/i", "/jetbrains/i"]
+    },
+    {
+      "groupName": "Auth0",
+      "matchPackageNames": ["/^Auth0\\./"]
+    },
+    {
+      "groupName": "Azure",
+      "matchPackageNames": ["/^Azure\\./"]
+    },
+    {
+      "groupName": "GitHub Actions",
+      "matchManagers": ["github-actions"]
+    },
+    {
+      "groupName": "JavaScript toolchain",
+      "matchManagers": ["npm"]
+    }
+  ],
+  "prBodyTemplate": "## Overview\n\n{{{table}}}\n\n## What Changed and Why\n\nRoutine dependency currency — always latest stable, aged at least 3 days before raising.\n\n{{{notes}}}\n{{{changelogs}}}\n\n## Tests\n\nAutomated — CI (Validate code, Build & test) gates this change; no source changes beyond the dependency.\n\n## Breaking Changes\n\n{{#if isMajor}}⚠️ Major version update — review the release notes above before merging.{{else}}None.{{/if}}\n\n## Testing Plan\n\n- [ ] CI green\n- [ ] Release notes reviewed\n- [ ] Bedded in (routine) / triaged (security)\n\n{{{controls}}}\n{{{footer}}}"
+}
