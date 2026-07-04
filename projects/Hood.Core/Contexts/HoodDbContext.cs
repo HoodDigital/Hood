@@ -80,7 +80,9 @@ namespace Hood.Models
             var siteAdmin = await identityContext.GetSiteAdmin(ownerEmail);
 
             // The site owner id, keyed by the settings repo's JSON-round-tripped Option convention
-            // (matching every other persisted Option) so Engine.Settings can read it back.
+            // (matching every other persisted Option) so Engine.Settings can read it back. Existing
+            // installs that stored this value raw (pre-dating the convention) still read correctly —
+            // the settings repo falls back to the raw string when JSON decoding fails.
             var siteOwnerRef = await Options.SingleOrDefaultAsync(o =>
                 o.Id == "Hood.Settings.SiteOwner"
             );

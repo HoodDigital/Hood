@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Hood.Caching;
 using Hood.Contexts;
 using Hood.Models;
 using Hood.Services;
@@ -13,9 +14,11 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace Hood.Tests
@@ -157,6 +160,45 @@ namespace Hood.Tests
                 accounts.DeleteUserAsync(owner.Id, new ClaimsPrincipal())
             );
             Assert.Contains("cannot delete the site owner account", ex.Message);
+        }
+
+        [SkippableFact]
+        public async Task Site_owner_protection_survives_a_legacy_unencoded_option_value()
+        {
+            Skip.IfNot(_fx.Db.Available, _fx.Db.UnavailableReason);
+
+            // Pre-v7 installs wrote Hood.Settings.SiteOwner as a raw (unquoted) id string, not the
+            // JSON-encoded form Seed writes now. Overwrite the seeded option back to that legacy shape
+            // and confirm resolution/protection still work off it, with no config email anywhere.
+            using var scope = _fx.Factory.Services.CreateScope();
+            var settings = scope.ServiceProvider.GetRequiredService<ISettingsRepository>();
+            var cache = scope.ServiceProvider.GetRequiredService<IHoodCache>();
+            var userManager = scope.ServiceProvider.GetRequiredService<
+                UserManager<ApplicationUser>
+            >();
+            var accounts = scope.ServiceProvider.GetRequiredService<IPasswordAccountRepository>();
+            var hoodDb = scope.ServiceProvider.GetRequiredService<HoodDbContext>();
+
+            ApplicationUser owner = await userManager.FindByNameAsync(HttpSmokeFixture.AdminEmail);
+
+            Option option = await hoodDb.Options.SingleAsync(o =>
+                o.Id == "Hood.Settings.SiteOwner"
+            );
+            option.Value = owner.Id;
+            await hoodDb.SaveChangesAsync();
+            cache.Remove("Hood.Settings.SiteOwner");
+
+            Assert.Equal(owner.Id, settings["Hood.Settings.SiteOwner"]);
+
+            Exception ex = await Assert.ThrowsAsync<Exception>(() =>
+                accounts.DeleteUserAsync(owner.Id, new ClaimsPrincipal())
+            );
+            Assert.Contains("cannot delete the site owner account", ex.Message);
+
+            // Leave the option JSON-encoded again for any tests that run after this one.
+            option.Value = JsonConvert.SerializeObject(owner.Id);
+            await hoodDb.SaveChangesAsync();
+            cache.Remove("Hood.Settings.SiteOwner");
         }
 
         // Pulls every <input type=hidden> name/value pair out of the rendered page. Handles both
