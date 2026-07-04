@@ -250,20 +250,20 @@ namespace Hood.Services
         {
             Auth0User user = await Users.SingleOrDefaultAsync(u => u.Id == userId);
 
-            if (user.Email == Engine.Configuration.SuperAdminEmail)
+            if (user.Email == Engine.SiteOwnerEmail)
             {
                 throw new Exception(
-                    "You cannot delete the site owner account, the owner is set via an environment variable and cannot be changed from the admin area."
+                    "You cannot delete the site owner account, it was set during installation and cannot be changed from the admin area."
                 );
             }
 
             Auth0User siteOwner = await Users
                 .AsNoTracking()
-                .SingleOrDefaultAsync(u => u.Email == Engine.Configuration.SuperAdminEmail);
+                .SingleOrDefaultAsync(u => u.Email == Engine.SiteOwnerEmail);
             if (siteOwner == null)
             {
                 throw new Exception(
-                    "Could not load the owner account, check your settings, the owner is set via an environment variable and cannot be changed from the admin area."
+                    "Could not load the owner account, check your settings, the owner was set during installation and cannot be changed from the admin area."
                 );
             }
 

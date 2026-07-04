@@ -90,6 +90,28 @@ namespace Hood.Models
             {
                 siteOwnerRef.Value = siteAdmin.Id;
             }
+
+            // Persists the administrator's email as the runtime source of truth for
+            // Engine.SiteOwnerEmail, so consumers don't have to hardcode Hood:SuperAdminEmail.
+            var siteOwnerEmailRef = await Options.SingleOrDefaultAsync(o =>
+                o.Id == "Hood.Settings.SuperAdminEmail"
+            );
+            string encodedSiteOwnerEmail = JsonConvert.SerializeObject(siteAdmin.Email);
+            if (siteOwnerEmailRef == null)
+            {
+                Options.Add(
+                    new Option
+                    {
+                        Id = "Hood.Settings.SuperAdminEmail",
+                        Value = encodedSiteOwnerEmail,
+                    }
+                );
+            }
+            else
+            {
+                siteOwnerEmailRef.Value = encodedSiteOwnerEmail;
+            }
+
             await SaveChangesAsync();
             await SetupHoodMediaDirectoriesAsync(siteAdmin.Id);
             await InitialiseHoodSettingsAsync();

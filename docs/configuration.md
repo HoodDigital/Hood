@@ -1,7 +1,60 @@
 # Hood configuration (`appsettings.json`)
 
-Reference for the `Hood` configuration section a consumer app provides. Only settings you need to
-override have to be present; sensible defaults apply otherwise.
+Reference for the `Hood` and `Identity` configuration sections a consumer app provides. Only
+settings you need to override have to be present; sensible defaults apply otherwise.
+
+## Minimal consumer `appsettings.json`
+
+The only setting every consumer must provide is the connection string. Everything else in this
+document is an optional override — a fresh site can start from:
+
+```jsonc
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=…;Database=…;User Id=…;Password=…;TrustServerCertificate=True"
+  }
+}
+```
+
+Add your own provider/integration keys (SendGrid, Google, Auth0, …) as you turn features on —
+most of those live in the admin **Settings** area (persisted to the database), not
+`appsettings.json`. [`Hood.Development/appsettings.json`](../projects/Hood.Development/appsettings.json)
+is the working example: it only sets the handful of values that genuinely differ from Hood's
+defaults (its local connection string, a couple of password-policy overrides, and `BypassCDN` for
+the in-repo dev loop).
+
+## The site owner (`SuperAdminEmail`)
+
+The site owner's email comes from the account you create on first run at `/install` — that's the
+source of truth, persisted to the database. `Hood:SuperAdminEmail` in configuration is an
+**optional override** for cases where you need to pin it outside the database; leave it unset and
+Hood uses whoever was installed.
+
+## Identity
+
+The whole `Identity` section is optional. Every setting below has a working default; only add a
+key when you need something other than Hood's default.
+
+| Setting | Default | Notes |
+|---|---|---|
+| `Identity:Password:RequireDigit` | `true` | |
+| `Identity:Password:RequireLowercase` | `false` | |
+| `Identity:Password:RequireUppercase` | `false` | |
+| `Identity:Password:RequireNonAlphanumeric` | `true` | |
+| `Identity:Password:RequiredLength` | `6` | |
+| `Identity:Cookies:Name` | `hoodcms` | Prefixed onto the auth/antiforgery/session/consent cookie names. |
+| `Identity:Cookies:Domain` | *(unset)* | Cookie domain; unset scopes cookies to the current host. |
+| `Identity:Cookies:ConsentRequired` | `true` | Whether the cookie-consent banner gates non-essential cookies. |
+| `Identity:LoginPath` | `/account/login` | |
+| `Identity:LogoutPath` | `/account/logout` | |
+| `Identity:AccessDeniedPath` | `/account/access-denied` | |
+
+### Auth0 (optional)
+
+`Identity:Auth0` is entirely optional. Leave it out (or leave `Domain`/`ClientId` unset) and Hood
+runs on the standard ASP.NET Identity/password backend — no Auth0 configuration is required to run
+Hood at all. Set both `Identity:Auth0:Domain` and `Identity:Auth0:ClientId` to switch the site to
+the Auth0 backend instead.
 
 ## CDN asset delivery
 

@@ -79,7 +79,7 @@ namespace Hood.Models
 
         public ContactSettings()
         {
-            Email = Engine.Configuration.SuperAdminEmail;
+            Email = Engine.SiteOwnerEmail;
             ContactFormTitle = "Send us a message";
             ContactFormMessage = "Someone will be in touch very soon...";
             ThankYouTitle = "Enquiry Sent!";
