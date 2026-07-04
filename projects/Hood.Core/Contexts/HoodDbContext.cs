@@ -73,43 +73,27 @@ namespace Hood.Models
             return base.Set<TEntity>();
         }
 
-        public virtual async Task Seed(IHoodIdentityContext identityContext)
+        public virtual async Task Seed(IHoodIdentityContext identityContext, string ownerEmail)
         {
             await CheckDatabaseIsInitialisedAsync();
 
-            var siteAdmin = await identityContext.GetSiteAdmin();
+            var siteAdmin = await identityContext.GetSiteAdmin(ownerEmail);
 
+            // The site owner id, keyed by the settings repo's JSON-round-tripped Option convention
+            // (matching every other persisted Option) so Engine.Settings can read it back.
             var siteOwnerRef = await Options.SingleOrDefaultAsync(o =>
                 o.Id == "Hood.Settings.SiteOwner"
             );
+            string encodedSiteOwnerId = JsonConvert.SerializeObject(siteAdmin.Id);
             if (siteOwnerRef == null)
             {
-                Options.Add(new Option { Id = "Hood.Settings.SiteOwner", Value = siteAdmin.Id });
-            }
-            else
-            {
-                siteOwnerRef.Value = siteAdmin.Id;
-            }
-
-            // Persists the administrator's email as the runtime source of truth for
-            // Engine.SiteOwnerEmail, so consumers don't have to hardcode Hood:SuperAdminEmail.
-            var siteOwnerEmailRef = await Options.SingleOrDefaultAsync(o =>
-                o.Id == "Hood.Settings.SuperAdminEmail"
-            );
-            string encodedSiteOwnerEmail = JsonConvert.SerializeObject(siteAdmin.Email);
-            if (siteOwnerEmailRef == null)
-            {
                 Options.Add(
-                    new Option
-                    {
-                        Id = "Hood.Settings.SuperAdminEmail",
-                        Value = encodedSiteOwnerEmail,
-                    }
+                    new Option { Id = "Hood.Settings.SiteOwner", Value = encodedSiteOwnerId }
                 );
             }
             else
             {
-                siteOwnerEmailRef.Value = encodedSiteOwnerEmail;
+                siteOwnerRef.Value = encodedSiteOwnerId;
             }
 
             await SaveChangesAsync();

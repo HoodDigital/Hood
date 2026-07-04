@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using Hood.BaseTypes;
-using Hood.Core;
 
 namespace Hood.Models
 {
@@ -79,7 +78,6 @@ namespace Hood.Models
 
         public ContactSettings()
         {
-            Email = Engine.SiteOwnerEmail;
             ContactFormTitle = "Send us a message";
             ContactFormMessage = "Someone will be in touch very soon...";
             ThankYouTitle = "Enquiry Sent!";

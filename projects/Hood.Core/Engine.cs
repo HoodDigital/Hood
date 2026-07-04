@@ -253,24 +253,6 @@ namespace Hood.Core
             }
         }
 
-        /// <summary>
-        /// The site owner/administrator's email. Sourced from the account created during
-        /// <c>/install</c> — the seed persists it to <c>Hood.Settings.SuperAdminEmail</c>, which is the
-        /// source of truth from then on. <c>Hood:SuperAdminEmail</c> in configuration is an optional
-        /// override, checked first, for consumers that need to pin it outside the database.
-        /// </summary>
-        public static string SiteOwnerEmail
-        {
-            get
-            {
-                if (Configuration?.SuperAdminEmail.IsSet() == true)
-                {
-                    return Configuration.SuperAdminEmail;
-                }
-                return Settings["Hood.Settings.SuperAdminEmail"];
-            }
-        }
-
         public static string Version
         {
             get

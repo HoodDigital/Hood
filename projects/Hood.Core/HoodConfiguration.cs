@@ -4,8 +4,8 @@ namespace Hood.Core
 {
     /// <summary>
     /// Binds the optional <c>Hood</c> configuration section. Every member here defaults sensibly, so
-    /// a consumer only needs to set the ones they're overriding — see <see cref="Engine.SiteOwnerEmail"/>
-    /// for <see cref="SuperAdminEmail"/> and <see cref="Engine.Resource(string)"/> for the CDN settings.
+    /// a consumer only needs to set the ones they're overriding — see <see cref="Engine.Resource(string)"/>
+    /// for the CDN settings.
     /// </summary>
     public class HoodConfiguration
     {
@@ -15,11 +15,6 @@ namespace Hood.Core
             Integrations = new Integrations();
         }
 
-        /// <summary>
-        /// Optional override for the site owner's email — leave unset and it comes from the account
-        /// created during <c>/install</c> instead.
-        /// </summary>
-        public string SuperAdminEmail { get; set; }
         public bool InitializeOnStartup { get; set; }
         public LogLevel LogLevel { get; set; }
 

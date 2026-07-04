@@ -5,6 +5,6 @@ namespace Hood.Contexts
 {
     public interface IHoodIdentityContext
     {
-        Task<IHoodIdentity> GetSiteAdmin();
+        Task<IHoodIdentity> GetSiteAdmin(string ownerEmail);
     }
 }

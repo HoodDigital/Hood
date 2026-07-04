@@ -23,12 +23,11 @@ is the working example: it only sets the handful of values that genuinely differ
 defaults (its local connection string, a couple of password-policy overrides, and `BypassCDN` for
 the in-repo dev loop).
 
-## The site owner (`SuperAdminEmail`)
+## The site owner
 
-The site owner's email comes from the account you create on first run at `/install` — that's the
-source of truth, persisted to the database. `Hood:SuperAdminEmail` in configuration is an
-**optional override** for cases where you need to pin it outside the database; leave it unset and
-Hood uses whoever was installed.
+The site owner is simply the account you create on first run at `/install` — there is no
+configuration key for it. If you're upgrading a consumer that used to set `Hood:SuperAdminEmail`,
+remove it from `appsettings.json`; the key is no longer read and no other action is needed.
 
 ## Identity
 
