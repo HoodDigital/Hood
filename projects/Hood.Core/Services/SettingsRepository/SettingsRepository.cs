@@ -126,9 +126,8 @@ namespace Hood.Services
             }
             catch
             {
-                // Some options predate this repo's JSON-encoding convention and were persisted as a
-                // plain (unquoted) string, which isn't valid JSON. For string reads, fall back to the
-                // raw value rather than losing it; other types have no sensible raw interpretation.
+                // A raw (unquoted) string isn't valid JSON; for string reads, fall back to the raw
+                // value rather than dropping it. Other types have no sensible raw interpretation.
                 if (typeof(T) == typeof(string) && raw != null)
                 {
                     return (T)(object)raw;
