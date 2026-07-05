@@ -73,23 +73,28 @@ namespace Hood.Models
             return base.Set<TEntity>();
         }
 
-        public virtual async Task Seed(IHoodIdentityContext identityContext)
+        public virtual async Task Seed(IHoodIdentityContext identityContext, string ownerEmail)
         {
             await CheckDatabaseIsInitialisedAsync();
 
-            var siteAdmin = await identityContext.GetSiteAdmin();
+            var siteAdmin = await identityContext.GetSiteAdmin(ownerEmail);
 
+            // JSON-encode the id like every other Option so Engine.Settings reads it back.
             var siteOwnerRef = await Options.SingleOrDefaultAsync(o =>
                 o.Id == "Hood.Settings.SiteOwner"
             );
+            string encodedSiteOwnerId = JsonConvert.SerializeObject(siteAdmin.Id);
             if (siteOwnerRef == null)
             {
-                Options.Add(new Option { Id = "Hood.Settings.SiteOwner", Value = siteAdmin.Id });
+                Options.Add(
+                    new Option { Id = "Hood.Settings.SiteOwner", Value = encodedSiteOwnerId }
+                );
             }
             else
             {
-                siteOwnerRef.Value = siteAdmin.Id;
+                siteOwnerRef.Value = encodedSiteOwnerId;
             }
+
             await SaveChangesAsync();
             await SetupHoodMediaDirectoriesAsync(siteAdmin.Id);
             await InitialiseHoodSettingsAsync();

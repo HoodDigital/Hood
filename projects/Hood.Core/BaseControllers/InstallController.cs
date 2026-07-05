@@ -29,7 +29,7 @@ namespace Hood.BaseControllers
             {
                 return RedirectToAction("Index", "Home");
             }
-            return View(new InstallModel { Email = Engine.Configuration?.SuperAdminEmail });
+            return View(new InstallModel());
         }
 
         /// <summary>
@@ -54,13 +54,6 @@ namespace Hood.BaseControllers
 
             try
             {
-                // The chosen administrator email becomes the site owner for this initialisation run,
-                // so the seed's GetSiteAdmin resolves to the account we are about to create.
-                if (Engine.Configuration != null)
-                {
-                    Engine.Configuration.SuperAdminEmail = model.Email;
-                }
-
                 IPasswordAccountRepository accounts =
                     Engine.Services.Resolve<IPasswordAccountRepository>();
 
@@ -119,9 +112,10 @@ namespace Hood.BaseControllers
                 await accounts.AddUserToRolesAsync(admin, ownerRoles.ToArray());
 
                 // Seed Hood: version stamp, site owner option, media directories, default settings.
+                // The form's email is the only input — it becomes the site owner via GetSiteAdmin.
                 HoodDbContext hoodDb = Engine.Services.Resolve<HoodDbContext>();
                 IdentityContext identity = Engine.Services.Resolve<IdentityContext>();
-                await hoodDb.Seed(identity);
+                await hoodDb.Seed(identity, model.Email);
 
                 // Restart on a short delay so this response can flush first. The container's restart
                 // policy brings the host straight back up, now booting into an installed state.

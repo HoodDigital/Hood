@@ -62,14 +62,13 @@ namespace Hood.Contexts
             builder.Entity<UserProfileView<IdentityRole>>().ToView("HoodUserProfiles");
         }
 
-        public async Task<IHoodIdentity> GetSiteAdmin()
+        public async Task<IHoodIdentity> GetSiteAdmin(string ownerEmail)
         {
             try
             {
                 IPasswordAccountRepository repo =
                     Engine.Services.Resolve<IPasswordAccountRepository>();
 
-                string ownerEmail = Engine.SiteOwnerEmail;
                 if (!Users.Any(u => u.UserName == ownerEmail))
                 {
                     ApplicationUser userToInsert = new ApplicationUser
@@ -113,7 +112,7 @@ namespace Hood.Contexts
                     }
                 }
 
-                ApplicationUser siteAdmin = await repo.GetUserByEmailAsync(Engine.SiteOwnerEmail);
+                ApplicationUser siteAdmin = await repo.GetUserByEmailAsync(ownerEmail);
                 return siteAdmin;
             }
             catch (Exception ex)

@@ -4,8 +4,7 @@ namespace Hood.ViewModels
 {
     /// <summary>
     /// Backs the first-run install wizard (<c>/install</c>). Collects the administrator
-    /// credentials used to seed the site owner. The email defaults to the configured
-    /// <c>Hood:SuperAdminEmail</c> but can be overridden during setup.
+    /// credentials used to seed the site owner — this form is the only source of the owner's email.
     /// </summary>
     public class InstallModel
     {
