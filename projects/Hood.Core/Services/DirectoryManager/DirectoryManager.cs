@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Hood.Extensions;
@@ -14,9 +14,31 @@ namespace Hood.Services
     public class DirectoryManager : IDirectoryManager
     {
         private readonly IConfiguration _config;
-        private Lazy<MediaDirectory[]> _topLevel;
-        private Lazy<MediaDirectory> _siteDirectory;
-        private Lazy<Dictionary<int, MediaDirectory>> _directoriesById;
+        private readonly object _cacheLock = new object();
+
+        // Ids confirmed absent after a reload — suppresses repeated full reloads for stale references.
+        private volatile HashSet<int> _confirmedAbsent = new HashSet<int>();
+
+        // Single holder published atomically; readers capture all three Lazy fields in one volatile read.
+        private volatile CacheSnapshot _cache;
+
+        private sealed class CacheSnapshot
+        {
+            internal readonly Lazy<Dictionary<int, MediaDirectory>> ById;
+            internal readonly Lazy<MediaDirectory[]> TopLevel;
+            internal readonly Lazy<MediaDirectory> SiteDirectory;
+
+            internal CacheSnapshot(
+                Lazy<Dictionary<int, MediaDirectory>> byId,
+                Lazy<MediaDirectory[]> topLevel,
+                Lazy<MediaDirectory> siteDirectory
+            )
+            {
+                ById = byId;
+                TopLevel = topLevel;
+                SiteDirectory = siteDirectory;
+            }
+        }
 
         public DirectoryManager(IConfiguration config)
         {
@@ -26,7 +48,7 @@ namespace Hood.Services
 
         public int Count()
         {
-            return _directoriesById.Value.Count;
+            return _cache.ById.Value.Count;
         }
 
         public void ResetCache()
@@ -34,84 +56,92 @@ namespace Hood.Services
             DbContextOptionsBuilder<HoodDbContext> options =
                 new DbContextOptionsBuilder<HoodDbContext>();
             options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
-            HoodDbContext db = new HoodDbContext(options.Options);
-            _directoriesById = new Lazy<Dictionary<int, MediaDirectory>>(() =>
-            {
-                IQueryable<MediaDirectory> q =
-                    from d in db.MediaDirectories
-                    select new MediaDirectory
-                    {
-                        Id = d.Id,
-                        DisplayName = d.DisplayName,
-                        Slug = d.Slug,
-                        Type = d.Type,
-                        OwnerId = d.OwnerId,
-                        ParentId = d.ParentId,
-                        Parent = d.Parent,
-                        Children = d.Children,
-                    };
-                return q.ToDictionary(c => c.Id);
-            });
-            _topLevel = new Lazy<MediaDirectory[]>(() =>
-                _directoriesById.Value.Values.Where(c => c.ParentId == null).ToArray()
+            using HoodDbContext db = new HoodDbContext(options.Options);
+
+            var allDirectories = (
+                from d in db.MediaDirectories
+                select new MediaDirectory
+                {
+                    Id = d.Id,
+                    DisplayName = d.DisplayName,
+                    Slug = d.Slug,
+                    Type = d.Type,
+                    OwnerId = d.OwnerId,
+                    ParentId = d.ParentId,
+                    Parent = d.Parent,
+                    Children = d.Children,
+                }
+            ).ToDictionary(c => c.Id);
+
+            var newById = new Lazy<Dictionary<int, MediaDirectory>>(() => allDirectories);
+            var newTopLevel = new Lazy<MediaDirectory[]>(() =>
+                allDirectories.Values.Where(c => c.ParentId == null).ToArray()
             );
-            _siteDirectory = new Lazy<MediaDirectory>(() =>
-                _directoriesById.Value.Values.SingleOrDefault(c =>
+            var newSiteDirectory = new Lazy<MediaDirectory>(() =>
+                allDirectories.Values.SingleOrDefault(c =>
                     c.Slug == MediaManager.SiteDirectorySlug && c.Type == DirectoryType.System
                 )
             );
+
+            lock (_cacheLock)
+            {
+                _cache = new CacheSnapshot(newById, newTopLevel, newSiteDirectory);
+                _confirmedAbsent = new HashSet<int>();
+            }
         }
 
         public MediaDirectory GetDirectoryById(int id)
         {
-            if (!_directoriesById.Value.ContainsKey(id))
+            if (!_cache.ById.Value.ContainsKey(id))
             {
                 return null;
             }
 
-            return _directoriesById.Value[id];
+            return _cache.ById.Value[id];
         }
 
         public IEnumerable<MediaDirectory> MediaDirectories()
         {
-            _topLevel = new Lazy<MediaDirectory[]>(() =>
-                _directoriesById
-                    .Value.Values.Where(c => c.ParentId == _siteDirectory.Value.Id)
-                    .ToArray()
-            );
-            return _topLevel.Value;
+            CacheSnapshot snap = _cache;
+            return snap
+                .ById.Value.Values.Where(c => c.ParentId == snap.SiteDirectory.Value.Id)
+                .ToArray();
         }
 
         public IEnumerable<MediaDirectory> UserDirectories(string userId)
         {
-            _topLevel = new Lazy<MediaDirectory[]>(() =>
-                _directoriesById
-                    .Value.Values.Where(c =>
-                        c.ParentId != null
-                        && c.Parent.Type == DirectoryType.User
-                        && c.OwnerId == userId
-                    )
-                    .ToArray()
-            );
-            return _topLevel.Value;
+            CacheSnapshot snap = _cache;
+            return snap
+                .ById.Value.Values.Where(c =>
+                    c.ParentId != null && c.Parent.Type == DirectoryType.User && c.OwnerId == userId
+                )
+                .ToArray();
         }
 
         public IEnumerable<MediaDirectory> TopLevel()
         {
-            _topLevel = new Lazy<MediaDirectory[]>(() =>
-                _directoriesById.Value.Values.Where(c => c.ParentId == null).ToArray()
-            );
-            return _topLevel.Value;
+            return _cache.TopLevel.Value;
         }
 
         public IEnumerable<MediaDirectory> GetHierarchy(int id, int? stopAtId = null)
         {
-            // Reload the cache when the requested directory is absent — picks up
-            // directories created after the singleton was initialised without
-            // forcing a full DB round-trip on every call.
-            if (!_directoriesById.Value.ContainsKey(id))
+            // Reload once when the id is absent — picks up newly-created directories.
+            // If the id is still missing after a reload it is recorded so subsequent
+            // calls skip the DB round-trip entirely.
+            if (!_cache.ById.Value.ContainsKey(id) && !_confirmedAbsent.Contains(id))
             {
                 ResetCache();
+                if (!_cache.ById.Value.ContainsKey(id))
+                {
+                    lock (_cacheLock)
+                    {
+                        if (!_confirmedAbsent.Contains(id))
+                        {
+                            var absent = new HashSet<int>(_confirmedAbsent) { id };
+                            _confirmedAbsent = absent;
+                        }
+                    }
+                }
             }
 
             List<MediaDirectory> result = new List<MediaDirectory>();
@@ -344,8 +374,8 @@ namespace Hood.Services
                     else
                     {
                         template =
-                            $@"<div class='list-group-item list-group-item-action p-0 collapse' 
-                                           id='sub-directory-{directory.ParentId}' 
+                            $@"<div class='list-group-item list-group-item-action p-0 collapse'
+                                           id='sub-directory-{directory.ParentId}'
                                            aria-labelledby='sub-directory-heading-{directory.ParentId}'>";
                     }
 
@@ -353,9 +383,9 @@ namespace Hood.Services
                     if (directory.Children != null && directory.Children.Count > 0)
                     {
                         expand =
-                            $@" 
+                            $@"
                             <a class='btn-link' data-toggle='collapse' aria-labelledby='sub-directory-heading-{directory.Id}' data-target='#sub-directory-{directory.Id}' href='#sub-directory-{directory.Id}' aria-expanded='{expanded}' aria-controls='sub-directory-{directory.Id}'>
-                                <small><i class='fa fa-plus-square p-1 text-success'></i></small>                 
+                                <small><i class='fa fa-plus-square p-1 text-success'></i></small>
                             </a>";
                     }
 
