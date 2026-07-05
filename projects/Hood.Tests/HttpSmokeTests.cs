@@ -2,18 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Hood.Caching;
 using Hood.Contexts;
 using Hood.Models;
+using Hood.Services;
 using Hood.Startup;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace Hood.Tests
@@ -133,6 +138,69 @@ namespace Hood.Tests
             }
         }
 
+        [SkippableFact]
+        public async Task Site_owner_resolves_and_is_protected_by_id_with_no_config_email()
+        {
+            Skip.IfNot(_fx.Db.Available, _fx.Db.UnavailableReason);
+
+            // The fixture never sets Hood:SuperAdminEmail — this proves owner resolution works from
+            // Hood.Settings.SiteOwner alone.
+            using var scope = _fx.Factory.Services.CreateScope();
+            var settings = scope.ServiceProvider.GetRequiredService<ISettingsRepository>();
+            var userManager = scope.ServiceProvider.GetRequiredService<
+                UserManager<ApplicationUser>
+            >();
+            var accounts = scope.ServiceProvider.GetRequiredService<IPasswordAccountRepository>();
+
+            ApplicationUser owner = await userManager.FindByNameAsync(HttpSmokeFixture.AdminEmail);
+            string siteOwnerId = settings["Hood.Settings.SiteOwner"];
+            Assert.Equal(owner.Id, siteOwnerId);
+
+            Exception ex = await Assert.ThrowsAsync<Exception>(() =>
+                accounts.DeleteUserAsync(owner.Id, new ClaimsPrincipal())
+            );
+            Assert.Contains("cannot delete the site owner account", ex.Message);
+        }
+
+        [SkippableFact]
+        public async Task Site_owner_protection_survives_a_legacy_unencoded_option_value()
+        {
+            Skip.IfNot(_fx.Db.Available, _fx.Db.UnavailableReason);
+
+            // Pre-v7 installs wrote Hood.Settings.SiteOwner as a raw (unquoted) id string, not the
+            // JSON-encoded form Seed writes now. Overwrite the seeded option back to that legacy shape
+            // and confirm resolution/protection still work off it, with no config email anywhere.
+            using var scope = _fx.Factory.Services.CreateScope();
+            var settings = scope.ServiceProvider.GetRequiredService<ISettingsRepository>();
+            var cache = scope.ServiceProvider.GetRequiredService<IHoodCache>();
+            var userManager = scope.ServiceProvider.GetRequiredService<
+                UserManager<ApplicationUser>
+            >();
+            var accounts = scope.ServiceProvider.GetRequiredService<IPasswordAccountRepository>();
+            var hoodDb = scope.ServiceProvider.GetRequiredService<HoodDbContext>();
+
+            ApplicationUser owner = await userManager.FindByNameAsync(HttpSmokeFixture.AdminEmail);
+
+            Option option = await hoodDb.Options.SingleAsync(o =>
+                o.Id == "Hood.Settings.SiteOwner"
+            );
+            option.Value = owner.Id;
+            await hoodDb.SaveChangesAsync();
+            cache.Remove("Hood.Settings.SiteOwner");
+
+            Assert.Equal(owner.Id, settings["Hood.Settings.SiteOwner"]);
+
+            Exception ex = await Assert.ThrowsAsync<Exception>(() =>
+                accounts.DeleteUserAsync(owner.Id, new ClaimsPrincipal())
+            );
+            Assert.Contains("cannot delete the site owner account", ex.Message);
+
+            // Leave the option JSON-encoded again for any tests that run after this one.
+            option.Value = JsonConvert.SerializeObject(owner.Id);
+            await hoodDb.SaveChangesAsync();
+            cache.Remove("Hood.Settings.SiteOwner");
+        }
+
         // Pulls every <input type=hidden> name/value pair out of the rendered page. Handles both
         // single- and double-quoted attributes — the framework antiforgery token uses double quotes,
         // but Hood's honeypot/anti-spam fields (ts/hsh/slt) are rendered single-quoted.
@@ -223,12 +291,13 @@ namespace Hood.Tests
             // Run the same install seed production uses: it writes the Hood.Settings.SiteOwner option
             // (which the [Installed] filter gates on, otherwise every page 302s to the install wizard)
             // and seeds the default settings/media directories. Without the seeded IntegrationSettings,
-            // the recaptcha tag helper on the login page NREs. GetSiteAdmin reuses our admin because
-            // Hood:SuperAdminEmail is pointed at it above. Seed is idempotent, so it's safe to run every
-            // time (and repairs a half-installed database, not just a pristine one).
+            // the recaptcha tag helper on the login page NREs. GetSiteAdmin reuses our admin because we
+            // pass its email as the seed's owner email directly — no Hood:SuperAdminEmail config
+            // involved. Seed is idempotent, so it's safe to run every time (and repairs a
+            // half-installed database, not just a pristine one).
             var hoodDb = scope.ServiceProvider.GetRequiredService<HoodDbContext>();
             var identityContext = scope.ServiceProvider.GetRequiredService<IdentityContext>();
-            await hoodDb.Seed(identityContext);
+            await hoodDb.Seed(identityContext, AdminEmail);
         }
 
         public Task DisposeAsync()
@@ -259,9 +328,6 @@ namespace Hood.Tests
                         new Dictionary<string, string>
                         {
                             ["ConnectionStrings:DefaultConnection"] = _connectionString,
-                            // The install seed resolves the site owner via Hood:SuperAdminEmail; point it
-                            // at the seeded admin so Seed() reuses that user rather than creating a stray one.
-                            ["Hood:SuperAdminEmail"] = HttpSmokeFixture.AdminEmail,
                         }
                     )
             );

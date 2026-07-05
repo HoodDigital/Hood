@@ -202,6 +202,8 @@ namespace Hood.Startup
                 );
             }
 
+            // The entire Identity:Auth0 section is optional — omit it and Hood falls back to the
+            // standard ASP.NET Identity/password backend below.
             if (
                 config.IsConfigured("Identity:Auth0:Domain")
                 && config.IsConfigured("Identity:Auth0:ClientId")
@@ -483,21 +485,28 @@ namespace Hood.Startup
                     o.SignIn.RequireConfirmedEmail = false;
                     o.SignIn.RequireConfirmedPhoneNumber = false;
 
-                    o.Password.RequireDigit =
-                        !config["Identity:Password:RequireDigit"].IsSet()
-                        || bool.Parse(config["Identity:Password:RequireDigit"]);
-                    o.Password.RequireLowercase =
-                        config["Identity:Password:RequireLowercase"].IsSet()
-                        && bool.Parse(config["Identity:Password:RequireLowercase"]);
-                    o.Password.RequireUppercase =
-                        config["Identity:Password:RequireUppercase"].IsSet()
-                        && bool.Parse(config["Identity:Password:RequireUppercase"]);
-                    o.Password.RequireNonAlphanumeric =
-                        !config["Identity:Password:RequireNonAlphanumeric"].IsSet()
-                        || bool.Parse(config["Identity:Password:RequireNonAlphanumeric"]);
-                    o.Password.RequiredLength = config["Identity:Password:RequiredLength"].IsSet()
-                        ? int.Parse(config["Identity:Password:RequiredLength"])
-                        : 6;
+                    // All of Identity:Password is optional — every value below is Hood's default,
+                    // used as-is unless a consumer overrides the specific key.
+                    o.Password.RequireDigit = config.GetValue(
+                        "Identity:Password:RequireDigit",
+                        true
+                    );
+                    o.Password.RequireLowercase = config.GetValue(
+                        "Identity:Password:RequireLowercase",
+                        false
+                    );
+                    o.Password.RequireUppercase = config.GetValue(
+                        "Identity:Password:RequireUppercase",
+                        false
+                    );
+                    o.Password.RequireNonAlphanumeric = config.GetValue(
+                        "Identity:Password:RequireNonAlphanumeric",
+                        true
+                    );
+                    o.Password.RequiredLength = config.GetValue(
+                        "Identity:Password:RequiredLength",
+                        6
+                    );
                 })
                 .AddEntityFrameworkStores<IdentityContext>()
                 .AddDefaultTokenProviders();

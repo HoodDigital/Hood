@@ -121,7 +121,7 @@ Hood is split into focused packages under `projects/`, each published as its own
 
 Documentation is a work in progress. The most useful references today:
 
-- [`docs/configuration.md`](docs/configuration.md) — consumer `appsettings.json` reference, including CDN asset delivery.
+- [`docs/configuration.md`](docs/configuration.md) — consumer `appsettings.json` reference: the minimal set to provide, Identity/Auth0 defaults, the site owner, and CDN asset delivery.
 - [`sql/README.md`](sql/README.md) — database schema, the `hood-schema` runner, upgrade tiers, and how to regenerate the SQL.
 - [`docs/docker.md`](docs/docker.md) — the containerised local dev rig (`docker compose up`).
 

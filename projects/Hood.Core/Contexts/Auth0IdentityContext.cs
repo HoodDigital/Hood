@@ -83,12 +83,11 @@ namespace Hood.Contexts
             builder.Entity<UserProfileView<Auth0Role>>().HasNoKey().ToView("HoodAuth0UserProfiles");
         }
 
-        public async Task<IHoodIdentity> GetSiteAdmin()
+        public async Task<IHoodIdentity> GetSiteAdmin(string ownerEmail)
         {
             try
             {
                 IAuth0AccountRepository repo = Engine.Services.Resolve<IAuth0AccountRepository>();
-                string ownerEmail = Engine.SiteOwnerEmail;
                 if (!Users.Any(u => u.UserName == ownerEmail))
                 {
                     Auth0User userToInsert = new Auth0User
@@ -118,7 +117,7 @@ namespace Hood.Contexts
                     await SaveChangesAsync();
                 }
 
-                Auth0User siteAdmin = await repo.GetUserByEmailAsync(Engine.SiteOwnerEmail);
+                Auth0User siteAdmin = await repo.GetUserByEmailAsync(ownerEmail);
                 return siteAdmin;
             }
             catch (Exception ex)

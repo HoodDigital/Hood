@@ -116,21 +116,24 @@ namespace Hood.Services
         {
             ApplicationUser user = await Users.SingleOrDefaultAsync(u => u.Id == userId);
 
-            if (user.UserName == Engine.Configuration.SuperAdminEmail)
+            // Absent before install completes — nothing to protect yet.
+            string siteOwnerId = Engine.Settings["Hood.Settings.SiteOwner"];
+            if (siteOwnerId.IsSet())
             {
-                throw new Exception(
-                    "You cannot delete the site owner account, the owner is set via an environment variable and cannot be changed from the admin area."
-                );
-            }
+                if (user.Id == siteOwnerId)
+                {
+                    throw new Exception(
+                        "You cannot delete the site owner account, it was set during installation and cannot be changed from the admin area."
+                    );
+                }
 
-            ApplicationUser siteOwner = await Users
-                .AsNoTracking()
-                .SingleOrDefaultAsync(u => u.UserName == Engine.Configuration.SuperAdminEmail);
-            if (siteOwner == null)
-            {
-                throw new Exception(
-                    "Could not load the owner account, check your settings, the owner is set via an environment variable and cannot be changed from the admin area."
-                );
+                ApplicationUser siteOwner = await GetUserByIdAsync(siteOwnerId, track: false);
+                if (siteOwner == null)
+                {
+                    throw new Exception(
+                        "Could not load the owner account, check your settings, the owner was set during installation and cannot be changed from the admin area."
+                    );
+                }
             }
 
             if (!adminUser.IsAdminOrBetter() && adminUser.GetLocalUserId() != user.Id)
