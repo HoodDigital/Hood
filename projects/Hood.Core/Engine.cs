@@ -253,18 +253,6 @@ namespace Hood.Core
             }
         }
 
-        public static string SiteOwnerEmail
-        {
-            get
-            {
-                if (Configuration != null)
-                {
-                    return Configuration.SuperAdminEmail;
-                }
-                return "admin@hooddigital.com";
-            }
-        }
-
         public static string Version
         {
             get

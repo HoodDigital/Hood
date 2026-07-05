@@ -119,12 +119,19 @@ namespace Hood.Services
                 key = typeof(T).ToString();
             }
 
+            string raw = Get(key);
             try
             {
-                return JsonConvert.DeserializeObject<T>(Get(key));
+                return JsonConvert.DeserializeObject<T>(raw);
             }
             catch
             {
+                // A raw (unquoted) string isn't valid JSON; for string reads, fall back to the raw
+                // value rather than dropping it. Other types have no sensible raw interpretation.
+                if (typeof(T) == typeof(string) && raw != null)
+                {
+                    return (T)(object)raw;
+                }
                 _cache.Remove(key);
                 return default;
             }
