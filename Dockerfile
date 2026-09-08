@@ -17,7 +17,7 @@
 # ---------------------------------------------------------------------------
 # Stage 1: restore (cached unless a .csproj or the .sln changes)
 # ---------------------------------------------------------------------------
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0.400 AS build
 WORKDIR /src
 
 # Copy solution + central build files + every project file first so restore layers cache well.
