@@ -6,12 +6,11 @@
 # =============================================================================
 #
 # Frontend assets: Hood's core CSS/JS ship as the external `hoodcms` npm package
-# (normally served from jsDelivr, keyed by the backend assembly version). With the
-# backend now on 7.0.0-rc and `hoodcms` still published at 6.1.x, that CDN path
-# 404s — and the dev appsettings runs with "BypassCDN": true, which expects the
-# assets locally under wwwroot. So we pull the stable `hoodcms` package at build
-# time (frontend stage below) and bundle its src/ + dist/ into wwwroot, keeping
-# the dev rig fully self-contained. Bump HOODCMS_VERSION as the frontend releases.
+# (normally served from jsDelivr, keyed by the backend assembly version). The dev
+# appsettings runs with "BypassCDN": true, which expects the assets locally under
+# wwwroot. So we pull the stable `hoodcms` package at build time (frontend stage
+# below) and bundle its src/ + dist/ into wwwroot, keeping the dev rig fully
+# self-contained. Renovate tracks HOODCMS_VERSION and raises the bump.
 # =============================================================================
 
 # ---------------------------------------------------------------------------
