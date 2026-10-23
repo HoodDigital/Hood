@@ -30,7 +30,7 @@ export class Uploader {
             maxFiles: 1,
             paramName: 'file',
             parallelUploads: 1,
-            acceptedFiles: $tag.data('types') || ".png,.jpg,.jpeg,.gif",
+            acceptedFiles: $tag.data('types') || ".png,.jpg,.jpeg,.gif,.webp",
             autoProcessQueue: true, // Make sure the files aren't queued until manually added
             previewsContainer: false, // Define the container to display the previews
             clickable: tag,
@@ -93,7 +93,7 @@ export class Uploader {
             parallelUploads: 5,
             previewTemplate: previewTemplate,
             paramName: 'files',
-            acceptedFiles: $tag.data('types') || ".png,.jpg,.jpeg,.gif",
+            acceptedFiles: $tag.data('types') || ".png,.jpg,.jpeg,.gif,.webp",
             autoProcessQueue: true, // Make sure the files aren't queued until manually added
             previewsContainer: "#previews", // Define the container to display the previews
             clickable: ".fileinput-button",
