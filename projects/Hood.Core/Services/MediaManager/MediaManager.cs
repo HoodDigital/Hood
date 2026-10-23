@@ -14,9 +14,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
-using SixLabors.ImageSharp.Processing;
+using SkiaSharp;
 
 namespace Hood.Services
 {
@@ -298,26 +296,51 @@ namespace Hood.Services
                 string url;
 
                 string fileName = Path.GetFileNameWithoutExtension(media.Url);
-                string fileExt = Path.GetExtension(media.Url);
-                string thumbBlobReference = $"{media.Path}/{fileName}{prefix}{fileExt}";
                 stream.Position = 0;
-                using (Image image = Image.Load(stream))
+                using var bytes = SKData.Create(stream);
+                using var codec = SKCodec.Create(bytes);
+                if (codec == null)
                 {
-                    // ImageSharp 3.x: the out-format Load overload was removed — the decoded format
-                    // now lives on Metadata, and Save takes an encoder rather than a format.
-                    IImageFormat format = image.Metadata.DecodedImageFormat;
-                    image.Mutate(x => x.Resize(size, 0));
-                    using (Stream outputStream = new MemoryStream())
-                    {
-                        IImageEncoder encoder = image.Configuration.ImageFormatsManager.GetEncoder(
-                            format
-                        );
-                        image.Save(outputStream, encoder);
-                        outputStream.Position = 0;
-                        var blob = await Upload(outputStream, thumbBlobReference);
-                        url = blob.Uri.ToUrlString();
-                    }
+                    return media.Url;
                 }
+
+                using var source = SKBitmap.Decode(bytes);
+                if (source == null)
+                {
+                    return media.Url;
+                }
+
+                int height = Math.Max(
+                    1,
+                    (int)Math.Round((double)source.Height * size / source.Width)
+                );
+                using var resized = source.Resize(
+                    new SKImageInfo(size, height, source.ColorType, source.AlphaType),
+                    new SKSamplingOptions(SKCubicResampler.Mitchell)
+                );
+                if (resized == null)
+                {
+                    return media.Url;
+                }
+
+                // Skia only encodes JPEG, PNG and WebP, so every other decoded format becomes a PNG.
+                var encodeFormat = codec.EncodedFormat is SKEncodedImageFormat.Jpeg
+                    or SKEncodedImageFormat.Png
+                    or SKEncodedImageFormat.Webp
+                    ? codec.EncodedFormat
+                    : SKEncodedImageFormat.Png;
+                string fileExt =
+                    encodeFormat == codec.EncodedFormat ? Path.GetExtension(media.Url) : ".png";
+                string thumbBlobReference = $"{media.Path}/{fileName}{prefix}{fileExt}";
+                using var data = resized.Encode(encodeFormat, 90);
+                if (data == null)
+                {
+                    return media.Url;
+                }
+
+                using Stream outputStream = data.AsStream();
+                var blob = await Upload(outputStream, thumbBlobReference);
+                url = blob.Uri.ToUrlString();
 
                 return url;
             }

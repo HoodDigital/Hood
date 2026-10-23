@@ -42,6 +42,7 @@ namespace Hood.Extensions
                 case "image/gif":
                 case "image/jpeg":
                 case "image/png":
+                case "image/webp":
                 case "image/bmp":
                 case "image/tiff":
                     return GenericFileType.Image;
