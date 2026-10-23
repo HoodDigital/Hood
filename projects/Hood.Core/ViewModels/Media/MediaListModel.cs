@@ -11,7 +11,7 @@ namespace Hood.ViewModels
     {
         public MediaListModel()
         {
-            Restrict = ".pdf,.gif,.png,.jpg,.jpeg";
+            Restrict = ".pdf,.gif,.png,.jpg,.jpeg,.webp";
         }
 
         [FromQuery(Name = "user")]

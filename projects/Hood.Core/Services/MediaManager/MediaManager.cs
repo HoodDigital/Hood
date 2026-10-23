@@ -14,9 +14,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
-using SixLabors.ImageSharp.Processing;
+using SkiaSharp;
 
 namespace Hood.Services
 {
@@ -275,55 +273,131 @@ namespace Hood.Services
         {
             HttpClient client = new HttpClient();
             var response = await client.GetAsync(media.Url);
-            using (var fs = new MemoryStream())
+            using var fs = new MemoryStream();
+            await response.Content.CopyToAsync(fs);
+
+            SKBitmap source = null;
+            var format = SKEncodedImageFormat.Png;
+            try
             {
-                await response.Content.CopyToAsync(fs);
-                media.ThumbUrl = await GenerateThumb(media, fs, ".xs", 250);
-                media.SmallUrl = await GenerateThumb(media, fs, ".sm", 600);
-                media.MediumUrl = await GenerateThumb(media, fs, ".md", 1280);
-                media.LargeUrl = await GenerateThumb(media, fs, ".xl", 1920);
+                using var data = SKData.CreateCopy(fs.ToArray());
+                using var codec = SKCodec.Create(data);
+                if (codec != null)
+                {
+                    format = codec.EncodedFormat;
+                    using var decoded = SKBitmap.Decode(codec);
+                    source = Orient(decoded, codec.EncodedOrigin);
+                }
+            }
+            catch (Exception ex)
+            {
+                await Engine.Logs.AddExceptionAsync<MediaManager>(
+                    "Failed to read an uploaded image, using the original in place of thumbnails.",
+                    ex,
+                    LogType.Warning
+                );
+            }
+
+            using (source)
+            {
+                media.ThumbUrl = await GenerateThumb(media, source, format, ".xs", 250);
+                media.SmallUrl = await GenerateThumb(media, source, format, ".sm", 600);
+                media.MediumUrl = await GenerateThumb(media, source, format, ".md", 1280);
+                media.LargeUrl = await GenerateThumb(media, source, format, ".xl", 1920);
             }
             return media;
         }
 
+        // Skia ignores the EXIF orientation tag, and its re-encoded thumbnails carry none.
+        private static SKBitmap Orient(SKBitmap bitmap, SKEncodedOrigin origin)
+        {
+            if (bitmap == null || origin == SKEncodedOrigin.TopLeft)
+            {
+                return bitmap?.Copy();
+            }
+
+            float w = bitmap.Width;
+            float h = bitmap.Height;
+            var matrix = origin switch
+            {
+                SKEncodedOrigin.TopRight => new SKMatrix(-1, 0, w, 0, 1, 0, 0, 0, 1),
+                SKEncodedOrigin.BottomRight => new SKMatrix(-1, 0, w, 0, -1, h, 0, 0, 1),
+                SKEncodedOrigin.BottomLeft => new SKMatrix(1, 0, 0, 0, -1, h, 0, 0, 1),
+                SKEncodedOrigin.LeftTop => new SKMatrix(0, 1, 0, 1, 0, 0, 0, 0, 1),
+                SKEncodedOrigin.RightTop => new SKMatrix(0, -1, h, 1, 0, 0, 0, 0, 1),
+                SKEncodedOrigin.RightBottom => new SKMatrix(0, -1, h, -1, 0, w, 0, 0, 1),
+                SKEncodedOrigin.LeftBottom => new SKMatrix(0, 1, 0, -1, 0, w, 0, 0, 1),
+                _ => SKMatrix.Identity,
+            };
+            bool swap = origin >= SKEncodedOrigin.LeftTop;
+            var oriented = new SKBitmap(
+                bitmap.Info.WithSize(
+                    swap ? bitmap.Height : bitmap.Width,
+                    swap ? bitmap.Width : bitmap.Height
+                )
+            );
+            using var canvas = new SKCanvas(oriented);
+            canvas.SetMatrix(matrix);
+            using var image = SKImage.FromBitmap(bitmap);
+            canvas.DrawImage(image, 0, 0, new SKSamplingOptions(SKFilterMode.Nearest));
+            return oriented;
+        }
+
         private async Task<string> GenerateThumb(
             IMediaObject media,
-            Stream stream,
+            SKBitmap source,
+            SKEncodedImageFormat format,
             string prefix,
             int size
         )
         {
+            if (source == null)
+            {
+                return media.Url;
+            }
+
             try
             {
-                string url;
-
                 string fileName = Path.GetFileNameWithoutExtension(media.Url);
-                string fileExt = Path.GetExtension(media.Url);
-                string thumbBlobReference = $"{media.Path}/{fileName}{prefix}{fileExt}";
-                stream.Position = 0;
-                using (Image image = Image.Load(stream))
+                int height = Math.Max(
+                    1,
+                    (int)Math.Round((double)source.Height * size / source.Width)
+                );
+                using var resized = source.Resize(
+                    source.Info.WithSize(size, height),
+                    new SKSamplingOptions(SKCubicResampler.Mitchell)
+                );
+                if (resized == null)
                 {
-                    // ImageSharp 3.x: the out-format Load overload was removed — the decoded format
-                    // now lives on Metadata, and Save takes an encoder rather than a format.
-                    IImageFormat format = image.Metadata.DecodedImageFormat;
-                    image.Mutate(x => x.Resize(size, 0));
-                    using (Stream outputStream = new MemoryStream())
-                    {
-                        IImageEncoder encoder = image.Configuration.ImageFormatsManager.GetEncoder(
-                            format
-                        );
-                        image.Save(outputStream, encoder);
-                        outputStream.Position = 0;
-                        var blob = await Upload(outputStream, thumbBlobReference);
-                        url = blob.Uri.ToUrlString();
-                    }
+                    return media.Url;
                 }
 
-                return url;
+                // Skia only encodes JPEG, PNG and WebP, so every other decoded format becomes a PNG.
+                var encodeFormat = format
+                    is SKEncodedImageFormat.Jpeg
+                        or SKEncodedImageFormat.Png
+                        or SKEncodedImageFormat.Webp
+                    ? format
+                    : SKEncodedImageFormat.Png;
+                string fileExt = encodeFormat == format ? Path.GetExtension(media.Url) : ".png";
+                string thumbBlobReference = $"{media.Path}/{fileName}{prefix}{fileExt}";
+                using var data = resized.Encode(encodeFormat, 90);
+                if (data == null)
+                {
+                    return media.Url;
+                }
+
+                using Stream outputStream = data.AsStream();
+                var blob = await Upload(outputStream, thumbBlobReference);
+                return blob.Uri.ToUrlString();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Thumbnailing failed, just send back the Url.
+                await Engine.Logs.AddExceptionAsync<MediaManager>(
+                    "Failed to generate a thumbnail, using the original.",
+                    ex,
+                    LogType.Warning
+                );
                 return media.Url;
             }
         }
