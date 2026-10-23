@@ -33,8 +33,9 @@
       Version="10.0.13"
     />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.13" />
-    <!-- Keep Design on the same version as the EF runtime: `dotnet ef` breaks when it loads a
-         Design assembly from an older EF against the EF 10 runtime. -->
+    <!-- Pin Design to the EF runtime version rather than relying on the floor Tools sets for it,
+         which can trail the runtime: `dotnet ef` breaks when it loads an older Design assembly
+         against the EF 10 runtime. -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
