@@ -54,7 +54,7 @@ namespace Hood.Caching
             try
             {
                 string json = JsonConvert.SerializeObject(cacheItem);
-                Database.StringSet(key, json, expiry);
+                Database.StringSet(key, json, ToExpiration(expiry));
             }
             catch (JsonSerializationException) { }
         }
@@ -64,10 +64,13 @@ namespace Hood.Caching
             try
             {
                 string json = JsonConvert.SerializeObject(cacheItem);
-                await Database.StringSetAsync(key, json, expiry);
+                await Database.StringSetAsync(key, json, ToExpiration(expiry));
             }
             catch (JsonSerializationException) { }
         }
+
+        private static Expiration ToExpiration(TimeSpan? expiry) =>
+            expiry.HasValue ? new Expiration(expiry.Value) : Expiration.Default;
 
         public void Remove(string key)
         {
