@@ -1,24 +1,16 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
-  "mode": "full",
-  "dependencyDashboard": true,
-  "configMigration": true,
-  "semanticCommits": "disabled",
-  "commitMessageTopic": "{{depName}}",
-  "labels": ["dependencies"],
-  "minimumReleaseAge": "3 days",
-  "internalChecksFilter": "strict",
-  "prConcurrentLimit": 10,
-  "prHourlyLimit": 2,
-  "major": {
-    "dependencyDashboardApproval": true
-  },
-  "vulnerabilityAlerts": {
-    "enabled": true,
-    "labels": ["dependencies", "security"]
-  },
-  "osvVulnerabilityAlerts": true,
+  "extends": ["github>HoodDigital/renovate-config"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "HoodCMS frontend version the Docker image installs",
+      "managerFilePatterns": ["/(^|/)Dockerfile$/"],
+      "matchStrings": ["ARG HOODCMS_VERSION=(?<currentValue>\\S+)"],
+      "datasourceTemplate": "npm",
+      "depNameTemplate": "hoodcms"
+    }
+  ],
   "packageRules": [
     {
       "groupName": ".NET runtime",
@@ -32,10 +24,6 @@
     {
       "groupName": "Test and build tooling",
       "matchPackageNames": ["/^xunit/", "Microsoft.NET.Test.Sdk", "Xunit.SkippableFact", "/csharpier/i", "/resharper/i", "/jetbrains/i"]
-    },
-    {
-      "groupName": "Auth0",
-      "matchPackageNames": ["/^Auth0\\./"]
     },
     {
       "groupName": "Azure",
