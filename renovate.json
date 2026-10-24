@@ -1,24 +1,16 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
-  "mode": "full",
-  "dependencyDashboard": true,
-  "configMigration": true,
-  "semanticCommits": "disabled",
-  "commitMessageTopic": "{{depName}}",
-  "labels": ["dependencies"],
-  "minimumReleaseAge": "3 days",
-  "internalChecksFilter": "strict",
-  "prConcurrentLimit": 10,
-  "prHourlyLimit": 2,
-  "major": {
-    "dependencyDashboardApproval": true
-  },
-  "vulnerabilityAlerts": {
-    "enabled": true,
-    "labels": ["dependencies", "security"]
-  },
-  "osvVulnerabilityAlerts": true,
+  "extends": ["github>HoodDigital/renovate-config"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "HoodCMS frontend version the Docker image installs",
+      "managerFilePatterns": ["/(^|/)Dockerfile$/"],
+      "matchStrings": ["ARG HOODCMS_VERSION=(?<currentValue>\\S+)"],
+      "datasourceTemplate": "npm",
+      "depNameTemplate": "hoodcms"
+    }
+  ],
   "packageRules": [
     {
       "groupName": ".NET runtime",
@@ -34,8 +26,11 @@
       "matchPackageNames": ["/^xunit/", "Microsoft.NET.Test.Sdk", "Xunit.SkippableFact", "/csharpier/i", "/resharper/i", "/jetbrains/i"]
     },
     {
+      "description": "Adds the ASP.NET Core integration to the preset's Auth0 group.",
       "groupName": "Auth0",
-      "matchPackageNames": ["/^Auth0\\./"]
+      "matchManagers": ["nuget"],
+      "matchPackageNames": ["Auth0.AspNetCore.Authentication"],
+      "separateMajorMinor": false
     },
     {
       "groupName": "Azure",
@@ -50,5 +45,5 @@
       "matchManagers": ["npm"]
     }
   ],
-  "prBodyTemplate": "## Overview\n\n{{{table}}}\n\n## What Changed and Why\n\nRoutine dependency currency — always latest stable, aged at least 3 days before raising.\n\n{{{notes}}}\n{{{changelogs}}}\n\n## Tests\n\nAutomated — CI (Validate code, Build & test) gates this change; no source changes beyond the dependency.\n\n## Breaking Changes\n\n{{#if isMajor}}⚠️ Major version update — review the release notes above before merging.{{else}}None.{{/if}}\n\n## Testing Plan\n\n- [ ] CI green\n- [ ] Release notes reviewed\n- [ ] Bedded in (routine) / triaged (security)\n\n{{{controls}}}\n{{{footer}}}"
+  "prBodyTemplate": "## Overview\n\n{{{table}}}\n\n## What Changed and Why\n\nRoutine dependency currency — always latest stable. Routine updates wait 3 days after release; security fixes, Auth0 and Docker image updates skip that wait.\n\n{{{notes}}}\n{{{changelogs}}}\n\n## Tests\n\nAutomated — CI (Validate code, Build & test) gates this change; no source changes beyond the dependency.\n\n## Breaking Changes\n\n{{#if isMajor}}⚠️ Major version update — review the release notes above before merging.{{else}}None.{{/if}}\n\n## Testing Plan\n\n- [ ] CI green\n- [ ] Release notes reviewed\n- [ ] Bedded in (routine) / triaged (security)\n\n{{{controls}}}\n{{{footer}}}"
 }
