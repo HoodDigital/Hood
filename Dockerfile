@@ -16,7 +16,7 @@
 # ---------------------------------------------------------------------------
 # Stage 1: restore (cached unless a .csproj or the .sln changes)
 # ---------------------------------------------------------------------------
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0@sha256:212fe4cb74627d5adf9817a4088906ae3edff1bd853bb27565d4b46731efe61e AS build
 WORKDIR /src
 
 # Copy solution + central build files + every project file first so restore layers cache well.
@@ -46,7 +46,7 @@ RUN dotnet publish projects/Hood.Development/Hood.Development.csproj \
 # ---------------------------------------------------------------------------
 # Stage 3: frontend assets (the `hoodcms` npm package — Hood's core CSS/JS)
 # ---------------------------------------------------------------------------
-FROM node:20-alpine AS frontend
+FROM node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 AS frontend
 ARG HOODCMS_VERSION=6.1.8
 WORKDIR /fe
 # `npm pack` downloads the published tarball without installing anything; extracting
@@ -56,7 +56,7 @@ RUN npm pack hoodcms@${HOODCMS_VERSION} && tar -xzf hoodcms-*.tgz
 # ---------------------------------------------------------------------------
 # Stage 4: runtime image
 # ---------------------------------------------------------------------------
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0@sha256:1a48394b6f29d3a32c79d9edecd4abda0ecbe8776d567dbfc4590ed6979c740c AS final
 WORKDIR /app
 EXPOSE 8080
 

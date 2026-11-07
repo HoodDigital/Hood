@@ -9,7 +9,7 @@
 # See docs/docker.md for the full walkthrough.
 services:
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: mcr.microsoft.com/mssql/server:2022-latest@sha256:cf8f0ab2ebe61feec2eed2629061a07d247f791c2a8ddda74a4ac9f06a291718
     container_name: hood-sqlserver
     hostname: sqlserver
     environment:
@@ -34,7 +34,7 @@ services:
   # One-shot: create an empty Hood.Web database so the app boots (it tolerates an
   # unseeded DB, but not a missing one). Schema + seed are applied separately.
   db-init:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: mcr.microsoft.com/mssql/server:2022-latest@sha256:cf8f0ab2ebe61feec2eed2629061a07d247f791c2a8ddda74a4ac9f06a291718
     container_name: hood-db-init
     depends_on:
       sqlserver:
