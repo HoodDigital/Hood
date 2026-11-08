@@ -1,6 +1,6 @@
 namespace Hood.Identity
 {
-    public class Authentication
+    public static class Authentication
     {
         public const string CookieDefaultName = "hoodcms";
         public const string ReturnUrlParameter = "returnurl";

@@ -1,6 +1,6 @@
 namespace Hood.Constants.Identity
 {
-    public class ClaimTypes
+    public static class ClaimTypes
     {
         public const string AccountNotConnected =
             "https://schemas.hooddigital.com/hoodcms/account-not-connected";

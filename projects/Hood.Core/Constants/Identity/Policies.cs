@@ -1,6 +1,6 @@
 namespace Hood.Constants.Identity
 {
-    public class Policies
+    public static class Policies
     {
         public const string AccountLinkRequired = "hoodcms-account-link-required";
         public const string AccountNotConnected = "hoodcms-account-not-connected";
