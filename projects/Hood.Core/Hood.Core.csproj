@@ -16,31 +16,31 @@
     <PackageReference Include="BundlerMinifier.Core" Version="3.2.449" />
     <PackageReference Include="Geocoding.Core" Version="4.0.1" />
     <PackageReference Include="Geocoding.Google" Version="4.0.1" />
-    <PackageReference Include="Google.Cloud.RecaptchaEnterprise.V1" Version="2.20.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.13" />
+    <PackageReference Include="Google.Cloud.RecaptchaEnterprise.V1" Version="2.21.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.14" />
     <PackageReference
       Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore"
-      Version="10.0.13"
+      Version="10.0.14"
     />
     <PackageReference
       Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore"
-      Version="10.0.13"
+      Version="10.0.14"
     />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="10.0.13" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="10.0.14" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.14" />
     <PackageReference
       Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation"
-      Version="10.0.13"
+      Version="10.0.14"
     />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.14" />
     <!-- Pin Design to the EF runtime version rather than relying on the floor Tools sets for it,
          which can trail the runtime: `dotnet ef` breaks when it loads an older Design assembly
          against the EF 10 runtime. -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.13">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.14">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -48,10 +48,13 @@
     <PackageReference Include="RestSharp" Version="106.15.0" />
     <PackageReference Include="Sendgrid" Version="9.29.3" />
     <PackageReference Include="SharpZipLib" Version="1.4.2" />
-    <PackageReference Include="SkiaSharp" Version="4.153.1" />
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.153.1" />
-    <PackageReference Include="StackExchange.Redis" Version="2.13.17" />
+    <PackageReference Include="SkiaSharp" Version="4.154.0" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.154.0" />
+    <PackageReference Include="StackExchange.Redis" Version="2.13.23" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
+    <!-- Microsoft.Data.SqlClient 6.1.7 resolves Pkcs 9.0.11, which GHSA-846f-f764-76mx and
+         GHSA-2fmv-rv2c-59x7 flag. Raise the floor to the patched 10.0 line until SqlClient does. -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
     <PackageReference Include="unsplasharp.api" Version="0.7.0" />
   </ItemGroup>
   <!-- The repo-root sql tier scripts are embedded so the Hood.Core NuGet carries its own schema.
